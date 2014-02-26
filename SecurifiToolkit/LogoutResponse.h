@@ -10,5 +10,6 @@
 
 @interface LogoutResponse : NSObject
 @property BOOL isSuccessful;
-@property NSString *Reason;
+@property NSString *reason;
+@property int reasonCode;
 @end

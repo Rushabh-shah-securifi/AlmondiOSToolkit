@@ -14,17 +14,17 @@
 #import <UIKit/UIKit.h>
 #import "SNLog.h"
 
-NSString *const tmpPwdKey = @"tempPasswordPrefKey";
-NSString *const usrIDKey = @"userIDPrefKey";
 
 Reachability* hostReach;
 dispatch_queue_t bgQueue;
 
+#define SDK_UNINITIALIZED 0
 #define NETWORK_DOWN   1
 #define NOT_LOGGED_IN   2
 #define LOGGED_IN       3
 #define LOGGING  4
 #define INITIALIZING  5
+#define CLOUD_CONNECTION_ENDED  6
 
 @implementation SecurifiToolkit
 
@@ -39,7 +39,7 @@ dispatch_queue_t bgQueue;
 
 +(id)initSDK
 {
-    NSLog(@"INIT SDK - PRIA");
+    NSLog(@"INIT SDK");
    
     [SingleTon removeSingletonObject];
     [SingleTon createSingletonObj];
@@ -76,13 +76,13 @@ dispatch_queue_t bgQueue;
             //Send Temppass command
             @try{
                 NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-                if ([prefs objectForKey:tmpPwdKey] && [prefs objectForKey:usrIDKey])
+                if ([prefs objectForKey:PASSWORD] && [prefs objectForKey:USERID])
                 {
                     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
                     LoginTempPass *loginCommand = [[LoginTempPass alloc] init];
                     
-                    loginCommand.UserID =  [prefs objectForKey:usrIDKey];
-                    loginCommand.TempPass = [prefs objectForKey:tmpPwdKey];
+                    loginCommand.UserID =  [prefs objectForKey:USERID];
+                    loginCommand.TempPass = [prefs objectForKey:PASSWORD];
                     
                     cloudCommand.commandType=LOGIN_TEMPPASS_COMMAND;
                     cloudCommand.command=loginCommand;
@@ -112,8 +112,8 @@ dispatch_queue_t bgQueue;
                     NSLog(@"TempPass not found in preferences");
                     //// [SNLog Log:@"Method Name: %s TempPass not found in preferences", __PRETTY_FUNCTION__];
                     //Send notification so that App can display Login / Password screen
+                    //[SecurifiToolkit initSDKCloud];
                     [socket setConnectionState:NOT_LOGGED_IN];
-                    
                     [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:nil];
                     //return @"yes";
                 }
@@ -157,6 +157,103 @@ dispatch_queue_t bgQueue;
     //return @"yes";
 }
 
+
+//+(id)initReconnectSDK
+//{
+//    NSLog(@"INIT Reconnect SDK");
+//    
+//    [SingleTon removeSingletonObject];
+//    [SingleTon createSingletonObj];
+//    dispatch_queue_t cloudReconnectQueue;
+//    if(!cloudReconnectQueue){
+//        cloudReconnectQueue = dispatch_queue_create("command_reconnect_queue", DISPATCH_QUEUE_SERIAL);
+//    }
+//
+//    //Start a Async task of sending Sanity command and TempPassCommand and return YES
+//    //Asynch task will send command and will generate respective events
+//    
+//    dispatch_async(cloudReconnectQueue, ^(void) {
+//        
+//        SingleTon *socket = [SingleTon getObject];
+//        [socket setConnectionState:CLOUD_CONNECTION_ENDED];
+//        
+////        GenericCommand *sanityCommand = [[GenericCommand alloc] init];
+////        sanityCommand.commandType=CLOUD_SANITY;
+////        sanityCommand.command=nil;
+////        
+////        NSError *error;
+////        id ret = nil;
+////        ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
+////        sanityCommand=nil;
+////        
+////        if (ret != nil)
+////        {
+//            //// [SNLog Log:@"Method Name: %s initSDK - Send Sanity Successful", __PRETTY_FUNCTION__];
+//            //Send Temppass command
+//            @try{
+//                NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+//                if ([prefs objectForKey:PASSWORD] && [prefs objectForKey:USERID])
+//                {
+//                    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+//                    LoginTempPass *loginCommand = [[LoginTempPass alloc] init];
+//                    
+//                    loginCommand.UserID =  [prefs objectForKey:USERID];
+//                    loginCommand.TempPass = [prefs objectForKey:PASSWORD];
+//                    
+//                    cloudCommand.commandType=LOGIN_TEMPPASS_COMMAND;
+//                    cloudCommand.command=loginCommand;
+//                    
+//                    NSError *error;
+//                    id ret = nil;
+//                    ret = [SecurifiToolkit sendtoCloud:cloudCommand error:&error];
+//                    if (ret != nil)
+//                    {
+//                        NSLog(@"init Reconnect SDK - Temp login sent");
+//                        //// [SNLog Log:@"Method Name: %s initSDK - Temp login sent", __PRETTY_FUNCTION__];
+//                        [socket setConnectionState:LOGGING];
+//                        //return @"yes";
+//                    }
+//                    else
+//                    {
+//                        NSLog(@"Error : %@",[error localizedDescription]);
+//                        //// [SNLog Log:@"Method Name: %s Error : %@", __PRETTY_FUNCTION__,[error localizedDescription]];
+//                        [socket setConnectionState:NETWORK_DOWN];
+//                        //return nil;
+//                    }
+//                    cloudCommand=nil;
+//                    loginCommand=nil;
+//                }
+//                else
+//                {
+//                    NSLog(@"TempPass not found in preferences");
+//                    //// [SNLog Log:@"Method Name: %s TempPass not found in preferences", __PRETTY_FUNCTION__];
+//                    //Send notification so that App can display Login / Password screen
+//                    //[SecurifiToolkit initSDKCloud];
+//                    [socket setConnectionState:NOT_LOGGED_IN];
+//                    [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:nil];
+//                    //return @"yes";
+//                }
+//            }
+//            @catch (NSException *e) {
+//                NSLog(@" Network Down %@", e.reason);
+//                //// [SNLog Log:@"Method Name: %s Network Down %@", __PRETTY_FUNCTION__,e.reason];
+//            }
+////        }
+////        else
+////        {
+////            //// [SNLog Log:@"Method Name: %s Error : %@", __PRETTY_FUNCTION__,[error localizedDescription]];
+////            
+////            [socket setConnectionState:NETWORK_DOWN];
+////            //return nil;
+////        }
+//    });
+//
+//    
+//    
+//    return @"Yes";
+//    
+//}
+
 +(NSInteger)getConnectionState
 {
     SingleTon *socket = [SingleTon getObject];
@@ -183,7 +280,7 @@ dispatch_queue_t bgQueue;
 +(id)initSDKCloud
 {
     
-    
+    NSLog(@"Init Cloud");
     [SingleTon removeSingletonObject];
     [SingleTon createSingletonObj];
     dispatch_queue_t cloudQueue;
@@ -315,11 +412,12 @@ dispatch_queue_t bgQueue;
                         // [SNLog Log:@"Method Name: %s Sending LOGIN COMMAND",__PRETTY_FUNCTION__];
                         Login *ob1 = (Login *)obj.command;
                         commandPayload = [NSString stringWithFormat:FRESH_LOGIN_REQUEST_XML,ob1.UserID,ob1.Password];
-                        commandLength = (uint32_t)htonl([commandPayload length]);
+                        
                         
                         commandType= (uint32_t)htonl(LOGIN_COMMAND);
                         
                         sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                        commandLength = (uint32_t)htonl([sendCommandPayload length]);
                         obj=nil;
                         ob1=nil;
                     }
@@ -330,12 +428,12 @@ dispatch_queue_t bgQueue;
                     // [SNLog Log:@"Method Name: %s Sending LOGIN_TEMPPASS_COMMAND",__PRETTY_FUNCTION__];
                     LoginTempPass *ob1 = (LoginTempPass *)obj.command;
                     commandPayload = [NSString stringWithFormat:LOGIN_REQUEST_XML,ob1.UserID,ob1.TempPass];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     //Cloud has switch for both command as LOGIN_COMMAND
                     commandType= (uint32_t)htonl(LOGIN_COMMAND);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     ob1=nil;
                 }
@@ -345,33 +443,36 @@ dispatch_queue_t bgQueue;
                     // [SNLog Log:@"Method Name: %s Sending LOGOUT COMMAND",__PRETTY_FUNCTION__];
                     Logout *ob1 = (Logout *)obj.command;
                     commandPayload = [NSString stringWithFormat:LOGOUT_REQUEST_XML];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     //Cloud has switch for both command as LOGIN_COMMAND
                     commandType= (uint32_t)htonl(LOGOUT_COMMAND);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     ob1=nil;
+                    
+                    //PY 250214 - Logout Response will be received now
                     //Remove preferences
-                    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-                    
-                    // [SNLog Log:@"Method Name: %s TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
-                    [prefs removeObjectForKey:tmpPwdKey];
-                    [prefs removeObjectForKey:usrIDKey];
-                    [prefs synchronize];
-                    // [SNLog Log:@"Method Name: %s After delete\n",__PRETTY_FUNCTION__];
-                    // [SNLog Log:@"Method Name: %s TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
-                    
-                    [socket setConnectionState:NOT_LOGGED_IN];
-                    
-                    //PY 160913 - Reconnect to cloud
-                    id ret = [SecurifiToolkit initSDKCloud];
-                    if (ret == nil)
-                    {
-                        // [SNLog Log:@"Method Name: %s APP Delegate : SDKInit Error",__PRETTY_FUNCTION__];
-                    }
-                    
+//                    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+//                    
+//                    // [SNLog Log:@"Method Name: %s TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
+//                    [prefs removeObjectForKey:tmpPwdKey];
+//                    [prefs removeObjectForKey:usrIDKey];
+//                    [prefs synchronize];
+//                    // [SNLog Log:@"Method Name: %s After delete\n",__PRETTY_FUNCTION__];
+//                    // [SNLog Log:@"Method Name: %s TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
+//                    
+//                    [socket setConnectionState:NOT_LOGGED_IN];
+//                    
+//                    //PY 160913 - Reconnect to cloud
+//                    id ret = [SecurifiToolkit initSDKCloud];
+//                    if (ret == nil)
+//                    {
+//                        // [SNLog Log:@"Method Name: %s APP Delegate : SDKInit Error",__PRETTY_FUNCTION__];
+//                    }
+//                    
                     
                 }
                     break;
@@ -380,11 +481,12 @@ dispatch_queue_t bgQueue;
                     // [SNLog Log:@"Method Name: %s Sending SIGNUP Command",__PRETTY_FUNCTION__];
                     Signup *ob1 = (Signup *)obj.command;
                     commandPayload = [NSString stringWithFormat:SIGNUP_REQUEST_XML,ob1.UserID,ob1.Password];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(SIGNUP_COMMAND);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     ob1=nil;
                 }
@@ -394,11 +496,12 @@ dispatch_queue_t bgQueue;
                 {
                     // [SNLog Log:@"Method Name: %s Sending CLOUD_SANITY Command",__PRETTY_FUNCTION__];
                     commandPayload =[NSString stringWithFormat:CLOUDSANITY_REQUEST_XML];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(CLOUD_SANITY);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                 }
                     break;
@@ -407,11 +510,12 @@ dispatch_queue_t bgQueue;
                     // [SNLog Log:@"Method Name: %s Sending Affiliation Code request",__PRETTY_FUNCTION__];
                     AffiliationUserRequest *affiliationObj = (AffiliationUserRequest*)obj.command;
                     commandPayload =[NSString stringWithFormat:AFFILIATION_CODE_REQUEST_XML,affiliationObj.Code];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(AFFILIATION_CODE_REQUEST);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                 }
                     break;
                 case LOGOUT_ALL_COMMAND:
@@ -427,11 +531,12 @@ dispatch_queue_t bgQueue;
                     
                     LogoutAllRequest *logoutAllObj = (LogoutAllRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:LOGOUT_ALL_REQUEST_XML,logoutAllObj.UserID,logoutAllObj.Password];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(LOGOUT_ALL_COMMAND);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     logoutAllObj=nil;
                 }
@@ -444,11 +549,13 @@ dispatch_queue_t bgQueue;
                     
                     //AlmondListRequest *logoutAllObj = (AlmondListRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:ALMOND_LIST_REQUEST_XML];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(ALMOND_LIST);
                     
+                    
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     //logoutAllObj=nil;
                 }
@@ -463,11 +570,12 @@ dispatch_queue_t bgQueue;
                     
                     DeviceDataHashRequest *deviceDataHashObj = (DeviceDataHashRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:DEVICE_DATA_HASH_REQUEST_XML,deviceDataHashObj.almondMAC];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(DEVICEDATA_HASH);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     deviceDataHashObj=nil;
                 }
@@ -482,11 +590,12 @@ dispatch_queue_t bgQueue;
                     
                     DeviceListRequest *deviceDataObj = (DeviceListRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:DEVICE_DATA_REQUEST_XML,deviceDataObj.almondMAC];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(DEVICEDATA);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     deviceDataObj=nil;
                 }
@@ -501,11 +610,12 @@ dispatch_queue_t bgQueue;
                     
                     DeviceValueRequest *deviceValueObj = (DeviceValueRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:DEVICE_VALUE_REQUEST_XML,deviceValueObj.almondMAC];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(DEVICE_VALUE);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     deviceValueObj=nil;
                 }
@@ -525,7 +635,8 @@ dispatch_queue_t bgQueue;
                     
                     MobileCommandRequest *mobileCommandObj = (MobileCommandRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:MOBILE_COMMAND_REQUEST_XML,mobileCommandObj.almondMAC, mobileCommandObj.deviceID, mobileCommandObj.indexID, mobileCommandObj.changedValue, mobileCommandObj.internalIndex];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    NSLog(@"Command length %d", [commandPayload length]);
+                    
                     
                     //PY 290114: Replacing the \" (backslash quotes) in the string to just " (quotes).
                     //When we are using string obfuscation the decoded string has the \ escape character with it.
@@ -536,6 +647,8 @@ dispatch_queue_t bgQueue;
                     commandType= (uint32_t)htonl(MOBILE_COMMAND);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    NSLog(@"Payload Command length %d", [sendCommandPayload length]);
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     mobileCommandObj=nil;
                 }
@@ -564,11 +677,12 @@ dispatch_queue_t bgQueue;
                     NSString *encodedString = [[NSString alloc] initWithData:encodedData encoding:NSUTF8StringEncoding];
                     
                     commandPayload = [NSString stringWithFormat:GENERIC_COMMAND_REQUEST_XML,genericCommandObj.almondMAC, genericCommandObj.applicationID, genericCommandObj.mobileInternalIndex, encodedString];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(GENERIC_COMMAND_REQUEST);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     genericCommandObj=nil;
                 }
@@ -587,11 +701,12 @@ dispatch_queue_t bgQueue;
                     
                     ValidateAccountRequest *validateObj = (ValidateAccountRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:VALIDATE_REQUEST_XML,validateObj.email];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(VALIDATE_REQUEST);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     validateObj=nil;
                 }
@@ -609,11 +724,12 @@ dispatch_queue_t bgQueue;
                     
                     ResetPasswordRequest *resetPwdObj = (ResetPasswordRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:RESET_PWD_REQUEST_XML,resetPwdObj.email];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     commandType= (uint32_t)htonl(RESET_PASSWORD_REQUEST);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     resetPwdObj=nil;
                 }
@@ -631,13 +747,14 @@ dispatch_queue_t bgQueue;
                     
                     SensorForcedUpdateRequest *forcedUpdateObj = (SensorForcedUpdateRequest *)obj.command;
                     commandPayload = [NSString stringWithFormat:SENSOR_FORCED_UPDATE_REQUEST_XML,forcedUpdateObj.almondMAC, forcedUpdateObj.mobileInternalIndex];
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     
                     //Send as Command 61
                     commandType= (uint32_t)htonl(MOBILE_COMMAND);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     forcedUpdateObj=nil;
                     
@@ -669,7 +786,7 @@ dispatch_queue_t bgQueue;
                     }else{
                     commandPayload = [NSString stringWithFormat:SENSOR_CHANGE_REQUEST_XML,sensorChangeObj.almondMAC, sensorChangeObj.deviceID, sensorChangeObj.changedName, sensorChangeObj.changedLocation, sensorChangeObj.mobileInternalIndex];
                     }
-                    commandLength = (uint32_t)htonl([commandPayload length]);
+                    //commandLength = (uint32_t)htonl([commandPayload length]);
                     
                     //PY 290114: Replacing the \" (backslash quotes) in the string to just " (quotes).
                     //When we are using string obfuscation the decoded string has the \ escape character with it.
@@ -683,6 +800,7 @@ dispatch_queue_t bgQueue;
                     commandType= (uint32_t)htonl(MOBILE_COMMAND);
                     
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    commandLength = (uint32_t)htonl([sendCommandPayload length]);
                     obj=nil;
                     sensorChangeObj=nil;
                     
@@ -694,6 +812,8 @@ dispatch_queue_t bgQueue;
             }
             //isLoggedin might be set to 1 if we miss the TCP termination callback
             //Check on each write if it fails set isLoggedin to
+            
+            NSLog(@"@Payload being sent: %@", sendCommandPayload);
             
             obj=nil;
             NSStreamStatus type;
@@ -707,26 +827,27 @@ dispatch_queue_t bgQueue;
             
             // [SNLog Log:@"Method Name: %s Out of stream type check loop : %d",__PRETTY_FUNCTION__,type];
             
-            if (-1 == [socket.outputStream write:(uint8_t *)&commandLength maxLength:4])
-            {
-                socket.isLoggedin = NO;
-                NSMutableDictionary* details = [NSMutableDictionary dictionary];
-                [details setValue:@"Securifi - Send Error" forKey:NSLocalizedDescriptionKey];
-                *outError=[NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
-                
-                if ([socket disableNetworkDownNotification] == NO)
+            if(socket.outputStream !=nil){
+                if (-1 == [socket.outputStream write:(uint8_t *)&commandLength maxLength:4])
                 {
-                    //PUSH Notify NetworkDOWN
-                    // [SNLog Log:@"Method Name: %s From First Write ",__PRETTY_FUNCTION__];
+                    socket.isLoggedin = NO;
+                    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+                    [details setValue:@"Securifi Length - Send Error" forKey:NSLocalizedDescriptionKey];
+                    *outError=[NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
                     
-                    [socket setSendCommandFail:YES];
-                    [socket setIsStreamConnected:NO];
-                    
-                    [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
+                    if ([socket disableNetworkDownNotification] == NO)
+                    {
+                        //PUSH Notify NetworkDOWN
+                        // [SNLog Log:@"Method Name: %s From First Write ",__PRETTY_FUNCTION__];
+                        
+                        [socket setSendCommandFail:YES];
+                        [socket setIsStreamConnected:NO];
+                        
+                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
+                    }
+                    return nil;
                 }
-                return nil;
             }
-            
             /*
              UIAlertView *alert1 = [[UIAlertView alloc]
              initWithTitle:@"After Wirte 1"
@@ -743,12 +864,12 @@ dispatch_queue_t bgQueue;
             
             //stream status
             
-            
+            if(socket.outputStream !=nil){
             if (-1 == [socket.outputStream write:(uint8_t *)&commandType maxLength:4])
             {
                 socket.isLoggedin = NO;
                 NSMutableDictionary* details = [NSMutableDictionary dictionary];
-                [details setValue:@"Securifi - Send Error" forKey:NSLocalizedDescriptionKey];
+                [details setValue:@"Securifi Command Type - Send Error" forKey:NSLocalizedDescriptionKey];
                 *outError=[NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
                 
                 if ([socket disableNetworkDownNotification] == NO)
@@ -765,12 +886,14 @@ dispatch_queue_t bgQueue;
                 }
                 return nil;
             }
+            }
             
+            if(socket.outputStream !=nil){
             if (-1 == [socket.outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]])
             {
                 socket.isLoggedin = NO;
                 NSMutableDictionary* details = [NSMutableDictionary dictionary];
-                [details setValue:@"Securifi - Send Error" forKey:NSLocalizedDescriptionKey];
+                [details setValue:@"Securifi Payload - Send Error" forKey:NSLocalizedDescriptionKey];
                 *outError=[NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
                 
                 if ([socket disableNetworkDownNotification] == NO)
@@ -787,7 +910,7 @@ dispatch_queue_t bgQueue;
                 }
                 return nil;
             }
-            
+            }
             NSLog(@"Method Name: %s Command send to cloud: TIME => %f ",__PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
             //[SNLog Log:@"Method Name: %s Command send to cloud: TIME => %f",__PRETTY_FUNCTION__ , CFAbsoluteTimeGetCurrent()];
             return @"yes";

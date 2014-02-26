@@ -16,6 +16,7 @@
 #import <SecurifiToolkit/Signup.h>
 #import <SecurifiToolkit/SignupResponse.h>
 #import <SecurifiToolkit/Logout.h>
+#import <SecurifiToolkit/LogoutResponse.h>
 #import <SecurifiToolkit/LogoutAllRequest.h>
 #import <SecurifiToolkit/LogoutAllResponse.h>
 #import <SecurifiToolkit/AlmondListRequest.h>

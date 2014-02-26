@@ -35,7 +35,7 @@ static const char *kName_SanityResponse =                   "SanityResponse";
 static const char *kName_AffiliationUserComplete =          "AffiliationUserCompleteResponse";
 static const char *kName_SignupResponse =                   "SignupResponse";
 //PY 160913 - Add Constants
-//static const char *kName_LogoutAllResponse =              "LogoutAllResponse";
+static const char *kName_LogoutAllResponse =              "LogoutAllResponse";
 //static const char *kName_AlmondPlusMAC =                  "AlmondplusMAC";
 static const char *kName_AlmondListResponse =               "AlmondListResponse";
 static const char *k_Success =                              "success";
@@ -100,6 +100,10 @@ static const char *kName_DynamicAlmondDelete =              "DynamicAlmondDelete
 
 //PY 200114 - SensorChangeResponse
 static const char *kName_SensorChangeResponse =             "SensorChangeResponse";
+
+//PY 250214 - LogoutResponse
+static const char *kName_LogoutResponse =                   "LogoutResponse";
+
 
 //static const char *kName_Index =                            "Index";
 //static const char *kName_Name =                             "Name";
@@ -315,6 +319,15 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         obj.command = self.command;
         obj.commandType = self.commandType;
     }
+    //PY 250214 - Logout Response
+    else if(self.commandType == LOGOUT_RESPONSE){
+        obj.command = self.command;
+        obj.commandType = self.commandType;
+    }
+    else if(self.commandType == LOGOUT_ALL_RESPONSE){
+        obj.command = self.command;
+        obj.commandType = self.commandType;
+    }
     return obj;
 }
 
@@ -468,6 +481,50 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         parser.parsingCommand = YES;
         parser.storingCommandType = SIGNUP_RESPONSE;
+    }
+    //PY 250214 - Logout Response
+    else if (prefix == NULL && !strncmp((const char *)localname, kName_LogoutResponse, kLength_MaxTag))
+    {
+        LogoutResponse *logoutResponse= [[LogoutResponse alloc]init];
+        parser.command = (LogoutResponse *)logoutResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        int vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = LOGOUT_RESPONSE;
+    }
+    //PY 250214 - Logout All Response
+    else if (prefix == NULL && !strncmp((const char *)localname, kName_LogoutAllResponse, kLength_MaxTag))
+    {
+        LogoutAllResponse *logoutResponse= [[LogoutAllResponse alloc]init];
+        parser.command = (LogoutAllResponse *)logoutResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        int vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = LOGOUT_ALL_RESPONSE;
     }
     //PY160913 - Almond List Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_AlmondListResponse, kLength_MaxTag)){
@@ -1674,6 +1731,36 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
                  && (parser.storingCommandType == SENSOR_CHANGE_RESPONSE))
         {
             parser.commandType = SENSOR_CHANGE_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+         //PY 250214 - Logout Response
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == LOGOUT_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == LOGOUT_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] integerValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_LogoutResponse, kLength_MaxTag)) {
+            parser.commandType = LOGOUT_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 250214 - Logout ALL Response
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == LOGOUT_ALL_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == LOGOUT_ALL_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] integerValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_LogoutAllResponse, kLength_MaxTag)) {
+            parser.commandType = LOGOUT_ALL_RESPONSE;
             parser.parsingCommand = NO;
         }
     }

@@ -20,6 +20,7 @@
 #define VALIDATE_RESPONSE                   11
 #define RESET_PASSWORD_REQUEST              14
 #define RESET_PASSWORD_RESPONSE             15
+#define LOGOUT_RESPONSE                     18
 #define AFFILIATION_CODE_REQUEST            23
 //#define AFFILIATION_CODE_RESPONSE           22
 #define AFFILIATION_USER_COMPLETE           26

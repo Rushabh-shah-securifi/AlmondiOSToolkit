@@ -22,9 +22,10 @@
 //#define CLOUD_SERVER  @"ec2-54-205-177-169.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"ec2-54-242-74-175.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"ec2-54-226-236-86.compute-1.amazonaws.com"
-
+//#define CLOUD_SERVER  @"ec2-54-80-216-255.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"nodeLB-1553508487.us-east-1.elb.amazonaws.com"
 #define CLOUD_SERVER  @"cloud.securifi.com"
+//#define CLOUD_SERVER  @"ec2-54-226-236-86.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"clouddev.securifi.com"
 //#define CLOUD_SERVER  @"ec2-54-227-49-52.compute-1.amazonaws.com"
 //Notifiers
@@ -49,6 +50,11 @@
 #define DYNAMIC_ALMOND_LIST_ADD_NOTIFIER    @"DynamicAlmondListAddNotifier"
 #define DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER @"DynamicAlmondListDeleteNotifier"
 #define SENSOR_CHANGE_NOTIFIER              @"SensorChangeNotifier"
+#define LOGOUT_NOTIFIER                     @"logoutResponse"
+#define LOGOUT_ALL_NOTIFIER                     @"LogoutAllResponseNotifier"
+
+#define PASSWORD @"tempPasswordPrefKey"
+#define USERID @"userIDPrefKey"
 
 //XMLS
 #define FRESH_LOGIN_REQUEST_XML             @"<root><Login><EmailID>%@</EmailID><Password>%@</Password></Login></root>"
