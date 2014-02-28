@@ -112,6 +112,8 @@
 		CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6DC94817EC60D1006F48C4 /* MobileCommandResponse.m */; };
 		CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7EA7DC18978910005DCBA3 /* Base64.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7EA7DD18978910005DCBA3 /* Base64.m */; };
+		CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */; };
 		CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185F6178D453A00EE23ED /* CoreFoundation.framework */; };
 		CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9A2910188D2B240063D562 /* SensorChangeRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9A2913188D2B240063D562 /* SensorChangeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9A2911188D2B240063D562 /* SensorChangeRequest.m */; };
@@ -260,6 +262,8 @@
 		CE6DC94817EC60D1006F48C4 /* MobileCommandResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MobileCommandResponse.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE7EA7DC18978910005DCBA3 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
 		CE7EA7DD18978910005DCBA3 /* Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Base64.m; sourceTree = "<group>"; };
+		CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicAlmondNameChangeResponse.h; sourceTree = "<group>"; };
+		CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicAlmondNameChangeResponse.m; sourceTree = "<group>"; };
 		CE9A2910188D2B240063D562 /* SensorChangeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorChangeRequest.h; sourceTree = "<group>"; };
 		CE9A2911188D2B240063D562 /* SensorChangeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorChangeRequest.m; sourceTree = "<group>"; };
 		CE9A2914188D30270063D562 /* SensorChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorChangeResponse.h; sourceTree = "<group>"; };
@@ -457,6 +461,7 @@
 				CE9C5B48188669B6006F2306 /* SensorForcedUpdateRequest.h */,
 				CE9A2910188D2B240063D562 /* SensorChangeRequest.h */,
 				CE9A2914188D30270063D562 /* SensorChangeResponse.h */,
+				CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */,
 			);
 			name = public;
 			sourceTree = "<group>";
@@ -464,6 +469,7 @@
 		22A76D2517912B830099CD8F /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */,
 				CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */,
 				22B326CD1796D447004B3642 /* SanityResponse.h */,
 				CE5EB5BA17E703BA00985636 /* LogoutAllRequest.m */,
@@ -588,6 +594,7 @@
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
+				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -809,6 +816,7 @@
 				22B326D01796D447004B3642 /* SanityResponse.m in Sources */,
 				2253388617A6B7380051BF0F /* AffiliationUserRequest.m in Sources */,
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
+				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
 				CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */,
 				CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */,

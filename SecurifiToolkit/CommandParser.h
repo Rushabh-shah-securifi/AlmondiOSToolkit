@@ -30,6 +30,7 @@
 #import "ValidateAccountResponse.h"
 #import "ResetPasswordResponse.h"
 #import "SensorChangeResponse.h"
+#import "DynamicAlmondNameChangeResponse.h"
 @class LoginResponse, LogoutAllResponse;
 
 @interface CommandParser : NSObject {

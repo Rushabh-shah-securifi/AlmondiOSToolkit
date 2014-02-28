@@ -104,6 +104,8 @@ static const char *kName_SensorChangeResponse =             "SensorChangeRespons
 //PY 250214 - LogoutResponse
 static const char *kName_LogoutResponse =                   "LogoutResponse";
 
+//PY 280214 - DynamicAlmondNameChange
+static const char *kName_DynamicAlmondNameChange =          "DynamicAlmondNameChange";
 
 //static const char *kName_Index =                            "Index";
 //static const char *kName_Name =                             "Name";
@@ -328,6 +330,12 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         obj.command = self.command;
         obj.commandType = self.commandType;
     }
+    //PY 280214 - Dynamic Almond Name Change
+    else if(self.commandType == DYNAMIC_ALMOND_NAME_CHANGE){
+        obj.command = self.command;
+        obj.commandType = self.commandType;
+    }
+
     return obj;
 }
 
@@ -1128,6 +1136,13 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.parsingCommand = YES;
         parser.storingCommandType = SENSOR_CHANGE_RESPONSE;
     }
+    //PY 2080214 - Dynamic Name Change Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicAlmondNameChange, kLength_MaxTag)){
+        DynamicAlmondNameChangeResponse *almondNameChangeResponse = [[DynamicAlmondNameChangeResponse alloc]init];
+        parser.command = (DynamicAlmondNameChangeResponse *)almondNameChangeResponse;
+        parser.parsingCommand = YES;
+        parser.storingCommandType = DYNAMIC_ALMOND_NAME_CHANGE;
+    }
     else if (parser.parsingCommand && (prefix == NULL && (
                                                           (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_UserID, kLength_MaxTag))
@@ -1763,6 +1778,24 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.commandType = LOGOUT_ALL_RESPONSE;
             parser.parsingCommand = NO;
         }
+        
+        //PY 280214 - Dynamic Almond Name Change Response
+        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+            && (parser.storingCommandType == DYNAMIC_ALMOND_NAME_CHANGE))
+        {
+            
+            [parser.command setAlmondplusMAC:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_AlmondName, kLength_MaxTag)
+                 && (parser.storingCommandType == DYNAMIC_ALMOND_NAME_CHANGE))
+        {
+            [parser.command setAlmondplusName:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_DynamicAlmondNameChange, kLength_MaxTag)) {
+            parser.commandType = DYNAMIC_ALMOND_NAME_CHANGE;
+            parser.parsingCommand = NO;
+        }
+
     }
     
     parser.storingCharacters = NO;

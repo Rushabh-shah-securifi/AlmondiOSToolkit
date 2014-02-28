@@ -52,6 +52,7 @@
 #define SENSOR_CHANGE_NOTIFIER              @"SensorChangeNotifier"
 #define LOGOUT_NOTIFIER                     @"logoutResponse"
 #define LOGOUT_ALL_NOTIFIER                     @"LogoutAllResponseNotifier"
+#define DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER @"DynamicAlmondNameChangeNotifier"
 
 #define PASSWORD @"tempPasswordPrefKey"
 #define USERID @"userIDPrefKey"

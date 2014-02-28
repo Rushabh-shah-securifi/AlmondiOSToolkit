@@ -43,6 +43,7 @@
 #import <SecurifiToolkit/SensorChangeRequest.h>
 #import <SecurifiToolkit/SensorChangeResponse.h>
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>
+#import <SecurifiToolkit/DynamicAlmondNameChangeResponse.h>
 
 @interface SecurifiToolkit : NSObject
 

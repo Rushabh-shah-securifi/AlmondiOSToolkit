@@ -1027,6 +1027,18 @@ static BOOL isBusy=NO;
                                             temp=nil;
                                         }
                                             break;
+                                        case DYNAMIC_ALMOND_NAME_CHANGE:
+                                        {
+                                            // [SNLog Log:@"Method Name: %s Received DYNAMIC_ALMOND_NAME_CHANGE", __PRETTY_FUNCTION__];
+                                            DynamicAlmondNameChangeResponse *obj = (DynamicAlmondNameChangeResponse *)temp.command;
+                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
+                                            
+                                            [[NSNotificationCenter defaultCenter] postNotificationName:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:self userInfo:data];
+                                            tempObj=nil;
+                                            temp=nil;
+                                            break;
+                                        }
+                                            
                                         default:
                                             break;
                                     }

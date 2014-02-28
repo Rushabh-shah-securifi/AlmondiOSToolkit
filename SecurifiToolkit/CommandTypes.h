@@ -38,6 +38,7 @@
 #define DYNAMIC_DEVICE_VALUE_LIST			82
 #define DYNAMIC_ALMOND_ADD                  83
 #define DYNAMIC_ALMOND_DELETE               84
+#define DYNAMIC_ALMOND_NAME_CHANGE          85
 #define GENERIC_COMMAND_REQUEST             201
 #define GENERIC_COMMAND_RESPONSE            204
 #define GENERIC_COMMAND_NOTIFICATION        205
