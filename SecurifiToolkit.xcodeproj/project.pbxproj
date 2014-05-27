@@ -59,7 +59,6 @@
 		22A76D4A1791347D0099CD8F /* AffiliationUserComplete.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A76D481791347D0099CD8F /* AffiliationUserComplete.m */; };
 		22A76D4D179136B80099CD8F /* CommandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D4B179136B80099CD8F /* CommandParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22A76D4E179136B80099CD8F /* CommandParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A76D4C179136B80099CD8F /* CommandParser.m */; };
-		22A76D52179180AE0099CD8F /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A76D51179180AE0099CD8F /* libxml2.dylib */; };
 		22B326CF1796D447004B3642 /* SanityResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 22B326CD1796D447004B3642 /* SanityResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22B326D01796D447004B3642 /* SanityResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B326CE1796D447004B3642 /* SanityResponse.m */; };
 		22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22B326D11796D659004B3642 /* PrivateCommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -281,7 +280,6 @@
 			files = (
 				CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */,
 				22A19D941797AC7A003E6148 /* SystemConfiguration.framework in Frameworks */,
-				22A76D52179180AE0099CD8F /* libxml2.dylib in Frameworks */,
 				221185BE178D371200EE23ED /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
