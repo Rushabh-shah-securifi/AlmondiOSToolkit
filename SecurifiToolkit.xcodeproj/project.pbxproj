@@ -36,7 +36,6 @@
 		221185C3178D371200EE23ED /* SecurifiToolkit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 221185C2178D371200EE23ED /* SecurifiToolkit.h */; };
 		221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */ = {isa = PBXBuildFile; fileRef = 221185C4178D371200EE23ED /* SecurifiToolkit.m */; };
 		221185CD178D371200EE23ED /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185CC178D371200EE23ED /* SenTestingKit.framework */; };
-		221185CF178D371200EE23ED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185CE178D371200EE23ED /* UIKit.framework */; };
 		221185D0178D371200EE23ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185BD178D371200EE23ED /* Foundation.framework */; };
 		221185D3178D371200EE23ED /* libSecurifiToolkit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185BA178D371200EE23ED /* libSecurifiToolkit.a */; };
 		221185D9178D371200EE23ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 221185D7178D371200EE23ED /* InfoPlist.strings */; };
@@ -181,7 +180,6 @@
 		221185C4178D371200EE23ED /* SecurifiToolkit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SecurifiToolkit.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		221185CB178D371200EE23ED /* SecurifiToolkitTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SecurifiToolkitTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		221185CC178D371200EE23ED /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		221185CE178D371200EE23ED /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		221185D6178D371200EE23ED /* SecurifiToolkitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SecurifiToolkitTests-Info.plist"; sourceTree = "<group>"; };
 		221185D8178D371200EE23ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		221185DA178D371200EE23ED /* SecurifiToolkitTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecurifiToolkitTests.h; sourceTree = "<group>"; };
@@ -293,7 +291,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				221185CD178D371200EE23ED /* SenTestingKit.framework in Frameworks */,
-				221185CF178D371200EE23ED /* UIKit.framework in Frameworks */,
 				221185D0178D371200EE23ED /* Foundation.framework in Frameworks */,
 				221185D3178D371200EE23ED /* libSecurifiToolkit.a in Frameworks */,
 			);
@@ -348,7 +345,6 @@
 				22A19D931797AC7A003E6148 /* SystemConfiguration.framework */,
 				221185BD178D371200EE23ED /* Foundation.framework */,
 				221185CC178D371200EE23ED /* SenTestingKit.framework */,
-				221185CE178D371200EE23ED /* UIKit.framework */,
 				221185F6178D453A00EE23ED /* CoreFoundation.framework */,
 			);
 			name = Frameworks;
@@ -665,7 +661,7 @@
 		221185B2178D371100EE23ED /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Nirav Uchat";
 			};
 			buildConfigurationList = 221185B5178D371100EE23ED /* Build configuration list for PBXProject "SecurifiToolkit" */;
@@ -760,7 +756,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /usr/bin/ruby;
-			shellScript = "#!/usr/bin/ruby\n#\n# This script obfuscates c-style #define values in your 'defines_file'\n# Run this script _before_ comiling your code/project\n# Make sure to also run deobfuscate.rb after the build, to revert the obfuscation in 'defines_file'\n#\n# This script is in public domain at https://github.com/100grams/Xcode_Base64_string_obfuscation.git\n\nrequire 'Base64'\n\ndefines_file = 'SecurifiToolkit/AlmondPlusSDKConstants.h'\n\ndef add_deobfuscate_macro(lines)\nindex = lines.rindex(/(\\s+)#endif/)\nlines.insert(index, \"\\n#define deobfuscate(exp) \\[NSString stringWithBase64EncodedString:\\[NSString stringWithFormat:\\@\\\"%\\@\\\\n\\\", exp\\]\\]\\n\")\nend\n\n\n# obfuscate string literals in defines_file\n\nlines = IO.readlines(defines_file).join\nhas_deobfuscate_macro = false\ntarget = \"\"\ncount = 0\nlines.each do |line|\nif line =~/#define\\s/\nclear_text = line.scan(/#define\\s+\\w+\\s+@\"(.*)\"/).flatten\ndefine_name = line.scan(/#define\\s+(\\w+)/).flatten\nif define_name.first !=~ /deobfuscate/ && clear_text.first !=nil && clear_text.first.length > 0\nbreak if clear_text.first =~ /deobfuscate/\nenc_text = Base64.encode64(clear_text.first)\nenc_text.delete! \"\\n\"\nline.gsub!(/(#define\\s+\\w+\\s+)(@\".+\")/, \"\\\\1deobfuscate(\\@\\\"#{enc_text}\\\")\")\ncount +=1\nend\nhas_deobfuscate_macro |= define_name.first =~ /deobfuscate/\nend\ntarget << line\nend\n\nif count > 0\nputs \"obfuscated #{count} strings in #{defines_file}\"\nadd_deobfuscate_macro(target) if !has_deobfuscate_macro\nFile.open(defines_file, 'w') {|f| f.write(target)}\nelse\nputs \"no new strings to obfuscate in #{defines_file}\"\nend\n\n\n";
+			shellScript = "#\n# This script obfuscates c-style #define values in your 'defines_file'\n# Run this script _before_ comiling your code/project\n# Make sure to also run deobfuscate.rb after the build, to revert the obfuscation in 'defines_file'\n#\n# This script is in public domain at https://github.com/100grams/Xcode_Base64_string_obfuscation.git\n\nrequire 'Base64'\n\ndefines_file = 'SecurifiToolkit/AlmondPlusSDKConstants.h'\n\ndef add_deobfuscate_macro(lines)\nindex = lines.rindex(/(\\s+)#endif/)\nlines.insert(index, \"\\n#define deobfuscate(exp) \\[NSString stringWithBase64EncodedString:\\[NSString stringWithFormat:\\@\\\"%\\@\\\\n\\\", exp\\]\\]\\n\")\nend\n\n\n# obfuscate string literals in defines_file\n\nlines = IO.readlines(defines_file)\nhas_deobfuscate_macro = false\ntarget = \"\"\ncount = 0\nlines.each do |line|\nif line =~/#define\\s/\nclear_text = line.scan(/#define\\s+\\w+\\s+@\"(.*)\"/).flatten\ndefine_name = line.scan(/#define\\s+(\\w+)/).flatten\nif define_name.first !=~ /deobfuscate/ && clear_text.first !=nil && clear_text.first.length > 0\nbreak if clear_text.first =~ /deobfuscate/\nenc_text = Base64.encode64(clear_text.first)\nenc_text.delete! \"\\n\"\nline.gsub!(/(#define\\s+\\w+\\s+)(@\".+\")/, \"\\\\1deobfuscate(\\@\\\"#{enc_text}\\\")\")\ncount +=1\nend\nhas_deobfuscate_macro |= define_name.first =~ /deobfuscate/\nend\ntarget << line\nend\n\nif count > 0\nputs \"obfuscated #{count} strings in #{defines_file}\"\nadd_deobfuscate_macro(target) if !has_deobfuscate_macro\nFile.open(defines_file, 'w') {|f| f.write(target)}\nelse\nputs \"no new strings to obfuscate in #{defines_file}\"\nend";
 		};
 		CEDFC37C1897879800ADF0BB /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -773,7 +769,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /usr/bin/ruby;
-			shellScript = "#!/usr/bin/ruby\n#\n# This script reverses (deobfuscates) any c-style #define values which have been previously obfuscated by obfuscate.rb in your 'defines_file'\n# Run this script _after_ comiling your code/project\n\n# This script is in public domain at https://github.com/100grams/Xcode_Base64_string_obfuscation.git\n\nrequire 'Base64'\n\ndefines_file = 'SecurifiToolkit/AlmondPlusSDKConstants.h'\n\ndef remove_deobfuscate_macro(lines)\nindex = lines.gsub!(/(\\n#define\\s+deobfuscate\\(exp\\).+)\\n/, '')\nend\n\n\n# deobfuscate in defines_file\n\nlines = IO.readlines(defines_file).join\ntarget = \"\"\ncount = 0\nhas_deobfuscate_macro = false\nlines.each do |line|\nif line =~/#define\\s/\ndefine_name = line.scan(/#define\\s+(\\w+)/).flatten\nenc_text = line.scan(/#define\\s+\\w+\\s+deobfuscate\\(@\"(.*)\"\\)/).flatten.first\nif enc_text != nil && enc_text.length > 0\nenc_text += \"\\n\"\nclear_text = Base64.decode64(enc_text)\nline.gsub!(/(#define\\s+\\w+\\s+)(.+)/, \"\\\\1\\@\\\"#{clear_text}\\\"\")\ncount +=1\nend\nhas_deobfuscate_macro |= define_name.first =~ /deobfuscate/\nend\ntarget << line\nend\n\nif count > 0\nputs \"deobfuscated #{count} strings in #{defines_file}\"\nremove_deobfuscate_macro(target) if has_deobfuscate_macro\nFile.open(defines_file, 'w') {|f| f.write(target)}\nelse\nputs \"no obfuscated strings found in #{defines_file}\"\nend";
+			shellScript = "#\n# This script reverses (deobfuscates) any c-style #define values which have been previously obfuscated by obfuscate.rb in your 'defines_file'\n# Run this script _after_ comiling your code/project\n\n# This script is in public domain at https://github.com/100grams/Xcode_Base64_string_obfuscation.git\n\nrequire 'Base64'\n\ndefines_file = 'SecurifiToolkit/AlmondPlusSDKConstants.h'\n\ndef remove_deobfuscate_macro(lines)\nindex = lines.gsub!(/(\\n#define\\s+deobfuscate\\(exp\\).+)\\n/, '')\nend\n\n\n# deobfuscate in defines_file\n\nlines = IO.readlines(defines_file)\ntarget = \"\"\ncount = 0\nhas_deobfuscate_macro = false\nlines.each do |line|\nif line =~/#define\\s/\ndefine_name = line.scan(/#define\\s+(\\w+)/).flatten\nenc_text = line.scan(/#define\\s+\\w+\\s+deobfuscate\\(@\"(.*)\"\\)/).flatten.first\nif enc_text != nil && enc_text.length > 0\nenc_text += \"\\n\"\nclear_text = Base64.decode64(enc_text)\nline.gsub!(/(#define\\s+\\w+\\s+)(.+)/, \"\\\\1\\@\\\"#{clear_text}\\\"\")\ncount +=1\nend\nhas_deobfuscate_macro |= define_name.first =~ /deobfuscate/\nend\ntarget << line\nend\n\nif count > 0\nputs \"deobfuscated #{count} strings in #{defines_file}\"\nremove_deobfuscate_macro(target) if has_deobfuscate_macro\nFile.open(defines_file, 'w') {|f| f.write(target)}\nelse\nputs \"no obfuscated strings found in #{defines_file}\"\nend";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -886,7 +882,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -922,7 +917,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
