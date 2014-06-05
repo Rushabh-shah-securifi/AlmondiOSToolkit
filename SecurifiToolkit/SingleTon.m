@@ -33,8 +33,6 @@
 }
 
 @synthesize deviceid;
-@synthesize outputStream;
-@synthesize inputStream;
 @synthesize totalReceivedLength;
 @synthesize expectedLength;
 
@@ -126,161 +124,6 @@ static BOOL isBusy=NO;
      */
 }
 
-
-
-//-(void)reconnect
-//{
-//    //@synchronized(self)
-//    //{
-//    NSLog(@"State Reconnect %d",[single connectionState]);
-//    id ret=nil;
-//    unsigned int i=1;
-//    //[single setConnectionState:RECONNECT];
-//    if([single connectionState] == SDK_UNINITIALIZED)
-//    {
-//        isBusy = YES;
-//        ret = [self initReconnectSDK];
-//        //self.disableNetworkDownNotification=YES;
-////        while (ret == nil && i<5)
-////        {
-////            
-////            ret = [self initReconnectSDK];
-////            //            if (ret == nil)
-////            //            {
-////            //                // [SNLog Log:@"Method Name: %s Thread - SDKInit Error", __PRETTY_FUNCTION__];
-////            ////                if (1 == i)
-////            ////                {
-////            ////                    // [SNLog Log:@"Method Name: %s Server not reachable", __PRETTY_FUNCTION__];
-////            ////                    [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
-////            ////                }
-////            //            }
-////            // [SNLog Log:@"Method Name: %s Thread - Sleeping for %d seconds", __PRETTY_FUNCTION__,i];
-////            sleep(i);
-////            i+=1;
-////        }
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkUp" object:self userInfo:nil];
-//        //self.disableNetworkDownNotification=NO;
-//        isBusy=NO;
-//    }
-//    // [SNLog Log:@"Method Name: %s Out of reconnect thread", __PRETTY_FUNCTION__];
-//    
-//    //}
-//    /*
-//     
-//     */
-//}
-
-//-(id)initReconnectSDK
-//{
-//    NSLog(@"INIT Reconnect SDK");
-//    
-//    [SingleTon removeSingletonObject];
-//    [SingleTon createSingletonObj];
-//    
-//    
-//    
-//    SingleTon *socket = [SingleTon getObject];
-//    [socket setConnectionState:INITIALIZING];
-//    
-//    GenericCommand *sanityCommand = [[GenericCommand alloc] init];
-//    sanityCommand.commandType=CLOUD_SANITY;
-//    sanityCommand.command=nil;
-//    
-//    NSError *error;
-//    id ret = nil;
-//    ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
-//    sanityCommand=nil;
-//    
-//    if (ret != nil)
-//    {
-//        NSLog(@"Method Name: %s SESSION STARTED TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-//        NSLog(@"initSDK - Send Sanity Successful");
-//        //// [SNLog Log:@"Method Name: %s initSDK - Send Sanity Successful", __PRETTY_FUNCTION__];
-//        //Send Temppass command
-//        @try{
-//            NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-//            if ([prefs objectForKey:PASSWORD] && [prefs objectForKey:USERID])
-//            {
-//                GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-//                LoginTempPass *loginCommand = [[LoginTempPass alloc] init];
-//                
-//                loginCommand.UserID =  [prefs objectForKey:USERID];
-//                loginCommand.TempPass = [prefs objectForKey:PASSWORD];
-//                
-//                cloudCommand.commandType=LOGIN_TEMPPASS_COMMAND;
-//                cloudCommand.command=loginCommand;
-//                
-//                NSError *error;
-//                id ret = nil;
-//                ret = [SecurifiToolkit sendtoCloud:cloudCommand error:&error];
-//                if (ret != nil)
-//                {
-//                    NSLog(@"initSDK - Temp login sent");
-//                    //// [SNLog Log:@"Method Name: %s initSDK - Temp login sent", __PRETTY_FUNCTION__];
-//                    [socket setConnectionState:LOGGING];
-//                    //return @"yes";
-//                }
-//                else
-//                {
-//                    NSLog(@"Error : %@",[error localizedDescription]);
-//                    //// [SNLog Log:@"Method Name: %s Error : %@", __PRETTY_FUNCTION__,[error localizedDescription]];
-//                    [socket setConnectionState:NETWORK_DOWN];
-//                    //return nil;
-//                }
-//                cloudCommand=nil;
-//                loginCommand=nil;
-//            }
-//            else
-//            {
-//                NSLog(@"TempPass not found in preferences");
-//                //// [SNLog Log:@"Method Name: %s TempPass not found in preferences", __PRETTY_FUNCTION__];
-//                //Send notification so that App can display Login / Password screen
-//                [socket setConnectionState:NOT_LOGGED_IN];
-//                
-//                [[NSNotificationCenter defaultCenter] postNotificationName:LOGOUT_ALL_NOTIFIER object:self userInfo:nil];
-//                //return @"yes";
-//            }
-//        }
-//        @catch (NSException *e) {
-//            NSLog(@" Network Down %@", e.reason);
-//            //// [SNLog Log:@"Method Name: %s Network Down %@", __PRETTY_FUNCTION__,e.reason];
-//        }
-//    }
-//    else
-//    {
-//        //// [SNLog Log:@"Method Name: %s Error : %@", __PRETTY_FUNCTION__,[error localizedDescription]];
-//        
-//        [socket setConnectionState:NETWORK_DOWN];
-//        //return nil;
-//    }
-//    
-//    //4. Send temppass login command
-//    //Now try to send Login Request using stored credentials
-//    
-//    
-//    //For initSDK
-//    
-//    
-//    return @"Yes";
-//    
-//    //Send tempPass Command to check existing login
-//    //Send SANITY_COMMAND TO chekc cloud connectivity and insturct main app that you are
-//    //connected to cloud
-//    
-//    //3 Register Reachability callback
-//    //[[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reachabilityChanged:) name: kReachabilityChangedNotification object: nil];
-//    
-//    //Change the host name here to change the server your monitoring
-//    //remoteHostLabel.text = [NSString stringWithFormat: @"Remote Host: %@", @"www.apple.com"];
-//	/*
-//     hostReach = [Reachability reachabilityWithHostName: @"www.apple.com"];
-//     [hostReach startNotifier];
-//     */
-//    
-//    //return @"yes";
-//}
-
-
 - (id)initReconnectSDK {
     // NSLog(@"In Reconnect");
     [SingleTon removeSingletonObject];
@@ -318,175 +161,14 @@ static BOOL isBusy=NO;
     }
 }
 
-//+(id)initSDK
-//{
-//    [SingleTon removeSingletonObject];
-//    [SingleTon createSingletonObj];
-//
-//    if(!bgQueue){
-//        bgQueue = dispatch_queue_create("command_queue", NULL);
-//    }
-//
-//    //    SNFileLogger *logger = [[SNFileLogger alloc] init];
-//    //    [// [SNLog logManager] addLogStrategy:logger];
-//
-//    //Start a Async task of sending Sanity command and TempPassCommand and return YES
-//    //Asynch task will send command and will generate respective events
-//
-//    dispatch_async(bgQueue, ^(void) {
-//
-//        SingleTon *socket = [SingleTon getObject];
-//
-//        GenericCommand *sanityCommand = [[GenericCommand alloc] init];
-//        sanityCommand.commandType=CLOUD_SANITY;
-//        sanityCommand.command=nil;
-//
-//        NSError *error;
-//        id ret = nil;
-//        ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
-//        sanityCommand=nil;
-//
-//        if (ret != nil)
-//        {
-//            // [SNLog Log:@"Method Name: %s initSDK - Send Sanity Successful", __PRETTY_FUNCTION__];
-//            //Send Temppass command
-//            @try{
-//                NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-//                if ([prefs objectForKey:tmpPwdKey] && [prefs objectForKey:usrIDKey])
-//                {
-//                    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-//                    LoginTempPass *loginCommand = [[LoginTempPass alloc] init];
-//
-//                    loginCommand.UserID =  [prefs objectForKey:usrIDKey];
-//                    loginCommand.TempPass = [prefs objectForKey:tmpPwdKey];
-//
-//                    cloudCommand.commandType=LOGIN_TEMPPASS_COMMAND;
-//                    cloudCommand.command=loginCommand;
-//
-//                    NSError *error;
-//                    id ret = nil;
-//                    ret = [SecurifiToolkit sendtoCloud:cloudCommand error:&error];
-//                    if (ret != nil)
-//                    {
-//                        // [SNLog Log:@"Method Name: %s initSDK - Temp login sent", __PRETTY_FUNCTION__];
-//                        //return @"yes";
-//                    }
-//                    else
-//                    {
-//                        // [SNLog Log:@"Method Name: %s Error : %@", __PRETTY_FUNCTION__,[error localizedDescription]];
-//                        [socket setConnectionState:NETWORK_DOWN];
-//                        //return nil;
-//                    }
-//                    cloudCommand=nil;
-//                    loginCommand=nil;
-//                }
-//                else
-//                {
-//                    // [SNLog Log:@"Method Name: %s TempPass not found in preferences", __PRETTY_FUNCTION__];
-//                    //Send notification so that App can display Login / Password screen
-//                    [socket setConnectionState:NOT_LOGGED_IN];
-//
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:nil];
-//                    //return @"yes";
-//                }
-//            }
-//            @catch (NSException *e) {
-//                // [SNLog Log:@"Method Name: %s Network Down %@", __PRETTY_FUNCTION__,e.reason];
-//            }
-//        }
-//        else
-//        {
-//            // [SNLog Log:@"Method Name: %s Error : %@", __PRETTY_FUNCTION__,[error localizedDescription]];
-//
-//            [socket setConnectionState:NETWORK_DOWN];
-//            //return nil;
-//        }
-//    });
-//    //4. Send temppass login command
-//    //Now try to send Login Request using stored credentials
-//
-//
-//    //For initSDK
-//
-//
-//    return @"Yes";
-//
-//    //Send tempPass Command to check existing login
-//    //Send SANITY_COMMAND TO chekc cloud connectivity and insturct main app that you are
-//    //connected to cloud
-//
-//    //3 Register Reachability callback
-//    //[[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(reachabilityChanged:) name: kReachabilityChangedNotification object: nil];
-//
-//    //Change the host name here to change the server your monitoring
-//    //remoteHostLabel.text = [NSString stringWithFormat: @"Remote Host: %@", @"www.apple.com"];
-//	/*
-//     hostReach = [Reachability reachabilityWithHostName: @"www.apple.com"];
-//     [hostReach startNotifier];
-//     */
-//
-//    //return @"yes";
-//}
-
-
 + (void)removeSingletonObject {
     @synchronized (self) {
         if (single) {
-            //todo there are three or four places in the code that handle tearing down the network; find and consolidate
-
-            [single.outputStream close];
-            [single.inputStream close];
-
-            NSRunLoop *loop = [NSRunLoop currentRunLoop];
-            [single.outputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
-            [single.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
-
-            single.outputStream = nil;
-            single.inputStream = nil;
+            [single tearDownNetwork];
             single = nil;
         }
     }
 }
-
-/*
-- (NSThread *)networkThread {
-    nThread = nil;
-    
-    nThread =
-    [[NSThread alloc] initWithTarget:self
-                            selector:@selector(networkThreadMain:)
-                              object:nil];
-    [nThread start];
-    
-    // [SNLog Log:@"Method Name: %s thread: %@, debug description: %@", __PRETTY_FUNCTION__, nThread, nThread.debugDescription];
-    return nThread;
-}
-*/
-
-/*
-- (void)networkThreadMain:(id)unused {
-    do {
-        //// NSLog(@"Thread runloop");
-
-        if ([[NSThread currentThread] isCancelled] == YES)
-        {
-            // [SNLog Log:@"Method Name: %s Exiting current thread", __PRETTY_FUNCTION__];
-            [outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-            [inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-            [NSThread exit];
-        }
-        [[NSRunLoop currentRunLoop] run];
-    } while (YES);
-}
-
-- (void)scheduleInCurrentThread:(id)unused {
-    NSRunLoop *loop = [NSRunLoop currentRunLoop];
-    [inputStream scheduleInRunLoop:loop forMode:NSRunLoopCommonModes];
-    [outputStream scheduleInRunLoop:loop forMode:NSRunLoopCommonModes];
-    [inputStream open];
-    [outputStream open];
-}
-*/
 
 -(void) initNetworkCommunication{
 
@@ -510,14 +192,14 @@ static BOOL isBusy=NO;
             //Migrating to nodeLB
             //CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"nodeLB-1553508487.us-east-1.elb.amazonaws.com", 1028, &readStream, &writeStream);
 
-            inputStream = (__bridge_transfer NSInputStream *)readStream;
-            outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+            self.inputStream = (__bridge_transfer NSInputStream *)readStream;
+            self.outputStream = (__bridge_transfer NSOutputStream *)writeStream;
 
-            [inputStream setDelegate:self];
-            [outputStream setDelegate:self];
+            [self.inputStream setDelegate:self];
+            [self.outputStream setDelegate:self];
 
-            [inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
-            [outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
+            [self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
+            [self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
 
             //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredRoots];
             //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
@@ -543,10 +225,10 @@ static BOOL isBusy=NO;
             CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef)settings);
             CFWriteStreamSetProperty(writeStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef)settings);
 
-            [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-            [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-            [inputStream open];
-            [outputStream open];
+            [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+            [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+            [self.inputStream open];
+            [self.outputStream open];
 
             self.isStreamConnected = YES;
 
@@ -598,13 +280,13 @@ static BOOL isBusy=NO;
 			break;
 
 		case NSStreamEventHasBytesAvailable:
-			if (theStream == inputStream) {
-				while ([inputStream hasBytesAvailable]) {
+			if (theStream == _inputStream) {
+				while ([_inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
                     NSInteger len;
 
                     //Multiple entry in one callback possible
-					len = [inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
+					len = [_inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
 					if (len > 0) {
 
                         //[SNLog Log:@"Method Name: %s Response Length : %d",__PRETTY_FUNCTION__,len];
@@ -697,11 +379,7 @@ static BOOL isBusy=NO;
                                                 [self setConnectionState:NOT_LOGGED_IN];
                                             }
 
-//                                            NSDictionary *data = @{@"data" : obj};
-//                                            [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:data];
-
                                             [self postData:LOGIN_NOTIFIER data:obj];
-                                            //// NSLog(@"After Pushed Notification");
                                             break;
                                         }
                                         case SIGNUP_RESPONSE: {
@@ -790,13 +468,8 @@ static BOOL isBusy=NO;
                                         case GENERIC_COMMAND_RESPONSE: {
                                             // [SNLog Log:@"Method Name: %s Received Generic Command Response", __PRETTY_FUNCTION__];
                                             GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
-
-                                            //Decode using Base64
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
                                             obj.decodedData = decodedData;
-
-//                                            NSDictionary *data = @{@"data" : obj};
-//                                            [[NSNotificationCenter defaultCenter] postNotificationName:GENERIC_COMMAND_NOTIFIER object:self userInfo:data];
 
                                             [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
                                             break;
@@ -920,21 +593,12 @@ static BOOL isBusy=NO;
             //We should create new object of singleton class
             //if (theStream == outputStream && [outputStream streamStatus] == NSStreamStatusError)
 
-            if (theStream == outputStream)
-            {
+            if (theStream == self.outputStream) {
                 // [SNLog Log:@"Method Name: %s Connection event: server down", __PRETTY_FUNCTION__];
-                isDone=YES;
 
-                [theStream close];
-                [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-                theStream = nil;
-
-                [inputStream close];
-                [inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-                inputStream=nil;
-
-                //Instruct SingleTon object
-                isLoggedin=NO;
+                [self tearDownNetwork];
+                isDone = YES;
+                isLoggedin = NO;
                 [self setConnectionState:NETWORK_DOWN];
 
                 //PY301013 - Reconnect
@@ -985,28 +649,13 @@ static BOOL isBusy=NO;
 
 
         case NSStreamEventEndEncountered: {
-            if (theStream == inputStream) {
+            if (theStream == self.inputStream) {
                 NSLog(@"Method Name: %s SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
 
-                //PY 160913 - Logout All Notifier - PY 250214 - Logout All should happen after user tries to reconnect and fails
-                //[[NSNotificationCenter defaultCenter] postNotificationName:@"LogoutAllResponseNotifier" object:self userInfo:NULL];
-
-                // [SNLog Log:@"Method Name: %s Cloud Server Closed the Connection", __PRETTY_FUNCTION__];
-                //[nThread cancel];
-                [theStream close];
-                [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-                theStream = nil;   //todo nulling here is probably not the right way to handle this
-
-                [outputStream close];
-                [outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-                outputStream = nil;
-
+                [self tearDownNetwork];
                 isDone = YES;
-                // [SNLog Log:@"Method Name: %s Dispatch EndEncountered Notification -- TCP DOWN", __PRETTY_FUNCTION__];
-
                 isLoggedin = NO;
                 [self setConnectionState:CLOUD_CONNECTION_ENDED];
-
 
                 //User APP should not handle reconnection
                 //Dispatch thread
@@ -1030,6 +679,18 @@ static BOOL isBusy=NO;
 
 }
 
+- (void)tearDownNetwork {
+    [self.outputStream close];
+    [self.inputStream close];
+
+    NSRunLoop *loop = [NSRunLoop currentRunLoop];
+    [self.outputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+    [self.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+
+    self.outputStream = nil;
+    self.inputStream = nil;
+}
+
 #pragma mark - Payload notification
 
 - (void)postData:(NSString*)notificationName data:(id)payload {
@@ -1045,6 +706,9 @@ static BOOL isBusy=NO;
 #pragma mark - SSL certificates
 
 - (void)loadCertificate {
+/*
+    2014-06-05 sinclair no actual need to load a cert file so we disable for now; besides, this seems to trigger a leak inside of Security framework.
+
     NSString *path = [[NSBundle mainBundle] pathForResource:@"cert" ofType:@"der"];
     NSData *certData = [NSData dataWithContentsOfFile:path];
 
@@ -1053,38 +717,14 @@ static BOOL isBusy=NO;
     if (oldCertificate) {
         CFRelease(oldCertificate);
     }
-
-    //            // NSLog(@"Certificate Data: %@", certificateData);
-    //            // Import .p12 data
-    //            CFArrayRef keyref = NULL;
-    //
-    //            // Identity
-    //            CFDictionaryRef identityDict = CFArrayGetValueAtIndex(keyref, 0);
-    //            SecIdentityRef identityRef = (SecIdentityRef)CFDictionaryGetValue(identityDict,
-    //                                                                              kSecImportItemIdentity);
-    //            SecCertificateRef   cert;
-    // Cert
-    //            SecCertificateRef   cert;
-    //            //CFDataRef cfdata = CFDataCreate(NULL, [certificateData bytes], [certificateData length]);
-    //            if( [certData length] ) {
-    //                cert = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certData);
-    //                if( cert != NULL ) {
-    //                    CFStringRef certSummary = SecCertificateCopySubjectSummary(cert);
-    //                    NSString* summaryString = [[NSString alloc] initWithString:(__bridge NSString*)certSummary];
-    //                    // NSLog(@"CERT SUMMARY: %@", summaryString);
-    //                    CFRelease(certSummary);
-    //                } else {
-    //                    // NSLog(@" *** ERROR *** trying to create the SSL certificate from data located at %@, but failed", path);
-    //                }
-    //            }
-    //
-    //            // the certificates array, containing the identity then the root certificate
-    //            NSArray *sslCerts = [[NSArray alloc] initWithObjects:(__bridge id)cert, nil];
-    //            // NSLog(@"sslCerts Size %d", sslCerts);
-    //
+*/
 }
 
 - (BOOL)isTrustedCertificate {
+    if (self.certificate == nil) {
+        return YES;
+    }
+
     SecPolicyRef policy = SecPolicyCreateSSL(NO, CFSTR("*.securifi.com"));
     //CFArrayRef streamCertificates = (__bridge CFArrayRef)([theStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerCertificates]);
     // NSLog(@"After kCFStreamPropertySSLPeerCertificates");
@@ -1100,19 +740,6 @@ static BOOL isBusy=NO;
     OSStatus status = SecTrustEvaluate(trust, &trustResultType);
 
     BOOL trusted = (status == errSecSuccess);
-
-/*
-    if (status == errSecSuccess) {
-        // expect trustResultType == kSecTrustResultUnspecified
-        // until my cert exists in the keychain see technote for more detail.
-        if (trustResultType == kSecTrustResultUnspecified) {
-            // NSLog(@"We can trust this certificate! TrustResultType: %d", trustResultType);
-        }
-        else {
-            NSLog(@"Cannot trust certificate. TrustResultType: %d", trustResultType);
-        }
-    }
-*/
 
     if (trust) {
         CFRelease(trust);
