@@ -1,4 +1,3 @@
-//
 //  SingleTon.m
 //  SecurifiToolkit
 //
@@ -9,15 +8,9 @@
 
 #import "SingleTon.h"
 #import <SecurifiToolkit/SecurifiToolkit.h>
-//#import <SecurifiToolkit/LoginResponse.h>
-#import "GenericCommand.h"
 #import "Commandparser.h"
 #import "PrivateCommandTypes.h"
-#import "AlmondPlusSDKConstants.h"
-#import "SNLog.h"
-#import <Security/Security.h>
-#import "Base64.h"
-#import "LoginTempPass.h"
+
 //Schedule runloop on backgroundQueue
 
 #define SDK_UNINITIALIZED       0
@@ -29,11 +22,21 @@
 #define CLOUD_CONNECTION_ENDED  6
 
 
-@implementation SingleTon
+@interface SingleTon ()
+@property SecCertificateRef certificate;
+@property dispatch_queue_t backgroundQueue;
+@end
+
+@implementation SingleTon {
+    NSMutableData *partialData;
+    dispatch_queue_t backgroundQueue;
+}
 
 @synthesize deviceid;
-@synthesize inputStream, outputStream;
-@synthesize expectedLength,totalReceivedLength;
+@synthesize outputStream;
+@synthesize inputStream;
+@synthesize totalReceivedLength;
+@synthesize expectedLength;
 
 @synthesize command;
 @synthesize isLoggedin;
@@ -46,65 +49,57 @@
 
 
 static SingleTon *single=nil;
-NSThread * nThread;
 
+//todo track down and remove
+//NSThread * nThread;
+
+//todo track down and remove
 static BOOL isDone=NO;
 
+//todo track down and remove
 static BOOL isBusy=NO;
 
 //static BOOL disableNetworkDownNotification=NO;
 
-+ (SingleTon *)getObject
-{
-    @synchronized(self)
-    {
-        if (single)
++ (SingleTon *)getObject {
+    @synchronized (self) {
+        if (single) {
             return single;
-        else
+        }
+        else {
             return nil;
+        }
     }
 }
 
-+(SingleTon *)createSingletonObj{
-    
-    @synchronized(self)
-    {
-        if (!single)
-        {
-            // SNFileLogger *logger = [[SNFileLogger alloc] init];
-            // [// [SNLog logManager] addLogStrategy:logger];
-            // [SNLog Log:@"Method Name: %s Creating SingleTon Object with Network Init", __PRETTY_FUNCTION__];
++ (void)createSingletonObj {
+    @synchronized (self) {
+        if (!single) {
             single = [[SingleTon alloc] init];
-            //single->backgroundQueue=dispatch_queue_create("com.securifi.cloud", NULL);
-            [single setDisableNetworkDownNotification:NO];
-            [single setIsLoggedin:NO];
-            [single setIsStreamConnected:NO];
-            
-            [single setSendCommandFail:NO];
-            [single setConnectionState:SDK_UNINITIALIZED];
-            
+            single.disableNetworkDownNotification = NO;
+            single.isLoggedin = NO;
+            single.isStreamConnected = NO;
+
+            single.sendCommandFail = NO;
+            single.connectionState = SDK_UNINITIALIZED;
+
             [single initNetworkCommunication];
         }
     }
-    //Don't return singleTon Object
-    return single;
 }
 
--(void)reconnect
-{
+- (void)reconnect {
     //@synchronized(self)
     //{
     // NSLog(@"State Reconnect %d",[single connectionState]);
-    id ret=nil;
-    unsigned int i=1;
+    id ret = nil;
+    unsigned int i = 1;
     //[single setConnectionState:RECONNECT];
-    if(isBusy == NO)
-    {
+    if (isBusy == NO) {
         isBusy = YES;
         //self.disableNetworkDownNotification=YES;
-        while (ret == nil && i<5)
-        {
-            
+        while (ret == nil && i < 5) {
+
             ret = [self initReconnectSDK];
             //            if (ret == nil)
             //            {
@@ -117,14 +112,14 @@ static BOOL isBusy=NO;
             //            }
             // [SNLog Log:@"Method Name: %s Thread - Sleeping for %d seconds", __PRETTY_FUNCTION__,i];
             sleep(i);
-            i+=1;
+            i += 1;
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkUp" object:self userInfo:nil];
         //self.disableNetworkDownNotification=NO;
-        isBusy=NO;
+        isBusy = NO;
     }
     // [SNLog Log:@"Method Name: %s Out of reconnect thread", __PRETTY_FUNCTION__];
-    
+
     //}
     /*
      
@@ -286,7 +281,7 @@ static BOOL isBusy=NO;
 //}
 
 
--(id)initReconnectSDK{
+- (id)initReconnectSDK {
     // NSLog(@"In Reconnect");
     [SingleTon removeSingletonObject];
     [SingleTon createSingletonObj];
@@ -301,23 +296,19 @@ static BOOL isBusy=NO;
 
     //Send Sanity Command
     GenericCommand *sanityCommand = [[GenericCommand alloc] init];
-
-    sanityCommand.commandType=CLOUD_SANITY;
-    sanityCommand.command=nil;
+    sanityCommand.commandType = CLOUD_SANITY;
+    sanityCommand.command = nil;
 
     NSError *error;
-    id ret = nil;
-    ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
-    if (ret != nil)
-    {
+    id ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
+    if (ret != nil) {
         // NSLog(@"Reconnect initSDK - Send Sanity Successful");
 
         //Notify main app
         [single setConnectionState:SDK_UNINITIALIZED];
         return @"Yes";
     }
-    else
-    {
+    else {
         // NSLog(@"Reconnect Error : %@",[error localizedDescription]);
         return nil;
         //Dont notify User about network down unless it has been asked
@@ -325,7 +316,6 @@ static BOOL isBusy=NO;
 
         //[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkDOWN" object:self userInfo:nil];
     }
-    sanityCommand=nil;
 }
 
 //+(id)initSDK
@@ -439,24 +429,26 @@ static BOOL isBusy=NO;
 //}
 
 
-+(void) removeSingletonObject
-{
-    @synchronized(self)
-    {
-        if(single){
++ (void)removeSingletonObject {
+    @synchronized (self) {
+        if (single) {
+            //todo there are three or four places in the code that handle tearing down the network; find and consolidate
+
             [single.outputStream close];
             [single.inputStream close];
-            
-            [single.outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-            [single.inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-            
-            single.outputStream=nil;
-            single.inputStream=nil;
-            single=nil;
+
+            NSRunLoop *loop = [NSRunLoop currentRunLoop];
+            [single.outputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+            [single.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+
+            single.outputStream = nil;
+            single.inputStream = nil;
+            single = nil;
         }
     }
 }
 
+/*
 - (NSThread *)networkThread {
     nThread = nil;
     
@@ -469,11 +461,13 @@ static BOOL isBusy=NO;
     // [SNLog Log:@"Method Name: %s thread: %@, debug description: %@", __PRETTY_FUNCTION__, nThread, nThread.debugDescription];
     return nThread;
 }
+*/
 
+/*
 - (void)networkThreadMain:(id)unused {
     do {
         //// NSLog(@"Thread runloop");
-        
+
         if ([[NSThread currentThread] isCancelled] == YES)
         {
             // [SNLog Log:@"Method Name: %s Exiting current thread", __PRETTY_FUNCTION__];
@@ -485,25 +479,27 @@ static BOOL isBusy=NO;
     } while (YES);
 }
 
-- (void)scheduleInCurrentThread:(id)unused
-{
-    [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
-                           forMode:NSRunLoopCommonModes];
-    [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
-                            forMode:NSRunLoopCommonModes];
+- (void)scheduleInCurrentThread:(id)unused {
+    NSRunLoop *loop = [NSRunLoop currentRunLoop];
+    [inputStream scheduleInRunLoop:loop forMode:NSRunLoopCommonModes];
+    [outputStream scheduleInRunLoop:loop forMode:NSRunLoopCommonModes];
     [inputStream open];
     [outputStream open];
 }
+*/
 
 -(void) initNetworkCommunication{
-    
+
     if(!self.backgroundQueue){
         self.backgroundQueue = dispatch_queue_create("connection_queue", NULL);
     }
-    
+
     dispatch_async(self.backgroundQueue, ^(void) {
-        
-        if(self.inputStream ==nil && self.outputStream ==nil) {
+        if (self.inputStream == nil && self.outputStream == nil) {
+            // Load certificate
+            //
+            [self loadCertificate];
+
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
             //ashutosh: ec2-54-226-113-110.compute-1.amazonaws.com
@@ -513,52 +509,16 @@ static BOOL isBusy=NO;
             CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)CFBridgingRetain(cloudServer), 1028, &readStream, &writeStream);
             //Migrating to nodeLB
             //CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"nodeLB-1553508487.us-east-1.elb.amazonaws.com", 1028, &readStream, &writeStream);
-            
-            //Add certificate
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"cert" ofType:@"der"];
-            NSData *certData = [NSData dataWithContentsOfFile:path];
-            certificate = SecCertificateCreateWithData(NULL,(__bridge CFDataRef)certData);
-            
-            //            // NSLog(@"Certificate Data: %@", certificateData);
-            //            // Import .p12 data
-            //            CFArrayRef keyref = NULL;
-            //
-            //            // Identity
-            //            CFDictionaryRef identityDict = CFArrayGetValueAtIndex(keyref, 0);
-            //            SecIdentityRef identityRef = (SecIdentityRef)CFDictionaryGetValue(identityDict,
-            //                                                                              kSecImportItemIdentity);
-            //            SecCertificateRef   cert;
-            // Cert
-            //            SecCertificateRef   cert;
-            //            //CFDataRef cfdata = CFDataCreate(NULL, [certificateData bytes], [certificateData length]);
-            //            if( [certData length] ) {
-            //                cert = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certData);
-            //                if( cert != NULL ) {
-            //                    CFStringRef certSummary = SecCertificateCopySubjectSummary(cert);
-            //                    NSString* summaryString = [[NSString alloc] initWithString:(__bridge NSString*)certSummary];
-            //                    // NSLog(@"CERT SUMMARY: %@", summaryString);
-            //                    CFRelease(certSummary);
-            //                } else {
-            //                    // NSLog(@" *** ERROR *** trying to create the SSL certificate from data located at %@, but failed", path);
-            //                }
-            //            }
-            //
-            //            // the certificates array, containing the identity then the root certificate
-            //            NSArray *sslCerts = [[NSArray alloc] initWithObjects:(__bridge id)cert, nil];
-            //            // NSLog(@"sslCerts Size %d", sslCerts);
-            //
-            
-            inputStream = (__bridge NSInputStream *)readStream;
-            outputStream = (__bridge NSOutputStream *)writeStream;
-            
+
+            inputStream = (__bridge_transfer NSInputStream *)readStream;
+            outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+
             [inputStream setDelegate:self];
             [outputStream setDelegate:self];
-            
-            [inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL
-                              forKey:NSStreamSocketSecurityLevelKey];
-            [outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL
-                               forKey:NSStreamSocketSecurityLevelKey];
-            
+
+            [inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
+            [outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
+
             //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredRoots];
             //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
             //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsAnyRoot];
@@ -568,44 +528,30 @@ static BOOL isBusy=NO;
             //[SSLOptions setObject:(NSString *)kCFStreamSocketSecurityLevelNegotiatedSSL forKey:(NSString*)kCFStreamPropertySocketSecurityLevel];
             //[SSLOptions setObject:myCerts forKey:(NSString *)kCFStreamSSLCertificates];
             //[SSLOptions setObject:[NSNumber numberWithBool:NO] forKey:(NSString *)kCFStreamSSLIsServer];
-            
-            NSDictionary *settings = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                      [NSNumber numberWithBool:NO], kCFStreamSSLAllowsExpiredRoots,
-                                      [NSNumber numberWithBool:NO], kCFStreamSSLAllowsExpiredCertificates,
-                                      [NSNumber numberWithBool:NO], kCFStreamSSLAllowsAnyRoot,
-                                      [NSNumber numberWithBool:NO], kCFStreamSSLValidatesCertificateChain,
-                                      //@"*.securifi.com",kCFStreamSSLPeerName,
-                                      nil];
-            
+
+            NSDictionary *settings = @{
+                    (__bridge id) kCFStreamSSLAllowsExpiredRoots : @NO,
+                    (__bridge id) kCFStreamSSLAllowsExpiredCertificates : @NO,
+                    (__bridge id) kCFStreamSSLAllowsAnyRoot : @NO,
+                    (__bridge id) kCFStreamSSLValidatesCertificateChain : @NO
+            };
+
             //            sslCerts , kCFStreamSSLCertificates,
             //            [NSNumber numberWithBool:NO], kCFStreamSSLIsServer,
-            
-            
-            CFReadStreamSetProperty((CFReadStreamRef)inputStream, kCFStreamPropertySSLSettings, (CFTypeRef)settings);
-            CFWriteStreamSetProperty((CFWriteStreamRef)outputStream, kCFStreamPropertySSLSettings, (CFTypeRef)settings);
-            
-            [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
-                                   forMode:NSRunLoopCommonModes];
-            [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
-                                    forMode:NSRunLoopCommonModes];
+
+
+            CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef)settings);
+            CFWriteStreamSetProperty(writeStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef)settings);
+
+            [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+            [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
             [inputStream open];
             [outputStream open];
-            
-            /*
-             [self performSelector:@selector(scheduleInCurrentThread:)
-             onThread:[self networkThread]
-             withObject:nil
-             waitUntilDone:YES];
-             */
-            
-            [self setIsStreamConnected:YES];
-            
-            // [SNLog Log:@"Method Name: %s *****Stream opened from dispatch queue", __PRETTY_FUNCTION__];
-            
-            NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
-            
-            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && (self.isStreamConnected == YES) && (isDone == NO))
-            {
+
+            self.isStreamConnected = YES;
+
+            NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && self.isStreamConnected && !isDone) {
                 //// NSLog(@"Run loop did run");
             }
             //// NSLog(@"Run loop exitted");
@@ -613,32 +559,32 @@ static BOOL isBusy=NO;
         else{
             //// NSLog(@"Stream already opened");
         }
-        
+
         // [SNLog Log:@"Method Name: %s Terminating Async task", __PRETTY_FUNCTION__];
-        isDone=NO;
+        isDone = NO;
     });
 }
 
+
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
-    
     if (!partialData)
     {
         partialData = [[NSMutableData alloc] init];
     }
-    
+
     NSString *endTagString = @"</root>";
     NSData *endTag = [endTagString dataUsingEncoding:NSUTF8StringEncoding];
-    
+
     NSString *startTagString = @"<root>";
     NSData *startTag = [startTagString dataUsingEncoding:NSUTF8StringEncoding];
-    
+
 	// NSLog(@"stream event %i", streamEvent);
 	switch (streamEvent) {
 		case NSStreamEventOpenCompleted:
             //MIGRATE TCP UP Notification -- send sanity check command to cloud after initSDK
             //if outputstream is not valid .. it will trigger TCP Down notification
             //Else if SDK receives some response from cloud it will push TCP UP notification
-            
+
             /*
              if (theStream == outputStream)
              {
@@ -650,46 +596,46 @@ static BOOL isBusy=NO;
              }
              */
 			break;
-            
+
 		case NSStreamEventHasBytesAvailable:
 			if (theStream == inputStream) {
 				while ([inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
-                    int len;
-                    
+                    NSInteger len;
+
                     //Multiple entry in one callback possible
 					len = [inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
 					if (len > 0) {
-                        
+
                         //[SNLog Log:@"Method Name: %s Response Length : %d",__PRETTY_FUNCTION__,len];
                         //If current stream has </root>
                         //1. Get NSRange and prepare command
-                        //2. If command has parital command add it to mutableData object
+                        //2. If command has partial command add it to mutableData object
                         //3. It mutable object has some data append new received Data to it
                         //4. repeat this procedure for newly created mutableData
-                        
-                        //Append received data to paritial buffer
-                        [partialData appendBytes:&inputBuffer[0] length:len];
-                        
+
+                        //Append received data to partial buffer
+                        [partialData appendBytes:&inputBuffer[0] length:(NSUInteger) len];
+
                         //Initialize range
                         NSRange endTagRange = NSMakeRange(0, [partialData length]);
                         int count=0;
-                        
+
                         //NOT NEEDED- Convert received buffer to NSMutableData
                         //[totalReceivedData appendBytes:&inputBuffer[0] length:len];
-                        
+
                         while (endTagRange.location != NSNotFound)
                         {
                             endTagRange = [partialData rangeOfData:endTag options:0 range:endTagRange];
                             if(endTagRange.location != NSNotFound)
                             {
                                 //// NSLog(@"endTag Location: %i, Length: %i",endTagRange.location,endTagRange.length);
-                                
+
                                 //Look for <root> tag in [0 to endTag]
                                 NSRange startTagRange = NSMakeRange(0, endTagRange.location);
-                                
+
                                 startTagRange = [partialData rangeOfData:startTag options:0 range:startTagRange];
-                                
+
                                 if(startTagRange.location == NSNotFound)
                                 {
                                     // [SNLog Log:@"Method Name: %s Seriouse error !!! should not come heer // Invalid command /// without startRootTag", __PRETTY_FUNCTION__];
@@ -700,136 +646,94 @@ static BOOL isBusy=NO;
                                     //Prepare Command
                                     [partialData getBytes:&expectedLength range:NSMakeRange(0, 4)];
                                     // [SNLog Log:@"Method Name: %s Expected Length: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(expectedLength)];
-                                    
+
                                     [partialData getBytes:&command range:NSMakeRange(4,4)];
                                     // [SNLog Log:@"Method Name: %s Command: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(command)];
                                     //[SNLog Log:@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(command), CFAbsoluteTimeGetCurrent()];
-                                    
+
                                     NSLog(@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(command), CFAbsoluteTimeGetCurrent());
-                                    
+
                                     command = NSSwapBigIntToHost(command);
                                     // [SNLog Log:@"Method Name: %s Command Again: %d", __PRETTY_FUNCTION__,command];
                                     CommandParser *tempObj = [[CommandParser alloc] init];
                                     GenericCommand *temp = nil ;
-                                    
+
                                     NSLog(@"Partial Buffer : %@",partialData);
-                                    
+
                                     //Send single command data to parseXML rather than complete buffer
                                     NSRange xmlParser = {startTagRange.location, (endTagRange.location+endTagRange.length - 8)};
-                                    
+
                                     NSData *buffer = [partialData subdataWithRange:xmlParser];
-                                    
+
                                     temp = (GenericCommand *)[tempObj parseXML:buffer];
-                                    
+
                                     //Remove 8 bytes from received command
                                     [partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
-                                    
+
                                     // [SNLog Log:@"Method Name: %s Parsed Command: %d", __PRETTY_FUNCTION__, temp.commandType];
-                                    
-                                    
-                                    
+
                                     switch (temp.commandType) {
-                                        case LOGIN_RESPONSE:
-                                        {
-                                            LoginResponse *obj = (LoginResponse *)temp.command;
+                                        case LOGIN_RESPONSE: {
+                                            LoginResponse *obj = (LoginResponse *) temp.command;
                                             //// NSLog(@"Singleton User ID : %@",[obj userID]);
                                             //// NSLog(@"Singleton TempPass : %@", [obj tempPass]);
                                             //// NSLog(@"Singleton isSuccessful : %d",[obj isSuccessful]);
                                             //// NSLog(@"Singleton Reason : %@",[obj reason]);
-                                            
-                                            if (obj.isSuccessful == YES)
-                                            {
+
+                                            if (obj.isSuccessful == YES) {
                                                 //Set the indicator that we are logged in to prevent next login from User
                                                 isLoggedin = YES;
-                                                
+
                                                 [self setConnectionState:LOGGED_IN];
-                                                
+
                                                 NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
                                                 NSString *tempPass = obj.tempPass;
                                                 NSString *userID = obj.userID;
-                                                [prefs setObject:tempPass  forKey:PASSWORD];
+                                                [prefs setObject:tempPass forKey:PASSWORD];
                                                 [prefs setObject:userID forKey:USERID];
                                                 [prefs synchronize];
                                             }
-                                            else{
+                                            else {
                                                 [self setConnectionState:NOT_LOGGED_IN];
                                             }
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            //Send Object
-                                            //// NSLog(@"Before Pused Notification");
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:data];
-                                            
+
+//                                            NSDictionary *data = @{@"data" : obj};
+//                                            [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:data];
+
+                                            [self postData:LOGIN_NOTIFIER data:obj];
                                             //// NSLog(@"After Pushed Notification");
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
                                             break;
-                                        case SIGNUP_RESPONSE:
-                                        {
+                                        }
+                                        case SIGNUP_RESPONSE: {
                                             // [SNLog Log:@"Method Name: %s Received Signup Response", __PRETTY_FUNCTION__];;
-                                            SignupResponse *obj = (SignupResponse *)temp.command;
-                                            
-                                            // [SNLog Log:@"Method Name: %s Signup isSuccessful %d", __PRETTY_FUNCTION__, obj.isSuccessful];
-                                            // [SNLog Log:@"Method Name: %s Signup Reason %@", __PRETTY_FUNCTION__,obj.Reason];
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:SIGN_UP_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:SIGN_UP_NOTIFIER data:temp.command];
                                             break;
-                                        case KEEP_ALIVE:
+                                        }
+                                        case KEEP_ALIVE: {
                                             // [SNLog Log:@"Method Name: %s Received keepalive command", __PRETTY_FUNCTION__];
-                                            tempObj=nil;
-                                            temp=nil;
                                             break;
-                                        case CLOUD_SANITY_RESPONSE:
-                                        {
-                                            //SanityResponse *obj = (SanityResponse *)temp.command;
-                                            //// NSLog(@"Singleton Response : %@",[obj reason]);
-                                            
-                                            //Instruct Main App that cloud is reachable
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_UP_NOTIFIER object:self userInfo:nil];
-                                            tempObj=nil;
-                                            temp=nil;
                                         }
+
+                                        case CLOUD_SANITY_RESPONSE: {
+                                            //SanityResponse *obj = (SanityResponse *)temp.command;
+                                            [self postData:NETWORK_UP_NOTIFIER data:nil];
                                             break;
+                                        }
                                             //PY 250214 - Logout Response
-                                        case LOGOUT_RESPONSE:
-                                        {
-                                            LogoutResponse *obj = (LogoutResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:LOGOUT_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
+                                        case LOGOUT_RESPONSE: {
+                                            [self postData:LOGOUT_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 250214 - Logout All Response
-                                        case LOGOUT_ALL_RESPONSE:
-                                        {
-                                            LogoutAllResponse *obj = (LogoutAllResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:LOGOUT_ALL_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
+                                        case LOGOUT_ALL_RESPONSE: {
+                                            [self postData:LOGOUT_ALL_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case AFFILIATION_USER_COMPLETE:
-                                        {
-                                            // [SNLog Log:@"Method Name: %s Received Affiliation User Complete", __PRETTY_FUNCTION__];
-                                            AffiliationUserComplete *obj = (AffiliationUserComplete *)temp.command;
-                                            
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:AFFILIATION_COMPLETE_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+
+                                        case AFFILIATION_USER_COMPLETE: {
+                                            [self postData:AFFILIATION_COMPLETE_NOTIFIER data:temp.command];
                                             break;
+                                        }
                                             //                                        case AFFILIATION_CODE_RESPONSE:
                                             //                                        {
                                             //                                            // [SNLog Log:@"Method Name: %s Received Affiliation Code", __PRETTY_FUNCTION__];
@@ -843,202 +747,105 @@ static BOOL isBusy=NO;
                                             //                                        }
                                             //                                            break;
                                             //PY 160913 - Almond List Response
-                                        case ALMOND_LIST_RESPONSE:
-                                        {
-                                            // [SNLog Log:@"Method Name: %s Received Almond List Response", __PRETTY_FUNCTION__];
-                                            AlmondListResponse *obj = (AlmondListResponse *)temp.command;
-                                            
-                                            
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:ALMOND_LIST_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                        case ALMOND_LIST_RESPONSE: {
+                                            [self postData:ALMOND_LIST_NOTIFIER data:temp.command];
                                             break;
+                                        }
                                             //PY 170913 - Device Data Hash Response
-                                        case DEVICEDATA_HASH_RESPONSE:
-                                        {
-                                            // [SNLog Log:@"Method Name: %s Received Device Data Hash Response", __PRETTY_FUNCTION__];
-                                            DeviceDataHashResponse *obj = (DeviceDataHashResponse *)temp.command;
-                                            
-                                            // [SNLog Log:@"Method Name: %s Hash Success %d",__PRETTY_FUNCTION__, (int)obj.isSuccessful];
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:HASH_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                        case DEVICEDATA_HASH_RESPONSE: {
+                                            [self postData:HASH_NOTIFIER data:temp.command];
                                             break;
-                                            //PY 170913 - Device Data  Response
-                                        case DEVICEDATA_RESPONSE:
-                                        {
-                                            // [SNLog Log:@"Method Name: %s Received Device Data Response", __PRETTY_FUNCTION__];
-                                            DeviceListResponse *obj = (DeviceListResponse *)temp.command;
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:DEVICE_DATA_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
                                         }
-                                            break;
                                             //PY 170913 - Device Data  Response
-                                        case DEVICE_VALUE_LIST_RESPONSE:
-                                        {
+                                        case DEVICEDATA_RESPONSE: {
+                                            [self postData:DEVICE_DATA_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            //PY 170913 - Device Data  Response
+                                        case DEVICE_VALUE_LIST_RESPONSE: {
                                             // [SNLog Log:@"Method Name: %s Received Device Value Mobile Response", __PRETTY_FUNCTION__];
-                                            DeviceValueResponse *obj = (DeviceValueResponse *)temp.command;
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:DEVICE_VALUE_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:DEVICE_VALUE_NOTIFIER data:temp.command];
                                             break;
+                                        }
                                             //PY 200913 - Mobile Command Response
-                                        case MOBILE_COMMAND_RESPONSE:
-                                        {
+                                        case MOBILE_COMMAND_RESPONSE: {
                                             // [SNLog Log:@"Method Name: %s Received Mobile Command Response", __PRETTY_FUNCTION__];
-                                            MobileCommandResponse *obj = (MobileCommandResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:MOBILE_COMMAND_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:MOBILE_COMMAND_NOTIFIER data:temp.command];
                                             break;
+                                        }
                                             //PY 230913 - Device List Command - 81 -  Response
-                                        case DYNAMIC_DEVICE_DATA:
-                                        {
+                                        case DYNAMIC_DEVICE_DATA: {
                                             // [SNLog Log:@"Method Name: %s Received DYNAMIC_DEVICE_DATA", __PRETTY_FUNCTION__];
-                                            DeviceListResponse *obj = (DeviceListResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:DEVICE_DATA_CLOUD_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:DEVICE_DATA_CLOUD_NOTIFIER data:temp.command];
                                             break;
-                                            
+                                        }
+
                                             //PY 230913 - Device Value Command - 82 -  Response
-                                        case DYNAMIC_DEVICE_VALUE_LIST:
-                                        {
+                                        case DYNAMIC_DEVICE_VALUE_LIST: {
                                             // [SNLog Log:@"Method Name: %s Received DEVICE_VALUE_LIST_RESPONSE", __PRETTY_FUNCTION__];
-                                            DeviceValueResponse *obj = (DeviceValueResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:DEVICE_VALUE_CLOUD_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:DEVICE_VALUE_CLOUD_NOTIFIER data:temp.command];
                                             break;
+                                        }
                                             //PY 291013 - Generic Command Response
-                                        case GENERIC_COMMAND_RESPONSE:
-                                        {
+                                        case GENERIC_COMMAND_RESPONSE: {
                                             // [SNLog Log:@"Method Name: %s Received Generic Command Response", __PRETTY_FUNCTION__];
-                                            GenericCommandResponse *obj = (GenericCommandResponse *)temp.command;
-                                            
+                                            GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
+
                                             //Decode using Base64
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
-                                            //                                            NSString *decodedString = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
                                             obj.decodedData = decodedData;
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:GENERIC_COMMAND_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+
+//                                            NSDictionary *data = @{@"data" : obj};
+//                                            [[NSNotificationCenter defaultCenter] postNotificationName:GENERIC_COMMAND_NOTIFIER object:self userInfo:data];
+
+                                            [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
                                             break;
+                                        }
                                             //PY 301013 - Generic Command Notification
-                                        case GENERIC_COMMAND_NOTIFICATION:
-                                        {
+                                        case GENERIC_COMMAND_NOTIFICATION: {
                                             // [SNLog Log:@"Method Name: %s Received Generic Command Notification", __PRETTY_FUNCTION__];
-                                            GenericCommandResponse *obj = (GenericCommandResponse *)temp.command;
-                                            
+                                            GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
+
                                             //Decode using Base64
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
-                                            //                                            NSString *decodedString = [[NSString alloc] initWithData:decodedData encoding:NSUTF8StringEncoding];
                                             obj.decodedData = decodedData;
-                                            
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:GENERIC_COMMAND_CLOUD_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+
+                                            [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:obj];
+
                                             break;
+                                        }
                                             //PY 011113 - Validate Account Response
-                                        case VALIDATE_RESPONSE:
-                                        {
+                                        case VALIDATE_RESPONSE: {
                                             // [SNLog Log:@"Method Name: %s Received VALIDATE_RESPONSE", __PRETTY_FUNCTION__];
-                                            ValidateAccountResponse *obj = (ValidateAccountResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:VALIDATE_RESPONSE_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:VALIDATE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
-                                        case RESET_PASSWORD_RESPONSE:
-                                        {
+                                        }
+                                        case RESET_PASSWORD_RESPONSE: {
                                             // [SNLog Log:@"Method Name: %s Received RESET_PASSWORD_RESPONSE", __PRETTY_FUNCTION__];
-                                            ResetPasswordResponse *obj = (ResetPasswordResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:RESET_PWD_RESPONSE_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:RESET_PWD_RESPONSE_NOTIFIER data:temp.command];
                                             break;
-                                        case DYNAMIC_ALMOND_ADD:
-                                        {
+                                        }
+                                        case DYNAMIC_ALMOND_ADD: {
                                             // [SNLog Log:@"Method Name: %s Received DYNAMIC_ALMOND_ADD", __PRETTY_FUNCTION__];
-                                            AlmondListResponse *obj = (AlmondListResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:temp.command];
                                             break;
-                                        case DYNAMIC_ALMOND_DELETE:
-                                        {
+                                        }
+                                        case DYNAMIC_ALMOND_DELETE: {
                                             // [SNLog Log:@"Method Name: %s Received DYNAMIC_ALMOND_DELETE", __PRETTY_FUNCTION__];
-                                            AlmondListResponse *obj = (AlmondListResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:temp.command];
                                             break;
-                                        case SENSOR_CHANGE_RESPONSE:
-                                        {
+                                        }
+                                        case SENSOR_CHANGE_RESPONSE: {
                                             //[SNLog Log:@"Method Name: %s Received SENSOR_CHANGE_RESPONSE", __PRETTY_FUNCTION__];
-                                            SensorChangeResponse *obj = (SensorChangeResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:SENSOR_CHANGE_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
-                                        }
+                                            [self postData:SENSOR_CHANGE_NOTIFIER data:temp.command];
                                             break;
-                                        case DYNAMIC_ALMOND_NAME_CHANGE:
-                                        {
+                                        }
+                                        case DYNAMIC_ALMOND_NAME_CHANGE: {
                                             // [SNLog Log:@"Method Name: %s Received DYNAMIC_ALMOND_NAME_CHANGE", __PRETTY_FUNCTION__];
-                                            DynamicAlmondNameChangeResponse *obj = (DynamicAlmondNameChangeResponse *)temp.command;
-                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            
-                                            [[NSNotificationCenter defaultCenter] postNotificationName:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:self userInfo:data];
-                                            tempObj=nil;
-                                            temp=nil;
+                                            [self postData:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
+
                                         default:
                                             break;
                                     }
@@ -1052,47 +859,47 @@ static BOOL isBusy=NO;
                                      // NSLog(@"Inside command == 2");
                                      //Create Notification and send it
                                      NSString *output = [[NSString alloc] initWithData:partialData encoding:NSUTF8StringEncoding];
-                                     
+
                                      if (nil != output) {
                                      // NSLog(@"server said: %@", output);
                                      //[self messageReceived:output];
                                      //send local notification to update view
                                      NSDictionary *data = [NSDictionary dictionaryWithObject:output forKey:@"data"];
-                                     
+
                                      [[NSNotificationCenter defaultCenter] postNotificationName:@"loginResponse" object:self userInfo:data];
-                                     
+
                                      //[[NSNotificationCenter defaultCenter] postNotificationName:@"tempPassLogingRes" object:self userInfo:data];
                                      }
                                      }
-                                     
+
                                      if ((NSSwapBigIntToHost(command) == 24) || (NSSwapBigIntToHost(command) == 26))
                                      {
                                      // NSLog(@"Inside command == %d",NSSwapBigIntToHost(command));
                                      //Create Notification and send it
                                      NSString *output = [[NSString alloc] initWithData:partialData encoding:NSUTF8StringEncoding];
-                                     
+
                                      if (nil != output) {
                                      // NSLog(@"server said: %@", output);
                                      //[self messageReceived:output];
                                      //send local notification to update view
                                      NSDictionary *data = [NSDictionary dictionaryWithObject:output forKey:@"data"];
-                                     
+
                                      //[[NSNotificationCenter defaultCenter] postNotificationName:@"loginResponse" object:self userInfo:data];
                                      }
                                      }
                                      */
-                                    
+
                                     //// NSLog(@"Partial Buffer before trim : %@",partialData);
-                                    
+
                                     //Trim Partial Buffer
                                     //This will trim parital buffer till </root>
-                                    
-                                    
+
+
                                     [partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location+endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
-                                    
+
                                     //Regenerate NSRange
                                     endTagRange = NSMakeRange(0, [partialData length]);
-                                    
+
                                     //// NSLog(@"Partial Buffer after trim : %@",partialData);
                                 }
                                 count++;
@@ -1103,152 +910,222 @@ static BOOL isBusy=NO;
                                 //At this point paritalBuffer will have unffinised command data
                             }
                         }
-					}
-				}
-			}
-			break;
-			
-		case NSStreamEventErrorOccurred:
+                    }
+                }
+            }
+            break;
+
+        case NSStreamEventErrorOccurred:
             //Cleanup stream -- taken from EventEndEncountered
             //We should create new object of singleton class
             //if (theStream == outputStream && [outputStream streamStatus] == NSStreamStatusError)
-            
+
             if (theStream == outputStream)
             {
                 // [SNLog Log:@"Method Name: %s Connection event: server down", __PRETTY_FUNCTION__];
                 isDone=YES;
-                
+
                 [theStream close];
                 [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
                 theStream = nil;
-                
+
                 [inputStream close];
                 [inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
                 inputStream=nil;
-                
+
                 //Instruct SingleTon object
                 isLoggedin=NO;
                 [self setConnectionState:NETWORK_DOWN];
-                
+
                 //PY301013 - Reconnect
-                [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
+                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
                 //PY 080114 - TRYING
                 //                dispatch_async(backgroundQueue, ^ {
                 //
                 //                    [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
                 //                });
-                
+
                 //[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkDOWN" object:self userInfo:nil];
-                
+
                 //TEST --- Remove it later
                 //// NSLog(@"Dispatch ErrorOccurred Notification -- TCP DOWN");
-                
+
                 //Some how we should know that this is comming from thread or main thread
                 //[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkDOWN" object:self userInfo:nil];
-                
+
                 //User APP should not handle reconnection
                 //Dispatch thread
                 //[SingleTon reconnect];
-                
+
                 //Testing with reachability
-                
+
                 /*
                  if ([[SingleTon getObject] disableNetworkDownNotification] == NO) //Implies not in thread
                  {
                  // NSLog(@"Launching thread from errorEvent handler");
                  //First Write of initSDK will throw NetworkDOWN notification
                  //dispatch_async(backgroundQueue, ^ {
-                 
+
                  [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
-                 
+
                  //[self reconnect];
                  //});
                  }
                  */
             }
             break;
-        case NSStreamEventHasSpaceAvailable:
-            // NSLog(@"Inside NSStreamEventHasSpaceAvailable");
-        {
-            SecPolicyRef policy= SecPolicyCreateSSL(NO, CFSTR("*.securifi.com"));
-            SecTrustRef trust = NULL;
-            //CFArrayRef streamCertificates = (__bridge CFArrayRef)([theStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerCertificates]);
-            // NSLog(@"After kCFStreamPropertySSLPeerCertificates");
-            SecCertificateRef certs[1] = { self.certificate };
-            CFArrayRef array = CFArrayCreate(NULL, (const void **) certs, 1, NULL);
-            SecTrustCreateWithCertificates(array, policy, &trust);
-            // NSLog(@"After SecTrustCreateWithCertificates");
-            SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef)([NSArray arrayWithObject:(id)self.certificate]));
-            // NSLog(@"After SecTrustSetAnchorCertificates");
-            
-            SecTrustResultType trustResultType = kSecTrustResultInvalid;
-            OSStatus status = SecTrustEvaluate(trust, &trustResultType);
-            if (status == errSecSuccess) {
-                // expect trustResultType == kSecTrustResultUnspecified
-                // until my cert exists in the keychain see technote for more detail.
-                if (trustResultType == kSecTrustResultUnspecified) {
-                    // NSLog(@"We can trust this certificate! TrustResultType: %d", trustResultType);
-                } else {
-                    // NSLog(@"Cannot trust certificate. TrustResultType: %d", trustResultType);
-                }
-            } else {
-                // NSLog(@"Creating trust failed: %d", status);
+
+        case NSStreamEventHasSpaceAvailable: {
+            BOOL trusted = [self isTrustedCertificate];
+            if (!trusted) {
                 [theStream close];
             }
-            if (trust) {
-                CFRelease(trust);
-            }
-            if (policy) {
-                CFRelease(policy);
-            }
-        }
             break;
-            
-            
-		case NSStreamEventEndEncountered:
-            if (theStream == inputStream)
-            {
+        }
+
+
+        case NSStreamEventEndEncountered: {
+            if (theStream == inputStream) {
                 NSLog(@"Method Name: %s SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-                
+
                 //PY 160913 - Logout All Notifier - PY 250214 - Logout All should happen after user tries to reconnect and fails
                 //[[NSNotificationCenter defaultCenter] postNotificationName:@"LogoutAllResponseNotifier" object:self userInfo:NULL];
-                
+
                 // [SNLog Log:@"Method Name: %s Cloud Server Closed the Connection", __PRETTY_FUNCTION__];
                 //[nThread cancel];
                 [theStream close];
                 [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-                theStream = nil;
-                
+                theStream = nil;   //todo nulling here is probably not the right way to handle this
+
                 [outputStream close];
                 [outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-                outputStream=nil;
-                
+                outputStream = nil;
+
                 isDone = YES;
                 // [SNLog Log:@"Method Name: %s Dispatch EndEncountered Notification -- TCP DOWN", __PRETTY_FUNCTION__];
-                
-                isLoggedin=NO;
+
+                isLoggedin = NO;
                 [self setConnectionState:CLOUD_CONNECTION_ENDED];
-                
-                
+
+
                 //User APP should not handle reconnection
                 //Dispatch thread
                 //[SingleTon reconnect];
-                
+
                 //PY301013 - Reconnect
-                [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
-                dispatch_async(backgroundQueue, ^ {
-                    
+                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
+                dispatch_async(backgroundQueue, ^{
                     [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
                 });
 
-                
             }
+
             break;
-            
-            //default:
-			//[SNLog Log:@"Method Name: %s Unknown event", __PRETTY_FUNCTION__];
-	}
-    
+        }
+
+        default: {
+//                [SNLog Log:@"Method Name: %s Unknown event", __PRETTY_FUNCTION__];
+        }
+    }
+
 }
+
+#pragma mark - Payload notification
+
+- (void)postData:(NSString*)notificationName data:(id)payload {
+    NSDictionary *data = nil;
+    if (payload) {
+        data = @{@"data" : payload};
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:data];
+}
+
+
+#pragma mark - SSL certificates
+
+- (void)loadCertificate {
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"cert" ofType:@"der"];
+    NSData *certData = [NSData dataWithContentsOfFile:path];
+
+    SecCertificateRef oldCertificate = self.certificate;
+    self.certificate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef) certData);
+    if (oldCertificate) {
+        CFRelease(oldCertificate);
+    }
+
+    //            // NSLog(@"Certificate Data: %@", certificateData);
+    //            // Import .p12 data
+    //            CFArrayRef keyref = NULL;
+    //
+    //            // Identity
+    //            CFDictionaryRef identityDict = CFArrayGetValueAtIndex(keyref, 0);
+    //            SecIdentityRef identityRef = (SecIdentityRef)CFDictionaryGetValue(identityDict,
+    //                                                                              kSecImportItemIdentity);
+    //            SecCertificateRef   cert;
+    // Cert
+    //            SecCertificateRef   cert;
+    //            //CFDataRef cfdata = CFDataCreate(NULL, [certificateData bytes], [certificateData length]);
+    //            if( [certData length] ) {
+    //                cert = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certData);
+    //                if( cert != NULL ) {
+    //                    CFStringRef certSummary = SecCertificateCopySubjectSummary(cert);
+    //                    NSString* summaryString = [[NSString alloc] initWithString:(__bridge NSString*)certSummary];
+    //                    // NSLog(@"CERT SUMMARY: %@", summaryString);
+    //                    CFRelease(certSummary);
+    //                } else {
+    //                    // NSLog(@" *** ERROR *** trying to create the SSL certificate from data located at %@, but failed", path);
+    //                }
+    //            }
+    //
+    //            // the certificates array, containing the identity then the root certificate
+    //            NSArray *sslCerts = [[NSArray alloc] initWithObjects:(__bridge id)cert, nil];
+    //            // NSLog(@"sslCerts Size %d", sslCerts);
+    //
+}
+
+- (BOOL)isTrustedCertificate {
+    SecPolicyRef policy = SecPolicyCreateSSL(NO, CFSTR("*.securifi.com"));
+    //CFArrayRef streamCertificates = (__bridge CFArrayRef)([theStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerCertificates]);
+    // NSLog(@"After kCFStreamPropertySSLPeerCertificates");
+
+    SecCertificateRef certs[1] = {self.certificate};
+    SecTrustRef trust = NULL;
+    CFArrayRef array = CFArrayCreate(NULL, (const void **) certs, 1, NULL);
+    SecTrustCreateWithCertificates(array, policy, &trust);
+
+    SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) (@[(id) self.certificate]));
+
+    SecTrustResultType trustResultType = kSecTrustResultInvalid;
+    OSStatus status = SecTrustEvaluate(trust, &trustResultType);
+
+    BOOL trusted = (status == errSecSuccess);
+
+/*
+    if (status == errSecSuccess) {
+        // expect trustResultType == kSecTrustResultUnspecified
+        // until my cert exists in the keychain see technote for more detail.
+        if (trustResultType == kSecTrustResultUnspecified) {
+            // NSLog(@"We can trust this certificate! TrustResultType: %d", trustResultType);
+        }
+        else {
+            NSLog(@"Cannot trust certificate. TrustResultType: %d", trustResultType);
+        }
+    }
+*/
+
+    if (trust) {
+        CFRelease(trust);
+    }
+    if (policy) {
+        CFRelease(policy);
+    }
+    if (array) {
+        CFRelease(array);
+    }
+
+    return trusted;
+}
+
 @end
 
