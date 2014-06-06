@@ -23,7 +23,7 @@
 
 
 - (id)initWithCoder:(NSCoder *)decoder {
-    self.index = [decoder decodeIntegerForKey:kName_Index];
+    self.index = [decoder decodeIntForKey:kName_Index];
     self.almondplusMAC = [decoder decodeObjectForKey:kName_AlmondPlusMAC];
     self.almondplusName = [decoder decodeObjectForKey:kName_AlmondPlusName];
     return self;

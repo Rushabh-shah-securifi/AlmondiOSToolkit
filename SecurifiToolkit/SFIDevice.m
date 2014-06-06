@@ -68,30 +68,30 @@
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
-    self.deviceID = [decoder decodeIntegerForKey:kName_ID];
+    self.deviceID = (unsigned int) [decoder decodeIntForKey:kName_ID];
     self.deviceName = [decoder decodeObjectForKey:kName_DeviceName];
     self.OZWNode = [decoder decodeObjectForKey:kName_OZWNode];
     self.zigBeeShortID = [decoder decodeObjectForKey:kName_ZigBeeShortID];
     self.zigBeeEUI64 = [decoder decodeObjectForKey:kName_ZigBeeEUI64];
-    self.deviceTechnology = [decoder decodeIntegerForKey:kName_DeviceTechnology];
+    self.deviceTechnology = (unsigned int) [decoder decodeIntForKey:kName_DeviceTechnology];
     self.associationTimestamp = [decoder decodeObjectForKey:kName_AssociationTimestamp];
-    self.deviceType = [decoder decodeIntegerForKey:kName_DeviceType];
+    self.deviceType = (unsigned int) [decoder decodeIntForKey:kName_DeviceType];
     self.deviceTypeName = [decoder decodeObjectForKey:kName_DeviceTypeName];
     self.friendlyDeviceType = [decoder decodeObjectForKey:kName_FriendlyDeviceType];
     self.deviceFunction = [decoder decodeObjectForKey:kName_DeviceFunction];
     self.allowNotification = [decoder decodeObjectForKey:kName_AllowNotification];
-    self.valueCount = [decoder decodeIntegerForKey:kName_ValueCount];
+    self.valueCount = (unsigned int) [decoder decodeIntForKey:kName_ValueCount];
     self.location = [decoder decodeObjectForKey:kName_Location];
     
     //PY 111013 - Integration with new UI
     self.isExpanded = [decoder decodeBoolForKey:kName_IsExpanded];
     self.imageName = [decoder decodeObjectForKey:kName_ImageName];
     self.mostImpValueName = [decoder decodeObjectForKey:kName_ImpValueName];
-    self.mostImpValueIndex = [decoder decodeIntegerForKey:kName_ImpValueIndex];
-    self.stateIndex = [decoder decodeIntegerForKey:kName_StateIndex];
+    self.mostImpValueIndex = [decoder decodeIntForKey:kName_ImpValueIndex];
+    self.stateIndex = [decoder decodeIntForKey:kName_StateIndex];
     self.isTampered = [decoder decodeBoolForKey:kName_IsTampered];
     self.isBatteryLow = [decoder decodeBoolForKey:kName_IsBatteryLow];
-    self.tamperValueIndex = [decoder decodeIntegerForKey:kName_TamperIndex];
+    self.tamperValueIndex = [decoder decodeIntForKey:kName_TamperIndex];
     return self;
 }
 @end

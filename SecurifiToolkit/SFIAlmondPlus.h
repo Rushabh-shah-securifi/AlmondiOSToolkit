@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface SFIAlmondPlus : NSObject <NSCoding>
-@property (nonatomic, retain) NSString      *almondplusMAC;
-@property (nonatomic, retain) NSString      *almondplusName;
-@property int                               index;
+@property(nonatomic, retain) NSString *almondplusMAC;
+@property(nonatomic, retain) NSString *almondplusName;
+@property int index;
 @end

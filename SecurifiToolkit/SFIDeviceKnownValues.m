@@ -26,7 +26,7 @@
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
-    self.index = [decoder decodeIntegerForKey:kName_Index];
+    self.index = (unsigned int)[decoder decodeIntForKey:kName_Index];
     self.valueName = [decoder decodeObjectForKey:kName_ValueName];
     self.valueType = [decoder decodeObjectForKey:kName_ValueType];
     self.value = [decoder decodeObjectForKey:kName_Value];

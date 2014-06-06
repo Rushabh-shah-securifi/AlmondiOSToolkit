@@ -9,8 +9,6 @@
 #import "SFIDeviceValue.h"
 
 @implementation SFIDeviceValue
-@synthesize deviceID, valueCount, knownValues;
-@synthesize isPresent;
 
 #define kName_ID                                @"ID"          //int
 #define kName_ValueCount                        @"ValueCount" //int
@@ -18,16 +16,16 @@
 #define kName_IsPresent                         @"IsPresent"
 
 - (void) encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:deviceID forKey:kName_ID];
-    [encoder encodeInteger:valueCount forKey:kName_ValueCount];
-    [encoder encodeObject:knownValues forKey:kName_KnownValues];
-    [encoder encodeBool:isPresent forKey:kName_IsPresent];
+    [encoder encodeInteger:self.deviceID forKey:kName_ID];
+    [encoder encodeInteger:self.valueCount forKey:kName_ValueCount];
+    [encoder encodeObject:self.knownValues forKey:kName_KnownValues];
+    [encoder encodeBool:self.isPresent forKey:kName_IsPresent];
     
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
-    self.deviceID = [decoder decodeIntegerForKey:kName_ID];
-    self.valueCount = [decoder decodeIntegerForKey:kName_ValueCount];
+    self.deviceID = (unsigned int) [decoder decodeIntForKey:kName_ID];
+    self.valueCount = (unsigned int) [decoder decodeIntForKey:kName_ValueCount];
     self.knownValues = [decoder decodeObjectForKey:kName_KnownValues];
     self.isPresent = [decoder decodeBoolForKey:kName_IsPresent];
     return self;
