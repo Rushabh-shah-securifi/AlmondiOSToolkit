@@ -50,7 +50,7 @@
 +(id)initSDK;
 +(id)initSDKCloud;
 +(id)sendtoCloud:(id)sender error:(NSError **)outError;
-+(BOOL)isLoggedin;
+//+(BOOL)isLoggedin;
 +(NSInteger) getConnectionState;
 @end
  
