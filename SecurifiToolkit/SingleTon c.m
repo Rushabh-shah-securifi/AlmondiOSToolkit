@@ -92,7 +92,7 @@ static BOOL isBusy=NO;
         while (ret == nil && i<10)
         {
             NSLog(@"From Thread");
-            ret = [SecurifiToolkit initSDK];
+            ret = [[SecurifiToolkit sharedInstance] initSDK];
             if (ret == nil)
             {
                 NSLog(@"Thread - SDKInit Error");
@@ -125,7 +125,7 @@ static BOOL isBusy=NO;
     
     NSError *error;
     id ret = nil;
-    ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
+    ret = [[SecurifiToolkit sharedInstance] sendtoCloud:sanityCommand error:&error];
     if (ret != nil)
     {
         NSLog(@"initSDK - Send Sanity Successful");

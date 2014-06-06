@@ -47,10 +47,13 @@
 
 @interface SecurifiToolkit : NSObject
 
-+(id)initSDK;
-+(id)initSDKCloud;
-+(id)sendtoCloud:(id)sender error:(NSError **)outError;
++ (instancetype)sharedInstance;
+
+- (void)initSDK;
+- (void)initSDKCloud;
+- (id)sendToCloud:(id)sender error:(NSError **)outError;
 //+(BOOL)isLoggedin;
-+(NSInteger) getConnectionState;
+- (NSInteger)getConnectionState;
+
 @end
  

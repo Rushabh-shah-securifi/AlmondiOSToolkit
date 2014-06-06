@@ -11,9 +11,6 @@
 #import "LoginTempPass.h"
 #import "PrivateCommandTypes.h"
 
-//todo remove me or push into a property
-dispatch_queue_t bgQueue;
-
 #define SDK_UNINITIALIZED 0
 #define NETWORK_DOWN   1
 #define NOT_LOGGED_IN   2
@@ -22,80 +19,100 @@ dispatch_queue_t bgQueue;
 #define INITIALIZING  5
 #define CLOUD_CONNECTION_ENDED  6
 
+@interface SecurifiToolkit ()
+@property (nonatomic) dispatch_queue_t bgQueue;
+@property (nonatomic) dispatch_queue_t cloudQueue;
+@end
+
 @implementation SecurifiToolkit
 
++ (instancetype)sharedInstance {
+    static dispatch_once_t pred;
+    static SecurifiToolkit *singleton = nil;
 
-+ (id)initSDK {
+    dispatch_once(&pred, ^{
+        singleton = [SecurifiToolkit new];
+    });
+
+    return singleton;
+}
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _bgQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
+        _cloudQueue = dispatch_queue_create("cloud_connect_queue", DISPATCH_QUEUE_SERIAL);
+    }
+
+    return self;
+}
+
+
+- (void)initSDK {
     NSLog(@"INIT SDK");
 
     [SingleTon removeSingletonObject];
     [SingleTon createSingletonObj];
 
-    if (!bgQueue) {
-        bgQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
-    }
-
     //Start a Async task of sending Sanity command and TempPassCommand and return YES
     //Async task will send command and will generate respective events
 
-    dispatch_async(bgQueue, ^(void) {
-        SingleTon *socket = [SingleTon getObject];
-        [socket setConnectionState:INITIALIZING];
+    dispatch_async(self.bgQueue, ^(void) {
+        SingleTon *singleTon = [SingleTon getObject];
+        [singleTon setConnectionState:INITIALIZING];
 
         GenericCommand *sanityCommand = [[GenericCommand alloc] init];
         sanityCommand.commandType = CLOUD_SANITY;
         sanityCommand.command = nil;
 
         NSError *error;
+        id ret = [self sendToCloud:sanityCommand error:&error];
+        if (ret == nil || error) {
+            [singleTon setConnectionState:NETWORK_DOWN];
+            NSLog(@"Error init sdk after sending cmd: %@", error.localizedDescription);
+            return;
+        }
 
-        id ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
-        if (ret != nil) {
-            NSLog(@"Method Name: %s SESSION STARTED TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-            NSLog(@"initSDK - Send Sanity Successful");
+        NSLog(@"Method Name: %s SESSION STARTED TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+        NSLog(@"initSDK - Send Sanity Successful");
 
-            //Send Temppass command
-            @try {
-                NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-                if ([prefs objectForKey:PASSWORD] && [prefs objectForKey:USERID]) {
-                    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-                    LoginTempPass *loginCommand = [[LoginTempPass alloc] init];
+        //Send Temppass command
+        @try {
+            //todo store password in keychain, not user defaults
+            NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+            if ([prefs objectForKey:PASSWORD] && [prefs objectForKey:USERID]) {
+                GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+                LoginTempPass *loginCommand = [[LoginTempPass alloc] init];
 
-                    loginCommand.UserID = [prefs objectForKey:USERID];
-                    loginCommand.TempPass = [prefs objectForKey:PASSWORD];
+                loginCommand.UserID = [prefs objectForKey:USERID];
+                loginCommand.TempPass = [prefs objectForKey:PASSWORD];
 
-                    cloudCommand.commandType = LOGIN_TEMPPASS_COMMAND;
-                    cloudCommand.command = loginCommand;
+                cloudCommand.commandType = LOGIN_TEMPPASS_COMMAND;
+                cloudCommand.command = loginCommand;
 
-                    NSError *error_2;
-                    id ret_2 = [SecurifiToolkit sendtoCloud:cloudCommand error:&error_2];
-                    if (error_2) {
-                        NSLog(@"Error init sdk: %@", error_2.localizedDescription);
-                        [socket setConnectionState:NETWORK_DOWN];
-                    }
-                    else if (ret_2 != nil) {
-                        NSLog(@"initSDK - Temp login sent");
-                        [socket setConnectionState:LOGGING];
-                    }
-                    else {
-                        NSLog(@"Error init sdk: %@", error_2.localizedDescription);
-                        [socket setConnectionState:NETWORK_DOWN];
-                    }
+                NSError *error_2;
+                id ret_2 = [self sendToCloud:cloudCommand error:&error_2];
+                if (ret_2 == nil || error_2) {
+                    NSLog(@"Error init sdk: %@", error_2.localizedDescription);
+                    [singleTon setConnectionState:NETWORK_DOWN];
                 }
                 else {
-                    NSLog(@"TempPass not found in preferences");
-                    //// [SNLog Log:@"Method Name: %s TempPass not found in preferences", __PRETTY_FUNCTION__];
-                    //Send notification so that App can display Login / Password screen
-                    //[SecurifiToolkit initSDKCloud];
-                    [socket setConnectionState:NOT_LOGGED_IN];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:nil];
+                    NSLog(@"initSDK - Temp login sent");
+                    [singleTon setConnectionState:LOGGING];
                 }
             }
-            @catch (NSException *e) {
-                NSLog(@" Network Down %@", e.reason);
+            else {
+                NSLog(@"TempPass not found in preferences");
+                //// [SNLog Log:@"Method Name: %s TempPass not found in preferences", __PRETTY_FUNCTION__];
+                //Send notification so that App can display Login / Password screen
+                //[SecurifiToolkit initSDKCloud];
+                [singleTon setConnectionState:NOT_LOGGED_IN];
+                [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:nil];
             }
         }
-        else {
-            [socket setConnectionState:NETWORK_DOWN];
+        @catch (NSException *e) {
+            [singleTon setConnectionState:NETWORK_DOWN];
+            NSLog(@" Exception throw on init sdk. Network down: %@", e.reason);
         }
     });
     //4. Send temppass login command
@@ -104,8 +121,6 @@ dispatch_queue_t bgQueue;
 
     //For initSDK
 
-
-    return @"Yes";
 
     //Send tempPass Command to check existing login
     //Send SANITY_COMMAND TO chekc cloud connectivity and insturct main app that you are
@@ -150,7 +165,7 @@ dispatch_queue_t bgQueue;
 ////        
 ////        NSError *error;
 ////        id ret = nil;
-////        ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
+////        ret = [[SecurifiToolkit sharedInstance] sendtoCloud:sanityCommand error:&error];
 ////        sanityCommand=nil;
 ////        
 ////        if (ret != nil)
@@ -172,7 +187,7 @@ dispatch_queue_t bgQueue;
 //                    
 //                    NSError *error;
 //                    id ret = nil;
-//                    ret = [SecurifiToolkit sendtoCloud:cloudCommand error:&error];
+//                    ret = [[SecurifiToolkit sharedInstance] sendtoCloud:cloudCommand error:&error];
 //                    if (ret != nil)
 //                    {
 //                        NSLog(@"init Reconnect SDK - Temp login sent");
@@ -221,8 +236,7 @@ dispatch_queue_t bgQueue;
 //    
 //}
 
-+(NSInteger)getConnectionState
-{
+- (NSInteger)getConnectionState {
     SingleTon *socket = [SingleTon getObject];
     return [socket connectionState];
 }
@@ -246,17 +260,15 @@ dispatch_queue_t bgQueue;
 */
 
 /*PY 190913 To Establish cloud connection without trying to login - Useful for Logout command*/
-+ (id)initSDKCloud {
-    NSLog(@"Init Cloud");
+- (void)initSDKCloud {
+    NSLog(@"Init SDK Cloud");
+
     [SingleTon removeSingletonObject];
     [SingleTon createSingletonObj];
 
-    //todo this leaks; why not just use default queue.
-    dispatch_queue_t cloudQueue = dispatch_queue_create("cloud_connect_queue", DISPATCH_QUEUE_SERIAL);
-
     //Start a Async task of sending Sanity command and TempPassCommand and return YES
     //Async task will send command and will generate respective events
-    dispatch_async(cloudQueue, ^(void) {
+    dispatch_async(self.cloudQueue, ^(void) {
         SingleTon *socket = [SingleTon getObject];
 
         GenericCommand *sanityCommand = [[GenericCommand alloc] init];
@@ -264,18 +276,16 @@ dispatch_queue_t bgQueue;
         sanityCommand.command = nil;
 
         NSError *error;
-
-        id ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
-        if (ret != nil) {
+        id ret = [self sendToCloud:sanityCommand error:&error];
+        if (ret == nil || error) {
+            NSLog(@"Failed to init SDK cloud: %@", error.description);
+            [socket setConnectionState:NETWORK_DOWN];
+        }
+        else {
             NSLog(@"Method Name: %s SESSION STARTED - SANITY TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
             [socket setConnectionState:NOT_LOGGED_IN];
         }
-        else {
-            [socket setConnectionState:NETWORK_DOWN];
-        }
     });
-
-    return @"Yes";
 }
 
 /*
@@ -314,10 +324,8 @@ dispatch_queue_t bgQueue;
 }
 */
 
-+(id)sendtoCloud:(id)sender error:(NSError **)outError
-{
+- (id)sendToCloud:(id)sender error:(NSError **)outError {
     @synchronized(self){
-        
         SingleTon *socket = [SingleTon getObject];
         
         do {
@@ -416,7 +424,7 @@ dispatch_queue_t bgQueue;
 //                    [socket setConnectionState:NOT_LOGGED_IN];
 //                    
 //                    //PY 160913 - Reconnect to cloud
-//                    id ret = [SecurifiToolkit initSDKCloud];
+//                    id ret = [[SecurifiToolkit sharedInstance] initSDKCloud];
 //                    if (ret == nil)
 //                    {
 //                        // [SNLog Log:@"Method Name: %s APP Delegate : SDKInit Error",__PRETTY_FUNCTION__];
@@ -827,8 +835,7 @@ dispatch_queue_t bgQueue;
     }//synchronized
 }
 
-+ (NSString *)stringByRemovingEscapeCharacters: (NSString *)inputString
-{
+- (NSString *)stringByRemovingEscapeCharacters:(NSString *)inputString {
     NSMutableString *s = [NSMutableString stringWithString:inputString];
     [s replaceOccurrencesOfString:@"\\\"" withString:@"\"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
 //    //[s replaceOccurrencesOfString:@"/" withString:@"\\/" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];

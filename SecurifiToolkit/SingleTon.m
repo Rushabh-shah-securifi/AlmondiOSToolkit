@@ -143,7 +143,7 @@ static BOOL isBusy=NO;
     sanityCommand.command = nil;
 
     NSError *error;
-    id ret = [SecurifiToolkit sendtoCloud:sanityCommand error:&error];
+    id ret = [[SecurifiToolkit sharedInstance] sendToCloud:sanityCommand error:&error];
     if (ret != nil) {
         // NSLog(@"Reconnect initSDK - Send Sanity Successful");
 
