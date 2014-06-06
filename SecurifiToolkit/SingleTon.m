@@ -87,44 +87,26 @@ static BOOL isBusy=NO;
 }
 
 - (void)reconnect {
-    //@synchronized(self)
-    //{
-    // NSLog(@"State Reconnect %d",[single connectionState]);
-    id ret = nil;
-    unsigned int i = 1;
-    //[single setConnectionState:RECONNECT];
     if (isBusy == NO) {
         isBusy = YES;
-        //self.disableNetworkDownNotification=YES;
-        while (ret == nil && i < 5) {
 
-            ret = [self initReconnectSDK];
-            //            if (ret == nil)
-            //            {
-            //                // [SNLog Log:@"Method Name: %s Thread - SDKInit Error", __PRETTY_FUNCTION__];
-            ////                if (1 == i)
-            ////                {
-            ////                    // [SNLog Log:@"Method Name: %s Server not reachable", __PRETTY_FUNCTION__];
-            ////                    [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
-            ////                }
-            //            }
-            // [SNLog Log:@"Method Name: %s Thread - Sleeping for %d seconds", __PRETTY_FUNCTION__,i];
-            sleep(i);
-            i += 1;
+        unsigned int attempt_count = 1;
+        while (attempt_count < 5) {
+            BOOL success = [self initReconnectSDK];
+            if (success) {
+                break;
+            }
+            sleep(attempt_count);
+            attempt_count += 1;
         }
+
         [[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkUp" object:self userInfo:nil];
         //self.disableNetworkDownNotification=NO;
         isBusy = NO;
     }
-    // [SNLog Log:@"Method Name: %s Out of reconnect thread", __PRETTY_FUNCTION__];
-
-    //}
-    /*
-     
-     */
 }
 
-- (id)initReconnectSDK {
+- (BOOL)initReconnectSDK {
     // NSLog(@"In Reconnect");
     [SingleTon removeSingletonObject];
     [SingleTon createSingletonObj];
@@ -149,11 +131,11 @@ static BOOL isBusy=NO;
 
         //Notify main app
         [single setConnectionState:SDK_UNINITIALIZED];
-        return @"Yes";
+        return YES;
     }
     else {
         // NSLog(@"Reconnect Error : %@",[error localizedDescription]);
-        return nil;
+        return NO;
         //Dont notify User about network down unless it has been asked
         //Only notify once its back on internet
 
