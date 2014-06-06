@@ -9,12 +9,8 @@
 //
 
 #import "CommandParser.h"
-#import <libxml/tree.h>
 #import "GenericCommand.h"
 #import "PrivateCommandTypes.h"
-
-#import "SNLog.h"
-
 
 #pragma mark Constants
 
@@ -148,17 +144,11 @@ static const NSUInteger kLength_MaxTag  =                   35;
 //static const NSUInteger kLength_ValueCount =                10;
 
 
-
-
-#define SUCCESS @"success";
-
-
-
-#pragma  mark Functions
+#pragma mark - Functions
 
 // Function prototypes for SAX callbacks. This sample implements a minimal subset of SAX callbacks.
 // Depending on your application's needs, you might want to implement more callbacks.
-static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar *URI, int nb_namespaces, const xmlChar **namespaces, int nb_attributes, int nb_defaulted, const xmlChar **attributes);
+static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar *URI, int __unused nb_namespaces, const xmlChar **namespaces, int nb_attributes, int nb_defaulted, const xmlChar **attributes);
 static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar *URI);
 static void	charactersFoundSAX(void * ctx, const xmlChar * ch, int len);
 static void errorEncounteredSAX(void * ctx, const char * msg, ...);
@@ -167,7 +157,11 @@ static void errorEncounteredSAX(void * ctx, const char * msg, ...);
 static xmlSAXHandler simpleSAXHandlerStruct;
 
 @implementation CommandParser
-@synthesize characterBuffer, done, parsingCommand, storingCharacters, storingCommandType;
+@synthesize characterBuffer;
+@synthesize storingCommandType;
+@synthesize storingCharacters;
+@synthesize parsingCommand;
+@synthesize done;
 @synthesize command;
 @synthesize commandType;
 @synthesize tmpAlmondList;
@@ -184,7 +178,8 @@ static xmlSAXHandler simpleSAXHandlerStruct;
     @try{
         self.characterBuffer = [[NSMutableData alloc] init];
         context = xmlCreatePushParserCtxt(&simpleSAXHandlerStruct, (__bridge void *)(self), NULL, 0, NULL);
-        xmlParseChunk(context, (const char *)[xmlData bytes], [xmlData length], 0);
+        NSUInteger length = [xmlData length];
+        xmlParseChunk(context, (const char *)[xmlData bytes], (int) length, 0);
         xmlParseChunk(context, NULL, 0, 1);// 1 to end parsing
         done = YES;
         
@@ -340,14 +335,11 @@ static xmlSAXHandler simpleSAXHandlerStruct;
 }
 
 - (void)appendCharacters:(const char *)charactersFound length:(NSInteger)length {
-    
     //// NSLog(@"Buffer : %@",[characterBuffer bytes]);
-    [characterBuffer appendBytes:charactersFound length:length];
-    
+    [characterBuffer appendBytes:charactersFound length:(NSUInteger) length];
 }
 
 - (NSString *)currentString {
-    
     // Create a string with the character data using UTF-8 encoding. UTF-8 is the default XML data encoding.
     NSString *currentString = [[NSString alloc] initWithData:characterBuffer encoding:NSUTF8StringEncoding];
     [characterBuffer setLength:0];
@@ -378,8 +370,8 @@ static xmlSAXHandler simpleSAXHandlerStruct;
  child nodes of the Song currently being parsed. For those nodes we want to accumulate the character data
  in a buffer. Some of the child nodes use a namespace prefix.
  */
-static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar *URI,
-                            int nb_namespaces, const xmlChar **namespaces, int nb_attributes, int nb_defaulted, const xmlChar **attributes) {
+static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar __unused *URI,
+                            int __unused nb_namespaces, const xmlChar __unused **namespaces, int nb_attributes, int __unused nb_defaulted, const xmlChar **attributes) {
     
     CommandParser *parser = (__bridge CommandParser *)ctx;
     // The second parameter to strncmp is the name of the element, which we known from the XML schema of the feed.
@@ -387,7 +379,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //// NSLog(@"localName: %s current string: %@ size: %lu", localname ,[parser currentString] ,(unsigned long)[[parser currentString] length]);
     if (prefix == NULL && !strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag)) {
         LoginResponse *loginResponse = [[LoginResponse alloc]init];
-        parser.command = (LoginResponse *)loginResponse;
+        parser.command = loginResponse;
         parser.storingCommandType=LOGIN_RESPONSE;
         
         //// NSLog(@"localName: %s", localname);
@@ -397,7 +389,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         //Parse attribute value
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -412,7 +404,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     } else if (prefix == NULL && !strncmp((const char *)localname, kName_SanityResponse, kLength_MaxTag))
     {
         SanityResponse *sanityResponse = [[SanityResponse alloc]init];
-        parser.command = (SanityResponse *)sanityResponse;
+        parser.command = sanityResponse;
         //// NSLog(@"localName: %s", localname);
         parser.parsingCommand = YES;
         parser.storingCommandType=CLOUD_SANITY_RESPONSE;
@@ -429,13 +421,13 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     {
         //PY 301013 - Revised Affiliation Process
         AffiliationUserComplete *affUserResponse= [[AffiliationUserComplete alloc]init];
-        parser.command = (AffiliationUserComplete *)affUserResponse;
+        parser.command = affUserResponse;
         
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -470,12 +462,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     else if (prefix == NULL && !strncmp((const char *)localname, kName_SignupResponse, kLength_MaxTag))
     {
         SignupResponse *signupRes= [[SignupResponse alloc]init];
-        parser.command = (SignupResponse *)signupRes;
+        parser.command = signupRes;
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -494,11 +486,11 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     else if (prefix == NULL && !strncmp((const char *)localname, kName_LogoutResponse, kLength_MaxTag))
     {
         LogoutResponse *logoutResponse= [[LogoutResponse alloc]init];
-        parser.command = (LogoutResponse *)logoutResponse;
+        parser.command = logoutResponse;
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -516,11 +508,11 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     else if (prefix == NULL && !strncmp((const char *)localname, kName_LogoutAllResponse, kLength_MaxTag))
     {
         LogoutAllResponse *logoutResponse= [[LogoutAllResponse alloc]init];
-        parser.command = (LogoutAllResponse *)logoutResponse;
+        parser.command = logoutResponse;
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -537,7 +529,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY160913 - Almond List Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_AlmondListResponse, kLength_MaxTag)){
         AlmondListResponse *almondListResponse = [[AlmondListResponse alloc]init];
-        parser.command = (AlmondListResponse *)almondListResponse;
+        parser.command = almondListResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Success attribute
@@ -549,13 +541,13 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         //To get Count attribute
         attributes += 5;
         
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         
         if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
             [parser.command setIsSuccessful:1];
-            [parser.command setDeviceCount:[countVal integerValue]];
+            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
             parser.tmpAlmondList = [[NSMutableArray alloc]init]; //Create AlmondPlusMAC List
         }else{
             [parser.command setIsSuccessful:0];
@@ -568,12 +560,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY170913 - Device Hash Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceDataHashResponse, kLength_MaxTag)){
         DeviceDataHashResponse *deviceDataHashResponse = [[DeviceDataHashResponse alloc]init];
-        parser.command = (DeviceDataHashResponse *)deviceDataHashResponse;
+        parser.command = deviceDataHashResponse;
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -591,7 +583,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY170913 - Device Data Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceDataResponse, kLength_MaxTag)){
         DeviceListResponse *deviceDataResponse = [[DeviceListResponse alloc]init];
-        parser.command = (DeviceListResponse *)deviceDataResponse;
+        parser.command = deviceDataResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Success attribute
@@ -603,14 +595,14 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         //To get Count attribute
         attributes += 5;
         
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         
         if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
             [parser.command setIsSuccessful:1];
             //Set count
-            [parser.command setDeviceCount:[countVal integerValue]];
+            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
             parser.tmpDeviceList = [[NSMutableArray alloc]init]; //Create Device List
         }else{
             [parser.command setIsSuccessful:0];
@@ -629,7 +621,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         parser.tmpDevice = [[SFIDevice alloc]init];
         if([deviceIDKey isEqualToString:@"ID"]){
-            [parser.tmpDevice setDeviceID:[deviceIDVal integerValue]];
+            [parser.tmpDevice setDeviceID:(unsigned int) [deviceIDVal intValue]];
         }else{
             //Not possible: (no device id comes from cloud)
             [parser.tmpDevice setDeviceID:0];
@@ -639,16 +631,16 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY190913 - Device Value Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)){
         DeviceValueResponse *deviceValueResponse = [[DeviceValueResponse alloc]init];
-        parser.command = (DeviceValueResponse *)deviceValueResponse;
+        parser.command = deviceValueResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         
         //To get Count attribute
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         //Set count
-        [parser.command setDeviceCount:[countVal integerValue]];
+        [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
         parser.deviceValues = [[NSMutableArray alloc]init]; //Create Device Value List
         parser.parsingCommand = YES;
         parser.storingCommandType = DEVICE_VALUE_LIST_RESPONSE;
@@ -662,7 +654,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         parser.tmpDeviceValue = [[SFIDeviceValue alloc]init];
         if([deviceIDKey isEqualToString:@"ID"]){
-            [parser.tmpDeviceValue setDeviceID:[deviceIDVal integerValue]];
+            [parser.tmpDeviceValue setDeviceID:(unsigned int) [deviceIDVal intValue]];
         }else{
             //Not possible: (no device id comes from cloud)
             [parser.tmpDeviceValue setDeviceID:0];
@@ -672,11 +664,11 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
               && (parser.storingCommandType == DEVICE_VALUE_LIST_RESPONSE))
     {
         //Get Value Variable Count
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
-        
-        [parser.tmpDeviceValue setValueCount:[countVal integerValue]];
+
+        [parser.tmpDeviceValue setValueCount:(unsigned int) [countVal intValue]];
         //Create Device Known Value List
         parser.knownDeviceValues = [[NSMutableArray alloc]init];
         
@@ -712,7 +704,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.tmpDeviceKnownValue = [[SFIDeviceKnownValues alloc]init];
         //Save Index
         if([indexKey isEqualToString:@"Index"]){
-            [parser.tmpDeviceKnownValue setIndex:[indexVal integerValue]];
+            [parser.tmpDeviceKnownValue setIndex:(unsigned int) [indexVal intValue]];
         }
         //Save Name
         if([nameKey isEqualToString:@"Name"]){
@@ -728,12 +720,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY200913 - Mobile Command Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_MobileCommandResponse, kLength_MaxTag)){
         MobileCommandResponse *mobileCommandResponse = [[MobileCommandResponse alloc]init];
-        parser.command = (MobileCommandResponse *)mobileCommandResponse;
+        parser.command = mobileCommandResponse;
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -751,15 +743,15 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY 230913 - Device Value List Response - 82
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicDeviceValueList, kLength_MaxTag)){
         DeviceValueResponse *deviceValueResponse = [[DeviceValueResponse alloc]init];
-        parser.command = (DeviceValueResponse *)deviceValueResponse;
+        parser.command = deviceValueResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Count attribute
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         //Set count
-        [parser.command setDeviceCount:[countVal integerValue]];
+        [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
         parser.deviceValues = [[NSMutableArray alloc]init]; //Create Device Value List
         parser.parsingCommand = YES;
         parser.storingCommandType = DYNAMIC_DEVICE_VALUE_LIST;
@@ -767,15 +759,15 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //To be removed later
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceValueList, kLength_MaxTag)){
         DeviceValueResponse *deviceValueResponse = [[DeviceValueResponse alloc]init];
-        parser.command = (DeviceValueResponse *)deviceValueResponse;
+        parser.command = deviceValueResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Count attribute
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         //Set count
-        [parser.command setDeviceCount:[countVal integerValue]];
+        [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
         parser.deviceValues = [[NSMutableArray alloc]init]; //Create Device Value List
         parser.parsingCommand = YES;
         parser.storingCommandType = DYNAMIC_DEVICE_VALUE_LIST;
@@ -790,7 +782,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         parser.tmpDeviceValue = [[SFIDeviceValue alloc]init];
         if([deviceIDKey isEqualToString:@"ID"]){
-            [parser.tmpDeviceValue setDeviceID:[deviceIDVal integerValue]];
+            [parser.tmpDeviceValue setDeviceID:(unsigned int) [deviceIDVal intValue]];
         }else{
             //Not possible: (no device id comes from cloud)
             [parser.tmpDeviceValue setDeviceID:0];
@@ -800,11 +792,11 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
               && (parser.storingCommandType == DYNAMIC_DEVICE_VALUE_LIST))
     {
         //Get Value Variable Count
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
-        
-        [parser.tmpDeviceValue setValueCount:[countVal integerValue]];
+
+        [parser.tmpDeviceValue setValueCount:(unsigned int) [countVal intValue]];
         //Create Device Known Value List
         parser.knownDeviceValues = [[NSMutableArray alloc]init];
         
@@ -840,7 +832,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.tmpDeviceKnownValue = [[SFIDeviceKnownValues alloc]init];
         //Save Index
         if([indexKey isEqualToString:@"Index"]){
-            [parser.tmpDeviceKnownValue setIndex:[indexVal integerValue]];
+            [parser.tmpDeviceKnownValue setIndex:(unsigned int) [indexVal intValue]];
         }
         //Save Name
         if([nameKey isEqualToString:@"Name"]){
@@ -869,7 +861,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         parser.tmpAlmond = [[SFIAlmondPlus alloc]init];
         if([almondIDKey isEqualToString:@"Index"]){
-            [parser.tmpAlmond setIndex:[almondIDVal integerValue]];
+            [parser.tmpAlmond setIndex:[almondIDVal intValue]];
         }else{
             //Not possible: (no device id comes from cloud)
             [parser.tmpAlmond setIndex:0];
@@ -879,12 +871,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     else if (prefix == NULL && !strncmp((const char *)localname, kName_GenericCommandResponse, kLength_MaxTag))
     {
         GenericCommandResponse *genericRes= [[GenericCommandResponse alloc]init];
-        parser.command = (GenericCommandResponse *)genericRes;
+        parser.command = genericRes;
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -903,12 +895,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     else if (prefix == NULL && !strncmp((const char *)localname, kName_GenericCommandNotification, kLength_MaxTag))
     {
         GenericCommandResponse *genericRes= [[GenericCommandResponse alloc]init];
-        parser.command = (GenericCommandResponse *)genericRes;
+        parser.command = genericRes;
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -927,12 +919,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     else if (prefix == NULL && !strncmp((const char *)localname, kName_ValidateAccountResponse, kLength_MaxTag))
     {
         ValidateAccountResponse *validateRes= [[ValidateAccountResponse alloc]init];
-        parser.command = (ValidateAccountResponse *)validateRes;
+        parser.command = validateRes;
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -950,12 +942,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     else if (prefix == NULL && !strncmp((const char *)localname, kName_ResetPasswordResponse, kLength_MaxTag))
     {
         ResetPasswordResponse *resetPwdRes= [[ResetPasswordResponse alloc]init];
-        parser.command = (ResetPasswordResponse *)resetPwdRes;
+        parser.command = resetPwdRes;
         // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
         
         const char *begin = (const char *)attributes[0 + 3];
         const char *end = (const char *)attributes[0 + 4];
-        int vlen = end - begin;
+        long vlen = end - begin;
         char val[vlen + 1];
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
@@ -974,7 +966,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY 221113 - 81 Command - Tag Changed to DynamicDeviceData from DeviceDataResponse
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicDeviceData, kLength_MaxTag)){
         DeviceListResponse *deviceDataResponse = [[DeviceListResponse alloc]init];
-        parser.command = (DeviceListResponse *)deviceDataResponse;
+        parser.command = deviceDataResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Success attribute
@@ -986,14 +978,14 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         //To get Count attribute
         attributes += 5;
         
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         
         if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
             [parser.command setIsSuccessful:1];
             //Set count
-            [parser.command setDeviceCount:[countVal integerValue]];
+            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
             parser.tmpDeviceList = [[NSMutableArray alloc]init]; //Create Device List
         }else{
             [parser.command setIsSuccessful:0];
@@ -1008,7 +1000,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY 201213 - Almond List ADD - 83
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicAlmondAdd, kLength_MaxTag)){
         AlmondListResponse *almondListResponse = [[AlmondListResponse alloc]init];
-        parser.command = (AlmondListResponse *)almondListResponse;
+        parser.command = almondListResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Success attribute
@@ -1020,7 +1012,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         //To get Count attribute
         attributes += 5;
         
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         
@@ -1037,7 +1029,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
             [parser.command setIsSuccessful:1];
             //Set count
-            [parser.command setDeviceCount:[countVal integerValue]];
+            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
 //            [parser.command setAction:actionVal];
             parser.tmpAlmondList = [[NSMutableArray alloc]init]; //Create AlmondPlusMAC List
         }else{
@@ -1060,7 +1052,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         parser.tmpAlmond = [[SFIAlmondPlus alloc]init];
         if([almondIDKey isEqualToString:@"Index"]){
-            [parser.tmpAlmond setIndex:[almondIDVal integerValue]];
+            [parser.tmpAlmond setIndex:[almondIDVal intValue]];
         }else{
             //Not possible: (no device id comes from cloud)
             [parser.tmpAlmond setIndex:0];
@@ -1069,7 +1061,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY 241213 - Almond List DELETE - 84
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicAlmondDelete, kLength_MaxTag)){
         AlmondListResponse *almondListResponse = [[AlmondListResponse alloc]init];
-        parser.command = (AlmondListResponse *)almondListResponse;
+        parser.command = almondListResponse;
         // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Success attribute
@@ -1081,14 +1073,14 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         //To get Count attribute
         attributes += 5;
         
-        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
         
         if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
             [parser.command setIsSuccessful:1];
             //Set count
-            [parser.command setDeviceCount:[countVal integerValue]];
+            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
             parser.tmpAlmondList = [[NSMutableArray alloc]init]; //Create AlmondPlusMAC List
         }else{
             [parser.command setIsSuccessful:0];
@@ -1109,7 +1101,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         parser.tmpAlmond = [[SFIAlmondPlus alloc]init];
         if([almondIDKey isEqualToString:@"Index"]){
-            [parser.tmpAlmond setIndex:[almondIDVal integerValue]];
+            [parser.tmpAlmond setIndex:[almondIDVal intValue]];
         }else{
             //Not possible: (no device id comes from cloud)
             [parser.tmpAlmond setIndex:0];
@@ -1118,7 +1110,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY 200114 - Sensor Change Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_SensorChangeResponse, kLength_MaxTag)){
         SensorChangeResponse *sensorChangeResponse = [[SensorChangeResponse alloc]init];
-        parser.command = (SensorChangeResponse *)sensorChangeResponse;
+        parser.command = sensorChangeResponse;
         //[SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
         
         //To get Success attribute
@@ -1139,7 +1131,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
     //PY 2080214 - Dynamic Name Change Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicAlmondNameChange, kLength_MaxTag)){
         DynamicAlmondNameChangeResponse *almondNameChangeResponse = [[DynamicAlmondNameChangeResponse alloc]init];
-        parser.command = (DynamicAlmondNameChangeResponse *)almondNameChangeResponse;
+        parser.command = almondNameChangeResponse;
         parser.parsingCommand = YES;
         parser.storingCommandType = DYNAMIC_ALMOND_NAME_CHANGE;
     }
@@ -1187,8 +1179,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
  care about, this means we have all the character data. The next step is to create an NSString using the buffer
  contents and store that with the current Song object.
  */
-static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar *URI) {
-    
+static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar __unused *URI) {
     CommandParser *parser = (__bridge CommandParser *)ctx;
     if (parser.parsingCommand == NO) return;
     //// NSLog(@"Prefix in endElementSAX : %s",prefix);
@@ -1235,7 +1226,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
                  && (parser.storingCommandType == AFFILIATION_USER_COMPLETE))
         {
-            [parser.command setReasonCode:[[parser currentString] integerValue]];
+            [parser.command setReasonCode:[[parser currentString] intValue]];
         }
         //PY121113
         else if (!strncmp((const char *)localname, kName_WifiSSID, kLength_MaxTag)
@@ -1272,7 +1263,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
                  && (parser.storingCommandType == LOGIN_RESPONSE))
         {
-            [parser.command setReasonCode:[[parser currentString] integerValue]];
+            [parser.command setReasonCode:[[parser currentString] intValue]];
         }
         else if (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag)) {
             //[parser finishedCurrentSong];
@@ -1300,7 +1291,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }
         //PY 181013 - Signup Reason Code
         else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag) && (parser.storingCommandType == SIGNUP_RESPONSE)) {
-            [parser.command setReasonCode:[[parser currentString] integerValue]];
+            [parser.command setReasonCode:[[parser currentString] intValue]];
         }
         else if (!strncmp((const char *)localname, kName_SignupResponse, kLength_MaxTag)) {
             // [SNLog Log:@"Method Name: %s Signup Command Parsing done", __PRETTY_FUNCTION__];
@@ -1360,7 +1351,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_DeviceTechnology, kLength_MaxTag)
                   && (parser.storingCommandType == DEVICEDATA_RESPONSE))
         {
-            [parser.tmpDevice setDeviceTechnology:[[parser currentString] intValue]];
+            [parser.tmpDevice setDeviceTechnology:(unsigned int) [[parser currentString] intValue]];
             
         }else if (!strncmp((const char *)localname, kName_AssociationTimestamp, kLength_MaxTag)
                   && (parser.storingCommandType == DEVICEDATA_RESPONSE))
@@ -1370,7 +1361,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_DeviceType, kLength_MaxTag)
                   && (parser.storingCommandType == DEVICEDATA_RESPONSE))
         {
-            [parser.tmpDevice setDeviceType:[[parser currentString] intValue]];
+            [parser.tmpDevice setDeviceType:(unsigned int) [[parser currentString] intValue]];
             
         }else if (!strncmp((const char *)localname, kName_DeviceTypeName, kLength_MaxTag)
                   && (parser.storingCommandType == DEVICEDATA_RESPONSE))
@@ -1395,8 +1386,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_ValueCount, kLength_MaxTag)
                   && (parser.storingCommandType == DEVICEDATA_RESPONSE))
         {
-            [parser.tmpDevice setValueCount:[[parser currentString] intValue]];
-            
+            [parser.tmpDevice setValueCount:(unsigned int) [[parser currentString] intValue]];
         }
         //PY 121113
         else if (!strncmp((const char *)localname, kName_Location, kLength_MaxTag)
@@ -1481,7 +1471,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
                   && (parser.storingCommandType == MOBILE_COMMAND_RESPONSE))
         {
-            [parser.command setMobileInternalIndex:[[parser currentString] intValue]];
+            [parser.command setMobileInternalIndex:(unsigned int) [[parser currentString] intValue]];
             
         }else if (!strncmp((const char *)localname, kName_MobileCommandResponse, kLength_MaxTag)
                   && (parser.storingCommandType == MOBILE_COMMAND_RESPONSE))
@@ -1615,7 +1605,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
                   && (parser.storingCommandType == GENERIC_COMMAND_RESPONSE))
         {
-            [parser.command setMobileInternalIndex:[[parser currentString] integerValue]];
+            [parser.command setMobileInternalIndex:(unsigned int) [[parser currentString] intValue]];
         }else if (!strncmp((const char *)localname, kName_Data, kLength_MaxTag)
                   && (parser.storingCommandType == GENERIC_COMMAND_RESPONSE))
         {
@@ -1645,7 +1635,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
                   && (parser.storingCommandType == GENERIC_COMMAND_NOTIFICATION))
         {
-            [parser.command setMobileInternalIndex:[[parser currentString] integerValue]];
+            [parser.command setMobileInternalIndex:(unsigned int) [[parser currentString] intValue]];
         }else if (!strncmp((const char *)localname, kName_Data, kLength_MaxTag)
                   && (parser.storingCommandType == GENERIC_COMMAND_NOTIFICATION))
         {
@@ -1657,7 +1647,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag) && (parser.storingCommandType == VALIDATE_RESPONSE)) {
             [parser.command setReason:[parser currentString]];
         }else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag) && (parser.storingCommandType == VALIDATE_RESPONSE)) {
-            [parser.command setReasonCode:[[parser currentString] integerValue]];
+            [parser.command setReasonCode:[[parser currentString] intValue]];
         }else if (!strncmp((const char *)localname, kName_ValidateAccountResponse, kLength_MaxTag)) {
             // [SNLog Log:@"Method Name: %s Validate Account Command Parsing done", __PRETTY_FUNCTION__];
             parser.commandType = VALIDATE_RESPONSE;
@@ -1668,7 +1658,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag) && (parser.storingCommandType == RESET_PASSWORD_RESPONSE)) {
             [parser.command setReason:[parser currentString]];
         }else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag) && (parser.storingCommandType == RESET_PASSWORD_RESPONSE)) {
-            [parser.command setReasonCode:[[parser currentString] integerValue]];
+            [parser.command setReasonCode:[[parser currentString] intValue]];
         }else if (!strncmp((const char *)localname, kName_ResetPasswordResponse, kLength_MaxTag)) {
             // [SNLog Log:@"Method Name: %s Reset Password Command Parsing done", __PRETTY_FUNCTION__];
             parser.commandType = RESET_PASSWORD_RESPONSE;
@@ -1740,7 +1730,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
                  && (parser.storingCommandType == SENSOR_CHANGE_RESPONSE))
         {
-            [parser.command setMobileInternalIndex:[[parser currentString] integerValue]];
+            [parser.command setMobileInternalIndex:(unsigned int) [[parser currentString] intValue]];
             
         }else if (!strncmp((const char *)localname, kName_SensorChangeResponse, kLength_MaxTag)
                  && (parser.storingCommandType == SENSOR_CHANGE_RESPONSE))
@@ -1757,7 +1747,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
                  && (parser.storingCommandType == LOGOUT_RESPONSE))
         {
-            [parser.command setReasonCode:[[parser currentString] integerValue]];
+            [parser.command setReasonCode:[[parser currentString] intValue]];
         }
         else if (!strncmp((const char *)localname, kName_LogoutResponse, kLength_MaxTag)) {
             parser.commandType = LOGOUT_RESPONSE;
@@ -1772,7 +1762,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
                  && (parser.storingCommandType == LOGOUT_ALL_RESPONSE))
         {
-            [parser.command setReasonCode:[[parser currentString] integerValue]];
+            [parser.command setReasonCode:[[parser currentString] intValue]];
         }
         else if (!strncmp((const char *)localname, kName_LogoutAllResponse, kLength_MaxTag)) {
             parser.commandType = LOGOUT_ALL_RESPONSE;
@@ -1818,7 +1808,7 @@ static void	charactersFoundSAX(void *ctx, const xmlChar *ch, int len) {
  A production application should include robust error handling as part of its parsing implementation.
  The specifics of how errors are handled depends on the application.
  */
-static void errorEncounteredSAX(void *ctx, const char *msg, ...) {
+static void errorEncounteredSAX(void __unused *ctx, const char *msg, ...) {
     //Handle errors as appropriate for your application.
     va_list arglist;
     
