@@ -20,8 +20,8 @@
 #define CLOUD_CONNECTION_ENDED  6
 
 @interface SecurifiToolkit ()
-@property (nonatomic) dispatch_queue_t bgQueue;
-@property (nonatomic) dispatch_queue_t cloudQueue;
+@property (nonatomic, readonly) dispatch_queue_t bgQueue;
+@property (nonatomic, readonly) dispatch_queue_t cloudQueue;
 @end
 
 @implementation SecurifiToolkit
