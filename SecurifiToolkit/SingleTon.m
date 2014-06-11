@@ -49,9 +49,6 @@
 static SingleTon *single=nil;
 
 //todo track down and remove
-//NSThread * nThread;
-
-//todo track down and remove
 static BOOL isDone=NO;
 
 //todo track down and remove
