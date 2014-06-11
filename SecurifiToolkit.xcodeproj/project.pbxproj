@@ -23,6 +23,9 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBCE19480D6C00E353D1 /* Reachability.m */; };
+		1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */; };
 		22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D42179132A40099CD8F /* CommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011C9E179543E80019D5A4 /* Login.h in Headers */ = {isa = PBXBuildFile; fileRef = 22011C9C179543E80019D5A4 /* Login.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011C9F179543E80019D5A4 /* Login.m in Sources */ = {isa = PBXBuildFile; fileRef = 22011C9D179543E80019D5A4 /* Login.m */; };
@@ -164,6 +167,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1C23FBCD19480D6C00E353D1 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		1C23FBCE19480D6C00E353D1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIReachabilityManager.h; sourceTree = "<group>"; };
+		1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIReachabilityManager.m; sourceTree = "<group>"; };
 		22011C9C179543E80019D5A4 /* Login.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Login.h; sourceTree = "<group>"; };
 		22011C9D179543E80019D5A4 /* Login.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Login.m; sourceTree = "<group>"; };
 		22011CA1179549C70019D5A4 /* LoginTempPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginTempPass.h; sourceTree = "<group>"; };
@@ -305,6 +312,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1C23FBCC19480D6C00E353D1 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				1C23FBCD19480D6C00E353D1 /* Reachability.h */,
+				1C23FBCE19480D6C00E353D1 /* Reachability.m */,
+				1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */,
+				1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */,
+			);
+			path = Reachability;
+			sourceTree = "<group>";
+		};
 		2204C2071794288500B05F17 /* network */ = {
 			isa = PBXGroup;
 			children = (
@@ -421,6 +439,7 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				1C23FBCC19480D6C00E353D1 /* Reachability */,
 				CE5EB63617E852AA00985636 /* models */,
 				CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */,
 				2253388317A6B7380051BF0F /* AffiliationUserRequest.h */,
@@ -589,6 +608,7 @@
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
+				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -805,6 +825,7 @@
 				22011C9F179543E80019D5A4 /* Login.m in Sources */,
 				CE9A2913188D2B240063D562 /* SensorChangeRequest.m in Sources */,
 				22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */,
+				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
 				CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */,
 				CE5EB64A17E86D2200985636 /* DeviceListResponse.m in Sources */,
 				22B326D01796D447004B3642 /* SanityResponse.m in Sources */,
@@ -812,6 +833,7 @@
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
+				1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */,
 				CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */,
 				CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */,
 				22FAE88917A8E528002FFEE8 /* Signup.m in Sources */,

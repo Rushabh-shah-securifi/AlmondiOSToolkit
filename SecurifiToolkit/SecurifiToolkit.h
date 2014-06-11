@@ -31,6 +31,7 @@
 #import <SecurifiToolkit/SFIDeviceValue.h>
 #import <SecurifiToolkit/SFIAlmondPlus.h>
 #import <SecurifiToolkit/SFIDeviceKnownValues.h>
+#import <SecurifiToolkit/SFIReachabilityManager.h>
 #import <SecurifiToolkit/MobileCommandRequest.h>
 #import <SecurifiToolkit/MobileCommandResponse.h>
 #import <SecurifiToolkit/GenericCommandRequest.h>

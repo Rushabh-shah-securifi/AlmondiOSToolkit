@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6F0A6C1B-4995-481F-83D0-C1FF6A7264AF</string>
+	<key>IDESourceControlProjectName</key>
+	<string>SecurifiToolkit</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>EF452D4A-D1C1-4095-9E6F-151134A30FEE</key>
+		<string>ssh://github.com/11securifi34-zc/iostoolkit.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>SecurifiToolkit.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>EF452D4A-D1C1-4095-9E6F-151134A30FEE</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/11securifi34-zc/iostoolkit.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>EF452D4A-D1C1-4095-9E6F-151134A30FEE</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EF452D4A-D1C1-4095-9E6F-151134A30FEE</string>
+			<key>IDESourceControlWCCName</key>
+			<string>iostoolkit</string>
+		</dict>
+	</array>
+</dict>
+</plist>
