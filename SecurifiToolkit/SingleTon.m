@@ -143,16 +143,12 @@ static BOOL isBusy=NO;
 
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
-            //ashutosh: ec2-54-226-113-110.compute-1.amazonaws.com
-            //PY080813 Change to ashutosh
-            //CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"ec2-54-226-114-39.compute-1.amazonaws.com", 1028, &readStream, &writeStream);
-            NSString *cloudServer = CLOUD_SERVER;
-            CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)CFBridgingRetain(cloudServer), 1028, &readStream, &writeStream);
-            //Migrating to nodeLB
-            //CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)@"nodeLB-1553508487.us-east-1.elb.amazonaws.com", 1028, &readStream, &writeStream);
 
-            self.inputStream = (__bridge_transfer NSInputStream *)readStream;
-            self.outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+            CFStringRef host = (__bridge CFStringRef) CLOUD_SERVER;
+            CFStreamCreatePairWithSocketToHost(NULL, host, 1028, &readStream, &writeStream);
+
+            self.inputStream = (__bridge_transfer NSInputStream *) readStream;
+            self.outputStream = (__bridge_transfer NSOutputStream *) writeStream;
 
             [self.inputStream setDelegate:self];
             [self.outputStream setDelegate:self];
@@ -180,9 +176,8 @@ static BOOL isBusy=NO;
             //            sslCerts , kCFStreamSSLCertificates,
             //            [NSNumber numberWithBool:NO], kCFStreamSSLIsServer,
 
-
-            CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef)settings);
-            CFWriteStreamSetProperty(writeStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef)settings);
+            CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
+            CFWriteStreamSetProperty(writeStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
 
             [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
             [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
@@ -197,7 +192,7 @@ static BOOL isBusy=NO;
             }
             //// NSLog(@"Run loop exitted");
         }
-        else{
+        else {
             //// NSLog(@"Stream already opened");
         }
 
@@ -289,7 +284,7 @@ static BOOL isBusy=NO;
 //                                    [partialData getBytes:&expectedLength range:NSMakeRange(0, 4)];
 //                                    [SNLog Log:@"Method Name: %s Expected Length: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(expectedLength)];
 
-                                    [self.partialData getBytes:&self.command range:NSMakeRange(4, 4)];
+                                    [self.partialData getBytes:&_command range:NSMakeRange(4, 4)];
                                     // [SNLog Log:@"Method Name: %s Command: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(command)];
                                     //[SNLog Log:@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(command), CFAbsoluteTimeGetCurrent()];
 
