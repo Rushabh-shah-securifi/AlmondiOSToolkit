@@ -9,7 +9,6 @@
 #import "SFIDeviceKnownValues.h"
 
 @implementation SFIDeviceKnownValues
-@synthesize index, value, valueName, valueType, isUpdating;
 
 #define kName_Index             @"Index"          //int
 #define kName_ValueName         @"ValueName"
@@ -18,11 +17,11 @@
 #define kName_IsUpdating        @"IsUpdating"
 
 - (void) encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:index forKey:kName_Index];
-    [encoder encodeObject:valueName forKey:kName_ValueName];
-    [encoder encodeObject:valueType forKey:kName_ValueType];
-    [encoder encodeObject:value forKey:kName_Value];
-    [encoder encodeBool:isUpdating forKey:kName_IsUpdating];
+    [encoder encodeInteger:self.index forKey:kName_Index];
+    [encoder encodeObject:self.valueName forKey:kName_ValueName];
+    [encoder encodeObject:self.valueType forKey:kName_ValueType];
+    [encoder encodeObject:self.value forKey:kName_Value];
+    [encoder encodeBool:self.isUpdating forKey:kName_IsUpdating];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
