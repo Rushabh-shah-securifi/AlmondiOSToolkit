@@ -11,8 +11,6 @@
 #import "Commandparser.h"
 #import "PrivateCommandTypes.h"
 
-//Schedule runloop on backgroundQueue
-
 #define SDK_UNINITIALIZED       0
 #define NETWORK_DOWN            1
 #define NOT_LOGGED_IN           2
@@ -23,38 +21,21 @@
 
 
 @interface SingleTon ()
-@property SecCertificateRef certificate;
-@property dispatch_queue_t backgroundQueue;
+@property(nonatomic) SecCertificateRef certificate;
+@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
+@property(nonatomic) unsigned int command;
+@property(nonatomic, readonly) NSMutableData *partialData;
 @end
 
-@implementation SingleTon {
-    NSMutableData *partialData;
-    dispatch_queue_t backgroundQueue;
-}
+@implementation SingleTon
 
-@synthesize deviceid;
-@synthesize totalReceivedLength;
-@synthesize expectedLength;
-
-@synthesize command;
-@synthesize isLoggedin;
-@synthesize disableNetworkDownNotification;
-@synthesize isStreamConnected;
-@synthesize sendCommandFail;
-@synthesize connectionState;
-@synthesize backgroundQueue;
-@synthesize certificate;
-
-
-static SingleTon *single=nil;
+static SingleTon *single = nil;
 
 //todo track down and remove
 static BOOL isDone=NO;
 
 //todo track down and remove
 static BOOL isBusy=NO;
-
-//static BOOL disableNetworkDownNotification=NO;
 
 + (SingleTon *)getObject {
     @synchronized (self) {
@@ -72,7 +53,7 @@ static BOOL isBusy=NO;
         if (!single) {
             single = [[SingleTon alloc] init];
             single.disableNetworkDownNotification = NO;
-            single.isLoggedin = NO;
+            single.isLoggedIn = NO;
             single.isStreamConnected = NO;
 
             single.sendCommandFail = NO;
@@ -150,9 +131,8 @@ static BOOL isBusy=NO;
 }
 
 -(void) initNetworkCommunication{
-
     if(!self.backgroundQueue){
-        self.backgroundQueue = dispatch_queue_create("connection_queue", NULL);
+        _backgroundQueue = dispatch_queue_create("connection_queue", NULL);
     }
 
     dispatch_async(self.backgroundQueue, ^(void) {
@@ -228,9 +208,9 @@ static BOOL isBusy=NO;
 
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
-    if (!partialData)
+    if (!self.partialData)
     {
-        partialData = [[NSMutableData alloc] init];
+        _partialData = [[NSMutableData alloc] init];
     }
 
     NSString *endTagString = @"</root>";
@@ -276,10 +256,10 @@ static BOOL isBusy=NO;
                         //4. repeat this procedure for newly created mutableData
 
                         //Append received data to partial buffer
-                        [partialData appendBytes:&inputBuffer[0] length:(NSUInteger) len];
+                        [self.partialData appendBytes:&inputBuffer[0] length:(NSUInteger) len];
 
                         //Initialize range
-                        NSRange endTagRange = NSMakeRange(0, [partialData length]);
+                        NSRange endTagRange = NSMakeRange(0, [self.partialData length]);
                         int count=0;
 
                         //NOT NEEDED- Convert received buffer to NSMutableData
@@ -287,7 +267,7 @@ static BOOL isBusy=NO;
 
                         while (endTagRange.location != NSNotFound)
                         {
-                            endTagRange = [partialData rangeOfData:endTag options:0 range:endTagRange];
+                            endTagRange = [self.partialData rangeOfData:endTag options:0 range:endTagRange];
                             if(endTagRange.location != NSNotFound)
                             {
                                 //// NSLog(@"endTag Location: %i, Length: %i",endTagRange.location,endTagRange.length);
@@ -295,7 +275,7 @@ static BOOL isBusy=NO;
                                 //Look for <root> tag in [0 to endTag]
                                 NSRange startTagRange = NSMakeRange(0, endTagRange.location);
 
-                                startTagRange = [partialData rangeOfData:startTag options:0 range:startTagRange];
+                                startTagRange = [self.partialData rangeOfData:startTag options:0 range:startTagRange];
 
                                 if(startTagRange.location == NSNotFound)
                                 {
@@ -305,31 +285,32 @@ static BOOL isBusy=NO;
                                 {
                                     //// NSLog(@"startTag Location: %i, Length: %i",startTagRange.location,startTagRange.length);
                                     //Prepare Command
-                                    [partialData getBytes:&expectedLength range:NSMakeRange(0, 4)];
-                                    // [SNLog Log:@"Method Name: %s Expected Length: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(expectedLength)];
+//                                    unsigned int expectedLength;
+//                                    [partialData getBytes:&expectedLength range:NSMakeRange(0, 4)];
+//                                    [SNLog Log:@"Method Name: %s Expected Length: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(expectedLength)];
 
-                                    [partialData getBytes:&command range:NSMakeRange(4,4)];
+                                    [self.partialData getBytes:&self.command range:NSMakeRange(4, 4)];
                                     // [SNLog Log:@"Method Name: %s Command: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(command)];
                                     //[SNLog Log:@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(command), CFAbsoluteTimeGetCurrent()];
 
-                                    NSLog(@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(command), CFAbsoluteTimeGetCurrent());
+                                    NSLog(@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
 
-                                    command = NSSwapBigIntToHost(command);
+                                    self.command = NSSwapBigIntToHost(self.command);
                                     // [SNLog Log:@"Method Name: %s Command Again: %d", __PRETTY_FUNCTION__,command];
                                     CommandParser *tempObj = [[CommandParser alloc] init];
                                     GenericCommand *temp = nil ;
 
-                                    NSLog(@"Partial Buffer : %@",partialData);
+                                    NSLog(@"Partial Buffer : %@", self.partialData);
 
                                     //Send single command data to parseXML rather than complete buffer
                                     NSRange xmlParser = {startTagRange.location, (endTagRange.location+endTagRange.length - 8)};
 
-                                    NSData *buffer = [partialData subdataWithRange:xmlParser];
+                                    NSData *buffer = [self.partialData subdataWithRange:xmlParser];
 
                                     temp = (GenericCommand *)[tempObj parseXML:buffer];
 
                                     //Remove 8 bytes from received command
-                                    [partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
+                                    [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
 
                                     // [SNLog Log:@"Method Name: %s Parsed Command: %d", __PRETTY_FUNCTION__, temp.commandType];
 
@@ -343,7 +324,7 @@ static BOOL isBusy=NO;
 
                                             if (obj.isSuccessful == YES) {
                                                 //Set the indicator that we are logged in to prevent next login from User
-                                                isLoggedin = YES;
+                                                self.isLoggedIn = YES;
 
                                                 [self setConnectionState:LOGGED_IN];
 
@@ -547,10 +528,10 @@ static BOOL isBusy=NO;
                                     //This will trim parital buffer till </root>
 
 
-                                    [partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location+endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
+                                    [self.partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location + endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
 
                                     //Regenerate NSRange
-                                    endTagRange = NSMakeRange(0, [partialData length]);
+                                    endTagRange = NSMakeRange(0, [self.partialData length]);
 
                                     //// NSLog(@"Partial Buffer after trim : %@",partialData);
                                 }
@@ -577,7 +558,7 @@ static BOOL isBusy=NO;
 
                 [self tearDownNetwork];
                 isDone = YES;
-                isLoggedin = NO;
+                self.isLoggedIn = NO;
                 [self setConnectionState:NETWORK_DOWN];
 
                 //PY301013 - Reconnect
@@ -633,7 +614,7 @@ static BOOL isBusy=NO;
 
                 [self tearDownNetwork];
                 isDone = YES;
-                isLoggedin = NO;
+                self.isLoggedIn = NO;
                 [self setConnectionState:CLOUD_CONNECTION_ENDED];
 
                 //User APP should not handle reconnection
@@ -642,7 +623,7 @@ static BOOL isBusy=NO;
 
                 //PY301013 - Reconnect
                 [self postData:NETWORK_DOWN_NOTIFIER data:nil];
-                dispatch_async(backgroundQueue, ^{
+                dispatch_async(self.backgroundQueue, ^{
                     [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
                 });
 

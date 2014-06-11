@@ -42,11 +42,23 @@
     if (self) {
         _bgQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
         _cloudQueue = dispatch_queue_create("cloud_connect_queue", DISPATCH_QUEUE_SERIAL);
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityDidChange:) name:kSFIReachabilityChangedNotification object:nil];
     }
 
     return self;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kSFIReachabilityChangedNotification object:nil];
+}
+
+- (void)reachabilityDidChange:(id)notification {
+    if ([[SFIReachabilityManager sharedManager] isReachable]) {
+        NSLog(@"changed to reachable");
+        [[SecurifiToolkit sharedInstance] initSDK];
+    }
+}
 
 - (void)initSDK {
     NSLog(@"INIT SDK");
@@ -352,7 +364,7 @@
                 case LOGIN_COMMAND:
                 {
                     /* Check if User is already logged in [ if he has received loginResponse command */
-                    if (socket.isLoggedin == YES)
+                    if (socket.isLoggedIn == YES)
                         // if (0)
                     {
                         //Post Callback that you are logged in
@@ -761,7 +773,7 @@
 
             if (socket.outputStream != nil) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandLength maxLength:4]) {
-                    socket.isLoggedin = NO;
+                    socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
                     [details setValue:@"Securifi Length - Send Error" forKey:NSLocalizedDescriptionKey];
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
@@ -782,7 +794,7 @@
             //stream status
             if (socket.outputStream != nil) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandType maxLength:4]) {
-                    socket.isLoggedin = NO;
+                    socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
                     [details setValue:@"Securifi Command Type - Send Error" forKey:NSLocalizedDescriptionKey];
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
@@ -804,7 +816,7 @@
 
             if (socket.outputStream != nil) {
                 if (-1 == [socket.outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]]) {
-                    socket.isLoggedin = NO;
+                    socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
                     [details setValue:@"Securifi Payload - Send Error" forKey:NSLocalizedDescriptionKey];
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];

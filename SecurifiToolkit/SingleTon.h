@@ -10,22 +10,18 @@
 
 @interface SingleTon : NSObject <NSStreamDelegate>
 
-@property BOOL isLoggedin;
+@property BOOL disableNetworkDownNotification;
+
 @property(nonatomic, retain) NSInputStream *inputStream;
 @property(nonatomic, retain) NSOutputStream *outputStream;
-@property unsigned int command;
-@property unsigned int expectedLength;
-@property unsigned int totalReceivedLength;
-@property UInt32 deviceid;
-@property BOOL disableNetworkDownNotification;
-@property BOOL isStreamConnected;
-@property BOOL sendCommandFail;
 
 @property NSInteger connectionState;
+@property BOOL isStreamConnected;
+@property BOOL isLoggedIn;
+@property BOOL sendCommandFail;
 
 + (void)createSingletonObj;
 + (SingleTon *)getObject;
 + (void)removeSingletonObject;
-- (void)reconnect;
 
 @end
