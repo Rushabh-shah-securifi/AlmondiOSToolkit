@@ -20,8 +20,8 @@
 @property BOOL isLoggedIn;
 @property BOOL sendCommandFail;
 
-+ (void)createSingletonObj;
-+ (SingleTon *)getObject;
-+ (void)removeSingletonObject;
++ (SingleTon *)newSingleton:(dispatch_queue_t)backgroundQueue;
+
+- (void)shutdown;
 
 @end

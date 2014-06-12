@@ -25,116 +25,33 @@
 @property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
 @property(nonatomic) unsigned int command;
 @property(nonatomic, readonly) NSMutableData *partialData;
+@property(nonatomic) BOOL cloudConnectionEnded;
 @end
 
 @implementation SingleTon
 
-static SingleTon *single = nil;
-
-//todo track down and remove
-static BOOL isDone=NO;
-
-//todo track down and remove
-static BOOL isBusy=NO;
-
-+ (SingleTon *)getObject {
-    @synchronized (self) {
-        if (single) {
-            return single;
-        }
-        else {
-            return nil;
-        }
-    }
++ (SingleTon *)newSingleton:(dispatch_queue_t)backgroundQueue {
+    SingleTon *obj = [[SingleTon alloc] initWithQueue:backgroundQueue];
+    [obj initNetworkCommunication];
+    return obj;
 }
 
-+ (void)createSingletonObj {
-    @synchronized (self) {
-        if (!single) {
-            single = [[SingleTon alloc] init];
-            single.disableNetworkDownNotification = NO;
-            single.isLoggedIn = NO;
-            single.isStreamConnected = NO;
-
-            single.sendCommandFail = NO;
-            single.connectionState = SDK_UNINITIALIZED;
-
-            [single initNetworkCommunication];
-        }
+- (id)initWithQueue:(dispatch_queue_t)queue {
+    self = [super init];
+    if (self) {
+        self.disableNetworkDownNotification = NO;
+        self.isLoggedIn = NO;
+        self.isStreamConnected = NO;
+        self.sendCommandFail = NO;
+        self.cloudConnectionEnded = NO;
+        self.connectionState = SDK_UNINITIALIZED;
+        _backgroundQueue = queue;
     }
+    
+    return self;
 }
 
-- (void)reconnect {
-    if (isBusy == NO) {
-        isBusy = YES;
-
-        unsigned int attempt_count = 1;
-        while (attempt_count < 5) {
-            BOOL success = [self initReconnectSDK];
-            if (success) {
-                break;
-            }
-            sleep(attempt_count);
-            attempt_count += 1;
-        }
-
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkUp" object:self userInfo:nil];
-        //self.disableNetworkDownNotification=NO;
-        isBusy = NO;
-    }
-}
-
-- (BOOL)initReconnectSDK {
-    // NSLog(@"In Reconnect");
-    [SingleTon removeSingletonObject];
-    [SingleTon createSingletonObj];
-
-//     //// NSLog(@"Stream Status: %@", [single isStreamConnected]);
-//    if(single.inputStream ==nil && single.outputStream ==nil){
-//        // NSLog(@"Stream Connected!");
-//        return @"YES";
-//    }
-//    return nil;
-
-
-    //Send Sanity Command
-    GenericCommand *sanityCommand = [[GenericCommand alloc] init];
-    sanityCommand.commandType = CLOUD_SANITY;
-    sanityCommand.command = nil;
-
-    NSError *error;
-    id ret = [[SecurifiToolkit sharedInstance] sendToCloud:sanityCommand error:&error];
-    if (ret != nil) {
-        // NSLog(@"Reconnect initSDK - Send Sanity Successful");
-
-        //Notify main app
-        [single setConnectionState:SDK_UNINITIALIZED];
-        return YES;
-    }
-    else {
-        // NSLog(@"Reconnect Error : %@",[error localizedDescription]);
-        return NO;
-        //Dont notify User about network down unless it has been asked
-        //Only notify once its back on internet
-
-        //[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkDOWN" object:self userInfo:nil];
-    }
-}
-
-+ (void)removeSingletonObject {
-    @synchronized (self) {
-        if (single) {
-            [single tearDownNetwork];
-            single = nil;
-        }
-    }
-}
-
--(void) initNetworkCommunication{
-    if(!self.backgroundQueue){
-        _backgroundQueue = dispatch_queue_create("connection_queue", NULL);
-    }
-
+- (void)initNetworkCommunication {
     dispatch_async(self.backgroundQueue, ^(void) {
         if (self.inputStream == nil && self.outputStream == nil) {
             // Load certificate
@@ -187,7 +104,7 @@ static BOOL isBusy=NO;
             self.isStreamConnected = YES;
 
             NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && self.isStreamConnected && !isDone) {
+            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && self.isStreamConnected && !self.cloudConnectionEnded) {
                 //// NSLog(@"Run loop did run");
             }
             //// NSLog(@"Run loop exitted");
@@ -197,10 +114,13 @@ static BOOL isBusy=NO;
         }
 
         // [SNLog Log:@"Method Name: %s Terminating Async task", __PRETTY_FUNCTION__];
-        isDone = NO;
+        self.cloudConnectionEnded = NO;
     });
 }
 
+- (void)shutdown {
+    [self tearDownNetwork];
+}
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
     if (!self.partialData)
@@ -320,8 +240,7 @@ static BOOL isBusy=NO;
                                             if (obj.isSuccessful == YES) {
                                                 //Set the indicator that we are logged in to prevent next login from User
                                                 self.isLoggedIn = YES;
-
-                                                [self setConnectionState:LOGGED_IN];
+                                                self.connectionState = LOGGED_IN;
 
                                                 NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
                                                 NSString *tempPass = obj.tempPass;
@@ -331,7 +250,8 @@ static BOOL isBusy=NO;
                                                 [prefs synchronize];
                                             }
                                             else {
-                                                [self setConnectionState:NOT_LOGGED_IN];
+                                                self.isLoggedIn = NO;
+                                                self.connectionState = NOT_LOGGED_IN;
                                             }
 
                                             [self postData:LOGIN_NOTIFIER data:obj];
@@ -552,9 +472,9 @@ static BOOL isBusy=NO;
                 // [SNLog Log:@"Method Name: %s Connection event: server down", __PRETTY_FUNCTION__];
 
                 [self tearDownNetwork];
-                isDone = YES;
+                self.cloudConnectionEnded = YES;
                 self.isLoggedIn = NO;
-                [self setConnectionState:NETWORK_DOWN];
+                self.connectionState = NETWORK_DOWN;
 
                 //PY301013 - Reconnect
                 [self postData:NETWORK_DOWN_NOTIFIER data:nil];
@@ -569,7 +489,7 @@ static BOOL isBusy=NO;
                 //TEST --- Remove it later
                 //// NSLog(@"Dispatch ErrorOccurred Notification -- TCP DOWN");
 
-                //Some how we should know that this is comming from thread or main thread
+                //Some how we should know that this is coming from thread or main thread
                 //[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkDOWN" object:self userInfo:nil];
 
                 //User APP should not handle reconnection
@@ -608,20 +528,12 @@ static BOOL isBusy=NO;
                 NSLog(@"Method Name: %s SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
 
                 [self tearDownNetwork];
-                isDone = YES;
+                self.cloudConnectionEnded = YES;
                 self.isLoggedIn = NO;
-                [self setConnectionState:CLOUD_CONNECTION_ENDED];
-
-                //User APP should not handle reconnection
-                //Dispatch thread
-                //[SingleTon reconnect];
+                self.connectionState = CLOUD_CONNECTION_ENDED;
 
                 //PY301013 - Reconnect
                 [self postData:NETWORK_DOWN_NOTIFIER data:nil];
-                dispatch_async(self.backgroundQueue, ^{
-                    [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
-                });
-
             }
 
             break;

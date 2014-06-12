@@ -53,7 +53,6 @@
 - (void)initSDK;
 - (void)initSDKCloud;
 - (id)sendToCloud:(id)sender error:(NSError **)outError;
-//+(BOOL)isLoggedin;
 - (NSInteger)getConnectionState;
 
 @end
