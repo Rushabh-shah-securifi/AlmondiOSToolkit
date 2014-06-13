@@ -21,7 +21,6 @@
 
 @interface SecurifiToolkit ()
 @property (nonatomic, readonly) dispatch_queue_t backgroundQueue;
-@property (nonatomic, readonly) dispatch_queue_t cloudQueue;
 @property (nonatomic, readonly) dispatch_queue_t reconnectQueue;
 @property (nonatomic, readonly) dispatch_queue_t singleTonQueue;
 @property (nonatomic, readonly) SingleTon *networkSingleton;
@@ -47,7 +46,6 @@
     self = [super init];
     if (self) {
         _backgroundQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
-        _cloudQueue = dispatch_queue_create("cloud_connect_queue", DISPATCH_QUEUE_SERIAL);
         _reconnectQueue = dispatch_queue_create("network_reconnect_queue", DISPATCH_QUEUE_SERIAL);
         _singleTonQueue = dispatch_queue_create("network_reconnect_queue", DISPATCH_QUEUE_CONCURRENT);
 
@@ -108,7 +106,7 @@
     sanityCommand.command = nil;
 
     NSError *error;
-    id ret = [self sendToCloud:sanityCommand error:&error];
+    id ret = [self internalSendToCloud:sanityCommand error:&error];
     if (ret == nil || error) {
         singleTon.connectionState = NETWORK_DOWN;
         NSLog(@"Error init sdk after sending cmd: %@", error.localizedDescription);
@@ -134,7 +132,7 @@
             cloudCommand.command = loginCommand;
 
             NSError *error_2;
-            id ret_2 = [self sendToCloud:cloudCommand error:&error_2];
+            id ret_2 = [self internalSendToCloud:cloudCommand error:&error_2];
             if (ret_2 == nil || error_2) {
                 NSLog(@"Error init sdk: %@", error_2.localizedDescription);
                 singleTon.connectionState = NETWORK_DOWN;
@@ -170,19 +168,15 @@
 
         [self setupNetworkSingleton];
 
-        //Start a Async task of sending Sanity command and TempPassCommand and return YES
-        //Async task will send command and will generate respective events
-        dispatch_async(self.cloudQueue, ^(void) {
-            SingleTon *socket = self.networkSingleton;
+        SingleTon *socket = self.networkSingleton;
 
-            GenericCommand *sanityCommand = [[GenericCommand alloc] init];
-            sanityCommand.commandType = CLOUD_SANITY;
-            sanityCommand.command = nil;
+        GenericCommand *sanityCommand = [[GenericCommand alloc] init];
+        sanityCommand.commandType = CLOUD_SANITY;
+        sanityCommand.command = nil;
 
-            NSError *error;
-            id ret = [self sendToCloud:sanityCommand error:&error];
-            if (ret == nil || error) {
-                NSLog(@"Failed to init SDK cloud: %@", error.description);
+        [self asyncSendToCloud:sanityCommand completion:^(BOOL success, NSError *error2) {
+            if (success) {
+                NSLog(@"Failed to init SDK cloud: %@", error2.description);
                 [socket setConnectionState:NETWORK_DOWN];
             }
             else {
@@ -191,13 +185,45 @@
             }
 
             self.initializing = NO;
-        });
+        }];
     }
 }
 
 #pragma mark - Command dispatch
 
-- (id)sendToCloud:(id)sender error:(NSError **)outError {
+typedef void (^SendCompletion)(BOOL success, NSError *error);
+
+- (void)asyncSendToCloud:(id)command completion:(SendCompletion)callback {
+    dispatch_async(self.backgroundQueue, ^() {
+        NSError *outError;
+        id ret = [self internalSendToCloud:command error:&outError];
+        BOOL success = (ret != nil);
+
+        if (!success) {
+            if (self.networkSingleton.disableNetworkDownNotification == NO) {
+                NSLog(@"Posting NETWORK_DOWN_NOTIFIER, ret=%@, error=%@", ret, outError.localizedDescription);
+                [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
+            }
+        }
+
+        if (callback) {
+            callback(success, outError);
+        }
+    });
+}
+
+- (void)asyncSendToCloud:(GenericCommand*)command {
+    [self asyncSendToCloud:command completion:^(BOOL success, NSError *error2) {
+        if (success) {
+            NSLog(@"[Generic cmd: %d] send success", command.commandType);
+        }
+        else {
+            NSLog(@"[Generic cmd: %d] send error%@", command.commandType, error2.localizedDescription);
+        }
+    }];
+}
+
+- (id)internalSendToCloud:(id)sender error:(NSError **)outError {
     @synchronized (self) {
         SingleTon *socket = self.networkSingleton;
 
@@ -623,7 +649,7 @@
 
             // [SNLog Log:@"Method Name: %s Out of stream type check loop : %d",__PRETTY_FUNCTION__,type];
 
-            if (socket.outputStream != nil) {
+            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandLength maxLength:4]) {
                     socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
@@ -637,14 +663,14 @@
                         [socket setSendCommandFail:YES];
                         [socket setIsStreamConnected:NO];
 
-                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
+//                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
                     }
                     return nil;
                 }
             }
 
             //stream status
-            if (socket.outputStream != nil) {
+            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandType maxLength:4]) {
                     socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
@@ -658,7 +684,7 @@
                         [socket setIsStreamConnected:NO];
 
                         //PUSH Notify NetworkDOWN
-                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
+//                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
                         //Start reconnnect thread and return nil
                         //[NSThread detachNewThreadSelector:@selector(reconnect) toTarget:[SingleTon getObject] withObject:nil];
                     }
@@ -666,7 +692,7 @@
                 }
             }
 
-            if (socket.outputStream != nil) {
+            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]]) {
                     socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
@@ -680,7 +706,7 @@
                         [socket setIsStreamConnected:NO];
 
                         //PUSH Notify NetworkDOWN
-                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
+//                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
                         //Start reconnnect thread and return nil
                         //[NSThread detachNewThreadSelector:@selector(reconnect) toTarget:[SingleTon getObject] withObject:nil];
                     }
@@ -688,8 +714,14 @@
                 }
             }
 
-            NSLog(@"Method Name: %s Command send to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-            return @"yes";
+            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
+                NSLog(@"Method Name: %s Command send to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+                return @"yes";
+            }
+            else {
+                NSLog(@"Output stream is nil");
+                return nil;
+            }
         }
         @catch (NSException *e) {
             // [SNLog Log:@"Method Name: %s Exception : %@",__PRETTY_FUNCTION__,e.reason];
@@ -739,7 +771,7 @@
             SingleTon *singleTon = self.networkSingleton;
             [self internalInitSdk:singleTon];
 
-            if ([self getConnectionState] != NETWORK_DOWN) {
+            if ([self getConnectionState] != NETWORK_DOWN && [self getConnectionState] != INITIALIZING) {
                 break;
             }
 
@@ -747,8 +779,22 @@
             attempt_count += 1;
         } // end attempts to reconnect
 
-        if ([self getConnectionState] != NETWORK_DOWN) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_UP_NOTIFIER object:self userInfo:nil];
+        NSInteger state = [self getConnectionState];
+
+        switch (state) {
+            case INITIALIZING: {
+                NSLog(@"reconnect state: %ld (initializing)", (long)state);
+                break;
+            }
+            case NETWORK_DOWN: {
+                NSLog(@"reconnect state: %ld (network down)", (long)state);
+                break;
+            }
+            default: {
+                NSLog(@"reconnect state: %ld", (long)state);
+                [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_UP_NOTIFIER object:self userInfo:nil];
+                break;
+            }
         }
 
         self.initializing = NO;

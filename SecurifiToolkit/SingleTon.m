@@ -477,7 +477,7 @@
                 self.connectionState = NETWORK_DOWN;
 
                 //PY301013 - Reconnect
-                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
+//                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
                 //PY 080114 - TRYING
                 //                dispatch_async(backgroundQueue, ^ {
                 //
@@ -533,7 +533,7 @@
                 self.connectionState = CLOUD_CONNECTION_ENDED;
 
                 //PY301013 - Reconnect
-                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
+//                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
             }
 
             break;
@@ -554,8 +554,8 @@
     [self.outputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
     [self.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
 
-    self.outputStream = nil;
-    self.inputStream = nil;
+//    self.outputStream = nil;
+//    self.inputStream = nil;
 }
 
 #pragma mark - Payload notification

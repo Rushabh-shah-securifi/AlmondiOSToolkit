@@ -51,8 +51,11 @@
 + (instancetype)sharedInstance;
 
 - (void)initSDK;
+
 - (void)initSDKCloud;
-- (id)sendToCloud:(id)sender error:(NSError **)outError;
+
+- (void)asyncSendToCloud:(GenericCommand *)command;
+
 - (NSInteger)getConnectionState;
 
 @end
