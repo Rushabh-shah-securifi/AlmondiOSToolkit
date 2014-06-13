@@ -106,7 +106,7 @@
     sanityCommand.command = nil;
 
     NSError *error;
-    id ret = [self internalSendToCloud:sanityCommand error:&error];
+    id ret = [self internalSendToCloud:singleTon command:sanityCommand error:&error];
     if (ret == nil || error) {
         singleTon.connectionState = NETWORK_DOWN;
         NSLog(@"Error init sdk after sending cmd: %@", error.localizedDescription);
@@ -132,7 +132,7 @@
             cloudCommand.command = loginCommand;
 
             NSError *error_2;
-            id ret_2 = [self internalSendToCloud:cloudCommand error:&error_2];
+            id ret_2 = [self internalSendToCloud:singleTon command:cloudCommand error:&error_2];
             if (ret_2 == nil || error_2) {
                 NSLog(@"Error init sdk: %@", error_2.localizedDescription);
                 singleTon.connectionState = NETWORK_DOWN;
@@ -174,7 +174,7 @@
         sanityCommand.commandType = CLOUD_SANITY;
         sanityCommand.command = nil;
 
-        [self asyncSendToCloud:sanityCommand completion:^(BOOL success, NSError *error2) {
+        [self asyncSendToCloud:socket command:sanityCommand completion:^(BOOL success, NSError *error2) {
             if (success) {
                 NSLog(@"Failed to init SDK cloud: %@", error2.description);
                 [socket setConnectionState:NETWORK_DOWN];
@@ -193,10 +193,10 @@
 
 typedef void (^SendCompletion)(BOOL success, NSError *error);
 
-- (void)asyncSendToCloud:(id)command completion:(SendCompletion)callback {
+- (void)asyncSendToCloud:(SingleTon*)socket command:(id)command completion:(SendCompletion)callback {
     dispatch_async(self.backgroundQueue, ^() {
         NSError *outError;
-        id ret = [self internalSendToCloud:command error:&outError];
+        id ret = [self internalSendToCloud:socket command:command error:&outError];
         BOOL success = (ret != nil);
 
         if (!success) {
@@ -213,7 +213,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (void)asyncSendToCloud:(GenericCommand*)command {
-    [self asyncSendToCloud:command completion:^(BOOL success, NSError *error2) {
+    [self asyncSendToCloud:self.networkSingleton command:command completion:^(BOOL success, NSError *error2) {
         if (success) {
             NSLog(@"[Generic cmd: %d] send success", command.commandType);
         }
@@ -223,10 +223,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     }];
 }
 
-- (id)internalSendToCloud:(id)sender error:(NSError **)outError {
+- (id)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
     @synchronized (self) {
-        SingleTon *socket = self.networkSingleton;
-
         do {
             if (socket.sendCommandFail == YES) {
                 // [SNLog Log:@"Method Name: %s Break send loop and return error",__PRETTY_FUNCTION__];
@@ -637,7 +635,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             //isLoggedin might be set to 1 if we miss the TCP termination callback
             //Check on each write if it fails set isLoggedin to
 
-            NSLog(@"@Payload being sent: %@", sendCommandPayload);
+            NSLog(@"@Payload being sent: %@", commandPayload);
 
             NSStreamStatus type;
             do {
@@ -649,7 +647,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
             // [SNLog Log:@"Method Name: %s Out of stream type check loop : %d",__PRETTY_FUNCTION__,type];
 
-            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
+            if (socket.outputStream != nil && socket.outputStream.streamStatus == NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandLength maxLength:4]) {
                     socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
