@@ -88,7 +88,7 @@
                     (__bridge id) kCFStreamSSLAllowsExpiredRoots : @NO,
                     (__bridge id) kCFStreamSSLAllowsExpiredCertificates : @NO,
                     (__bridge id) kCFStreamSSLAllowsAnyRoot : @NO,
-                    (__bridge id) kCFStreamSSLValidatesCertificateChain : @NO
+                    (__bridge id) kCFStreamSSLValidatesCertificateChain : @YES
             };
 
             CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
@@ -163,7 +163,7 @@
 					len = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
 					if (len > 0) {
 
-                        //[SNLog Log:@"Method Name: %s Response Length : %d",__PRETTY_FUNCTION__,len];
+                        //[SNLog Log:@"%s: Response Length : %d",__PRETTY_FUNCTION__,len];
                         //If current stream has </root>
                         //1. Get NSRange and prepare command
                         //2. If command has partial command add it to mutableData object
@@ -194,15 +194,15 @@
 
                                 if(startTagRange.location == NSNotFound)
                                 {
-                                    // [SNLog Log:@"Method Name: %s Seriouse error !!! should not come heer // Invalid command /// without startRootTag", __PRETTY_FUNCTION__];
+                                    // [SNLog Log:@"%s: Seriouse error !!! should not come heer // Invalid command /// without startRootTag", __PRETTY_FUNCTION__];
                                 }
                                 else
                                 {
                                     [self.partialData getBytes:&_command range:NSMakeRange(4, 4)];
-                                    NSLog(@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
+                                    NSLog(@"%s: Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
 
                                     self.command = NSSwapBigIntToHost(self.command);
-                                    // [SNLog Log:@"Method Name: %s Command Again: %d", __PRETTY_FUNCTION__,command];
+                                    // [SNLog Log:@"%s: Command Again: %d", __PRETTY_FUNCTION__,command];
                                     CommandParser *tempObj = [[CommandParser alloc] init];
                                     GenericCommand *temp = nil ;
 
@@ -265,7 +265,7 @@
                                         }
                                             //                                        case AFFILIATION_CODE_RESPONSE:
                                             //                                        {
-                                            //                                            // [SNLog Log:@"Method Name: %s Received Affiliation Code", __PRETTY_FUNCTION__];
+                                            //                                            // [SNLog Log:@"%s: Received Affiliation Code", __PRETTY_FUNCTION__];
                                             //                                            AffiliationUserRequest *obj = (AffiliationUserRequest *)temp.command;
                                             //
                                             //                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
@@ -292,32 +292,32 @@
                                         }
                                             //PY 170913 - Device Data  Response
                                         case DEVICE_VALUE_LIST_RESPONSE: {
-                                            // [SNLog Log:@"Method Name: %s Received Device Value Mobile Response", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received Device Value Mobile Response", __PRETTY_FUNCTION__];
                                             [self postData:DEVICE_VALUE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 200913 - Mobile Command Response
                                         case MOBILE_COMMAND_RESPONSE: {
-                                            // [SNLog Log:@"Method Name: %s Received Mobile Command Response", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received Mobile Command Response", __PRETTY_FUNCTION__];
                                             [self postData:MOBILE_COMMAND_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 230913 - Device List Command - 81 -  Response
                                         case DYNAMIC_DEVICE_DATA: {
-                                            // [SNLog Log:@"Method Name: %s Received DYNAMIC_DEVICE_DATA", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received DYNAMIC_DEVICE_DATA", __PRETTY_FUNCTION__];
                                             [self postData:DEVICE_DATA_CLOUD_NOTIFIER data:temp.command];
                                             break;
                                         }
 
                                             //PY 230913 - Device Value Command - 82 -  Response
                                         case DYNAMIC_DEVICE_VALUE_LIST: {
-                                            // [SNLog Log:@"Method Name: %s Received DEVICE_VALUE_LIST_RESPONSE", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received DEVICE_VALUE_LIST_RESPONSE", __PRETTY_FUNCTION__];
                                             [self postData:DEVICE_VALUE_CLOUD_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 291013 - Generic Command Response
                                         case GENERIC_COMMAND_RESPONSE: {
-                                            // [SNLog Log:@"Method Name: %s Received Generic Command Response", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received Generic Command Response", __PRETTY_FUNCTION__];
                                             GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
                                             obj.decodedData = decodedData;
@@ -327,7 +327,7 @@
                                         }
                                             //PY 301013 - Generic Command Notification
                                         case GENERIC_COMMAND_NOTIFICATION: {
-                                            // [SNLog Log:@"Method Name: %s Received Generic Command Notification", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received Generic Command Notification", __PRETTY_FUNCTION__];
                                             GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
 
                                             //Decode using Base64
@@ -340,32 +340,32 @@
                                         }
                                             //PY 011113 - Validate Account Response
                                         case VALIDATE_RESPONSE: {
-                                            // [SNLog Log:@"Method Name: %s Received VALIDATE_RESPONSE", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received VALIDATE_RESPONSE", __PRETTY_FUNCTION__];
                                             [self postData:VALIDATE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case RESET_PASSWORD_RESPONSE: {
-                                            // [SNLog Log:@"Method Name: %s Received RESET_PASSWORD_RESPONSE", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received RESET_PASSWORD_RESPONSE", __PRETTY_FUNCTION__];
                                             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case DYNAMIC_ALMOND_ADD: {
-                                            // [SNLog Log:@"Method Name: %s Received DYNAMIC_ALMOND_ADD", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_ADD", __PRETTY_FUNCTION__];
                                             [self postData:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case DYNAMIC_ALMOND_DELETE: {
-                                            // [SNLog Log:@"Method Name: %s Received DYNAMIC_ALMOND_DELETE", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_DELETE", __PRETTY_FUNCTION__];
                                             [self postData:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case SENSOR_CHANGE_RESPONSE: {
-                                            //[SNLog Log:@"Method Name: %s Received SENSOR_CHANGE_RESPONSE", __PRETTY_FUNCTION__];
+                                            //[SNLog Log:@"%s: Received SENSOR_CHANGE_RESPONSE", __PRETTY_FUNCTION__];
                                             [self postData:SENSOR_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case DYNAMIC_ALMOND_NAME_CHANGE: {
-                                            // [SNLog Log:@"Method Name: %s Received DYNAMIC_ALMOND_NAME_CHANGE", __PRETTY_FUNCTION__];
+                                            // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_NAME_CHANGE", __PRETTY_FUNCTION__];
                                             [self postData:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
@@ -430,7 +430,7 @@
                             }
                             else
                             {
-                                // [SNLog Log:@"Method Name: %s Number of Command Processed  : %d", __PRETTY_FUNCTION__,count];
+                                // [SNLog Log:@"%s: Number of Command Processed  : %d", __PRETTY_FUNCTION__,count];
                                 //At this point paritalBuffer will have unffinised command data
                             }
                         }
@@ -501,7 +501,7 @@
 
         case NSStreamEventEndEncountered: {
             if (theStream == self.inputStream) {
-                NSLog(@"Method Name: %s SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+                NSLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 [self tearDownNetwork];
             }
 
@@ -509,7 +509,7 @@
         }
 
         default: {
-//                [SNLog Log:@"Method Name: %s Unknown event", __PRETTY_FUNCTION__];
+//                [SNLog Log:@"%s: Unknown event", __PRETTY_FUNCTION__];
         }
     }
 
