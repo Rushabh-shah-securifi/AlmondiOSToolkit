@@ -45,6 +45,8 @@
 #import <SecurifiToolkit/SensorChangeResponse.h>
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>
 #import <SecurifiToolkit/DynamicAlmondNameChangeResponse.h>
+#import <SecurifiToolkit/SFIDatabaseUpdateService.h>
+#import <SecurifiToolkit/SFIOfflineDataManager.h>
 
 @interface SecurifiToolkit : NSObject
 
@@ -62,6 +64,11 @@
 
 - (void)asyncSendLogout;
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
+
+- (NSArray*)almondList;
+- (void)asyncLoadAlmondList;
+
+- (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac;
 
 @end
  

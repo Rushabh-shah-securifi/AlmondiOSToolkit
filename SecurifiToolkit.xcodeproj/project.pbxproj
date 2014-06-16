@@ -26,9 +26,9 @@
 		1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBCE19480D6C00E353D1 /* Reachability.m */; };
 		1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */; };
-		1CA35360194ED4410042D429 /* SFIDatabaseUpdateService.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535C194ED4410042D429 /* SFIDatabaseUpdateService.h */; };
+		1CA35360194ED4410042D429 /* SFIDatabaseUpdateService.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535C194ED4410042D429 /* SFIDatabaseUpdateService.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CA35361194ED4410042D429 /* SFIDatabaseUpdateService.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535D194ED4410042D429 /* SFIDatabaseUpdateService.m */; };
-		1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */; };
+		1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */; };
 		22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D42179132A40099CD8F /* CommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011C9E179543E80019D5A4 /* Login.h in Headers */ = {isa = PBXBuildFile; fileRef = 22011C9C179543E80019D5A4 /* Login.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -449,7 +449,6 @@
 		22A76D2317912A110099CD8F /* private */ = {
 			isa = PBXGroup;
 			children = (
-				1CA3535B194ED4410042D429 /* OfflineStorage */,
 				2204C2071794288500B05F17 /* network */,
 				22A76D2517912B830099CD8F /* parser */,
 			);
@@ -459,6 +458,7 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				1CA3535B194ED4410042D429 /* OfflineStorage */,
 				1C23FBCC19480D6C00E353D1 /* Reachability */,
 				CE5EB63617E852AA00985636 /* models */,
 				CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */,
@@ -607,7 +607,6 @@
 				2204C20A179428B200B05F17 /* SingleTon.h in Headers */,
 				CE5EB64117E8549200985636 /* DeviceDataHashResponse.h in Headers */,
 				CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */,
-				1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */,
 				22A76D451791339B0099CD8F /* LogoutResponse.h in Headers */,
 				CE6DC94917EC60D1006F48C4 /* MobileCommandResponse.h in Headers */,
 				CE5EB5CA17E722BD00985636 /* AlmondListResponse.h in Headers */,
@@ -615,7 +614,6 @@
 				CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */,
 				22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */,
 				CE5EB63D17E8548500985636 /* DeviceDataHashRequest.h in Headers */,
-				1CA35360194ED4410042D429 /* SFIDatabaseUpdateService.h in Headers */,
 				CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */,
 				CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */,
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
@@ -632,6 +630,8 @@
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
+				1CA35360194ED4410042D429 /* SFIDatabaseUpdateService.h in Headers */,
+				1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

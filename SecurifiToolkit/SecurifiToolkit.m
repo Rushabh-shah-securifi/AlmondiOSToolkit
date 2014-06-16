@@ -226,6 +226,10 @@
 }
 
 - (void)removeLoginCredentials {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [SFIDatabaseUpdateService stopDatabaseUpdateService];
+    });
+
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
 
     [prefs removeObjectForKey:EMAIL];
@@ -234,6 +238,14 @@
     [prefs removeObjectForKey:COLORCODE];
     [prefs removeObjectForKey:USERID];
     [prefs removeObjectForKey:PASSWORD];
+
+    [prefs synchronize];
+
+    //Delete files
+    [SFIOfflineDataManager deleteFile:ALMONDLIST_FILENAME];
+    [SFIOfflineDataManager deleteFile:HASH_FILENAME];
+    [SFIOfflineDataManager deleteFile:DEVICELIST_FILENAME];
+    [SFIOfflineDataManager deleteFile:DEVICEVALUE_FILENAME];
 
     [prefs synchronize];
 }
@@ -283,6 +295,24 @@
     cloudCommand.command = cmd;
 
     [self asyncSendToCloud:cloudCommand];
+}
+
+#pragma mark - Almond Lists
+
+- (NSArray *)almondList {
+    return [SFIOfflineDataManager readAlmondList];
+}
+
+- (void)asyncLoadAlmondList {
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = ALMOND_LIST;
+    cloudCommand.command = [AlmondListRequest new];
+
+    [self asyncSendToCloud:cloudCommand];
+}
+
+- (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac {
+    [SFIOfflineDataManager writeDeviceValueList:deviceList currentMAC:almondMac];
 }
 
 #pragma mark - Command constructors
@@ -768,13 +798,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
 
                     if ([socket disableNetworkDownNotification] == NO) {
-                        //PUSH Notify NetworkDOWN
-                        // [SNLog Log:@"%s: From First Write ",__PRETTY_FUNCTION__];
-
                         [socket setSendCommandFail:YES];
                         [socket setIsStreamConnected:NO];
-
-//                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
                     }
                     return nil;
                 }
@@ -789,15 +814,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
 
                     if ([socket disableNetworkDownNotification] == NO) {
-                        // [SNLog Log:@"%s: From Second Write ",__PRETTY_FUNCTION__];
-
                         [socket setSendCommandFail:YES];
                         [socket setIsStreamConnected:NO];
-
-                        //PUSH Notify NetworkDOWN
-//                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
-                        //Start reconnnect thread and return nil
-                        //[NSThread detachNewThreadSelector:@selector(reconnect) toTarget:[SingleTon getObject] withObject:nil];
                     }
                     return nil;
                 }
@@ -811,15 +829,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
 
                     if ([socket disableNetworkDownNotification] == NO) {
-                        // [SNLog Log:@"%s: From Third Write ",__PRETTY_FUNCTION__];
-
                         [socket setSendCommandFail:YES];
                         [socket setIsStreamConnected:NO];
-
-                        //PUSH Notify NetworkDOWN
-//                        [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
-                        //Start reconnnect thread and return nil
-                        //[NSThread detachNewThreadSelector:@selector(reconnect) toTarget:[SingleTon getObject] withObject:nil];
                     }
                     return nil;
                 }
@@ -875,6 +886,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     }
 }
 
+//todo sinclair - the reconnect machinery needs to be re-evaluated
+//todo sinclair - using initializing property is problematic because other methods also control its state.
 - (void)reconnect {
     if (self.initializing == NO) {
         self.initializing = YES;
@@ -915,5 +928,6 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         self.initializing = NO;
     }
 }
+
 
 @end

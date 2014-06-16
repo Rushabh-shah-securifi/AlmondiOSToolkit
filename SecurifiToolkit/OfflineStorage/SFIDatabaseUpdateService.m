@@ -8,7 +8,6 @@
 
 #import "SFIDatabaseUpdateService.h"
 #import <SecurifiToolkit/SecurifiToolkit.h>
-#import "SFIOfflineDataManager.h"
 
 @implementation SFIDatabaseUpdateService
 
@@ -81,7 +80,7 @@
 
             //Compare the list with device value list size and correct the list accordingly if any device was deleted
             //Read device value list from storage
-            NSMutableArray *offlineDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
+            NSArray *offlineDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
 
             //Compare the size
             if ([deviceList count] < [offlineDeviceValueList count]) {
@@ -123,7 +122,7 @@
         NSMutableArray *cloudDeviceKnownValues;
 
         cloudDeviceValueList = obj.deviceValueList;
-        mobileDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
+        mobileDeviceValueList = [NSMutableArray arrayWithArray:[SFIOfflineDataManager readDeviceValueList:currentMAC]];
 
         if (mobileDeviceValueList != nil) {
             BOOL isDeviceFound = FALSE;
@@ -192,7 +191,7 @@
         AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
 
         if (obj.isSuccessful) {
-            NSMutableArray *offlineAlmondList = [SFIOfflineDataManager readAlmondList];
+            NSArray *offlineAlmondList = [SFIOfflineDataManager readAlmondList];
             NSMutableArray *deletedAlmondList = obj.almondPlusMACList;
             NSMutableArray *newAlmondList = [[NSMutableArray alloc] init];
             SFIAlmondPlus *deletedAlmond = deletedAlmondList[0];
@@ -226,7 +225,7 @@
 
     if (data != nil) {
         DynamicAlmondNameChangeResponse *obj = (DynamicAlmondNameChangeResponse *) [data valueForKey:@"data"];
-        NSMutableArray *offlineAlmondList = [SFIOfflineDataManager readAlmondList];
+        NSArray *offlineAlmondList = [SFIOfflineDataManager readAlmondList];
 
         for (SFIAlmondPlus *currentOfflineAlmond in offlineAlmondList) {
             if ([currentOfflineAlmond.almondplusMAC isEqualToString:obj.almondplusMAC]) {

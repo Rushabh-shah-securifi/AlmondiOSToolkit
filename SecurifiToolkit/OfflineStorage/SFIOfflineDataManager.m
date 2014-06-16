@@ -12,7 +12,7 @@
 @implementation SFIOfflineDataManager
 
 //Write AlmondList for the current user to offline storage
-+ (BOOL)writeAlmondList:(NSMutableArray *)arrayAlmondList {
++ (BOOL)writeAlmondList:(NSArray *)arrayAlmondList {
 //    SNFileLogger *logger = [[SNFileLogger alloc] init];
 //    [// [SNLog logManager] addLogStrategy:logger];
     // [SNLog Log:@"Method Name: %s Write to file! Almond List", __PRETTY_FUNCTION__];
@@ -86,7 +86,7 @@
 }
 
 //Write Device List for the current MAC to offline storage
-+ (BOOL)writeDeviceList:(NSMutableArray *)deviceList currentMAC:(NSString *)strCurrentMAC {
++ (BOOL)writeDeviceList:(NSArray *)deviceList currentMAC:(NSString *)strCurrentMAC {
     // [SNLog Log:@"Method Name: %s Write to file! Device List", __PRETTY_FUNCTION__];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = paths[0];
@@ -135,7 +135,7 @@
 
 
 //Write DeviceValueList for the current MAC to offline storage
-+ (BOOL)writeDeviceValueList:(NSMutableArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC {
++ (BOOL)writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC {
     // [SNLog Log:@"Method Name: %s Write to file! Device Value List", __PRETTY_FUNCTION__];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = paths[0];
