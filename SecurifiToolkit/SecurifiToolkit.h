@@ -56,7 +56,12 @@
 
 - (void)asyncSendToCloud:(GenericCommand *)command;
 
-- (NSInteger)getConnectionState;
+- (BOOL)isCloudOnline;
+
+- (BOOL)isLoggedIn;
+
+- (void)asyncSendLogout;
+- (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
 
 @end
  
