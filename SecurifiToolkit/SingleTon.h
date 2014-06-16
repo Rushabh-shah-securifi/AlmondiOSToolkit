@@ -8,12 +8,23 @@
 
 #import <Foundation/Foundation.h>
 
+@class SingleTon;
+
+@protocol SingleTonDelegate
+
+- (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon;
+
+@end
+
+
 @interface SingleTon : NSObject <NSStreamDelegate>
+
+@property(weak, nonatomic) id <SingleTonDelegate> delegate;
 
 @property BOOL disableNetworkDownNotification;
 
-@property(nonatomic, retain) NSInputStream *inputStream;
-@property(nonatomic, retain) NSOutputStream *outputStream;
+@property(nonatomic, strong) NSInputStream *inputStream;
+@property(nonatomic, strong) NSOutputStream *outputStream;
 
 @property NSInteger connectionState;
 @property BOOL isStreamConnected;

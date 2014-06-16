@@ -15,7 +15,7 @@
 #define NETWORK_DOWN            1
 #define NOT_LOGGED_IN           2
 #define LOGGED_IN               3
-#define LOGGING                 4
+#define LOGIN_IN_PROCESS        4
 #define INITIALIZING            5
 #define CLOUD_CONNECTION_ENDED  6
 
@@ -90,37 +90,42 @@
                     (__bridge id) kCFStreamSSLValidatesCertificateChain : @NO
             };
 
-            //            sslCerts , kCFStreamSSLCertificates,
-            //            [NSNumber numberWithBool:NO], kCFStreamSSLIsServer,
-
             CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
             CFWriteStreamSetProperty(writeStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
 
-            [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-            [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+            NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+
+            [self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
+            [self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
+
             [self.inputStream open];
             [self.outputStream open];
 
             self.isStreamConnected = YES;
 
-            NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
             while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && self.isStreamConnected && !self.cloudConnectionEnded) {
                 //// NSLog(@"Run loop did run");
             }
-            //// NSLog(@"Run loop exitted");
+
+            NSLog(@"Run loop exited");
+
+            [self.delegate singletTonCloudConnectionDidClose:self];
         }
         else {
-            //// NSLog(@"Stream already opened");
+            NSLog(@"Stream already opened");
         }
 
-        // [SNLog Log:@"Method Name: %s Terminating Async task", __PRETTY_FUNCTION__];
         self.cloudConnectionEnded = NO;
     });
 }
 
 - (void)shutdown {
-    [self tearDownNetwork];
+    dispatch_async(self.backgroundQueue, ^(void) {
+        [self tearDownNetwork];
+    });
 }
+
+#pragma mark - NSStreamDelegate methods
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
     if (!self.partialData)
@@ -154,13 +159,13 @@
 			break;
 
 		case NSStreamEventHasBytesAvailable:
-			if (theStream == _inputStream) {
-				while ([_inputStream hasBytesAvailable]) {
+			if (theStream == self.inputStream) {
+				while ([self.inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
                     NSInteger len;
 
                     //Multiple entry in one callback possible
-					len = [_inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
+					len = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
 					if (len > 0) {
 
                         //[SNLog Log:@"Method Name: %s Response Length : %d",__PRETTY_FUNCTION__,len];
@@ -198,16 +203,7 @@
                                 }
                                 else
                                 {
-                                    //// NSLog(@"startTag Location: %i, Length: %i",startTagRange.location,startTagRange.length);
-                                    //Prepare Command
-//                                    unsigned int expectedLength;
-//                                    [partialData getBytes:&expectedLength range:NSMakeRange(0, 4)];
-//                                    [SNLog Log:@"Method Name: %s Expected Length: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(expectedLength)];
-
                                     [self.partialData getBytes:&_command range:NSMakeRange(4, 4)];
-                                    // [SNLog Log:@"Method Name: %s Command: %d", __PRETTY_FUNCTION__,NSSwapBigIntToHost(command)];
-                                    //[SNLog Log:@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(command), CFAbsoluteTimeGetCurrent()];
-
                                     NSLog(@"Method Name: %s Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
 
                                     self.command = NSSwapBigIntToHost(self.command);
@@ -215,39 +211,27 @@
                                     CommandParser *tempObj = [[CommandParser alloc] init];
                                     GenericCommand *temp = nil ;
 
-                                    NSLog(@"Partial Buffer : %@", self.partialData);
-
                                     //Send single command data to parseXML rather than complete buffer
-                                    NSRange xmlParser = {startTagRange.location, (endTagRange.location+endTagRange.length - 8)};
+                                    NSRange xmlParserRange = {startTagRange.location, (endTagRange.location+endTagRange.length - 8)};
+                                    NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
 
-                                    NSData *buffer = [self.partialData subdataWithRange:xmlParser];
+                                    {
+                                        NSString *str = [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding];
+                                        NSLog(@"Partial Buffer : %@", str);
+                                    }
 
                                     temp = (GenericCommand *)[tempObj parseXML:buffer];
 
                                     //Remove 8 bytes from received command
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
 
-                                    // [SNLog Log:@"Method Name: %s Parsed Command: %d", __PRETTY_FUNCTION__, temp.commandType];
-
                                     switch (temp.commandType) {
                                         case LOGIN_RESPONSE: {
                                             LoginResponse *obj = (LoginResponse *) temp.command;
-                                            //// NSLog(@"Singleton User ID : %@",[obj userID]);
-                                            //// NSLog(@"Singleton TempPass : %@", [obj tempPass]);
-                                            //// NSLog(@"Singleton isSuccessful : %d",[obj isSuccessful]);
-                                            //// NSLog(@"Singleton Reason : %@",[obj reason]);
-
                                             if (obj.isSuccessful == YES) {
                                                 //Set the indicator that we are logged in to prevent next login from User
                                                 self.isLoggedIn = YES;
                                                 self.connectionState = LOGGED_IN;
-
-                                                NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-                                                NSString *tempPass = obj.tempPass;
-                                                NSString *userID = obj.userID;
-                                                [prefs setObject:tempPass forKey:PASSWORD];
-                                                [prefs setObject:userID forKey:USERID];
-                                                [prefs synchronize];
                                             }
                                             else {
                                                 self.isLoggedIn = NO;
@@ -258,17 +242,14 @@
                                             break;
                                         }
                                         case SIGNUP_RESPONSE: {
-                                            // [SNLog Log:@"Method Name: %s Received Signup Response", __PRETTY_FUNCTION__];;
                                             [self postData:SIGN_UP_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case KEEP_ALIVE: {
-                                            // [SNLog Log:@"Method Name: %s Received keepalive command", __PRETTY_FUNCTION__];
                                             break;
                                         }
 
                                         case CLOUD_SANITY_RESPONSE: {
-                                            //SanityResponse *obj = (SanityResponse *)temp.command;
                                             [self postData:NETWORK_UP_NOTIFIER data:nil];
                                             break;
                                         }
@@ -472,9 +453,7 @@
                 // [SNLog Log:@"Method Name: %s Connection event: server down", __PRETTY_FUNCTION__];
 
                 [self tearDownNetwork];
-                self.cloudConnectionEnded = YES;
-                self.isLoggedIn = NO;
-                self.connectionState = NETWORK_DOWN;
+//                self.connectionState = NETWORK_DOWN;
 
                 //PY301013 - Reconnect
 //                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
@@ -528,9 +507,6 @@
                 NSLog(@"Method Name: %s SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
 
                 [self tearDownNetwork];
-                self.cloudConnectionEnded = YES;
-                self.isLoggedIn = NO;
-                self.connectionState = CLOUD_CONNECTION_ENDED;
 
                 //PY301013 - Reconnect
 //                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
@@ -546,16 +522,27 @@
 
 }
 
+#pragma mark - Stream management
+
 - (void)tearDownNetwork {
-    [self.outputStream close];
-    [self.inputStream close];
+    // Signal to any waiting loops to exit
+    self.cloudConnectionEnded = YES;
+    self.isLoggedIn = NO;
+    self.connectionState = CLOUD_CONNECTION_ENDED;
 
     NSRunLoop *loop = [NSRunLoop currentRunLoop];
-    [self.outputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
-    [self.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
 
-//    self.outputStream = nil;
-//    self.inputStream = nil;
+    if (self.outputStream != nil) {
+        [self.outputStream close];
+        [self.outputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+        self.outputStream = nil;
+    }
+
+    if (self.inputStream != nil) {
+        [self.inputStream close];
+        [self.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+        self.inputStream = nil;
+    }
 }
 
 #pragma mark - Payload notification
