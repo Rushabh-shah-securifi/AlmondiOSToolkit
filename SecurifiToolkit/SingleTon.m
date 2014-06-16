@@ -22,6 +22,7 @@
 
 @interface SingleTon ()
 @property(nonatomic) SecCertificateRef certificate;
+@property BOOL certificateTrusted;
 @property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
 @property(nonatomic) unsigned int command;
 @property(nonatomic, readonly) NSMutableData *partialData;
@@ -119,6 +120,13 @@
     });
 }
 
+- (void)dealloc {
+    if (_certificate) {
+        CFRelease(_certificate);
+        _certificate = nil;
+    }
+}
+
 - (void)shutdown {
     dispatch_async(self.backgroundQueue, ^(void) {
         [self tearDownNetwork];
@@ -141,22 +149,9 @@
 
 	// NSLog(@"stream event %i", streamEvent);
 	switch (streamEvent) {
-		case NSStreamEventOpenCompleted:
-            //MIGRATE TCP UP Notification -- send sanity check command to cloud after initSDK
-            //if outputstream is not valid .. it will trigger TCP Down notification
-            //Else if SDK receives some response from cloud it will push TCP UP notification
-
-            /*
-             if (theStream == outputStream)
-             {
-             NSStreamStatus type;
-             type = [theStream streamStatus];
-             //// NSLog(@"Stream Status : %d",type);
-             // NSLog(@"Dispatch OpenCompleted Notification -- TCP UP");
-             [[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkUP" object:self userInfo:nil];
-             }
-             */
-			break;
+		case NSStreamEventOpenCompleted: {
+            break;
+        }
 
 		case NSStreamEventHasBytesAvailable:
 			if (theStream == self.inputStream) {
@@ -450,9 +445,7 @@
             //if (theStream == outputStream && [outputStream streamStatus] == NSStreamStatusError)
 
             if (theStream == self.outputStream) {
-                // [SNLog Log:@"Method Name: %s Connection event: server down", __PRETTY_FUNCTION__];
-
-                [self tearDownNetwork];
+                [self shutdown];
 //                self.connectionState = NETWORK_DOWN;
 
                 //PY301013 - Reconnect
@@ -494,22 +487,22 @@
             break;
 
         case NSStreamEventHasSpaceAvailable: {
-            BOOL trusted = [self isTrustedCertificate];
-            if (!trusted) {
-                [theStream close];
+            // Evaluate the SSL connection
+            if (!self.certificateTrusted) {
+                BOOL trusted = [self isTrustedCertificate:theStream];
+                if (!trusted) {
+                    [self shutdown];
+                }
+                self.certificateTrusted = trusted;
             }
+
             break;
         }
-
 
         case NSStreamEventEndEncountered: {
             if (theStream == self.inputStream) {
                 NSLog(@"Method Name: %s SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-
                 [self tearDownNetwork];
-
-                //PY301013 - Reconnect
-//                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
             }
 
             break;
@@ -560,9 +553,6 @@
 #pragma mark - SSL certificates
 
 - (void)loadCertificate {
-/*
-    2014-06-05 sinclair no actual need to load a cert file so we disable for now; besides, this seems to trigger a leak inside of Security framework.
-
     NSString *path = [[NSBundle mainBundle] pathForResource:@"cert" ofType:@"der"];
     NSData *certData = [NSData dataWithContentsOfFile:path];
 
@@ -571,38 +561,41 @@
     if (oldCertificate) {
         CFRelease(oldCertificate);
     }
-*/
 }
 
-- (BOOL)isTrustedCertificate {
-    if (self.certificate == nil) {
-        return YES;
-    }
-
+- (BOOL)isTrustedCertificate:(NSStream *)aStream {
     SecPolicyRef policy = SecPolicyCreateSSL(NO, CFSTR("*.securifi.com"));
-    //CFArrayRef streamCertificates = (__bridge CFArrayRef)([theStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerCertificates]);
-    // NSLog(@"After kCFStreamPropertySSLPeerCertificates");
 
-    SecCertificateRef certs[1] = {self.certificate};
     SecTrustRef trust = NULL;
-    CFArrayRef array = CFArrayCreate(NULL, (const void **) certs, 1, NULL);
-    SecTrustCreateWithCertificates(array, policy, &trust);
+    CFArrayRef streamCertificates = (__bridge CFArrayRef) [aStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerCertificates];
+    SecTrustCreateWithCertificates(streamCertificates, policy, &trust);
 
-    SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) (@[(id) self.certificate]));
+    SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) @[(id) self.certificate]);
 
     SecTrustResultType trustResultType = kSecTrustResultInvalid;
     OSStatus status = SecTrustEvaluate(trust, &trustResultType);
 
-    BOOL trusted = (status == errSecSuccess);
+    BOOL trusted;
+    if (status == errSecSuccess) {
+        // expect trustResultType == kSecTrustResultUnspecified until the cert exists in the keychain
+        if (trustResultType == kSecTrustResultUnspecified) {
+            trusted = YES;
+        }
+        else {
+            NSLog(@"%s: Certificate is not trusted. TrustResultType: %d", __PRETTY_FUNCTION__, trustResultType);
+            trusted = NO;
+        }
+    }
+    else {
+        NSLog(@"%s: Unable to evaluate trust: %d", __PRETTY_FUNCTION__, (int) status);
+        trusted = NO;
+    }
 
     if (trust) {
         CFRelease(trust);
     }
     if (policy) {
         CFRelease(policy);
-    }
-    if (array) {
-        CFRelease(array);
     }
 
     return trusted;
