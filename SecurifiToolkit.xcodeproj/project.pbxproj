@@ -23,6 +23,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */; };
+		1C2350C9195132B500F97EA7 /* KeyChainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */; };
 		1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBCE19480D6C00E353D1 /* Reachability.m */; };
 		1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */; };
@@ -171,6 +173,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyChainWrapper.h; sourceTree = "<group>"; };
+		1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainWrapper.m; sourceTree = "<group>"; };
 		1C23FBCD19480D6C00E353D1 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		1C23FBCE19480D6C00E353D1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIReachabilityManager.h; sourceTree = "<group>"; };
@@ -342,6 +346,15 @@
 			path = OfflineStorage;
 			sourceTree = "<group>";
 		};
+		1DF03F912D2886681925010C /* keychain */ = {
+			isa = PBXGroup;
+			children = (
+				1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */,
+				1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */,
+			);
+			path = keychain;
+			sourceTree = "<group>";
+		};
 		2204C2071794288500B05F17 /* network */ = {
 			isa = PBXGroup;
 			children = (
@@ -451,6 +464,7 @@
 			children = (
 				2204C2071794288500B05F17 /* network */,
 				22A76D2517912B830099CD8F /* parser */,
+				1DF03F912D2886681925010C /* keychain */,
 			);
 			name = private;
 			sourceTree = "<group>";
@@ -627,6 +641,7 @@
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
+				1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
@@ -857,6 +872,7 @@
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
+				1C2350C9195132B500F97EA7 /* KeyChainWrapper.m in Sources */,
 				1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */,
 				CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */,
 				CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */,

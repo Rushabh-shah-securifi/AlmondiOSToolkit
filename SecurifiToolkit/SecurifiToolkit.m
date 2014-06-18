@@ -10,6 +10,7 @@
 #import "SingleTon.h"
 #import "LoginTempPass.h"
 #import "PrivateCommandTypes.h"
+#import "KeyChainWrapper.h"
 
 #define SDK_UNINITIALIZED 0
 #define NETWORK_DOWN   1
@@ -18,6 +19,11 @@
 #define LOGIN_IN_PROCESS  4
 #define INITIALIZING  5
 #define CLOUD_CONNECTION_ENDED  6
+
+#define SEC_SERVICE_NAME @"securifiy.login_service"
+#define SEC_EMAIL @"com.securifi.email"
+#define SEC_PWD @"com.securifi.pwd"
+#define SEC_USERID @"com.securifi.userid"
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) dispatch_queue_t backgroundQueue;
@@ -30,6 +36,7 @@
 @implementation SecurifiToolkit
 
 #pragma mark - Lifecycle methods
+
 
 + (instancetype)sharedInstance {
     static dispatch_once_t once_predicate;
@@ -192,6 +199,25 @@
 
 #pragma mark - Logon
 
+- (void)asyncSendLoginWithEmail:(NSString *)email password:(NSString *)password {
+    [self clearSecCredentials];
+    [self setSecEmail:email];
+
+    Login *loginCommand = [[Login alloc] init];
+    loginCommand.UserID = [NSString stringWithString:email];
+    loginCommand.Password = [NSString stringWithString:password];
+
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = LOGIN_COMMAND;
+    cloudCommand.command = loginCommand;
+
+    [self asyncSendToCloud:cloudCommand];
+}
+
+- (NSString *)loginEmail {
+    return [self secEmail];
+}
+
 - (void)sendLoginCommand:(SingleTon *)singleTon {
     LoginTempPass *cmd = [self makeTempPassLoginCommand];
 
@@ -211,18 +237,12 @@
     }
 }
 
-- (BOOL)hasLoginCredentials {
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    return [prefs objectForKey:PASSWORD] && [prefs objectForKey:USERID];
-}
-
 - (void)storeLoginCredentials:(LoginResponse *)obj {
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSString *tempPass = obj.tempPass;
-    NSString *userID = obj.userID;
-    [prefs setObject:tempPass forKey:PASSWORD];
-    [prefs setObject:userID forKey:USERID];
-    [prefs synchronize];
+    NSString *userId = obj.userID;
+
+    [self setSecPassword:tempPass];
+    [self setSecUserId:userId];
 }
 
 - (void)removeLoginCredentials {
@@ -232,14 +252,12 @@
 
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
 
-    [prefs removeObjectForKey:EMAIL];
     [prefs removeObjectForKey:CURRENT_ALMOND_MAC];
     [prefs removeObjectForKey:CURRENT_ALMOND_MAC_NAME];
     [prefs removeObjectForKey:COLORCODE];
-    [prefs removeObjectForKey:USERID];
-    [prefs removeObjectForKey:PASSWORD];
-
     [prefs synchronize];
+
+    [self clearSecCredentials];
 
     //Delete files
     [SFIOfflineDataManager deleteFile:ALMONDLIST_FILENAME];
@@ -325,10 +343,10 @@
 }
 
 - (LoginTempPass *)makeTempPassLoginCommand {
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     LoginTempPass *cmd = [[LoginTempPass alloc] init];
-    cmd.UserID = [prefs objectForKey:USERID];
-    cmd.TempPass = [prefs objectForKey:PASSWORD];
+    cmd.UserID = [self secUserId];
+    cmd.TempPass = [self secPassword];
+
     return cmd;
 }
 
@@ -928,6 +946,51 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         self.initializing = NO;
     }
 }
+
+#pragma mark - Keychain Access
+
+- (void)clearSecCredentials {
+    [KeyChainWrapper removeEntryForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_USERID forService:SEC_SERVICE_NAME];
+}
+
+- (BOOL)hasLoginCredentials {
+    return [self hasSecEmail] && [self hasSecPassword];
+}
+
+- (BOOL)hasSecPassword {
+    return [KeyChainWrapper isEntryStoredForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
+}
+
+- (BOOL)hasSecEmail {
+    return [KeyChainWrapper isEntryStoredForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
+}
+
+- (NSString *)secEmail {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_EMAIL forService:SEC_SERVICE_NAME];
+}
+
+- (void)setSecEmail:(NSString *)email {
+    [KeyChainWrapper createEntryForUser:SEC_EMAIL entryValue:email forService:SEC_SERVICE_NAME];
+}
+
+- (NSString *)secPassword {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_PWD forService:SEC_SERVICE_NAME];
+}
+
+- (void)setSecPassword:(NSString *)pwd {
+    [KeyChainWrapper createEntryForUser:SEC_PWD entryValue:pwd forService:SEC_SERVICE_NAME];
+}
+
+- (NSString *)secUserId {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_USERID forService:SEC_SERVICE_NAME];
+}
+
+- (void)setSecUserId:(NSString *)userId {
+    [KeyChainWrapper createEntryForUser:SEC_USERID entryValue:userId forService:SEC_SERVICE_NAME];
+}
+
 
 
 @end

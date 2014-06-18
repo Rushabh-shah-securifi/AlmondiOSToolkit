@@ -66,9 +66,6 @@
 #define COLORCODE @"ColorCode"
 #define ALMONDLIST @"AlmondList"
 #define SETTINGS_LIST @"Settings"
-#define EMAIL @"Email"
-#define PASSWORD @"tempPasswordPrefKey"
-#define USERID @"userIDPrefKey"
 
 //XMLS
 #define FRESH_LOGIN_REQUEST_XML             @"<root><Login><EmailID>%@</EmailID><Password>%@</Password></Login></root>"

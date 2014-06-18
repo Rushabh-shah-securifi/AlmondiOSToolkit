@@ -62,6 +62,9 @@
 
 - (BOOL)isLoggedIn;
 
+- (void)asyncSendLoginWithEmail:(NSString*)email password:(NSString*)password;
+- (NSString*)loginEmail;
+
 - (void)asyncSendLogout;
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
 
