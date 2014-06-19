@@ -66,8 +66,6 @@
 
 
 + (NSDictionary *)searchForUserEmail:(NSString *)userEmail forService:(NSString *)service {
-    NSLog(@"userEmail: '%@'  service: '%@'", userEmail, service);
-
     NSMutableDictionary *searchQuery = [KeyChainWrapper createSearchQueryForUser:userEmail forService:service];
     searchQuery[(__bridge id) kSecReturnAttributes] = (id) kCFBooleanTrue;
     searchQuery[(__bridge id) kSecMatchLimit] = (__bridge id) kSecMatchLimitOne;
@@ -75,9 +73,9 @@
     CFDataRef searchResults = nil;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, (CFTypeRef *)&searchResults);
 
-    NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
-
     if (status != errSecSuccess) {
+        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         return nil;
     }
 
@@ -88,10 +86,7 @@
 
 
 + (BOOL)createEntryForUser:(NSString *)userEmail entryValue:(NSString *)entryValue forService:(NSString *)service {
-    NSLog(@"userEmail: '%@'  service: '%@'", userEmail, service);
     NSDictionary *searchResults = [KeyChainWrapper searchForUserEmail:userEmail forService:service];
-
-    OSStatus status = errSecSuccess;
 
     if (searchResults != nil) {
         [KeyChainWrapper removeEntryForUserEmail:userEmail forService:service];
@@ -104,29 +99,27 @@
     searchQuery[(__bridge id) kSecValueData] = encodedValue;
     searchQuery[(__bridge id) kSecAttrAccessible] = (__bridge id) kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
 
-    status = SecItemAdd((__bridge CFDictionaryRef) searchQuery, NULL);
-
+    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) searchQuery, NULL);
     if (status != errSecSuccess) {
+        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         [self printAttributes:searchQuery];
     }
-
-    NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
 
     return (status == errSecSuccess);
 }
 
 
 + (NSString *)retrieveEntryForUser:(NSString *)userEmail forService:(NSString *)service {
-    NSLog(@"userEmail: '%@'  service: '%@'", userEmail, service);
-
     NSMutableDictionary *searchQuery = [KeyChainWrapper createSearchQueryForUser:userEmail forService:service];
     searchQuery[(__bridge id) kSecReturnData] = (id) kCFBooleanTrue;
 
     CFTypeRef entryDataRef = nil;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef) searchQuery, &entryDataRef);
-    NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
 
     if (status != errSecSuccess) {
+        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         return nil;
     }
 
@@ -140,16 +133,15 @@
 
 
 + (BOOL)isEntryStoredForUserEmail:(NSString *)userEmail forService:(NSString *)service {
-    NSLog(@"userEmail: '%@'  service: '%@'", userEmail, service);
-
     NSMutableDictionary *searchQuery = [KeyChainWrapper createSearchQueryForUser:userEmail forService:service];
     searchQuery[(__bridge id) kSecReturnData] = (id) kCFBooleanTrue;
 
     CFTypeRef entryDataRef = nil;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, &entryDataRef);
-    NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
 
-    if (status != errSecSuccess) {
+    if (status != errSecSuccess && status != errSecItemNotFound) {
+        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         [self printAttributes:searchQuery];
     }
 
@@ -162,15 +154,14 @@
 
 
 + (BOOL)removeEntryForUserEmail:(NSString *)userEmail forService:(NSString *)service {
-    NSLog(@"userEmail: '%@'  service: '%@'", userEmail, service);
-
     NSMutableDictionary *searchQuery = [KeyChainWrapper createSearchQueryForUser:userEmail forService:service];
     [searchQuery removeObjectForKey:(__bridge id) kSecValueData];
 
     OSStatus status = SecItemDelete((__bridge CFDictionaryRef) searchQuery);
-    NSLog(@"KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
 
-    if (status != errSecSuccess) {
+    if (status != errSecSuccess && status != errSecItemNotFound) {
+        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        NSLog(@"KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         [self printAttributes:searchQuery];
     }
 
