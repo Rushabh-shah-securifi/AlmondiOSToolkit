@@ -26,9 +26,9 @@
 #define SEC_USERID @"com.securifi.userid"
 
 @interface SecurifiToolkit () <SingleTonDelegate>
-@property (nonatomic, readonly) dispatch_queue_t backgroundQueue;
-@property (nonatomic, readonly) dispatch_queue_t reconnectQueue;
-@property (nonatomic, readonly) dispatch_queue_t singleTonQueue;
+@property (nonatomic, readonly) NSObject *syncLocker;
+@property (nonatomic, readonly) dispatch_queue_t socketQueue;
+@property (nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property (nonatomic, readonly) SingleTon *networkSingleton;
 @property BOOL initializing; // when TRUE an op is already in progress to set up a network
 @end
@@ -52,13 +52,13 @@
 - (id)init {
     self = [super init];
     if (self) {
-        _backgroundQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
-        _reconnectQueue = dispatch_queue_create("network_reconnect_queue", DISPATCH_QUEUE_SERIAL);
-        _singleTonQueue = dispatch_queue_create("network_reconnect_queue", DISPATCH_QUEUE_CONCURRENT);
+        _syncLocker = [NSObject new];
+
+        _socketQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
+        _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(onReachabilityDidChange:) name:kSFIReachabilityChangedNotification object:nil];
-        [center addObserver:self selector:@selector(onNetworkDown:) name:NETWORK_DOWN_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLoginResponse:) name:LOGIN_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutResponse:) name:LOGOUT_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutAllResponse:) name:LOGOUT_ALL_NOTIFIER object:nil];
@@ -70,7 +70,6 @@
 - (void)dealloc {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center removeObserver:self name:kSFIReachabilityChangedNotification object:nil];
-    [center removeObserver:self name:NETWORK_DOWN_NOTIFIER object:nil];
     [center removeObserver:self name:LOGIN_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_ALL_NOTIFIER object:nil];
@@ -81,25 +80,21 @@
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
 
-    SingleTon *newSingleton = [SingleTon newSingleton:self.singleTonQueue];
+    SingleTon *newSingleton = [SingleTon newSingleton:self.socketQueue];
     newSingleton.delegate = self;
     _networkSingleton = newSingleton;
 }
 
-#pragma mark - SingleTonDelegate methods
-
-- (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {
-    if (singleTon == self.networkSingleton) {
-        [self initSDK];
-    }
-}
-
-#pragma mark - Initialization and state
+#pragma mark - Initialization
 
 - (BOOL)isCloudOnline {
-    BOOL reachable = [[SFIReachabilityManager sharedManager] isReachable];
-    NSInteger state = [[SecurifiToolkit sharedInstance] getConnectionState];
-    return reachable && state != NETWORK_DOWN && state != CLOUD_CONNECTION_ENDED && state != INITIALIZING;
+    BOOL reachable = [self isReachable];
+    NSInteger state = [self getConnectionState];
+    return reachable && state != SDK_UNINITIALIZED && state != NETWORK_DOWN && state != CLOUD_CONNECTION_ENDED && state != INITIALIZING;
+}
+
+- (BOOL)isReachable {
+    return [[SFIReachabilityManager sharedManager] isReachable];
 }
 
 - (BOOL)isLoggedIn {
@@ -116,32 +111,34 @@
     }
 }
 
+#pragma mark - Initialization
+
 - (void)initSDK {
     NSLog(@"INIT SDK");
 
     if (self.initializing == NO) {
         self.initializing = YES;
 
-        [self setupNetworkSingleton];
-        SingleTon *singleTon = self.networkSingleton;
-
         //Start a Async task of sending Sanity command and TempPassCommand
         //Async task will send command and will generate respective events
-        dispatch_async(self.backgroundQueue, ^(void) {
-            [self internalInitSdk:singleTon];
+        dispatch_async(self.socketQueue, ^(void) {
+            [self setupNetworkSingleton];
+            [self internalInitSdk:self.networkSingleton];
         });
     }
 }
 
 - (void)internalInitSdk:(SingleTon*)singleTon {
+    self.initializing = YES;
+
     singleTon.connectionState = INITIALIZING;
 
     // Send sanity command testing network connection
     GenericCommand *cmd = [self makeCloudSanityCommand];
 
     NSError *error;
-    id ret = [self internalSendToCloud:singleTon command:cmd error:&error];
-    if (ret == nil || error) {
+    BOOL success = [self internalSendToCloud:singleTon command:cmd error:&error];
+    if (!success) {
         singleTon.connectionState = NETWORK_DOWN;
         NSLog(@"%s: init SDK: send sanity failed: %@", __PRETTY_FUNCTION__, error.localizedDescription);
         self.initializing = NO;
@@ -179,22 +176,62 @@
 
         [self setupNetworkSingleton];
 
-        SingleTon *socket = self.networkSingleton;
+        __weak SingleTon *socket = self.networkSingleton;
+        __weak SecurifiToolkit *block_self = self;
+
         GenericCommand *cmd = [self makeCloudSanityCommand];
 
         [self asyncSendToCloud:socket command:cmd completion:^(BOOL success, NSError *error2) {
             if (success) {
-                NSLog(@"%s: Failed to init SDK cloud: %@", __PRETTY_FUNCTION__, error2.description);
-                [socket setConnectionState:NETWORK_DOWN];
+                NSLog(@"%s: SESSION STARTED - SANITY TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+                socket.connectionState = NOT_LOGGED_IN;
             }
             else {
-                NSLog(@"%s: SESSION STARTED - SANITY TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-                [socket setConnectionState:NOT_LOGGED_IN];
+                NSLog(@"%s: Failed to init SDK cloud: %@", __PRETTY_FUNCTION__, error2.description);
+                socket.connectionState = NETWORK_DOWN;
             }
 
-            self.initializing = NO;
+            block_self.initializing = NO;
         }];
     }
+}
+
+#pragma mark - Command dispatch
+
+typedef void (^SendCompletion)(BOOL success, NSError *error);
+
+- (void)asyncSendToCloud:(SingleTon*)socket command:(GenericCommand*)command completion:(SendCompletion)callback {
+    if (!socket.isStreamConnected && !self.initializing) {
+        [self initSDK];
+        socket = self.networkSingleton;
+    }
+
+    int cmd_type = command.commandType;
+    __weak SingleTon *block_socket = socket;
+
+    dispatch_async(self.commandDispatchQueue, ^() {
+        NSError *outError;
+        BOOL success = [self internalSendToCloud:block_socket command:command error:&outError];
+        if (success) {
+            NSLog(@"[Generic cmd: %d] send success", cmd_type);
+        }
+        else {
+            NSLog(@"[Generic cmd: %d] send error: %@", cmd_type, outError.localizedDescription);
+
+            if (block_socket.disableNetworkDownNotification == NO) {
+                NSLog(@"%s: Posting NETWORK_DOWN_NOTIFIER, error=%@", __PRETTY_FUNCTION__, outError.localizedDescription);
+                [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:nil userInfo:nil];
+            }
+        }
+
+        if (callback) {
+            callback(success, outError);
+        }
+    });
+}
+
+- (void)asyncSendToCloud:(GenericCommand*)command {
+    [self asyncSendToCloud:self.networkSingleton command:command completion:nil];
 }
 
 #pragma mark - Logon
@@ -226,8 +263,8 @@
     cloudCommand.command = cmd;
 
     NSError *error_2;
-    id ret_2 = [self internalSendToCloud:singleTon command:cloudCommand error:&error_2];
-    if (ret_2 == nil || error_2) {
+    BOOL success = [self internalSendToCloud:singleTon command:cloudCommand error:&error_2];
+    if (!success) {
         NSLog(@"%s: Error init sdk: %@", __PRETTY_FUNCTION__, error_2.localizedDescription);
         singleTon.connectionState = NETWORK_DOWN;
     }
@@ -292,7 +329,11 @@
 }
 
 - (void)onLogoutAllResponse:(NSNotification *)notification {
-    [self removeLoginCredentials];
+    NSDictionary *info = notification.userInfo;
+    LoginResponse *res = info[@"data"];
+    if (res.isSuccessful) {
+        [self removeLoginCredentials];
+    }
 }
 
 - (void)asyncSendLogout {
@@ -350,58 +391,98 @@
     return cmd;
 }
 
-#pragma mark - Command dispatch
+#pragma mark - Network reconnection handling
 
-typedef void (^SendCompletion)(BOOL success, NSError *error);
-
-- (void)asyncSendToCloud:(SingleTon*)socket command:(id)command completion:(SendCompletion)callback {
-    dispatch_async(self.backgroundQueue, ^() {
-        NSError *outError;
-        id ret = [self internalSendToCloud:socket command:command error:&outError];
-        BOOL success = (ret != nil);
-
-        if (!success) {
-            if (self.networkSingleton.disableNetworkDownNotification == NO) {
-                NSLog(@"%s: Posting NETWORK_DOWN_NOTIFIER, ret=%@, error=%@", __PRETTY_FUNCTION__, ret, outError.localizedDescription);
-                [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:self userInfo:nil];
-            }
-        }
-
-        if (callback) {
-            callback(success, outError);
-        }
-    });
+- (void)onReachabilityDidChange:(id)notification {
+        NSLog(@"changed to reachable");
 }
 
-- (void)asyncSendToCloud:(GenericCommand*)command {
-    [self asyncSendToCloud:self.networkSingleton command:command completion:^(BOOL success, NSError *error2) {
-        if (success) {
-            NSLog(@"[Generic cmd: %d] send success", command.commandType);
-        }
-        else {
-            NSLog(@"[Generic cmd: %d] send error%@", command.commandType, error2.localizedDescription);
-        }
-    }];
+#pragma mark - Keychain Access
+
+- (void)clearSecCredentials {
+    [KeyChainWrapper removeEntryForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_USERID forService:SEC_SERVICE_NAME];
 }
 
-- (id)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
-    @synchronized (self) {
-        do {
-            if (socket.sendCommandFail == YES) {
-                // [SNLog Log:@"%s: Break send loop and return error",__PRETTY_FUNCTION__];
+- (BOOL)hasLoginCredentials {
+    return [self hasSecEmail] && [self hasSecPassword];
+}
+
+- (BOOL)hasSecPassword {
+    return [KeyChainWrapper isEntryStoredForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
+}
+
+- (BOOL)hasSecEmail {
+    return [KeyChainWrapper isEntryStoredForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
+}
+
+- (NSString *)secEmail {
+    if (![self hasSecEmail]) {
+        return nil;
+    }
+    return [KeyChainWrapper retrieveEntryForUser:SEC_EMAIL forService:SEC_SERVICE_NAME];
+}
+
+- (void)setSecEmail:(NSString *)email {
+    [KeyChainWrapper createEntryForUser:SEC_EMAIL entryValue:email forService:SEC_SERVICE_NAME];
+}
+
+- (NSString *)secPassword {
+    if (![self hasSecPassword]) {
+        return nil;
+    }
+    return [KeyChainWrapper retrieveEntryForUser:SEC_PWD forService:SEC_SERVICE_NAME];
+}
+
+- (void)setSecPassword:(NSString *)pwd {
+    [KeyChainWrapper createEntryForUser:SEC_PWD entryValue:pwd forService:SEC_SERVICE_NAME];
+}
+
+- (NSString *)secUserId {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_USERID forService:SEC_SERVICE_NAME];
+}
+
+- (void)setSecUserId:(NSString *)userId {
+    [KeyChainWrapper createEntryForUser:SEC_USERID entryValue:userId forService:SEC_SERVICE_NAME];
+}
+
+#pragma mark - SingleTonDelegate methods
+
+- (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {
+    if (singleTon == self.networkSingleton) {
+//        NSLog(@"%s: ejecting SingleTon on closing of cloud connection", __PRETTY_FUNCTION__);
+//        _networkSingleton = nil;
+    }
+}
+
+#pragma mark - Sending and Network
+
+- (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
+    NSLog(@"%s: Waiting to enter sync block",__PRETTY_FUNCTION__);
+    @synchronized (self.syncLocker) {
+        NSLog(@"%s: Entered sync block",__PRETTY_FUNCTION__);
+
+        // Wait for connection establishment if need be.
+        if (!socket.isStreamConnected) {
+            NSLog(@"Waiting for stream connection");
+            [socket waitForConnectionEstablishment];
+            NSLog(@"Done waiting for stream connection");
+
+            if (!socket.isStreamConnected) {
+                NSLog(@"Stream died on connection");
                 NSMutableDictionary *details = [NSMutableDictionary dictionary];
                 [details setValue:@"Securifi - Send Error" forKey:NSLocalizedDescriptionKey];
                 *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
-                return nil;
+                return NO;
             }
         }
-        while (socket.isStreamConnected != YES && socket.sendCommandFail != YES);
 
         GenericCommand *obj = (GenericCommand *) sender;
 
         NSString *commandPayload;
-        unsigned int commandLength;
-        unsigned int commandType;
+        unsigned int commandLength = 0;
+        unsigned int commandType = 0;
         NSData *sendCommandPayload;
 
         @try {
@@ -422,7 +503,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
                         //NSLog(@"Before Notification");
                         [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:data];
 
-                        return @"Yes";
+                        return YES;
                     }
                     else {
                         // [SNLog Log:@"%s: Sending LOGIN COMMAND",__PRETTY_FUNCTION__];
@@ -466,23 +547,23 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
                     //PY 250214 - Logout Response will be received now
                     //Remove preferences
 //                    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-//                    
+//
 //                    // [SNLog Log:@"%s: TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
 //                    [prefs removeObjectForKey:tmpPwdKey];
 //                    [prefs removeObjectForKey:usrIDKey];
 //                    [prefs synchronize];
 //                    // [SNLog Log:@"%s: After delete\n",__PRETTY_FUNCTION__];
 //                    // [SNLog Log:@"%s: TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
-//                    
+//
 //                    [socket setConnectionState:NOT_LOGGED_IN];
-//                    
+//
 //                    //PY 160913 - Reconnect to cloud
 //                    id ret = [[SecurifiToolkit sharedInstance] initSDKCloud];
 //                    if (ret == nil)
 //                    {
 //                        // [SNLog Log:@"%s: APP Delegate : SDKInit Error",__PRETTY_FUNCTION__];
 //                    }
-//                    
+//
 
                     break;
                 }
@@ -802,76 +883,80 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             do {
                 type = [socket.outputStream streamStatus];
                 // [SNLog Log:@"%s: Socket in opening state.. wait..",__PRETTY_FUNCTION__];
-            } while (type == 1);
+            } while (type == NSStreamStatusOpening);
 
             [socket.outputStream streamStatus];
 
             // [SNLog Log:@"%s: Out of stream type check loop : %d",__PRETTY_FUNCTION__,type];
 
-            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
+            if (socket.isStreamConnected && socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandLength maxLength:4]) {
                     socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
                     [details setValue:@"Securifi Length - Send Error" forKey:NSLocalizedDescriptionKey];
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
 
-                    if ([socket disableNetworkDownNotification] == NO) {
-                        [socket setSendCommandFail:YES];
-                        [socket setIsStreamConnected:NO];
-                    }
-                    return nil;
+                    socket.sendCommandFail = YES;
+                    socket.isStreamConnected = NO;
+
+                    return NO;
                 }
             }
 
             //stream status
-            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
+            if (socket.isStreamConnected && socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandType maxLength:4]) {
                     socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
                     [details setValue:@"Securifi Command Type - Send Error" forKey:NSLocalizedDescriptionKey];
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
 
-                    if ([socket disableNetworkDownNotification] == NO) {
-                        [socket setSendCommandFail:YES];
-                        [socket setIsStreamConnected:NO];
-                    }
-                    return nil;
+                    socket.sendCommandFail = YES;
+                    socket.isStreamConnected = NO;
+
+                    return NO;
                 }
             }
 
-            if (socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
+            if (socket.isStreamConnected && socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]]) {
                     socket.isLoggedIn = NO;
                     NSMutableDictionary *details = [NSMutableDictionary dictionary];
                     [details setValue:@"Securifi Payload - Send Error" forKey:NSLocalizedDescriptionKey];
                     *outError = [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
 
-                    if ([socket disableNetworkDownNotification] == NO) {
-                        [socket setSendCommandFail:YES];
-                        [socket setIsStreamConnected:NO];
-                    }
-                    return nil;
+                    socket.sendCommandFail = YES;
+                    socket.isStreamConnected = NO;
+
+                    return NO;
                 }
             }
 
+            NSLog(@"%s: Exiting sync block",__PRETTY_FUNCTION__);
+
             if (socket.outputStream == nil) {
                 NSLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
-                return nil;
+                return NO;
+            }
+            else if (!socket.isStreamConnected) {
+                NSLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
+                return NO;
             }
             else if (socket.outputStream.streamStatus == NSStreamStatusError) {
                 NSLog(@"%s: Output stream has error status, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
-                return nil;
+                return NO;
             }
             else {
                 NSLog(@"%s: sent command to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-                return @"yes";
+                return YES;
             }
         }
         @catch (NSException *e) {
-            // [SNLog Log:@"%s: Exception : %@",__PRETTY_FUNCTION__,e.reason];
+            NSLog(@"%s: Exception : %@",__PRETTY_FUNCTION__, e.reason);
             @throw;
         }
     }//synchronized
+
 }
 
 - (NSString *)stringByRemovingEscapeCharacters:(NSString *)inputString {
@@ -885,112 +970,6 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 //    [s replaceOccurrencesOfString:@"\t" withString:@"\\t" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
     return [NSString stringWithString:s];
 }
-
-#pragma mark - Network reconnection handling
-
-- (void)onReachabilityDidChange:(id)notification {
-    if ([[SFIReachabilityManager sharedManager] isReachable]) {
-        NSLog(@"changed to reachable");
-        [[SecurifiToolkit sharedInstance] initSDK];
-    }
-}
-
-- (void)onNetworkDown:(id)notification {
-    if (!self.initializing) {
-        dispatch_async(self.reconnectQueue, ^{
-            // Run on a separate thread that can be put to sleep in reconnect.
-            [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
-        });
-    }
-}
-
-//todo sinclair - the reconnect machinery needs to be re-evaluated
-//todo sinclair - using initializing property is problematic because other methods also control its state.
-- (void)reconnect {
-    if (self.initializing == NO) {
-        self.initializing = YES;
-
-        unsigned int attempt_count = 1;
-        while (attempt_count < 5) {
-            [self setupNetworkSingleton];
-
-            SingleTon *singleTon = self.networkSingleton;
-            [self internalInitSdk:singleTon];
-
-            if ([self getConnectionState] != NETWORK_DOWN && [self getConnectionState] != INITIALIZING) {
-                break;
-            }
-
-            sleep(attempt_count + 2);
-            attempt_count += 1;
-        } // end attempts to reconnect
-
-        NSInteger state = [self getConnectionState];
-
-        switch (state) {
-            case INITIALIZING: {
-                NSLog(@"reconnect state: %ld (initializing)", (long)state);
-                break;
-            }
-            case NETWORK_DOWN: {
-                NSLog(@"reconnect state: %ld (network down)", (long)state);
-                break;
-            }
-            default: {
-                NSLog(@"reconnect state: %ld", (long)state);
-                [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_UP_NOTIFIER object:self userInfo:nil];
-                break;
-            }
-        }
-
-        self.initializing = NO;
-    }
-}
-
-#pragma mark - Keychain Access
-
-- (void)clearSecCredentials {
-    [KeyChainWrapper removeEntryForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
-    [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
-    [KeyChainWrapper removeEntryForUserEmail:SEC_USERID forService:SEC_SERVICE_NAME];
-}
-
-- (BOOL)hasLoginCredentials {
-    return [self hasSecEmail] && [self hasSecPassword];
-}
-
-- (BOOL)hasSecPassword {
-    return [KeyChainWrapper isEntryStoredForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
-}
-
-- (BOOL)hasSecEmail {
-    return [KeyChainWrapper isEntryStoredForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
-}
-
-- (NSString *)secEmail {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_EMAIL forService:SEC_SERVICE_NAME];
-}
-
-- (void)setSecEmail:(NSString *)email {
-    [KeyChainWrapper createEntryForUser:SEC_EMAIL entryValue:email forService:SEC_SERVICE_NAME];
-}
-
-- (NSString *)secPassword {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_PWD forService:SEC_SERVICE_NAME];
-}
-
-- (void)setSecPassword:(NSString *)pwd {
-    [KeyChainWrapper createEntryForUser:SEC_PWD entryValue:pwd forService:SEC_SERVICE_NAME];
-}
-
-- (NSString *)secUserId {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_USERID forService:SEC_SERVICE_NAME];
-}
-
-- (void)setSecUserId:(NSString *)userId {
-    [KeyChainWrapper createEntryForUser:SEC_USERID entryValue:userId forService:SEC_SERVICE_NAME];
-}
-
 
 
 @end
