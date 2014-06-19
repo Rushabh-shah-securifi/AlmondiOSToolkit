@@ -21,12 +21,14 @@
 
 
 @interface SingleTon ()
+@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
+@property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
+
 @property(nonatomic) SecCertificateRef certificate;
 @property BOOL certificateTrusted;
-@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
 @property(nonatomic) unsigned int command;
 @property(nonatomic, readonly) NSMutableData *partialData;
-@property(nonatomic) BOOL cloudConnectionEnded;
+@property(nonatomic) BOOL networkShutdown;
 @end
 
 @implementation SingleTon
@@ -44,35 +46,39 @@
         self.isLoggedIn = NO;
         self.isStreamConnected = NO;
         self.sendCommandFail = NO;
-        self.cloudConnectionEnded = NO;
+        self.networkShutdown = NO;
         self.connectionState = SDK_UNINITIALIZED;
         _backgroundQueue = queue;
+        _network_established_latch = dispatch_semaphore_create(0);
     }
     
     return self;
 }
 
 - (void)initNetworkCommunication {
+    SingleTon *block_self = self;
+    
     dispatch_async(self.backgroundQueue, ^(void) {
-        if (self.inputStream == nil && self.outputStream == nil) {
+        if (block_self.inputStream == nil && block_self.outputStream == nil) {
             // Load certificate
             //
-            [self loadCertificate];
+            [block_self loadCertificate];
 
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
 
             CFStringRef host = (__bridge CFStringRef) CLOUD_SERVER;
-            CFStreamCreatePairWithSocketToHost(NULL, host, 1028, &readStream, &writeStream);
+            UInt32 port = 1028;
+            CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
 
-            self.inputStream = (__bridge_transfer NSInputStream *) readStream;
-            self.outputStream = (__bridge_transfer NSOutputStream *) writeStream;
+            block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
+            block_self.outputStream = (__bridge_transfer NSOutputStream *) writeStream;
 
-            [self.inputStream setDelegate:self];
-            [self.outputStream setDelegate:self];
+            [block_self.inputStream setDelegate:block_self];
+            [block_self.outputStream setDelegate:block_self];
 
-            [self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
-            [self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
+            [block_self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
+            [block_self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
 
             //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredRoots];
             //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
@@ -96,27 +102,34 @@
 
             NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
 
-            [self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
-            [self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
+            [block_self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
+            [block_self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
 
-            [self.inputStream open];
-            [self.outputStream open];
+            [block_self.inputStream open];
+            [block_self.outputStream open];
 
-            self.isStreamConnected = YES;
+            NSLog(@"Streams opened and ready");
 
-            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && self.isStreamConnected && !self.cloudConnectionEnded) {
-                //// NSLog(@"Run loop did run");
+            NSLog(@"Streams entering run loop");
+
+            // Signal to waiting socket writers that the network is up and then invoke the run loop to pump events
+            block_self.isStreamConnected = YES;
+            dispatch_semaphore_signal(self.network_established_latch);
+            //
+            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && !block_self.networkShutdown) {
+//                NSLog(@"Streams entered run loop");
             }
+            block_self.isStreamConnected = NO;
 
-            NSLog(@"Run loop exited");
+            NSLog(@"Streams exited run loop");
 
-            [self.delegate singletTonCloudConnectionDidClose:self];
+            [block_self.delegate singletTonCloudConnectionDidClose:block_self];
         }
         else {
             NSLog(@"Stream already opened");
         }
 
-        self.cloudConnectionEnded = NO;
+        block_self.networkShutdown = NO;
     });
 }
 
@@ -128,10 +141,25 @@
 }
 
 - (void)shutdown {
+    if (_backgroundQueue == nil) {
+        // already shutdown
+        return;
+    }
     dispatch_async(self.backgroundQueue, ^(void) {
         [self tearDownNetwork];
     });
 }
+
+- (void)waitForConnectionEstablishment {
+    dispatch_time_t blockingSleepSecondsIfNotDone = 1;
+
+    while (0 != dispatch_semaphore_wait(self.network_established_latch, blockingSleepSecondsIfNotDone)) {
+        if (self.networkShutdown || self.sendCommandFail) {
+            return;
+        }
+    }
+}
+
 
 #pragma mark - NSStreamDelegate methods
 
@@ -194,7 +222,7 @@
 
                                 if(startTagRange.location == NSNotFound)
                                 {
-                                    // [SNLog Log:@"%s: Seriouse error !!! should not come heer // Invalid command /// without startRootTag", __PRETTY_FUNCTION__];
+                                    // [SNLog Log:@"%s: Serious error !!! should not come here// Invalid command /// without startRootTag", __PRETTY_FUNCTION__];
                                 }
                                 else
                                 {
@@ -373,58 +401,11 @@
                                         default:
                                             break;
                                     }
-                                    //                                    if (temp.commandType == LOGIN_RESPONSE)
-                                    //                                    {
-                                    //
-                                    //                                    }
-                                    /* MIGRATING TO iOS SDK
-                                     if (NSSwapBigIntToHost(command) == 2)
-                                     {
-                                     // NSLog(@"Inside command == 2");
-                                     //Create Notification and send it
-                                     NSString *output = [[NSString alloc] initWithData:partialData encoding:NSUTF8StringEncoding];
-
-                                     if (nil != output) {
-                                     // NSLog(@"server said: %@", output);
-                                     //[self messageReceived:output];
-                                     //send local notification to update view
-                                     NSDictionary *data = [NSDictionary dictionaryWithObject:output forKey:@"data"];
-
-                                     [[NSNotificationCenter defaultCenter] postNotificationName:@"loginResponse" object:self userInfo:data];
-
-                                     //[[NSNotificationCenter defaultCenter] postNotificationName:@"tempPassLogingRes" object:self userInfo:data];
-                                     }
-                                     }
-
-                                     if ((NSSwapBigIntToHost(command) == 24) || (NSSwapBigIntToHost(command) == 26))
-                                     {
-                                     // NSLog(@"Inside command == %d",NSSwapBigIntToHost(command));
-                                     //Create Notification and send it
-                                     NSString *output = [[NSString alloc] initWithData:partialData encoding:NSUTF8StringEncoding];
-
-                                     if (nil != output) {
-                                     // NSLog(@"server said: %@", output);
-                                     //[self messageReceived:output];
-                                     //send local notification to update view
-                                     NSDictionary *data = [NSDictionary dictionaryWithObject:output forKey:@"data"];
-
-                                     //[[NSNotificationCenter defaultCenter] postNotificationName:@"loginResponse" object:self userInfo:data];
-                                     }
-                                     }
-                                     */
-
-                                    //// NSLog(@"Partial Buffer before trim : %@",partialData);
-
-                                    //Trim Partial Buffer
-                                    //This will trim parital buffer till </root>
-
 
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location + endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
 
                                     //Regenerate NSRange
                                     endTagRange = NSMakeRange(0, [self.partialData length]);
-
-                                    //// NSLog(@"Partial Buffer after trim : %@",partialData);
                                 }
                                 count++;
                             }
@@ -445,44 +426,8 @@
             //if (theStream == outputStream && [outputStream streamStatus] == NSStreamStatusError)
 
             if (theStream == self.outputStream) {
+                NSLog(@"Output stream error: %@", theStream.streamError.localizedDescription);
                 [self shutdown];
-//                self.connectionState = NETWORK_DOWN;
-
-                //PY301013 - Reconnect
-//                [self postData:NETWORK_DOWN_NOTIFIER data:nil];
-                //PY 080114 - TRYING
-                //                dispatch_async(backgroundQueue, ^ {
-                //
-                //                    [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
-                //                });
-
-                //[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkDOWN" object:self userInfo:nil];
-
-                //TEST --- Remove it later
-                //// NSLog(@"Dispatch ErrorOccurred Notification -- TCP DOWN");
-
-                //Some how we should know that this is coming from thread or main thread
-                //[[NSNotificationCenter defaultCenter] postNotificationName:@"NetworkDOWN" object:self userInfo:nil];
-
-                //User APP should not handle reconnection
-                //Dispatch thread
-                //[SingleTon reconnect];
-
-                //Testing with reachability
-
-                /*
-                 if ([[SingleTon getObject] disableNetworkDownNotification] == NO) //Implies not in thread
-                 {
-                 // NSLog(@"Launching thread from errorEvent handler");
-                 //First Write of initSDK will throw NetworkDOWN notification
-                 //dispatch_async(backgroundQueue, ^ {
-
-                 [NSThread detachNewThreadSelector:@selector(reconnect) toTarget:self withObject:nil];
-
-                 //[self reconnect];
-                 //});
-                 }
-                 */
             }
             break;
 
@@ -519,9 +464,12 @@
 
 - (void)tearDownNetwork {
     // Signal to any waiting loops to exit
-    self.cloudConnectionEnded = YES;
+    dispatch_semaphore_signal(self.network_established_latch);
+
+    self.networkShutdown = YES;
     self.isLoggedIn = NO;
     self.connectionState = CLOUD_CONNECTION_ENDED;
+    self.isStreamConnected = NO;
 
     NSRunLoop *loop = [NSRunLoop currentRunLoop];
 
@@ -536,6 +484,8 @@
         [self.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
         self.inputStream = nil;
     }
+
+    _backgroundQueue = nil;
 }
 
 #pragma mark - Payload notification

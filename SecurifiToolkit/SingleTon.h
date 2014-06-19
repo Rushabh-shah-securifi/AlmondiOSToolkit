@@ -35,4 +35,7 @@
 
 - (void)shutdown;
 
+// Called by clients that need to use the output stream. Blocks until the connection is set up or fails.
+- (void)waitForConnectionEstablishment;
+
 @end
