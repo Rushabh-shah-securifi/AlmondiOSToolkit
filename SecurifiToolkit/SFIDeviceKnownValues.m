@@ -33,4 +33,9 @@
     return self;
 }
 
+- (BOOL)boolValue {
+    return [self.value isEqualToString:@"true"];
+}
+
+
 @end

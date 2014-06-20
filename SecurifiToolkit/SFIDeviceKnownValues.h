@@ -14,4 +14,7 @@
 @property NSString          *valueType;
 @property NSString          *value;
 @property BOOL              isUpdating;
+
+- (BOOL)boolValue;
+
 @end
