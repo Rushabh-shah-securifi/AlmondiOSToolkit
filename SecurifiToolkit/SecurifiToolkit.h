@@ -60,7 +60,11 @@
 
 - (BOOL)isCloudOnline;
 
+- (BOOL)isReachable;
+
 - (BOOL)isLoggedIn;
+
+- (BOOL)hasLoginCredentials;
 
 - (void)asyncSendLoginWithEmail:(NSString*)email password:(NSString*)password;
 - (NSString*)loginEmail;

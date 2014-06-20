@@ -22,6 +22,7 @@
 
 @interface SingleTon ()
 @property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
+@property(nonatomic, readonly) dispatch_queue_t callbackQueue;
 @property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
 
 @property(nonatomic) SecCertificateRef certificate;
@@ -33,13 +34,13 @@
 
 @implementation SingleTon
 
-+ (SingleTon *)newSingleton:(dispatch_queue_t)backgroundQueue {
-    SingleTon *obj = [[SingleTon alloc] initWithQueue:backgroundQueue];
++ (SingleTon *)newSingleton:(dispatch_queue_t)callbackQueue {
+    SingleTon *obj = [[SingleTon alloc] initWithQueue:callbackQueue];
     [obj initNetworkCommunication];
     return obj;
 }
 
-- (id)initWithQueue:(dispatch_queue_t)queue {
+- (id)initWithQueue:(dispatch_queue_t)callbackQueue {
     self = [super init];
     if (self) {
         self.disableNetworkDownNotification = NO;
@@ -48,7 +49,8 @@
         self.sendCommandFail = NO;
         self.networkShutdown = NO;
         self.connectionState = SDK_UNINITIALIZED;
-        _backgroundQueue = queue;
+        _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
+        _callbackQueue = callbackQueue;
         _network_established_latch = dispatch_semaphore_create(0);
     }
     
@@ -56,7 +58,7 @@
 }
 
 - (void)initNetworkCommunication {
-    SingleTon *block_self = self;
+    __strong SingleTon *block_self = self;
     
     dispatch_async(self.backgroundQueue, ^(void) {
         if (block_self.inputStream == nil && block_self.outputStream == nil) {
@@ -114,12 +116,15 @@
 
             // Signal to waiting socket writers that the network is up and then invoke the run loop to pump events
             block_self.isStreamConnected = YES;
-            dispatch_semaphore_signal(self.network_established_latch);
+            dispatch_semaphore_signal(block_self.network_established_latch);
             //
             while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && !block_self.networkShutdown) {
 //                NSLog(@"Streams entered run loop");
             }
             block_self.isStreamConnected = NO;
+
+            [block_self.inputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
+            [block_self.outputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
 
             NSLog(@"Streams exited run loop");
 
@@ -141,12 +146,35 @@
 }
 
 - (void)shutdown {
-    if (_backgroundQueue == nil) {
-        // already shutdown
-        return;
-    }
-    dispatch_async(self.backgroundQueue, ^(void) {
-        [self tearDownNetwork];
+    __weak SingleTon *block_self = self;
+
+    dispatch_sync(self.backgroundQueue, ^(void) {
+        // Signal to any waiting loops to exit
+        dispatch_semaphore_signal(block_self.network_established_latch);
+
+        block_self.networkShutdown = YES;
+        block_self.isLoggedIn = NO;
+        block_self.connectionState = CLOUD_CONNECTION_ENDED;
+        block_self.isStreamConnected = NO;
+
+        NSInputStream *in_stream = block_self.inputStream;
+        NSOutputStream *out_stream = block_self.outputStream;
+
+        NSRunLoop *loop = [NSRunLoop currentRunLoop];
+
+        if (out_stream != nil) {
+            out_stream.delegate = nil;
+            [out_stream close];
+            [out_stream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+            block_self.outputStream = nil;
+        }
+
+        if (in_stream != nil) {
+            in_stream.delegate = nil;
+            [in_stream close];
+            [in_stream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+            block_self.inputStream = nil;
+        }
     });
 }
 
@@ -183,7 +211,7 @@
 
 		case NSStreamEventHasBytesAvailable:
 			if (theStream == self.inputStream) {
-				while ([self.inputStream hasBytesAvailable]) {
+				while (!self.networkShutdown && [self.inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
                     NSInteger len;
 
@@ -447,7 +475,7 @@
         case NSStreamEventEndEncountered: {
             if (theStream == self.inputStream) {
                 NSLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-                [self tearDownNetwork];
+                [self shutdown];
             }
 
             break;
@@ -460,43 +488,23 @@
 
 }
 
-#pragma mark - Stream management
-
-- (void)tearDownNetwork {
-    // Signal to any waiting loops to exit
-    dispatch_semaphore_signal(self.network_established_latch);
-
-    self.networkShutdown = YES;
-    self.isLoggedIn = NO;
-    self.connectionState = CLOUD_CONNECTION_ENDED;
-    self.isStreamConnected = NO;
-
-    NSRunLoop *loop = [NSRunLoop currentRunLoop];
-
-    if (self.outputStream != nil) {
-        [self.outputStream close];
-        [self.outputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
-        self.outputStream = nil;
-    }
-
-    if (self.inputStream != nil) {
-        [self.inputStream close];
-        [self.inputStream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
-        self.inputStream = nil;
-    }
-
-    _backgroundQueue = nil;
-}
-
 #pragma mark - Payload notification
 
 - (void)postData:(NSString*)notificationName data:(id)payload {
-    NSDictionary *data = nil;
-    if (payload) {
-        data = @{@"data" : payload};
-    }
+    // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
+    // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
+    // UI can easily become confused. This needs to be sorted out.
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:self userInfo:data];
+    __weak id block_payload = payload;
+
+    dispatch_sync(self.callbackQueue, ^() {
+        NSDictionary *data = nil;
+        if (payload) {
+            data = @{@"data" : block_payload};
+        }
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
+    });
 }
 
 

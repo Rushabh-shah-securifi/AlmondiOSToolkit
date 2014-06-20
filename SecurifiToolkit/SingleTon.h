@@ -31,7 +31,8 @@
 @property BOOL isLoggedIn;
 @property BOOL sendCommandFail;
 
-+ (SingleTon *)newSingleton:(dispatch_queue_t)backgroundQueue;
+// queue on which notifications will be posted
++ (SingleTon *)newSingleton:(dispatch_queue_t)callbackQueue;
 
 - (void)shutdown;
 
