@@ -33,8 +33,63 @@
     return self;
 }
 
+- (BOOL)hasValue {
+    return self.value.length > 0;
+}
+
 - (BOOL)boolValue {
     return [self.value isEqualToString:@"true"];
+}
+
+- (float)floatValue {
+    return [self.value floatValue];
+}
+
+
+- (BOOL)isZeroLevelValue {
+    return [self.value isEqualToString:@"0"];
+}
+
+- (id)choiceForLevelValueZeroValue:(id)aZeroVal nonZeroValue:(id)aNonZeroValue nilValue:(id)aNoneValue {
+    if (self.value == nil) {
+        return aNoneValue;
+    }
+    if (self.isZeroLevelValue) {
+        return aZeroVal;
+    }
+    return aNonZeroValue;
+}
+
+
+- (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr {
+    if ([self.value isEqualToString:@"true"]) {
+        return aTrueStr;
+    }
+    return aFalseStr;
+}
+
+- (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr nilValue:(id)aNoneValue {
+    if ([self.value isEqualToString:@"true"]) {
+        return aTrueStr;
+    }
+    if ([self.value isEqualToString:@"false"]) {
+        return aFalseStr;
+    }
+    return aNoneValue;
+}
+
+
+- (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr nilValue:(id)aNoneValue nonNilValue:(NSString*)aNonNilValue {
+    if ([self.value isEqualToString:@"true"]) {
+        return aTrueStr;
+    }
+    if ([self.value isEqualToString:@"false"]) {
+        return aFalseStr;
+    }
+    if (self.value == nil) {
+        return aNoneValue;
+    }
+    return aNonNilValue;
 }
 
 
