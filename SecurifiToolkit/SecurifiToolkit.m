@@ -20,10 +20,12 @@
 #define INITIALIZING  5
 #define CLOUD_CONNECTION_ENDED  6
 
-#define SEC_SERVICE_NAME @"securifiy.login_service"
-#define SEC_EMAIL @"com.securifi.email"
-#define SEC_PWD @"com.securifi.pwd"
-#define SEC_USERID @"com.securifi.userid"
+#define SEC_SERVICE_NAME                    @"securifiy.login_service"
+#define SEC_EMAIL                           @"com.securifi.email"
+#define SEC_PWD                             @"com.securifi.pwd"
+#define SEC_USERID                          @"com.securifi.userid"
+
+#define SEC_USERDEFAULT_LOGGEDIN_ONCE       @"kLoggedInOnce"
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) NSObject *syncLocker;
@@ -289,6 +291,9 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     [self clearSecCredentials];
     [self setSecEmail:email];
 
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:YES forKey:SEC_USERDEFAULT_LOGGEDIN_ONCE];
+
     Login *loginCommand = [[Login alloc] init];
     loginCommand.UserID = [NSString stringWithString:email];
     loginCommand.Password = [NSString stringWithString:password];
@@ -460,7 +465,12 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (BOOL)hasLoginCredentials {
-    return [self hasSecEmail] && [self hasSecPassword];
+    // Keychains persist after an app is deleted. Therefore, to ensure credentials are "wiped out",
+    // we keep track of whether this is a new install by storing a value in user defaults.
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    BOOL logged_in_once = [defaults boolForKey:SEC_USERDEFAULT_LOGGEDIN_ONCE];
+
+    return logged_in_once && [self hasSecEmail] && [self hasSecPassword];
 }
 
 - (BOOL)hasSecPassword {
