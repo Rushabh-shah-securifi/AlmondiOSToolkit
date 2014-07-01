@@ -34,6 +34,8 @@
 // queue on which notifications will be posted
 + (SingleTon *)newSingleton:(dispatch_queue_t)callbackQueue;
 
+- (void)initNetworkCommunication;
+
 - (void)shutdown;
 
 // Called by clients that need to use the output stream. Blocks until the connection is set up or fails.

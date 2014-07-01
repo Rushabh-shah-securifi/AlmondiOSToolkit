@@ -35,9 +35,7 @@
 @implementation SingleTon
 
 + (SingleTon *)newSingleton:(dispatch_queue_t)callbackQueue {
-    SingleTon *obj = [[SingleTon alloc] initWithQueue:callbackQueue];
-    [obj initNetworkCommunication];
-    return obj;
+    return [[SingleTon alloc] initWithQueue:callbackQueue];
 }
 
 - (id)initWithQueue:(dispatch_queue_t)callbackQueue {
@@ -58,13 +56,19 @@
 }
 
 - (void)initNetworkCommunication {
+    NSLog(@"Initialzing network communication");
+
     __strong SingleTon *block_self = self;
     
     dispatch_async(self.backgroundQueue, ^(void) {
         if (block_self.inputStream == nil && block_self.outputStream == nil) {
             // Load certificate
             //
+            NSLog(@"Loading certificate");
+
             [block_self loadCertificate];
+
+            NSLog(@"Initializing sockets");
 
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
@@ -104,15 +108,17 @@
 
             NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
 
+            NSLog(@"Secheduling in run loop");
+
             [block_self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
             [block_self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
+
+            NSLog(@"Opening streams");
 
             [block_self.inputStream open];
             [block_self.outputStream open];
 
-            NSLog(@"Streams opened and ready");
-
-            NSLog(@"Streams entering run loop");
+            NSLog(@"Streams open and entering run loop");
 
             // Signal to waiting socket writers that the network is up and then invoke the run loop to pump events
             block_self.isStreamConnected = YES;
@@ -134,7 +140,7 @@
             NSLog(@"Stream already opened");
         }
 
-        block_self.networkShutdown = NO;
+        block_self.networkShutdown = YES;
     });
 }
 
@@ -146,16 +152,20 @@
 }
 
 - (void)shutdown {
+    NSLog(@"Shutting down network singleton");
+
     __weak SingleTon *block_self = self;
 
     dispatch_sync(self.backgroundQueue, ^(void) {
-        // Signal to any waiting loops to exit
-        dispatch_semaphore_signal(block_self.network_established_latch);
+        NSLog(@"[%@] Singleton is shutting down", block_self.debugDescription);
 
         block_self.networkShutdown = YES;
         block_self.isLoggedIn = NO;
         block_self.connectionState = CLOUD_CONNECTION_ENDED;
         block_self.isStreamConnected = NO;
+
+        // Signal to any waiting loops to exit
+        dispatch_semaphore_signal(block_self.network_established_latch);
 
         NSInputStream *in_stream = block_self.inputStream;
         NSOutputStream *out_stream = block_self.outputStream;
@@ -179,13 +189,23 @@
 }
 
 - (void)waitForConnectionEstablishment {
-    dispatch_time_t blockingSleepSecondsIfNotDone = 1;
-
-    while (0 != dispatch_semaphore_wait(self.network_established_latch, blockingSleepSecondsIfNotDone)) {
-        if (self.networkShutdown || self.sendCommandFail) {
-            return;
+    dispatch_time_t blockingSleepSecondsIfNotDone;
+    do {
+        if (self.networkShutdown) {
+            NSLog(@"Giving up on network establishment. Network was shutdown.");
+            break;
         }
+        if (self.sendCommandFail) {
+            NSLog(@"Giving up on network establishment. Failed to send cmd.");
+            break;
+        }
+
+        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC);
     }
+    while (0 != dispatch_semaphore_wait(self.network_established_latch, blockingSleepSecondsIfNotDone));
+
+    // make sure...
+    dispatch_semaphore_signal(self.network_established_latch);
 }
 
 
