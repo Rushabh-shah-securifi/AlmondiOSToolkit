@@ -187,40 +187,6 @@
     });
 }
 
-/*PY 190913 To Establish cloud connection without trying to login - Useful for Logout command*/
-- (void)initSDKCloud {
-    NSLog(@"Init SDK Cloud");
-
-    if (self.isShutdown) {
-        NSLog(@"SDK is shutdown. Returning.");
-        return;
-    }
-
-    if (self.initializing == NO) {
-        self.initializing = YES;
-
-        [self setupNetworkSingleton];
-
-        __weak SingleTon *socket = self.networkSingleton;
-        __weak SecurifiToolkit *block_self = self;
-
-        GenericCommand *cmd = [self makeCloudSanityCommand];
-
-        [self asyncSendToCloud:socket command:cmd completion:^(BOOL success, NSError *error2) {
-            if (success) {
-                NSLog(@"%s: SESSION STARTED - SANITY TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-                socket.connectionState = NOT_LOGGED_IN;
-            }
-            else {
-                NSLog(@"%s: Failed to init SDK cloud: %@", __PRETTY_FUNCTION__, error2.description);
-                socket.connectionState = NETWORK_DOWN;
-            }
-
-            block_self.initializing = NO;
-        }];
-    }
-}
-
 - (void)shutdown {
     if (self.isShutdown) {
         return;

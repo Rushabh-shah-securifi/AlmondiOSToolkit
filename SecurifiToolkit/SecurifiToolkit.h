@@ -54,8 +54,6 @@
 
 - (void)initSDK;
 
-- (void)initSDKCloud;
-
 - (void)shutdown;
 
 - (void)asyncSendToCloud:(GenericCommand *)command;
