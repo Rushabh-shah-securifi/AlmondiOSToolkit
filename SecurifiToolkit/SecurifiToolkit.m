@@ -31,6 +31,7 @@
 @property (nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property (weak, nonatomic) SingleTon *networkSingleton;
 @property BOOL initializing; // when TRUE an op is already in progress to set up a network
+@property BOOL isShutdown;
 @end
 
 @implementation SecurifiToolkit
@@ -75,14 +76,25 @@
 }
 
 - (SingleTon*)setupNetworkSingleton {
-    SingleTon *old = self.networkSingleton;
-    old.delegate = nil; // no longer interested in callbacks from this instance
-    [old shutdown];
+    NSLog(@"Setting up network singleton");
+
+    [self tearDownNetworkSingleton];
 
     SingleTon *newSingleton = [SingleTon newSingleton:self.socketCallbackQueue];
     newSingleton.delegate = self;
+
     _networkSingleton = newSingleton;
+    [newSingleton initNetworkCommunication];
+
     return newSingleton;
+}
+
+- (void)tearDownNetworkSingleton {
+    NSLog(@"Starting tear down of network singleton");
+    SingleTon *old = self.networkSingleton;
+    old.delegate = nil; // no longer interested in callbacks from this instance
+    [old shutdown];
+    NSLog(@"Finished tear down of network singleton");
 }
 
 #pragma mark - SDK state
@@ -115,18 +127,25 @@
 #pragma mark - SDK Initialization
 
 - (void)initSDK {
-    NSLog(@"INIT SDK");
+    if (self.isShutdown) {
+        NSLog(@"INIT SDK. Already shutdown. Returning.");
+        return;
+    }
 
     if (self.initializing) {
+        NSLog(@"INIT SDK. Already initializing.");
         return;
     }
     self.initializing = YES;
+    NSLog(@"INIT SDK");
 
     __weak SecurifiToolkit *block_self = self;
 
     //Start a Async task of sending Sanity command and TempPassCommand
     //Async task will send command and will generate respective events
     dispatch_async(self.socketCallbackQueue, ^(void) {
+        block_self.initializing = YES;
+
         SingleTon *singleTon = [block_self setupNetworkSingleton];
 
         singleTon.connectionState = INITIALIZING;
@@ -170,6 +189,11 @@
 - (void)initSDKCloud {
     NSLog(@"Init SDK Cloud");
 
+    if (self.isShutdown) {
+        NSLog(@"SDK is shutdown. Returning.");
+        return;
+    }
+
     if (self.initializing == NO) {
         self.initializing = YES;
 
@@ -193,6 +217,21 @@
             block_self.initializing = NO;
         }];
     }
+}
+
+- (void)shutdown {
+    if (self.isShutdown) {
+        return;
+    }
+    self.isShutdown = YES;
+    NSLog(@"Shutdown SDK");
+
+    SecurifiToolkit __weak *block_self = self;
+
+    dispatch_async(self.socketCallbackQueue, ^(void) {
+        [block_self tearDownNetworkSingleton];
+        block_self.networkSingleton = nil;
+    });
 }
 
 #pragma mark - Command dispatch
@@ -231,12 +270,22 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (void)asyncSendToCloud:(GenericCommand*)command {
+    if (self.isShutdown) {
+        NSLog(@"SDK is shutdown. Returning.");
+        return;
+    }
+
     [self asyncSendToCloud:self.networkSingleton command:command completion:nil];
 }
 
 #pragma mark - Cloud Logon
 
 - (void)asyncSendLoginWithEmail:(NSString *)email password:(NSString *)password {
+    if (self.isShutdown) {
+        NSLog(@"SDK is shutdown. Returning.");
+        return;
+    }
+
     [self clearSecCredentials];
     [self setSecEmail:email];
 
@@ -337,6 +386,11 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (void)asyncSendLogout {
+    if (self.isShutdown) {
+        NSLog(@"SDK is shutdown. Returning.");
+        return;
+    }
+
     GenericCommand *cmd = [[GenericCommand alloc] init];
     cmd.commandType = LOGOUT_COMMAND;
     cmd.command = nil;
@@ -469,9 +523,9 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
         // Wait for connection establishment if need be.
         if (!socket.isStreamConnected) {
-            NSLog(@"Waiting for stream connection");
+            NSLog(@"Waiting for connection establishment");
             [socket waitForConnectionEstablishment];
-            NSLog(@"Done waiting for stream connection");
+            NSLog(@"Done waiting for connection establishment");
 
             if (!socket.isStreamConnected) {
                 NSLog(@"Stream died on connection");

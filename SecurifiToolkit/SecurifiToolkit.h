@@ -56,6 +56,8 @@
 
 - (void)initSDKCloud;
 
+- (void)shutdown;
+
 - (void)asyncSendToCloud:(GenericCommand *)command;
 
 - (BOOL)isCloudOnline;
