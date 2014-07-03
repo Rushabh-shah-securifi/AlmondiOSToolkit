@@ -10,12 +10,12 @@
 
 typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
     SDKCloudStatusUninitialized = 1,
+    SDKCloudStatusInitializing,
     SDKCloudStatusNetworkDown,
     SDKCloudStatusNotLoggedIn,
     SDKCloudStatusLoginInProcess,
     SDKCloudStatusLoggedIn,
-    SDKCloudStatusInitializing,
-    SDKCloudStatusCloudConnectionEnded,
+    SDKCloudStatusCloudConnectionShutdown,
 };
 
 @class SingleTon;

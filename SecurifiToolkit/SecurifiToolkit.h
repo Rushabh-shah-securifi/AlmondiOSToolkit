@@ -58,6 +58,8 @@
 
 - (void)asyncSendToCloud:(GenericCommand *)command;
 
+- (BOOL)isCloudConnecting;
+
 - (BOOL)isCloudOnline;
 
 - (BOOL)isReachable;

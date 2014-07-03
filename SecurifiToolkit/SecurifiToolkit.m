@@ -15,7 +15,7 @@
 #define SEC_SERVICE_NAME                    @"securifiy.login_service"
 #define SEC_EMAIL                           @"com.securifi.email"
 #define SEC_PWD                             @"com.securifi.pwd"
-#define SEC_USERID                          @"com.securifi.userid"
+#define SEC_USER_ID                         @"com.securifi.userid"
 
 #define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
 
@@ -76,6 +76,7 @@
 
     SingleTon *newSingleton = [SingleTon newSingleton:self.socketCallbackQueue];
     newSingleton.delegate = self;
+    newSingleton.connectionState = SDKCloudStatusInitializing;
 
     _networkSingleton = newSingleton;
     [newSingleton initNetworkCommunication];
@@ -93,10 +94,38 @@
 
 #pragma mark - SDK state
 
+- (BOOL)isCloudConnecting {
+    BOOL reachable = [self isReachable];
+    if (!reachable) {
+        return NO;
+    }
+
+    SDKCloudStatus state = [self getConnectionState];
+    return state == SDKCloudStatusInitializing;
+}
+
 - (BOOL)isCloudOnline {
     BOOL reachable = [self isReachable];
-    NSInteger state = [self getConnectionState];
-    return reachable && state != SDKCloudStatusUninitialized && state != SDKCloudStatusNetworkDown && state != SDKCloudStatusCloudConnectionEnded && state != SDKCloudStatusInitializing;
+    if (!reachable) {
+        return NO;
+    }
+
+    SDKCloudStatus state = [self getConnectionState];
+
+    switch (state) {
+        case SDKCloudStatusNotLoggedIn:
+        case SDKCloudStatusLoginInProcess:
+        case SDKCloudStatusLoggedIn:
+            return YES;
+
+        case SDKCloudStatusUninitialized:
+        case SDKCloudStatusInitializing:
+        case SDKCloudStatusNetworkDown:
+        case SDKCloudStatusCloudConnectionShutdown:
+        default:
+            return NO;
+
+    }
 }
 
 - (BOOL)isReachable {
@@ -108,7 +137,7 @@
     return singleton && singleton.isLoggedIn;
 }
 
-- (NSInteger)getConnectionState {
+- (SDKCloudStatus)getConnectionState {
     SingleTon *singleTon = self.networkSingleton;
     if (singleTon) {
         return [singleTon connectionState];
@@ -141,8 +170,6 @@
         block_self.initializing = YES;
 
         SingleTon *singleTon = [block_self setupNetworkSingleton];
-
-        singleTon.connectionState = SDKCloudStatusInitializing;
 
         // Send sanity command testing network connection
         GenericCommand *cmd = [block_self makeCloudSanityCommand];
@@ -419,7 +446,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 - (void)clearSecCredentials {
     [KeyChainWrapper removeEntryForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
     [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
-    [KeyChainWrapper removeEntryForUserEmail:SEC_USERID forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_USER_ID forService:SEC_SERVICE_NAME];
 }
 
 - (BOOL)hasLoginCredentials {
@@ -462,11 +489,11 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (NSString *)secUserId {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_USERID forService:SEC_SERVICE_NAME];
+    return [KeyChainWrapper retrieveEntryForUser:SEC_USER_ID forService:SEC_SERVICE_NAME];
 }
 
 - (void)setSecUserId:(NSString *)userId {
-    [KeyChainWrapper createEntryForUser:SEC_USERID entryValue:userId forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper createEntryForUser:SEC_USER_ID entryValue:userId forService:SEC_SERVICE_NAME];
 }
 
 #pragma mark - SingleTonDelegate methods

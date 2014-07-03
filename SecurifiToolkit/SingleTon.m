@@ -154,7 +154,7 @@
 
         block_self.networkShutdown = YES;
         block_self.isLoggedIn = NO;
-        block_self.connectionState = SDKCloudStatusCloudConnectionEnded;
+        block_self.connectionState = SDKCloudStatusCloudConnectionShutdown;
         block_self.isStreamConnected = NO;
 
         // Signal to any waiting loops to exit
