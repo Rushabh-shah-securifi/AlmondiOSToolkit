@@ -30,6 +30,7 @@
 //#define CLOUD_SERVER  @"ec2-54-227-49-52.compute-1.amazonaws.com"
 //Notifiers
 
+#define NETWORK_CONNECTING_NOTIFIER         @"NETWORK_CONNECTING_NOTIFIER"
 #define NETWORK_DOWN_NOTIFIER               @"NetworkDOWN"
 #define NETWORK_UP_NOTIFIER                 @"NetworkUP"
 #define LOGIN_NOTIFIER                      @"loginResponse"

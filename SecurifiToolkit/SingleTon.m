@@ -62,6 +62,8 @@
     
     dispatch_async(self.backgroundQueue, ^(void) {
         if (block_self.inputStream == nil && block_self.outputStream == nil) {
+            [block_self postData:NETWORK_CONNECTING_NOTIFIER data:nil];
+
             // Load certificate
             //
             NSLog(@"Loading certificate");
