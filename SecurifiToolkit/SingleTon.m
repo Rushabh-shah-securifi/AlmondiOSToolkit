@@ -11,15 +11,6 @@
 #import "Commandparser.h"
 #import "PrivateCommandTypes.h"
 
-#define SDK_UNINITIALIZED       0
-#define NETWORK_DOWN            1
-#define NOT_LOGGED_IN           2
-#define LOGGED_IN               3
-#define LOGIN_IN_PROCESS        4
-#define INITIALIZING            5
-#define CLOUD_CONNECTION_ENDED  6
-
-
 @interface SingleTon ()
 @property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
 @property(nonatomic, readonly) dispatch_queue_t callbackQueue;
@@ -46,7 +37,7 @@
         self.isStreamConnected = NO;
         self.sendCommandFail = NO;
         self.networkShutdown = NO;
-        self.connectionState = SDK_UNINITIALIZED;
+        self.connectionState = SDKCloudStatusUninitialized;
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
         _callbackQueue = callbackQueue;
         _network_established_latch = dispatch_semaphore_create(0);
@@ -163,7 +154,7 @@
 
         block_self.networkShutdown = YES;
         block_self.isLoggedIn = NO;
-        block_self.connectionState = CLOUD_CONNECTION_ENDED;
+        block_self.connectionState = SDKCloudStatusCloudConnectionEnded;
         block_self.isStreamConnected = NO;
 
         // Signal to any waiting loops to exit
@@ -304,11 +295,11 @@
                                             if (obj.isSuccessful == YES) {
                                                 //Set the indicator that we are logged in to prevent next login from User
                                                 self.isLoggedIn = YES;
-                                                self.connectionState = LOGGED_IN;
+                                                self.connectionState = SDKCloudStatusLoggedIn;
                                             }
                                             else {
                                                 self.isLoggedIn = NO;
-                                                self.connectionState = NOT_LOGGED_IN;
+                                                self.connectionState = SDKCloudStatusNotLoggedIn;
                                             }
 
                                             [self postData:LOGIN_NOTIFIER data:obj];

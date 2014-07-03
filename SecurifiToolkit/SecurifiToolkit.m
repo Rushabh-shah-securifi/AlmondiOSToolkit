@@ -12,20 +12,12 @@
 #import "PrivateCommandTypes.h"
 #import "KeyChainWrapper.h"
 
-#define SDK_UNINITIALIZED 0
-#define NETWORK_DOWN   1
-#define NOT_LOGGED_IN   2
-#define LOGGED_IN       3
-#define LOGIN_IN_PROCESS  4
-#define INITIALIZING  5
-#define CLOUD_CONNECTION_ENDED  6
-
 #define SEC_SERVICE_NAME                    @"securifiy.login_service"
 #define SEC_EMAIL                           @"com.securifi.email"
 #define SEC_PWD                             @"com.securifi.pwd"
 #define SEC_USERID                          @"com.securifi.userid"
 
-#define SEC_USERDEFAULT_LOGGEDIN_ONCE       @"kLoggedInOnce"
+#define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) NSObject *syncLocker;
@@ -104,7 +96,7 @@
 - (BOOL)isCloudOnline {
     BOOL reachable = [self isReachable];
     NSInteger state = [self getConnectionState];
-    return reachable && state != SDK_UNINITIALIZED && state != NETWORK_DOWN && state != CLOUD_CONNECTION_ENDED && state != INITIALIZING;
+    return reachable && state != SDKCloudStatusUninitialized && state != SDKCloudStatusNetworkDown && state != SDKCloudStatusCloudConnectionEnded && state != SDKCloudStatusInitializing;
 }
 
 - (BOOL)isReachable {
@@ -122,7 +114,7 @@
         return [singleTon connectionState];
     }
     else {
-        return SDK_UNINITIALIZED;
+        return SDKCloudStatusUninitialized;
     }
 }
 
@@ -150,7 +142,7 @@
 
         SingleTon *singleTon = [block_self setupNetworkSingleton];
 
-        singleTon.connectionState = INITIALIZING;
+        singleTon.connectionState = SDKCloudStatusInitializing;
 
         // Send sanity command testing network connection
         GenericCommand *cmd = [block_self makeCloudSanityCommand];
@@ -158,7 +150,7 @@
         NSError *error;
         BOOL success = [block_self internalSendToCloud:singleTon command:cmd error:&error];
         if (!success) {
-            singleTon.connectionState = NETWORK_DOWN;
+            singleTon.connectionState = SDKCloudStatusNetworkDown;
             NSLog(@"%s: init SDK: send sanity failed: %@", __PRETTY_FUNCTION__, error.localizedDescription);
             block_self.initializing = NO;
             return;
@@ -173,13 +165,13 @@
                 [block_self sendLoginCommand:singleTon];
             }
             @catch (NSException *e) {
-                singleTon.connectionState = NETWORK_DOWN;
+                singleTon.connectionState = SDKCloudStatusNetworkDown;
                 NSLog(@"%s: Exception throw on init sdk. Network down: %@", __PRETTY_FUNCTION__, e.reason);
             }
         }
         else {
             NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
-            singleTon.connectionState = NOT_LOGGED_IN;
+            singleTon.connectionState = SDKCloudStatusNotLoggedIn;
             [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:block_self userInfo:nil];
         }
 
@@ -258,7 +250,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     [self setSecEmail:email];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:YES forKey:SEC_USERDEFAULT_LOGGEDIN_ONCE];
+    [defaults setBool:YES forKey:SEC_USER_DEFAULT_LOGGED_IN_ONCE];
 
     Login *loginCommand = [[Login alloc] init];
     loginCommand.UserID = [NSString stringWithString:email];
@@ -286,11 +278,11 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     BOOL success = [self internalSendToCloud:singleTon command:cloudCommand error:&error_2];
     if (!success) {
         NSLog(@"%s: Error init sdk: %@", __PRETTY_FUNCTION__, error_2.localizedDescription);
-        singleTon.connectionState = NETWORK_DOWN;
+        singleTon.connectionState = SDKCloudStatusNetworkDown;
     }
     else {
         NSLog(@"%s: login command sent", __PRETTY_FUNCTION__);
-        singleTon.connectionState = LOGIN_IN_PROCESS;
+        singleTon.connectionState = SDKCloudStatusLoginInProcess;
     }
 }
 
@@ -434,7 +426,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     // Keychains persist after an app is deleted. Therefore, to ensure credentials are "wiped out",
     // we keep track of whether this is a new install by storing a value in user defaults.
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    BOOL logged_in_once = [defaults boolForKey:SEC_USERDEFAULT_LOGGEDIN_ONCE];
+    BOOL logged_in_once = [defaults boolForKey:SEC_USER_DEFAULT_LOGGED_IN_ONCE];
 
     return logged_in_once && [self hasSecEmail] && [self hasSecPassword];
 }

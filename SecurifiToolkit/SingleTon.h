@@ -8,6 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
+    SDKCloudStatusUninitialized = 1,
+    SDKCloudStatusNetworkDown,
+    SDKCloudStatusNotLoggedIn,
+    SDKCloudStatusLoginInProcess,
+    SDKCloudStatusLoggedIn,
+    SDKCloudStatusInitializing,
+    SDKCloudStatusCloudConnectionEnded,
+};
+
 @class SingleTon;
 
 @protocol SingleTonDelegate
@@ -26,7 +36,7 @@
 @property(nonatomic, strong) NSInputStream *inputStream;
 @property(nonatomic, strong) NSOutputStream *outputStream;
 
-@property NSInteger connectionState;
+@property SDKCloudStatus connectionState;
 @property BOOL isStreamConnected;
 @property BOOL isLoggedIn;
 @property BOOL sendCommandFail;
