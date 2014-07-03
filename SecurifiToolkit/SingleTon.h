@@ -31,15 +31,9 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 
 @property(weak, nonatomic) id <SingleTonDelegate> delegate;
 
-@property BOOL disableNetworkDownNotification;
-
-@property(nonatomic, strong) NSInputStream *inputStream;
-@property(nonatomic, strong) NSOutputStream *outputStream;
-
 @property SDKCloudStatus connectionState;
 @property BOOL isStreamConnected;
 @property BOOL isLoggedIn;
-@property BOOL sendCommandFail;
 
 // queue on which notifications will be posted
 + (SingleTon *)newSingleton:(dispatch_queue_t)callbackQueue;
@@ -49,6 +43,13 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 - (void)shutdown;
 
 // Called by clients that need to use the output stream. Blocks until the connection is set up or fails.
-- (void)waitForConnectionEstablishment;
+// return YES when time out is reached; NO if connection established without timeout
+// On time out, the SingleTon will shut itself down
+- (BOOL)waitForConnectionEstablishment:(int)numSecsToWait;
+
+// Sends the specified command to the cloud
+// Returns YES on successful sending
+// Returns NO on failure to send
+- (BOOL)sendCommandToCloud:(id)command error:(NSError **)outError;
 
 @end
