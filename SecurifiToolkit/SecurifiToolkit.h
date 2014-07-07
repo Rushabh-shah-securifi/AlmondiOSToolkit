@@ -48,6 +48,8 @@
 #import <SecurifiToolkit/SFIDatabaseUpdateService.h>
 #import <SecurifiToolkit/SFIOfflineDataManager.h>
 
+extern NSString *const kSFIDidLogoutAllNotification;
+
 @interface SecurifiToolkit : NSObject
 
 + (instancetype)sharedInstance;

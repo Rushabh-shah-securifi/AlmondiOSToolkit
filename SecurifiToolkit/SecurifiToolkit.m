@@ -19,6 +19,8 @@
 
 #define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
 
+NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
+
 typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 @interface SecurifiToolkit () <SingleTonDelegate>
@@ -417,7 +419,10 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     NSDictionary *info = notification.userInfo;
     LoginResponse *res = info[@"data"];
     if (res.isSuccessful) {
+        NSLog(@"SDK received success on Logout All");
         [self removeLoginCredentials];
+        [self tearDownNetworkSingleton];
+        [self postData:kSFIDidLogoutAllNotification data:nil];
     }
 }
 
