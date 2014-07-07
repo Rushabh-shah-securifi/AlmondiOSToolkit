@@ -19,6 +19,8 @@
 
 #define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
 
+typedef void (^SendCompletion)(BOOL success, NSError *error);
+
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property (nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
@@ -156,15 +158,32 @@
         NSLog(@"INIT SDK. Already initializing.");
         return;
     }
-    self.initializing = YES;
-    NSLog(@"INIT SDK");
 
+    [self asyncInitSDK:nil];
+}
+
+- (void)asyncInitSDK:(SendCompletion)aCallback {
     __weak SecurifiToolkit *block_self = self;
 
     //Start a Async task of sending Sanity command and TempPassCommand
     //Async task will send command and will generate respective events
-    dispatch_async(self.socketCallbackQueue, ^(void) {
+    dispatch_async(self.commandDispatchQueue, ^(void) {
+        if (block_self.isShutdown) {
+            NSLog(@"INIT SDK. Already shutdown. Returning.");
+            if (aCallback) {
+                aCallback(NO, nil);
+            }
+            return;
+        }
+        if (block_self.initializing) {
+            NSLog(@"INIT SDK. Already initializing.");
+            if (aCallback) {
+                aCallback(NO, nil);
+            }
+            return;
+        }
         block_self.initializing = YES;
+        NSLog(@"INIT SDK");
 
         SingleTon *singleTon = [block_self setupNetworkSingleton];
 
@@ -176,7 +195,12 @@
         if (!success) {
             singleTon.connectionState = SDKCloudStatusNetworkDown;
             NSLog(@"%s: init SDK: send sanity failed: %@", __PRETTY_FUNCTION__, error.localizedDescription);
+
             block_self.initializing = NO;
+            if (aCallback) {
+                aCallback(NO, error);
+            }
+
             return;
         }
 
@@ -187,19 +211,37 @@
         if ([block_self hasLoginCredentials]) {
             @try {
                 [block_self sendLoginCommand:singleTon];
+
+                block_self.initializing = NO;
+                if (aCallback) {
+                    aCallback(YES, nil);
+                }
             }
             @catch (NSException *e) {
                 singleTon.connectionState = SDKCloudStatusNetworkDown;
                 NSLog(@"%s: Exception throw on init sdk. Network down: %@", __PRETTY_FUNCTION__, e.reason);
+
+                block_self.initializing = NO;
+                if (aCallback) {
+                    aCallback(NO, nil);
+                }
             }
         }
         else {
             NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
             singleTon.connectionState = SDKCloudStatusNotLoggedIn;
-            [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:block_self userInfo:nil];
+
+            block_self.initializing = NO;
+            if (aCallback) {
+                aCallback(NO, nil);
+            }
+
+            [block_self postData:LOGIN_NOTIFIER data:nil];
+
+//            [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:block_self userInfo:nil];
         }
 
-        block_self.initializing = NO;
+//        block_self.initializing = NO;
     });
 }
 
@@ -220,11 +262,20 @@
 
 #pragma mark - Command dispatch
 
-typedef void (^SendCompletion)(BOOL success, NSError *error);
-
 - (void)asyncSendToCloud:(SingleTon*)socket command:(GenericCommand*)command completion:(SendCompletion)callback {
     if (!socket.isStreamConnected && !self.initializing) {
-        [self initSDK];
+        // Set up network and wait
+        //
+        NSLog(@"Waiting to initialize");
+
+        dispatch_semaphore_t completion_latch = dispatch_semaphore_create(0);
+        [self asyncInitSDK:^(BOOL success, NSError *error) {
+            dispatch_semaphore_signal(completion_latch);
+        }];
+
+        dispatch_semaphore_wait(completion_latch, DISPATCH_TIME_FOREVER);
+        NSLog(@"Done waiting to initialize");
+
         socket = self.networkSingleton;
     }
 
@@ -242,7 +293,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             NSLog(@"[Generic cmd: %d] send error: %@", block_command.commandType, outError.localizedDescription);
 
             NSLog(@"%s: Posting NETWORK_DOWN_NOTIFIER, error=%@", __PRETTY_FUNCTION__, outError.localizedDescription);
-            [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_DOWN_NOTIFIER object:nil userInfo:nil];
+            [block_self postData:NETWORK_DOWN_NOTIFIER data:nil];
         }
 
         if (callback) {
@@ -433,7 +484,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 #pragma mark - Network reconnection handling
 
 - (void)onReachabilityDidChange:(id)notification {
-        NSLog(@"changed to reachable");
+    NSLog(@"changed to reachable");
 }
 
 #pragma mark - Keychain Access
@@ -508,6 +559,23 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
     return [socket sendCommandToCloud:sender error:outError];
+}
+
+- (void)postData:(NSString*)notificationName data:(id)payload {
+    // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
+    // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
+    // UI can easily become confused. This needs to be sorted out.
+
+    __weak id block_payload = payload;
+
+    dispatch_sync(self.socketCallbackQueue, ^() {
+        NSDictionary *data = nil;
+        if (payload) {
+            data = @{@"data" : block_payload};
+        }
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
+    });
 }
 
 @end
