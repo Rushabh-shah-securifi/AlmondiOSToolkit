@@ -371,13 +371,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         [SFIDatabaseUpdateService stopDatabaseUpdateService];
     });
 
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-
-    [prefs removeObjectForKey:CURRENT_ALMOND_MAC];
-    [prefs removeObjectForKey:CURRENT_ALMOND_MAC_NAME];
-    [prefs removeObjectForKey:COLORCODE];
-    [prefs synchronize];
-
+    [self removeCurrentAlmond];
     [self clearSecCredentials];
 
     //Delete files
@@ -385,8 +379,6 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     [SFIOfflineDataManager deleteFile:HASH_FILENAME];
     [SFIOfflineDataManager deleteFile:DEVICELIST_FILENAME];
     [SFIOfflineDataManager deleteFile:DEVICEVALUE_FILENAME];
-
-    [prefs synchronize];
 }
 
 - (void)onLoginResponse:(NSNotification*)notification {
@@ -450,12 +442,33 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 #pragma mark - Almond Lists
 
-- (void)setCurrentAlmond:(SFIAlmondPlus *)almond colorCodeIndex:(int)assignedColor {
+#define kPREF_CURRENT_ALMOND @"kAlmondCurrent"
+
+- (void)removeCurrentAlmond {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    [prefs setObject:almond.almondplusMAC forKey:CURRENT_ALMOND_MAC];
-    [prefs setObject:almond.almondplusName forKey:CURRENT_ALMOND_MAC_NAME];
-    [prefs setInteger:assignedColor forKey:COLORCODE];
+    [prefs removeObjectForKey:kPREF_CURRENT_ALMOND];
+    [prefs removeObjectForKey:COLORCODE];
     [prefs synchronize];
+}
+
+- (void)setCurrentAlmond:(SFIAlmondPlus *)almond colorCodeIndex:(int)assignedColor {
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
+    [defaults setInteger:assignedColor forKey:COLORCODE];
+    [defaults synchronize];
+}
+
+- (SFIAlmondPlus *)currentAlmond {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *data = [defaults objectForKey:kPREF_CURRENT_ALMOND];
+    if (data) {
+        SFIAlmondPlus *object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        return object;
+    }
+    else {
+        return nil;
+    }
 }
 
 - (NSArray *)almondList {
