@@ -10,21 +10,23 @@
 
 @implementation SFIAlmondPlus
 
-#define kName_AlmondPlusMAC     @"AlmondPlusMAC"
-#define kName_AlmondPlusName    @"AlmondPlusName"
-#define kName_Index             @"Index"
+- (id)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    if (self) {
+        self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
+        self.almondplusName = [coder decodeObjectForKey:@"self.almondplusName"];
+        self.index = [coder decodeIntForKey:@"self.index"];
+        self.colorCodeIndex = [coder decodeIntForKey:@"self.colorCodeIndex"];
+    }
 
-- (id)initWithCoder:(NSCoder *)decoder {
-    self.index = [decoder decodeIntForKey:kName_Index];
-    self.almondplusMAC = [decoder decodeObjectForKey:kName_AlmondPlusMAC];
-    self.almondplusName = [decoder decodeObjectForKey:kName_AlmondPlusName];
     return self;
 }
 
-- (void)encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:self.index forKey:kName_Index];
-    [encoder encodeObject:self.almondplusMAC forKey:kName_AlmondPlusMAC];
-    [encoder encodeObject:self.almondplusName forKey:kName_AlmondPlusName];
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
+    [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
+    [coder encodeInt:self.index forKey:@"self.index"];
+    [coder encodeInt:self.colorCodeIndex forKey:@"self.colorCodeIndex"];
 }
 
 @end

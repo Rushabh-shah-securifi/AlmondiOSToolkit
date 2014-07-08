@@ -452,6 +452,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond colorCodeIndex:(int)assignedColor {
+    almond.colorCodeIndex = assignedColor;
+
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
@@ -469,6 +471,10 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     else {
         return nil;
     }
+}
+
+- (NSString *)currentAlmondName {
+    return [[self currentAlmond] almondplusName];
 }
 
 - (NSArray *)almondList {

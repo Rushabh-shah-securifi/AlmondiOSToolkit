@@ -12,4 +12,10 @@
 @property(nonatomic) NSString *almondplusMAC;
 @property(nonatomic) NSString *almondplusName;
 @property int index;
+@property int colorCodeIndex;
+
+- (id)initWithCoder:(NSCoder *)coder;
+
+- (void)encodeWithCoder:(NSCoder *)coder;
+
 @end

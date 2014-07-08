@@ -10,14 +10,14 @@
 
 @implementation SFIDeviceKnownValues
 
-#define kName_Index             @"Index"          //int
+#define kName_AlmondIndex             @"Index"          //int
 #define kName_ValueName         @"ValueName"
 #define kName_ValueType         @"ValueType"
 #define kName_Value             @"Value"
 #define kName_IsUpdating        @"IsUpdating"
 
 - (void) encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:self.index forKey:kName_Index];
+    [encoder encodeInteger:self.index forKey:kName_AlmondIndex];
     [encoder encodeObject:self.valueName forKey:kName_ValueName];
     [encoder encodeObject:self.valueType forKey:kName_ValueType];
     [encoder encodeObject:self.value forKey:kName_Value];
@@ -25,7 +25,7 @@
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
-    self.index = (unsigned int)[decoder decodeIntForKey:kName_Index];
+    self.index = (unsigned int)[decoder decodeIntForKey:kName_AlmondIndex];
     self.valueName = [decoder decodeObjectForKey:kName_ValueName];
     self.valueType = [decoder decodeObjectForKey:kName_ValueType];
     self.value = [decoder decodeObjectForKey:kName_Value];
