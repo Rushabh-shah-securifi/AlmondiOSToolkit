@@ -76,6 +76,9 @@ extern NSString *const kSFIDidLogoutAllNotification;
 - (void)asyncSendLogout;
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
 
+- (void)setCurrentAlmond:(SFIAlmondPlus*)almond colorCodeIndex:(int)assignedColor;
+
+
 - (NSArray*)almondList;
 - (void)asyncLoadAlmondList;
 

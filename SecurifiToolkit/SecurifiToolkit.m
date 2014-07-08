@@ -239,11 +239,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             }
 
             [block_self postData:LOGIN_NOTIFIER data:nil];
-
-//            [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:block_self userInfo:nil];
         }
-
-//        block_self.initializing = NO;
     });
 }
 
@@ -453,6 +449,14 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 #pragma mark - Almond Lists
 
+- (void)setCurrentAlmond:(SFIAlmondPlus *)almond colorCodeIndex:(int)assignedColor {
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    [prefs setObject:almond.almondplusMAC forKey:CURRENT_ALMOND_MAC];
+    [prefs setObject:almond.almondplusName forKey:CURRENT_ALMOND_MAC_NAME];
+    [prefs setInteger:assignedColor forKey:COLORCODE];
+    [prefs synchronize];
+}
+
 - (NSArray *)almondList {
     return [SFIOfflineDataManager readAlmondList];
 }
@@ -550,14 +554,10 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 #pragma mark - SingleTonDelegate methods
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {
-/*
-    @synchronized (self.syncLocker) {
-        if (singleTon == self.networkSingleton) {
-            NSLog(@"%s: ejecting SingleTon on closing of cloud connection", __PRETTY_FUNCTION__);
-            self.networkSingleton = nil;
-        }
+    if (singleTon == self.networkSingleton) {
+        NSLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
+        [self postData:NETWORK_DOWN_NOTIFIER data:nil];
     }
-*/
 }
 
 #pragma mark - Sending and Network
