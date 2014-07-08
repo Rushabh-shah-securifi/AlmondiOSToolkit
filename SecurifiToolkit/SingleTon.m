@@ -11,6 +11,7 @@
 #import "Commandparser.h"
 #import "PrivateCommandTypes.h"
 #import "LoginTempPass.h"
+#import "SecurifiCloudResources-Prefix.pch"
 
 @interface SingleTon ()
 @property (nonatomic, readonly) NSObject *syncLocker;
@@ -25,8 +26,8 @@
 @property(nonatomic, readonly) NSMutableData *partialData;
 @property(nonatomic) BOOL networkShutdown;
 @property(nonatomic) BOOL networkUpNoticePosted;
-@property(nonatomic, strong) NSInputStream *inputStream;
-@property(nonatomic, strong) NSOutputStream *outputStream;
+@property(nonatomic) NSInputStream *inputStream;
+@property(nonatomic) NSOutputStream *outputStream;
 @property BOOL sendCommandFail;
 @end
 
@@ -64,11 +65,11 @@
 
             // Load certificate
             //
-            NSLog(@"Loading certificate");
+            DLog(@"Loading certificate");
 
             [block_self loadCertificate];
 
-            NSLog(@"Initializing sockets");
+            DLog(@"Initializing sockets");
 
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
@@ -108,31 +109,31 @@
 
             NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
 
-            NSLog(@"Secheduling in run loop");
+            DLog(@"Secheduling in run loop");
 
             [block_self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
             [block_self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
 
-            NSLog(@"Opening streams");
+            DLog(@"Opening streams");
 
             [block_self.inputStream open];
             [block_self.outputStream open];
 
-            NSLog(@"Streams open and entering run loop");
+            DLog(@"Streams open and entering run loop");
 
             // Signal to waiting socket writers that the network is up and then invoke the run loop to pump events
             block_self.isStreamConnected = YES;
             dispatch_semaphore_signal(block_self.network_established_latch);
             //
             while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && !block_self.networkShutdown) {
-//                NSLog(@"Streams entered run loop");
+//                DLog(@"Streams entered run loop");
             }
             block_self.isStreamConnected = NO;
 
             [block_self.inputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
             [block_self.outputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
 
-            NSLog(@"Streams exited run loop");
+            DLog(@"Streams exited run loop");
 
             [block_self.delegate singletTonCloudConnectionDidClose:block_self];
         }
@@ -293,7 +294,7 @@
                                 else
                                 {
                                     [self.partialData getBytes:&_command range:NSMakeRange(4, 4)];
-                                    NSLog(@"%s: Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
+                                    DLog(@"%s: Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
 
                                     self.command = NSSwapBigIntToHost(self.command);
                                     // [SNLog Log:@"%s: Command Again: %d", __PRETTY_FUNCTION__,command];
@@ -304,10 +305,7 @@
                                     NSRange xmlParserRange = {startTagRange.location, (endTagRange.location+endTagRange.length - 8)};
                                     NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
 
-                                    if (DEBUG) {
-                                        NSString *str = [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding];
-                                        NSLog(@"Partial Buffer : %@", str);
-                                    }
+                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
                                     temp = (GenericCommand *)[tempObj parseXML:buffer];
 
@@ -514,7 +512,7 @@
 
         case NSStreamEventEndEncountered: {
             if (theStream == self.inputStream) {
-                NSLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+                DLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 [self shutdown];
             }
 
@@ -614,24 +612,24 @@
 }
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
-    NSLog(@"%s: Waiting to enter sync block",__PRETTY_FUNCTION__);
+    DLog(@"%s: Waiting to enter sync block",__PRETTY_FUNCTION__);
     @synchronized (self.syncLocker) {
-        NSLog(@"%s: Entered sync block",__PRETTY_FUNCTION__);
+        DLog(@"%s: Entered sync block",__PRETTY_FUNCTION__);
 
         // Wait for connection establishment if need be.
         if (!socket.isStreamConnected) {
-            NSLog(@"Waiting for connection establishment");
+            DLog(@"Waiting for connection establishment");
             BOOL timedOut = [socket waitForConnectionEstablishment:20]; // wait 20 seconds
-            NSLog(@"Done waiting for connection establishment, timedOut=%@", timedOut ? @"YES" : @"NO");
+            DLog(@"Done waiting for connection establishment, timedOut=%@", timedOut ? @"YES" : @"NO");
 
             if (timedOut) {
-                NSLog(@"Timed out waiting to initialize connection");
+                DLog(@"Timed out waiting to initialize connection");
                 *outError = [self makeError:@"Securifi - Timed out waiting to initialize connection"];
                 return NO;
             }
 
             if (!socket.isStreamConnected) {
-                NSLog(@"Stream died on connection");
+                DLog(@"Stream died on connection");
                 *outError = [self makeError:@"Securifi - Stream died on connection"];
                 return NO;
             }
@@ -870,7 +868,7 @@
 
                     MobileCommandRequest *mobileCommandObj = (MobileCommandRequest *) obj.command;
                     commandPayload = [NSString stringWithFormat:MOBILE_COMMAND_REQUEST_XML, mobileCommandObj.almondMAC, mobileCommandObj.deviceID, mobileCommandObj.indexID, mobileCommandObj.changedValue, mobileCommandObj.internalIndex];
-                    NSLog(@"Command length %lu", (unsigned long) [commandPayload length]);
+                    DLog(@"Command length %lu", (unsigned long) [commandPayload length]);
 
 
                     //PY 290114: Replacing the \" (backslash quotes) in the string to just " (quotes).
@@ -882,7 +880,7 @@
                     commandType = (uint32_t) htonl(MOBILE_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    NSLog(@"Payload Command length %lu", (unsigned long) [sendCommandPayload length]);
+                    DLog(@"Payload Command length %lu", (unsigned long) [sendCommandPayload length]);
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
@@ -1019,7 +1017,7 @@
                     //Add this line to any XML  string with has \" in it. For example: <Device ID=\"%@\">
                     commandPayload = [self stringByRemovingEscapeCharacters:commandPayload];
 
-                    NSLog(@"Command Payload %@: ", commandPayload);
+                    DLog(@"Command Payload %@: ", commandPayload);
 
                     //Send as Command 61
                     commandType = (uint32_t) htonl(MOBILE_COMMAND);
@@ -1036,7 +1034,7 @@
             //isLoggedin might be set to 1 if we miss the TCP termination callback
             //Check on each write if it fails set isLoggedin to
 
-            NSLog(@"@Payload being sent: %@", commandPayload);
+            DLog(@"@Payload being sent: %@", commandPayload);
 
             NSStreamStatus type;
             do {
@@ -1087,22 +1085,22 @@
                 }
             }
 
-            NSLog(@"%s: Exiting sync block",__PRETTY_FUNCTION__);
+            DLog(@"%s: Exiting sync block",__PRETTY_FUNCTION__);
 
             if (socket.outputStream == nil) {
-                NSLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
+                DLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
                 return NO;
             }
             else if (!socket.isStreamConnected) {
-                NSLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
+                DLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
                 return NO;
             }
             else if (socket.outputStream.streamStatus == NSStreamStatusError) {
-                NSLog(@"%s: Output stream has error status, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
+                DLog(@"%s: Output stream has error status, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
                 return NO;
             }
             else {
-                NSLog(@"%s: sent command to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+                DLog(@"%s: sent command to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 return YES;
             }
         }

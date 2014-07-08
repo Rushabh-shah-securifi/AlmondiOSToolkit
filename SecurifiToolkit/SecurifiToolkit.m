@@ -11,6 +11,7 @@
 #import "LoginTempPass.h"
 #import "PrivateCommandTypes.h"
 #import "KeyChainWrapper.h"
+#import "SecurifiCloudResources-Prefix.pch"
 
 #define SEC_SERVICE_NAME                    @"securifiy.login_service"
 #define SEC_EMAIL                           @"com.securifi.email"
@@ -86,11 +87,11 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (void)tearDownNetworkSingleton {
-    NSLog(@"Starting tear down of network singleton");
+    DLog(@"Starting tear down of network singleton");
     SingleTon *old = self.networkSingleton;
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
-    NSLog(@"Finished tear down of network singleton");
+    DLog(@"Finished tear down of network singleton");
 }
 
 #pragma mark - SDK state
@@ -152,12 +153,12 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 - (void)initSDK {
     if (self.isShutdown) {
-        NSLog(@"INIT SDK. Already shutdown. Returning.");
+        DLog(@"INIT SDK. Already shutdown. Returning.");
         return;
     }
 
     if (self.initializing) {
-        NSLog(@"INIT SDK. Already initializing.");
+        DLog(@"INIT SDK. Already initializing.");
         return;
     }
 
@@ -171,14 +172,14 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     //Async task will send command and will generate respective events
     dispatch_async(self.commandDispatchQueue, ^(void) {
         if (block_self.isShutdown) {
-            NSLog(@"INIT SDK. Already shutdown. Returning.");
+            DLog(@"INIT SDK. Already shutdown. Returning.");
             if (aCallback) {
                 aCallback(NO, nil);
             }
             return;
         }
         if (block_self.initializing) {
-            NSLog(@"INIT SDK. Already initializing.");
+            DLog(@"INIT SDK. Already initializing.");
             if (aCallback) {
                 aCallback(NO, nil);
             }
@@ -206,8 +207,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             return;
         }
 
-        NSLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
-        NSLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+        DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
+        DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
 
         //Send Temppass command
         if ([block_self hasLoginCredentials]) {
@@ -230,7 +231,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             }
         }
         else {
-            NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
+            DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
             singleTon.connectionState = SDKCloudStatusNotLoggedIn;
 
             block_self.initializing = NO;
@@ -285,12 +286,12 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         NSError *outError;
         BOOL success = [block_self internalSendToCloud:block_socket command:block_command error:&outError];
         if (success) {
-            NSLog(@"[Generic cmd: %d] send success", block_command.commandType);
+            DLog(@"[Generic cmd: %d] send success", block_command.commandType);
         }
         else {
-            NSLog(@"[Generic cmd: %d] send error: %@", block_command.commandType, outError.localizedDescription);
+            DLog(@"[Generic cmd: %d] send error: %@", block_command.commandType, outError.localizedDescription);
 
-            NSLog(@"%s: Posting NETWORK_DOWN_NOTIFIER, error=%@", __PRETTY_FUNCTION__, outError.localizedDescription);
+            DLog(@"%s: Posting NETWORK_DOWN_NOTIFIER, error=%@", __PRETTY_FUNCTION__, outError.localizedDescription);
             [block_self postData:NETWORK_DOWN_NOTIFIER data:nil];
         }
 
@@ -302,7 +303,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 - (void)asyncSendToCloud:(GenericCommand*)command {
     if (self.isShutdown) {
-        NSLog(@"SDK is shutdown. Returning.");
+        DLog(@"SDK is shutdown. Returning.");
         return;
     }
 
@@ -313,7 +314,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 - (void)asyncSendLoginWithEmail:(NSString *)email password:(NSString *)password {
     if (self.isShutdown) {
-        NSLog(@"SDK is shutdown. Returning.");
+        DLog(@"SDK is shutdown. Returning.");
         return;
     }
 
@@ -348,11 +349,11 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     NSError *error_2;
     BOOL success = [self internalSendToCloud:singleTon command:cloudCommand error:&error_2];
     if (!success) {
-        NSLog(@"%s: Error init sdk: %@", __PRETTY_FUNCTION__, error_2.localizedDescription);
+        DLog(@"%s: Error init sdk: %@", __PRETTY_FUNCTION__, error_2.localizedDescription);
         singleTon.connectionState = SDKCloudStatusNetworkDown;
     }
     else {
-        NSLog(@"%s: login command sent", __PRETTY_FUNCTION__);
+        DLog(@"%s: login command sent", __PRETTY_FUNCTION__);
         singleTon.connectionState = SDKCloudStatusLoginInProcess;
     }
 }
@@ -415,7 +416,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     NSDictionary *info = notification.userInfo;
     LoginResponse *res = info[@"data"];
     if (res.isSuccessful) {
-        NSLog(@"SDK received success on Logout All");
+        DLog(@"SDK received success on Logout All");
         [self removeLoginCredentials];
         [self tearDownNetworkSingleton];
         [self postData:kSFIDidLogoutAllNotification data:nil];
@@ -424,7 +425,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 - (void)asyncSendLogout {
     if (self.isShutdown) {
-        NSLog(@"SDK is shutdown. Returning.");
+        DLog(@"SDK is shutdown. Returning.");
         return;
     }
 
@@ -493,7 +494,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 #pragma mark - Network reconnection handling
 
 - (void)onReachabilityDidChange:(id)notification {
-    NSLog(@"changed to reachable");
+    DLog(@"changed to reachable");
 }
 
 #pragma mark - Keychain Access
@@ -555,7 +556,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {
     if (singleTon == self.networkSingleton) {
-        NSLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
+        DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
         [self postData:NETWORK_DOWN_NOTIFIER data:nil];
     }
 }
