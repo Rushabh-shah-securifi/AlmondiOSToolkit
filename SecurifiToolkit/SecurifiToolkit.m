@@ -329,7 +329,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         return;
     }
 
-    [self clearSecCredentials];
+    [self removeLoginCredentials];
     [self setSecEmail:email];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
