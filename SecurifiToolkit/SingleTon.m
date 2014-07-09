@@ -654,11 +654,7 @@
                         object.tempPass = nil;
                         [object setReason:@"Already Loggedin"];
 
-                        NSDictionary *data = @{@"data" : object};
-
-                        //Send Object
-                        //NSLog(@"Before Notification");
-                        [[NSNotificationCenter defaultCenter] postNotificationName:LOGIN_NOTIFIER object:self userInfo:data];
+                        [self postData:LOGIN_NOTIFIER data:object];
 
                         return YES;
                     }

@@ -20,6 +20,7 @@
 
 #define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
 
+NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
 NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
 NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
 NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
@@ -248,8 +249,6 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             if (aCallback) {
                 aCallback(NO, nil);
             }
-
-            [block_self postNotification:LOGIN_NOTIFIER data:nil];
         }
     });
 }
@@ -358,15 +357,16 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     cloudCommand.commandType = LOGIN_TEMPPASS_COMMAND;
     cloudCommand.command = cmd;
 
+    singleTon.connectionState = SDKCloudStatusLoginInProcess;
+
     NSError *error_2;
     BOOL success = [self internalSendToCloud:singleTon command:cloudCommand error:&error_2];
-    if (!success) {
-        DLog(@"%s: Error init sdk: %@", __PRETTY_FUNCTION__, error_2.localizedDescription);
-        singleTon.connectionState = SDKCloudStatusNetworkDown;
+    if (success) {
+        DLog(@"%s: login command sent", __PRETTY_FUNCTION__);
     }
     else {
-        DLog(@"%s: login command sent", __PRETTY_FUNCTION__);
-        singleTon.connectionState = SDKCloudStatusLoginInProcess;
+        singleTon.connectionState = SDKCloudStatusNetworkDown;
+        DLog(@"%s: Error init sdk: %@", __PRETTY_FUNCTION__, error_2.localizedDescription);
     }
 }
 
@@ -388,15 +388,13 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     NSDictionary *info = notification.userInfo;
     LoginResponse *res = info[@"data"];
 
-    if (res == nil) {
-        [self removeLoginCredentials];
-    }
-    else if (res.isSuccessful) {
+    if (res.isSuccessful) {
+        // The response will contain the TempPass token, which we store in the keychain.
         [self storeLoginCredentials:res];
     }
-    else {
-        [self removeLoginCredentials];
-    }
+
+    // In any case, notify the UI about the login result
+    [self postNotification:kSFIDidCompleteLoginNotification data:res];
 }
 
 - (void)onLogoutResponse:(NSNotification *)notification {

@@ -48,6 +48,11 @@
 #import <SecurifiToolkit/SFIDatabaseUpdateService.h>
 #import <SecurifiToolkit/SFIOfflineDataManager.h>
 
+// Notification posted at the conclusion of a Login attempt.
+// The payload should contain a LoginResponse indicating success or failure.
+// Sent in response to a call to asyncSendLoginWithEmail:password:
+extern NSString *const kSFIDidCompleteLoginNotification;
+
 // Notification posted when the client has been logged out
 extern NSString *const kSFIDidLogoutNotification;
 
