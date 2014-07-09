@@ -627,9 +627,28 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     if (almondList.count == 0) {
         [self removeCurrentAlmond];
     }
-    else {
+    else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
         [self setCurrentAlmond:currentAlmond colorCodeIndex:0];
+    }
+    else {
+        BOOL currentStillInList = NO;
+        SFIAlmondPlus *current = [self currentAlmond];
+
+        if (current) {
+            for (SFIAlmondPlus *almond in almondList) {
+                if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
+                    currentStillInList = YES;
+                    break;
+                }
+            }
+        }
+
+        if (!currentStillInList) {
+            // Just pick the first one in this case
+            SFIAlmondPlus *currentAlmond = almondList[0];
+            [self setCurrentAlmond:currentAlmond colorCodeIndex:0];
+        }
     }
 
     [self postData:kSFIDidUpdateAlmondList data:nil];
@@ -672,6 +691,10 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     if (newAlmondList.count == 0) {
         [self removeCurrentAlmond];
     }
+    else if (newAlmondList.count == 1) {
+        SFIAlmondPlus *newAlmond = newAlmondList[0];
+        [self setCurrentAlmond:newAlmond colorCodeIndex:0];
+    }
     else {
         SFIAlmondPlus *plus = [self currentAlmond];
         if ([plus.almondplusMAC isEqualToString:deletedAlmond.almondplusMAC]) {
@@ -709,6 +732,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
                 [self setCurrentAlmond:almond colorCodeIndex:plus.colorCodeIndex];
             }
 
+            // Tell the world so they can update their view
             [self postData:kSFIDidChangeAlmondName data:almond];
 
             return;
