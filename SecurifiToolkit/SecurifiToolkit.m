@@ -162,6 +162,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         return;
     }
 
+    [[SFIDatabaseUpdateService sharedInstance] startDatabaseUpdateService];
     [self asyncInitSDK:nil];
 }
 
@@ -257,6 +258,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         [block_self tearDownNetworkSingleton];
         block_self.networkSingleton = nil;
     });
+
+    [[SFIDatabaseUpdateService sharedInstance] stopDatabaseUpdateService];
 }
 
 #pragma mark - Command dispatch
@@ -367,18 +370,9 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (void)removeLoginCredentials {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [SFIDatabaseUpdateService stopDatabaseUpdateService];
-    });
-
     [self removeCurrentAlmond];
     [self clearSecCredentials];
-
-    //Delete files
-    [SFIOfflineDataManager deleteFile:ALMONDLIST_FILENAME];
-    [SFIOfflineDataManager deleteFile:HASH_FILENAME];
-    [SFIOfflineDataManager deleteFile:DEVICELIST_FILENAME];
-    [SFIOfflineDataManager deleteFile:DEVICEVALUE_FILENAME];
+    [SFIOfflineDataManager purgeAll];
 }
 
 - (void)onLoginResponse:(NSNotification*)notification {

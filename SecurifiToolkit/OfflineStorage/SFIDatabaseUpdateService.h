@@ -9,6 +9,11 @@
 #import <Foundation/Foundation.h>
 
 @interface SFIDatabaseUpdateService : NSObject
-+(void)startDatabaseUpdateService;
-+(void)stopDatabaseUpdateService;
+
++ (instancetype)sharedInstance;
+
+- (void)startDatabaseUpdateService;
+
+- (void)stopDatabaseUpdateService;
+
 @end

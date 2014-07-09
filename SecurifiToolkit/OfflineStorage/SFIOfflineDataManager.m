@@ -8,6 +8,7 @@
 
 #import "SFIOfflineDataManager.h"
 #import "AlmondPlusSDKConstants.h"
+#import "SFIAlmondPlus.h"
 
 @implementation SFIOfflineDataManager
 
@@ -69,6 +70,21 @@
     //Read the current almond's device list from the hashmap
     NSString *strHashValue = [dictHashList valueForKey:strCurrentMAC];
     return strHashValue;
+}
+
++ (BOOL)purgeAll {
+    [SFIOfflineDataManager deleteFile:ALMONDLIST_FILENAME];
+    [SFIOfflineDataManager deleteFile:HASH_FILENAME];
+    [SFIOfflineDataManager deleteFile:DEVICELIST_FILENAME];
+    [SFIOfflineDataManager deleteFile:DEVICEVALUE_FILENAME];
+    return YES;
+}
+
++ (void)deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
+    NSString *mac = deletedAlmond.almondplusMAC;
+    [SFIOfflineDataManager deleteHashForAlmond:mac];
+    [SFIOfflineDataManager deleteDeviceDataForAlmond:mac];
+    [SFIOfflineDataManager deleteDeviceValueForAlmond:mac];
 }
 
 //Delete HashList for the deleted almond from offline storage

@@ -8,21 +8,28 @@
 
 #import <Foundation/Foundation.h>
 
+@class SFIAlmondPlus;
+
 @interface SFIOfflineDataManager : NSObject
-+(BOOL) writeAlmondList:(NSArray *)arrayAlmondList;
-+(NSArray*) readAlmondList;
 
-+(BOOL) writeHashList:(NSString*)strHashValue currentMAC:(NSString*)strCurrentMAC;
-+(NSString*) readHashList:(NSString*)strCurrentMAC;
++ (BOOL)writeAlmondList:(NSArray *)arrayAlmondList;
 
-+(BOOL) writeDeviceList:(NSArray *)deviceList currentMAC:(NSString*)strCurrentMAC;
-+(NSMutableArray*) readDeviceList:(NSString*)strCurrentMAC;
++ (NSArray *)readAlmondList;
 
-+(BOOL) writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString*)strCurrentMAC;
-+(NSArray*) readDeviceValueList:(NSString*)strCurrentMAC;
-+(BOOL)deleteFile:(NSString*)fileName;
++ (BOOL)writeHashList:(NSString *)strHashValue currentMAC:(NSString *)strCurrentMAC;
 
-+(void) deleteHashForAlmond:(NSString*)strCurrentMAC;
-+(void) deleteDeviceDataForAlmond:(NSString*)strCurrentMAC;
-+(void) deleteDeviceValueForAlmond:(NSString*)strCurrentMAC;
++ (NSString *)readHashList:(NSString *)strCurrentMAC;
+
++ (BOOL)writeDeviceList:(NSArray *)deviceList currentMAC:(NSString *)strCurrentMAC;
+
++ (NSMutableArray *)readDeviceList:(NSString *)strCurrentMAC;
+
++ (BOOL)writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC;
+
++ (NSArray *)readDeviceValueList:(NSString *)strCurrentMAC;
+
++ (BOOL)purgeAll;
+
++ (void)deleteAlmond:(SFIAlmondPlus*)almond;
+
 @end

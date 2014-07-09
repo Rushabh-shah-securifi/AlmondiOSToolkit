@@ -9,61 +9,84 @@
 #import "SFIDatabaseUpdateService.h"
 #import <SecurifiToolkit/SecurifiToolkit.h>
 
+@interface SFIDatabaseUpdateService ()
+@property BOOL started;
+@end
+
 @implementation SFIDatabaseUpdateService
 
-+ (void)startDatabaseUpdateService {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(deviceDataCloudResponseCallback:)
-                                                 name:DEVICE_DATA_CLOUD_NOTIFIER
-                                               object:nil];
++ (instancetype)sharedInstance {
+    static dispatch_once_t once_predicate;
+    static SFIDatabaseUpdateService *singleton = nil;
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(deviceValueListResponseCallback:)
-                                                 name:DEVICE_VALUE_CLOUD_NOTIFIER
-                                               object:nil];
+    dispatch_once(&once_predicate, ^{
+        singleton = [SFIDatabaseUpdateService new];
+    });
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(dynamicAlmondListAddCallback:)
-                                                 name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(dynamicAlmondListDeleteCallback:)
-                                                 name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(dynamicAlmondNameChangeCallback:)
-                                                 name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER
-                                               object:nil];
+    return singleton;
 }
 
-+ (void)stopDatabaseUpdateService {
-    // [SNLog Log:@"In Method Name: %s", __PRETTY_FUNCTION__];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:DEVICE_DATA_CLOUD_NOTIFIER
-                                                  object:nil];
+- (void)startDatabaseUpdateService {
+    if (self.started) {
+        return;
+    }
+    self.started = YES;
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:DEVICE_VALUE_CLOUD_NOTIFIER
-                                                  object:nil];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER
-                                                  object:nil];
+    [center addObserver:self
+               selector:@selector(deviceDataCloudResponseCallback:)
+                   name:DEVICE_DATA_CLOUD_NOTIFIER
+                 object:nil];
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER
-                                                  object:nil];
+    [center addObserver:self
+               selector:@selector(deviceValueListResponseCallback:)
+                   name:DEVICE_VALUE_CLOUD_NOTIFIER
+                 object:nil];
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER
-                                                  object:nil];
+    [center addObserver:self
+               selector:@selector(dynamicAlmondListAddCallback:)
+                   name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER
+                 object:nil];
+
+    [center addObserver:self
+               selector:@selector(dynamicAlmondListDeleteCallback:)
+                   name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER
+                 object:nil];
+
+    [center addObserver:self
+               selector:@selector(dynamicAlmondNameChangeCallback:)
+                   name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER
+                 object:nil];
+}
+
+- (void)stopDatabaseUpdateService {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+    [center removeObserver:self
+                      name:DEVICE_DATA_CLOUD_NOTIFIER
+                    object:nil];
+
+    [center removeObserver:self
+                      name:DEVICE_VALUE_CLOUD_NOTIFIER
+                    object:nil];
+
+    [center removeObserver:self
+                      name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER
+                    object:nil];
+
+    [center removeObserver:self
+                      name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER
+                    object:nil];
+
+    [center removeObserver:self
+                      name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER
+                    object:nil];
 }
 
 #pragma mark - Cloud command handlers
 
-+ (void)deviceDataCloudResponseCallback:(id)sender {
+- (void)deviceDataCloudResponseCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
 
@@ -107,7 +130,7 @@
     }
 }
 
-+ (void)deviceValueListResponseCallback:(id)sender {
+- (void)deviceValueListResponseCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
 
@@ -169,7 +192,7 @@
     }
 }
 
-+ (void)dynamicAlmondListAddCallback:(id)sender {
+- (void)dynamicAlmondListAddCallback:(id)sender {
     // [SNLog Log:@"In Method Name: %s", __PRETTY_FUNCTION__];
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
@@ -183,7 +206,7 @@
     }
 }
 
-+ (void)dynamicAlmondListDeleteCallback:(id)sender {
+- (void)dynamicAlmondListDeleteCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
 
@@ -205,27 +228,19 @@
             }
 
             [SFIOfflineDataManager writeAlmondList:newAlmondList];
-
-            //Update Hash List
-            [SFIOfflineDataManager deleteHashForAlmond:deletedAlmond.almondplusMAC];
-
-            //Update Device List
-            [SFIOfflineDataManager deleteDeviceDataForAlmond:deletedAlmond.almondplusMAC];
-
-            //Update Device Value List
-            [SFIOfflineDataManager deleteDeviceValueForAlmond:deletedAlmond.almondplusMAC];
+            [SFIOfflineDataManager deleteAlmond:deletedAlmond];
         }
 
     }
 }
 
-+ (void)dynamicAlmondNameChangeCallback:(id)sender {
+- (void)dynamicAlmondNameChangeCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
 
     if (data != nil) {
         DynamicAlmondNameChangeResponse *obj = (DynamicAlmondNameChangeResponse *) [data valueForKey:@"data"];
-        NSArray *offlineAlmondList = [SFIOfflineDataManager readAlmondList];
+        NSArray *offlineAlmondList = [[SecurifiToolkit sharedInstance] almondList];
 
         for (SFIAlmondPlus *currentOfflineAlmond in offlineAlmondList) {
             if ([currentOfflineAlmond.almondplusMAC isEqualToString:obj.almondplusMAC]) {
@@ -239,4 +254,6 @@
         [SFIOfflineDataManager writeAlmondList:offlineAlmondList];
     }
 }
+
+
 @end
