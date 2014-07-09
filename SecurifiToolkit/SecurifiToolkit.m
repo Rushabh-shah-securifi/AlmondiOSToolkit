@@ -20,6 +20,7 @@
 
 #define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
 
+NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
 NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
 NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
@@ -248,7 +249,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
                 aCallback(NO, nil);
             }
 
-            [block_self postData:LOGIN_NOTIFIER data:nil];
+            [block_self postNotification:LOGIN_NOTIFIER data:nil];
         }
     });
 }
@@ -303,7 +304,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             DLog(@"[Generic cmd: %d] send error: %@", block_command.commandType, outError.localizedDescription);
 
             DLog(@"%s: Posting NETWORK_DOWN_NOTIFIER, error=%@", __PRETTY_FUNCTION__, outError.localizedDescription);
-            [block_self postData:NETWORK_DOWN_NOTIFIER data:nil];
+            [block_self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
         }
 
         if (callback) {
@@ -399,11 +400,9 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 }
 
 - (void)onLogoutResponse:(NSNotification *)notification {
-    NSDictionary *info = notification.userInfo;
-    LoginResponse *res = info[@"data"];
-    if (res.isSuccessful) {
-        [self removeLoginCredentials];
-    }
+    [self removeLoginCredentials];
+    [self tearDownNetworkSingleton];
+    [self postNotification:kSFIDidLogoutNotification data:nil];
 }
 
 - (void)onLogoutAllResponse:(NSNotification *)notification {
@@ -413,7 +412,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         DLog(@"SDK received success on Logout All");
         [self removeLoginCredentials];
         [self tearDownNetworkSingleton];
-        [self postData:kSFIDidLogoutAllNotification data:nil];
+        [self postNotification:kSFIDidLogoutAllNotification data:nil];
     }
 }
 
@@ -423,11 +422,17 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         return;
     }
 
-    GenericCommand *cmd = [[GenericCommand alloc] init];
-    cmd.commandType = LOGOUT_COMMAND;
-    cmd.command = nil;
+    if (self.isCloudOnline) {
+        GenericCommand *cmd = [[GenericCommand alloc] init];
+        cmd.commandType = LOGOUT_COMMAND;
+        cmd.command = nil;
 
-    [self asyncSendToCloud:cmd];
+        [self asyncSendToCloud:cmd];
+    }
+    else {
+        // Not connected, so just purge on-device credentials and cache
+        [self onLogoutResponse:nil];
+    }
 }
 
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password {
@@ -578,7 +583,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {
     if (singleTon == self.networkSingleton) {
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
-        [self postData:NETWORK_DOWN_NOTIFIER data:nil];
+        [self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
     }
 }
 
@@ -588,7 +593,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     return [socket sendCommandToCloud:sender error:outError];
 }
 
-- (void)postData:(NSString*)notificationName data:(id)payload {
+- (void)postNotification:(NSString *)notificationName data:(id)payload {
     // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
     // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
     // UI can easily become confused. This needs to be sorted out.
@@ -651,7 +656,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         }
     }
 
-    [self postData:kSFIDidUpdateAlmondList data:nil];
+    [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
 - (void)dynamicAlmondListDeleteCallback:(id)sender {
@@ -701,8 +706,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             [self removeCurrentAlmond];
         }
     }
-    
-    [self postData:kSFIDidUpdateAlmondList data:nil];
+
+    [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
 - (void)dynamicAlmondNameChangeCallback:(id)sender {
@@ -733,7 +738,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
             }
 
             // Tell the world so they can update their view
-            [self postData:kSFIDidChangeAlmondName data:almond];
+            [self postNotification:kSFIDidChangeAlmondName data:almond];
 
             return;
         }

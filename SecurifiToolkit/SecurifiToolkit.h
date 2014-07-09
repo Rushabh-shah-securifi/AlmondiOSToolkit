@@ -48,6 +48,10 @@
 #import <SecurifiToolkit/SFIDatabaseUpdateService.h>
 #import <SecurifiToolkit/SFIOfflineDataManager.h>
 
+// Notification posted when the client has been logged out
+extern NSString *const kSFIDidLogoutNotification;
+
+// Notification posted when Logout All has been received
 extern NSString *const kSFIDidLogoutAllNotification;
 
 // Notification posted when the Almond list has been updated
