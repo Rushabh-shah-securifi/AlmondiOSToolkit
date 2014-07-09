@@ -43,21 +43,6 @@
                selector:@selector(deviceValueListResponseCallback:)
                    name:DEVICE_VALUE_CLOUD_NOTIFIER
                  object:nil];
-
-    [center addObserver:self
-               selector:@selector(dynamicAlmondListAddCallback:)
-                   name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER
-                 object:nil];
-
-    [center addObserver:self
-               selector:@selector(dynamicAlmondListDeleteCallback:)
-                   name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER
-                 object:nil];
-
-    [center addObserver:self
-               selector:@selector(dynamicAlmondNameChangeCallback:)
-                   name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER
-                 object:nil];
 }
 
 - (void)stopDatabaseUpdateService {
@@ -69,18 +54,6 @@
 
     [center removeObserver:self
                       name:DEVICE_VALUE_CLOUD_NOTIFIER
-                    object:nil];
-
-    [center removeObserver:self
-                      name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER
-                    object:nil];
-
-    [center removeObserver:self
-                      name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER
-                    object:nil];
-
-    [center removeObserver:self
-                      name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER
                     object:nil];
 }
 
@@ -192,68 +165,7 @@
     }
 }
 
-- (void)dynamicAlmondListAddCallback:(id)sender {
-    // [SNLog Log:@"In Method Name: %s", __PRETTY_FUNCTION__];
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
 
-    if (data != nil) {
-        AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
-        if (obj.isSuccessful) {
-            //Write Almond List offline - New list with added almond
-            [SFIOfflineDataManager writeAlmondList:obj.almondPlusMACList];
-        }
-    }
-}
-
-- (void)dynamicAlmondListDeleteCallback:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-
-    if (data != nil) {
-        AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
-
-        if (obj.isSuccessful) {
-            NSArray *offlineAlmondList = [SFIOfflineDataManager readAlmondList];
-            NSMutableArray *deletedAlmondList = obj.almondPlusMACList;
-            NSMutableArray *newAlmondList = [[NSMutableArray alloc] init];
-            SFIAlmondPlus *deletedAlmond = deletedAlmondList[0];
-
-            //Update Almond List
-            for (SFIAlmondPlus *currentOfflineAlmond in offlineAlmondList) {
-                if (![currentOfflineAlmond.almondplusMAC isEqualToString:deletedAlmond.almondplusMAC]) {
-                    //Add the current Almond from list except the deleted one
-                    [newAlmondList addObject:currentOfflineAlmond];
-                }
-            }
-
-            [SFIOfflineDataManager writeAlmondList:newAlmondList];
-            [SFIOfflineDataManager deleteAlmond:deletedAlmond];
-        }
-
-    }
-}
-
-- (void)dynamicAlmondNameChangeCallback:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-
-    if (data != nil) {
-        DynamicAlmondNameChangeResponse *obj = (DynamicAlmondNameChangeResponse *) [data valueForKey:@"data"];
-        NSArray *offlineAlmondList = [[SecurifiToolkit sharedInstance] almondList];
-
-        for (SFIAlmondPlus *currentOfflineAlmond in offlineAlmondList) {
-            if ([currentOfflineAlmond.almondplusMAC isEqualToString:obj.almondplusMAC]) {
-                //Change the name of the current almond in the offline list
-                currentOfflineAlmond.almondplusName = obj.almondplusName;
-                break;
-            }
-        }
-
-        //Update the list
-        [SFIOfflineDataManager writeAlmondList:offlineAlmondList];
-    }
-}
 
 
 @end

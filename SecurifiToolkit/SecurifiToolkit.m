@@ -21,6 +21,8 @@
 #define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
 
 NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
+NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
+NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 
 typedef void (^SendCompletion)(BOOL success, NSError *error);
 
@@ -58,6 +60,9 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         [center addObserver:self selector:@selector(onLoginResponse:) name:LOGIN_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutResponse:) name:LOGOUT_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutAllResponse:) name:LOGOUT_ALL_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDynamicAlmondListAdd:) name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(dynamicAlmondListDeleteCallback:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(dynamicAlmondNameChangeCallback:) name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
     }
 
     return self;
@@ -69,6 +74,9 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     [center removeObserver:self name:LOGIN_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_ALL_NOTIFIER object:nil];
+    [center removeObserver:self name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
+    [center removeObserver:self name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
+    [center removeObserver:self name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
 }
 
 - (SingleTon*)setupNetworkSingleton {
@@ -596,5 +604,118 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
     });
 }
+
+#pragma mark - Dynamic Updates
+
+- (void)onDynamicAlmondListAdd:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    
+    AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
+    if (!obj.isSuccessful) {
+        return;        
+    }
+
+    //Write Almond List offline - New list with added almond
+    NSArray *almondList = obj.almondPlusMACList;
+    [SFIOfflineDataManager writeAlmondList:almondList];
+
+    // Manage the "Current selected Almond" value
+    if (almondList.count == 0) {
+        [self removeCurrentAlmond];
+    }
+    else {
+        SFIAlmondPlus *currentAlmond = almondList[0];
+        [self setCurrentAlmond:currentAlmond colorCodeIndex:0];
+    }
+
+    [self postData:kSFIDidUpdateAlmondList data:nil];
+}
+
+- (void)dynamicAlmondListDeleteCallback:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    
+    AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
+    if (!obj.isSuccessful) {
+        return;
+    }
+    
+    NSArray *deletedAlmondList = obj.almondPlusMACList;
+    if (deletedAlmondList.count == 0) {
+        return;
+    }
+    SFIAlmondPlus *deletedAlmond = deletedAlmondList[0];
+
+    // Diff the current list, removing the deleted almond
+    NSArray *currentAlmondList = [SFIOfflineDataManager readAlmondList];
+    NSMutableArray *newAlmondList = [[NSMutableArray alloc] init];
+    //
+    // Update Almond List
+    for (SFIAlmondPlus *currentOfflineAlmond in currentAlmondList) {
+        if (![currentOfflineAlmond.almondplusMAC isEqualToString:deletedAlmond.almondplusMAC]) {
+            //Add the current Almond from list except the deleted one
+            [newAlmondList addObject:currentOfflineAlmond];
+        }
+    }
+
+    [SFIOfflineDataManager writeAlmondList:newAlmondList];
+    [SFIOfflineDataManager deleteAlmond:deletedAlmond];
+
+    // Manage the "Current Almond"
+    if (newAlmondList.count == 0) {
+        [self removeCurrentAlmond];
+    }
+    else {
+        SFIAlmondPlus *plus = [self currentAlmond];
+        if ([plus.almondplusMAC isEqualToString:deletedAlmond.almondplusMAC]) {
+            [self removeCurrentAlmond];
+        }
+    }
+    
+    [self postData:kSFIDidUpdateAlmondList data:nil];
+}
+
+- (void)dynamicAlmondNameChangeCallback:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    DynamicAlmondNameChangeResponse *obj = (DynamicAlmondNameChangeResponse *) [data valueForKey:@"data"];
+    if (obj == nil) {
+        return;
+    }
+
+    NSArray *currentList = [self almondList];
+    for (SFIAlmondPlus *almond in currentList) {
+        if ([almond.almondplusMAC isEqualToString:obj.almondplusMAC]) {
+            //Change the name of the current almond in the offline list
+            almond.almondplusName = obj.almondplusName;
+
+            // Save the change
+            [SFIOfflineDataManager writeAlmondList:currentList];
+
+            // Update the Current Almond
+            SFIAlmondPlus *plus = [self currentAlmond];
+            if ([plus.almondplusMAC isEqualToString:almond.almondplusMAC]) {
+                [self setCurrentAlmond:almond colorCodeIndex:plus.colorCodeIndex];
+            }
+
+            [self postData:kSFIDidChangeAlmondName data:almond];
+
+            return;
+        }
+    }
+}
+
+
 
 @end

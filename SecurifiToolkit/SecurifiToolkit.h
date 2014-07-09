@@ -50,6 +50,12 @@
 
 extern NSString *const kSFIDidLogoutAllNotification;
 
+// Notification posted when the Almond list has been updated
+extern NSString *const kSFIDidUpdateAlmondList;
+
+// Notification posted when an Almond's name has changed
+extern NSString *const kSFIDidChangeAlmondName;
+
 @interface SecurifiToolkit : NSObject
 
 + (instancetype)sharedInstance;
