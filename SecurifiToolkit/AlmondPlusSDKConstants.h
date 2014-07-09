@@ -55,14 +55,14 @@
 #define LOGOUT_ALL_NOTIFIER                     @"LogoutAllResponseNotifier"
 #define DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER @"DynamicAlmondNameChangeNotifier"
 
-#define CURRENT_ALMOND_MAC  @"AlmondMAC"
-#define CURRENT_ALMOND_MAC_NAME  @"AlmondMACName"
 #define ALMONDLIST_FILENAME @"almondlist"
 #define HASH_FILENAME @"hashlist"
 #define DEVICELIST_FILENAME  @"devicelist"
 #define DEVICEVALUE_FILENAME @"devicevalue"
+
 #define LOG_FILE_NAME  @"AlmondPlusLog.log"
 #define SDK_LOG_FILE_NAME  @"AlmondPlusSDKLog.log"
+
 #define COLORS @"colors"
 #define COLORCODE @"ColorCode"
 #define ALMONDLIST @"AlmondList"
@@ -86,18 +86,14 @@
 
 #define VALIDATE_REQUEST_XML                @"<root><ValidateAccountRequest><EmailID>%@</EmailID></ValidateAccountRequest></root>"
 
-#define RESET_PWD_REQUEST_XML                @"<root><ResetPasswordRequest><EmailID>%@</EmailID></ResetPasswordRequest></root>"
+#define RESET_PWD_REQUEST_XML               @"<root><ResetPasswordRequest><EmailID>%@</EmailID></ResetPasswordRequest></root>"
 #define SENSOR_FORCED_UPDATE_REQUEST_XML    @"<root><DeviceDataForcedUpdate><AlmondplusMAC>%@</AlmondplusMAC><MobileInternalIndex>%@</MobileInternalIndex></DeviceDataForcedUpdate></root>"
 
-#define SENSOR_CHANGE_REQUEST_XML    @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
+#define SENSOR_CHANGE_REQUEST_XML           @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
 
-#define SENSOR_CHANGE_NAME_REQUEST_XML    @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
+#define SENSOR_CHANGE_NAME_REQUEST_XML      @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
 
-#define SENSOR_CHANGE_LOCATION_REQUEST_XML    @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
-
-
-#define LOG_FILE_NAME  @"AlmondPlusLog.log"
-#define SDK_LOG_FILE_NAME  @"AlmondPlusSDKLog.log"
+#define SENSOR_CHANGE_LOCATION_REQUEST_XML  @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
 
 
 #define AFFILIATION_CODE_CHAR_COUNT 6
