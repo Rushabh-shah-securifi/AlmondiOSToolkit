@@ -654,10 +654,6 @@
     return trusted;
 }
 
-- (BOOL)sendCommandToCloud:(id)command error:(NSError **)outError {
-    return [self internalSendToCloud:self command:command error:outError];
-}
-
 - (NSInteger)nextUnitCounter {
     NSInteger next = self.currentUnitCounter + 1;
     self.currentUnitCounter = next;
@@ -690,6 +686,7 @@
         NSError *error;
         BOOL success = [block_self internalSendToCloud:block_self command:unit.command error:&error];
         if (!success) {
+            NSLog(@"Command Queue: send error: %@, tag:%ld", error.localizedDescription, (long)tag);
             [unit markResponse:NO];
             return;
         }

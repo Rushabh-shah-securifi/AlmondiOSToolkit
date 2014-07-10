@@ -43,11 +43,9 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 
 - (void)shutdown;
 
-// Sends the specified command to the cloud
-// Returns YES on successful sending
-// Returns NO on failure to send
-- (BOOL)sendCommandToCloud:(id)command error:(NSError **)outError;
-
+// Queues the specified command to the cloud
+// Returns YES on successful submission
+// Returns NO on failure to queue
 - (BOOL)submitCommand:(GenericCommand*)command;
 
 @end
