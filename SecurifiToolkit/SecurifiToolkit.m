@@ -224,7 +224,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         //Send Temppass command
         if ([block_self hasLoginCredentials]) {
             @try {
-                [block_self sendLoginCommand:singleTon];
+                [block_self sendTempPassLoginCommand:singleTon];
 
                 block_self.initializing = NO;
                 if (aCallback) {
@@ -278,8 +278,13 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         //
         NSLog(@"Waiting to initialize");
 
+        __block BOOL connectionSuccess = NO;
+        __block NSError *connectionError;
+
         dispatch_semaphore_t completion_latch = dispatch_semaphore_create(0);
         [self asyncInitSDK:^(BOOL success, NSError *error) {
+            connectionSuccess = success;
+            connectionError = error;
             dispatch_semaphore_signal(completion_latch);
         }];
 
@@ -287,6 +292,14 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         NSLog(@"Done waiting to initialize");
 
         socket = self.networkSingleton;
+
+        if (!connectionSuccess) {
+            if (callback) {
+                callback(NO, connectionError);
+            }
+
+            return;
+        }
     }
 
     __strong GenericCommand *block_command = command;
@@ -329,15 +342,15 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         return;
     }
 
-    [self removeLoginCredentials];
+    [self tearDownLoginSession];
     [self setSecEmail:email];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setBool:YES forKey:SEC_USER_DEFAULT_LOGGED_IN_ONCE];
 
-    Login *loginCommand = [[Login alloc] init];
-    loginCommand.UserID = [NSString stringWithString:email];
-    loginCommand.Password = [NSString stringWithString:password];
+    Login *loginCommand = [Login new];
+    loginCommand.UserID = email;
+    loginCommand.Password = password;
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
     cloudCommand.commandType = LOGIN_COMMAND;
@@ -350,7 +363,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     return [self secEmail];
 }
 
-- (void)sendLoginCommand:(SingleTon *)singleTon {
+- (void)sendTempPassLoginCommand:(SingleTon *)singleTon {
     LoginTempPass *cmd = [self makeTempPassLoginCommand];
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
@@ -378,7 +391,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     [self setSecUserId:userId];
 }
 
-- (void)removeLoginCredentials {
+- (void)tearDownLoginSession {
     [self removeCurrentAlmond];
     [self clearSecCredentials];
     [SFIOfflineDataManager purgeAll];
@@ -392,13 +405,17 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         // The response will contain the TempPass token, which we store in the keychain.
         [self storeLoginCredentials:res];
     }
+    else {
+        // Ensure all credentials are cleared
+        [self tearDownLoginSession];
+    }
 
     // In any case, notify the UI about the login result
     [self postNotification:kSFIDidCompleteLoginNotification data:res];
 }
 
 - (void)onLogoutResponse:(NSNotification *)notification {
-    [self removeLoginCredentials];
+    [self tearDownLoginSession];
     [self tearDownNetworkSingleton];
     [self postNotification:kSFIDidLogoutNotification data:nil];
 }
@@ -408,7 +425,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     LoginResponse *res = info[@"data"];
     if (res.isSuccessful) {
         DLog(@"SDK received success on Logout All");
-        [self removeLoginCredentials];
+        [self tearDownLoginSession];
         [self tearDownNetworkSingleton];
         [self postNotification:kSFIDidLogoutAllNotification data:nil];
     }
