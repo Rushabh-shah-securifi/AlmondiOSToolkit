@@ -10,6 +10,6 @@
 
 @interface Login : NSObject
 @property BOOL isSuccessful;
-@property NSString *UserID;
-@property NSString *Password;
+@property (copy) NSString *UserID;
+@property (copy) NSString *Password;
 @end
