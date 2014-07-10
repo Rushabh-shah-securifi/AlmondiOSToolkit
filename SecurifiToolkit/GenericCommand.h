@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 
 @interface GenericCommand : NSObject
+
 @property id command;
 @property unsigned int commandType;
+
+- (NSString *)debugDescription;
+
 @end

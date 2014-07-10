@@ -9,5 +9,13 @@
 #import "GenericCommand.h"
 
 @implementation GenericCommand
-@synthesize commandType,command;
+
+- (NSString *)debugDescription {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.command=%@", self.command];
+    [description appendFormat:@", self.commandType=%u", self.commandType];
+    [description appendString:@">"];
+    return description;
+}
+
 @end
