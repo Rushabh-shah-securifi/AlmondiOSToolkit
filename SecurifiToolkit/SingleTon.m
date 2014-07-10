@@ -12,12 +12,17 @@
 #import "PrivateCommandTypes.h"
 #import "LoginTempPass.h"
 #import "SecurifiCloudResources-Prefix.pch"
+#import "SUnit.h"
 
 @interface SingleTon ()
 @property (nonatomic, readonly) NSObject *syncLocker;
 
-@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;
-@property(nonatomic, readonly) dispatch_queue_t callbackQueue;
+@property (atomic) NSInteger currentUnitCounter;
+@property (atomic) SUnit *currentUnit;
+
+@property(nonatomic, readonly) dispatch_queue_t commandQueue;    // serial queue to which commands submitted to the system are added
+@property(nonatomic, readonly) dispatch_queue_t backgroundQueue; // queue on which the streams are managed
+@property(nonatomic, readonly) dispatch_queue_t callbackQueue;   // queue used for posting notifications
 @property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
 
 @property(nonatomic) SecCertificateRef certificate;
@@ -46,6 +51,7 @@
         self.networkShutdown = NO;
         self.connectionState = SDKCloudStatusUninitialized;
         _syncLocker = [NSObject new];
+        _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
         _callbackQueue = callbackQueue;
         _network_established_latch = dispatch_semaphore_create(0);
@@ -160,6 +166,8 @@
     dispatch_sync(self.backgroundQueue, ^(void) {
         NSLog(@"[%@] Singleton is shutting down", block_self.debugDescription);
 
+        [block_self tryAbortUnit];
+
         block_self.networkShutdown = YES;
         block_self.isLoggedIn = NO;
         block_self.connectionState = SDKCloudStatusCloudConnectionShutdown;
@@ -189,6 +197,9 @@
     });
 }
 
+// Called during command process need to use the output stream. Blocks until the connection is set up or fails.
+// return YES when time out is reached; NO if connection established without timeout
+// On time out, the SingleTon will shut itself down
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
 
@@ -229,6 +240,24 @@
 
 
 #pragma mark - NSStreamDelegate methods
+
+- (void)tryMarkUnitCompletion:(BOOL)success {
+    SUnit *unit = self.currentUnit;
+
+    if (unit) {
+        DLog(@"Marking response for unit: %@", unit.description);
+        [unit markResponse:success];
+    }
+}
+
+- (void)tryAbortUnit {
+    SUnit *unit = self.currentUnit;
+
+    if (unit) {
+        DLog(@"Marking unit as aborted: %@", unit.description);
+        [unit abort];
+    }
+}
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
     if (!self.partialData)
@@ -328,32 +357,40 @@
                                                 self.connectionState = SDKCloudStatusNotLoggedIn;
                                             }
 
+                                            [self tryMarkUnitCompletion:obj.isSuccessful];
                                             [self postData:LOGIN_NOTIFIER data:obj];
+
                                             break;
                                         }
                                         case SIGNUP_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:SIGN_UP_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case KEEP_ALIVE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             break;
                                         }
 
                                         case CLOUD_SANITY_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             break;
                                         }
                                             //PY 250214 - Logout Response
                                         case LOGOUT_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:LOGOUT_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 250214 - Logout All Response
                                         case LOGOUT_ALL_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:LOGOUT_ALL_NOTIFIER data:temp.command];
                                             break;
                                         }
 
                                         case AFFILIATION_USER_COMPLETE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:AFFILIATION_COMPLETE_NOTIFIER data:temp.command];
                                             break;
                                         }
@@ -371,28 +408,33 @@
                                             //                                            break;
                                             //PY 160913 - Almond List Response
                                         case ALMOND_LIST_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:ALMOND_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 170913 - Device Data Hash Response
                                         case DEVICEDATA_HASH_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:HASH_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 170913 - Device Data  Response
                                         case DEVICEDATA_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:DEVICE_DATA_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 170913 - Device Data  Response
                                         case DEVICE_VALUE_LIST_RESPONSE: {
                                             // [SNLog Log:@"%s: Received Device Value Mobile Response", __PRETTY_FUNCTION__];
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:DEVICE_VALUE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 200913 - Mobile Command Response
                                         case MOBILE_COMMAND_RESPONSE: {
                                             // [SNLog Log:@"%s: Received Mobile Command Response", __PRETTY_FUNCTION__];
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:MOBILE_COMMAND_NOTIFIER data:temp.command];
                                             break;
                                         }
@@ -416,6 +458,7 @@
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
                                             obj.decodedData = decodedData;
 
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
                                             break;
                                         }
@@ -428,6 +471,7 @@
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
                                             obj.decodedData = decodedData;
 
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:obj];
 
                                             break;
@@ -435,11 +479,13 @@
                                             //PY 011113 - Validate Account Response
                                         case VALIDATE_RESPONSE: {
                                             // [SNLog Log:@"%s: Received VALIDATE_RESPONSE", __PRETTY_FUNCTION__];
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:VALIDATE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case RESET_PASSWORD_RESPONSE: {
                                             // [SNLog Log:@"%s: Received RESET_PASSWORD_RESPONSE", __PRETTY_FUNCTION__];
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
@@ -455,6 +501,7 @@
                                         }
                                         case SENSOR_CHANGE_RESPONSE: {
                                             //[SNLog Log:@"%s: Received SENSOR_CHANGE_RESPONSE", __PRETTY_FUNCTION__];
+                                            [self tryMarkUnitCompletion:YES];
                                             [self postData:SENSOR_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
@@ -609,6 +656,53 @@
 
 - (BOOL)sendCommandToCloud:(id)command error:(NSError **)outError {
     return [self internalSendToCloud:self command:command error:outError];
+}
+
+- (NSInteger)nextUnitCounter {
+    NSInteger next = self.currentUnitCounter + 1;
+    self.currentUnitCounter = next;
+    return next;
+}
+
+- (BOOL)submitCommand:(GenericCommand *)command {
+    if (self.networkShutdown) {
+        DLog(@"SubmitCommand failed: network is shutdown");
+        return NO;
+    }
+
+    DLog(@"Command Queue: queueing command: %@", command);
+
+    __weak SingleTon *block_self = self;
+    dispatch_async(self.commandQueue, ^() {
+        if (block_self.networkShutdown) {
+            DLog(@"Command Queue: aborting unit: network is shutdown");
+            return;
+        }
+
+        NSInteger tag = [block_self nextUnitCounter];
+        
+        SUnit *unit = [[SUnit alloc] initWithCommand:command];
+        [unit markWorking: tag];
+        block_self.currentUnit = unit;
+
+        DLog(@"Command Queue: sending sunit to cloud: %ld", (long)tag);
+
+        NSError *error;
+        BOOL success = [block_self internalSendToCloud:block_self command:unit.command error:&error];
+        if (!success) {
+            [unit markResponse:NO];
+            return;
+        }
+
+        DLog(@"Command Queue: waiting for response: %ld", (long)tag);
+
+        int timeoutSecs = 10;
+        [unit waitForResponse:timeoutSecs];
+
+        DLog(@"Command Queue: done waiting for response: %ld", (long)tag);
+    });
+
+    return YES;
 }
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {

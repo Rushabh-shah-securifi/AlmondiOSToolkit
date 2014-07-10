@@ -26,8 +26,6 @@ NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
 NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 
-typedef void (^SendCompletion)(BOOL success, NSError *error);
-
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property (nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
@@ -173,84 +171,69 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     }
 
     [[SFIDatabaseUpdateService sharedInstance] startDatabaseUpdateService];
-    [self asyncInitSDK:nil];
+    [self _asyncInitSDK];
 }
 
-- (void)asyncInitSDK:(SendCompletion)aCallback {
-    __weak SecurifiToolkit *block_self = self;
+- (void)_asyncInitSDK {
+    if (self.isShutdown) {
+        DLog(@"INIT SDK. Already shutdown. Returning.");
+        return;
+    }
+    if (self.initializing) {
+        DLog(@"INIT SDK. Already initializing.");
+        return;
+    }
+    self.initializing = YES;
+    NSLog(@"INIT SDK");
 
-    //Start a Async task of sending Sanity command and TempPassCommand
-    //Async task will send command and will generate respective events
-    dispatch_async(self.commandDispatchQueue, ^(void) {
-        if (block_self.isShutdown) {
-            DLog(@"INIT SDK. Already shutdown. Returning.");
-            if (aCallback) {
-                aCallback(NO, nil);
-            }
-            return;
-        }
-        if (block_self.initializing) {
-            DLog(@"INIT SDK. Already initializing.");
-            if (aCallback) {
-                aCallback(NO, nil);
-            }
-            return;
-        }
-        block_self.initializing = YES;
-        NSLog(@"INIT SDK");
+    SingleTon *singleTon = [self setupNetworkSingleton];
 
-        SingleTon *singleTon = [block_self setupNetworkSingleton];
+    // After setting up the network, we need to do some basic things
+    // 1. send sanity cmd to test the socket
+    // 2. logon
+    // 3. update the devices list
+    // 4. check hashes etc.
 
-        // Send sanity command testing network connection
-        GenericCommand *cmd = [block_self makeCloudSanityCommand];
+    GenericCommand *cmd;
+    BOOL cmdSendSuccess;
 
-        NSError *error;
-        BOOL success = [block_self internalSendToCloud:singleTon command:cmd error:&error];
-        if (!success) {
-            singleTon.connectionState = SDKCloudStatusNetworkDown;
-            NSLog(@"%s: init SDK: send sanity failed: %@", __PRETTY_FUNCTION__, error.localizedDescription);
+    // Send sanity command testing network connection
+    cmd = [self makeCloudSanityCommand];
+    cmdSendSuccess = [self internalSendToCloud:singleTon command:cmd];
+    if (!cmdSendSuccess) {
+        NSLog(@"%s: init SDK: send sanity failed:", __PRETTY_FUNCTION__);
+        singleTon.connectionState = SDKCloudStatusNetworkDown;
+        self.initializing = NO;
+        return;
+    }
 
-            block_self.initializing = NO;
-            if (aCallback) {
-                aCallback(NO, error);
-            }
+    DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
+    DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
 
-            return;
-        }
+    // If no logon credentials, then initialization is completed.
+    if (![self hasLoginCredentials]) {
+        DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
+        singleTon.connectionState = SDKCloudStatusNotLoggedIn;
+        self.initializing = NO;
 
-        DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
-        DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+        // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
+        [self postNotification:kSFIDidLogoutNotification data:nil];
+        return;
+    }
 
-        //Send Temppass command
-        if ([block_self hasLoginCredentials]) {
-            @try {
-                [block_self sendTempPassLoginCommand:singleTon];
+    // Send logon credentials
+    DLog(@"%s: Sending temp pass credentials", __PRETTY_FUNCTION__);
+    singleTon.connectionState = SDKCloudStatusLoginInProcess;
 
-                block_self.initializing = NO;
-                if (aCallback) {
-                    aCallback(YES, nil);
-                }
-            }
-            @catch (NSException *e) {
-                singleTon.connectionState = SDKCloudStatusNetworkDown;
-                NSLog(@"%s: Exception throw on init sdk. Network down: %@", __PRETTY_FUNCTION__, e.reason);
+    cmd = [self makeTempPassLoginCommand];
+    cmdSendSuccess = [self internalSendToCloud:singleTon command:cmd];
+    if (!cmdSendSuccess) {
+        DLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
+        singleTon.connectionState = SDKCloudStatusNetworkDown;
+    }
+    self.initializing = NO;
 
-                block_self.initializing = NO;
-                if (aCallback) {
-                    aCallback(NO, nil);
-                }
-            }
-        }
-        else {
-            DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
-            singleTon.connectionState = SDKCloudStatusNotLoggedIn;
 
-            block_self.initializing = NO;
-            if (aCallback) {
-                aCallback(NO, nil);
-            }
-        }
-    });
 }
 
 - (void)shutdown {
@@ -272,57 +255,32 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 #pragma mark - Command dispatch
 
-- (void)asyncSendToCloud:(SingleTon*)socket command:(GenericCommand*)command completion:(SendCompletion)callback {
-    if (!socket.isStreamConnected && !self.initializing) {
+// 1. open connection
+// 2. send cloud sanity command
+//      a. wait for response
+//      b. if no response or bad response, kill connection and mark SingleTon as dead
+//      c. if good response, then process next command
+// 3. (optional) send logon (temp pass)
+//      a. wait for response
+//      b. if no response or bad response, kill connection and mark SingleTon as dead
+//      c. if good response, then process next command
+
+
+- (void)asyncSendToCloud:(SingleTon *)socket command:(GenericCommand *)command {
+    if (socket == nil || (!socket.isStreamConnected && !self.initializing)) {
         // Set up network and wait
         //
-        NSLog(@"Waiting to initialize");
-
-        __block BOOL connectionSuccess = NO;
-        __block NSError *connectionError;
-
-        dispatch_semaphore_t completion_latch = dispatch_semaphore_create(0);
-        [self asyncInitSDK:^(BOOL success, NSError *error) {
-            connectionSuccess = success;
-            connectionError = error;
-            dispatch_semaphore_signal(completion_latch);
-        }];
-
-        dispatch_semaphore_wait(completion_latch, DISPATCH_TIME_FOREVER);
-        NSLog(@"Done waiting to initialize");
-
-        socket = self.networkSingleton;
-
-        if (!connectionSuccess) {
-            if (callback) {
-                callback(NO, connectionError);
-            }
-
-            return;
-        }
+        NSLog(@"Waiting to initialize socket");
+        [self _asyncInitSDK];
     }
 
-    __strong GenericCommand *block_command = command;
-    __weak SingleTon *block_socket = socket;
-    __weak SecurifiToolkit *block_self = self;
-
-    dispatch_async(self.commandDispatchQueue, ^() {
-        NSError *outError;
-        BOOL success = [block_self internalSendToCloud:block_socket command:block_command error:&outError];
-        if (success) {
-            DLog(@"[Generic cmd: %d] send success", block_command.commandType);
-        }
-        else {
-            DLog(@"[Generic cmd: %d] send error: %@", block_command.commandType, outError.localizedDescription);
-
-            DLog(@"%s: Posting NETWORK_DOWN_NOTIFIER, error=%@", __PRETTY_FUNCTION__, outError.localizedDescription);
-            [block_self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
-        }
-
-        if (callback) {
-            callback(success, outError);
-        }
-    });
+    BOOL success = [self internalSendToCloud:socket command:command];
+    if (success) {
+        DLog(@"[Generic cmd: %d] send success", command.commandType);
+    }
+    else {
+        DLog(@"[Generic cmd: %d] send error", command.commandType);
+    }
 }
 
 - (void)asyncSendToCloud:(GenericCommand*)command {
@@ -331,7 +289,7 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
         return;
     }
 
-    [self asyncSendToCloud:self.networkSingleton command:command completion:nil];
+    [self asyncSendToCloud:self.networkSingleton command:command];
 }
 
 #pragma mark - Cloud Logon
@@ -361,26 +319,6 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 - (NSString *)loginEmail {
     return [self secEmail];
-}
-
-- (void)sendTempPassLoginCommand:(SingleTon *)singleTon {
-    LoginTempPass *cmd = [self makeTempPassLoginCommand];
-
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = LOGIN_TEMPPASS_COMMAND;
-    cloudCommand.command = cmd;
-
-    singleTon.connectionState = SDKCloudStatusLoginInProcess;
-
-    NSError *error_2;
-    BOOL success = [self internalSendToCloud:singleTon command:cloudCommand error:&error_2];
-    if (success) {
-        DLog(@"%s: login command sent", __PRETTY_FUNCTION__);
-    }
-    else {
-        singleTon.connectionState = SDKCloudStatusNetworkDown;
-        DLog(@"%s: Error init sdk: %@", __PRETTY_FUNCTION__, error_2.localizedDescription);
-    }
 }
 
 - (void)storeLoginCredentials:(LoginResponse *)obj {
@@ -524,12 +462,16 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
     return sanityCommand;
 }
 
-- (LoginTempPass *)makeTempPassLoginCommand {
+- (GenericCommand *)makeTempPassLoginCommand {
     LoginTempPass *cmd = [[LoginTempPass alloc] init];
     cmd.UserID = [self secUserId];
     cmd.TempPass = [self secPassword];
 
-    return cmd;
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = LOGIN_TEMPPASS_COMMAND;
+    cloudCommand.command = cmd;
+
+    return cloudCommand;
 }
 
 #pragma mark - Network reconnection handling
@@ -604,8 +546,8 @@ typedef void (^SendCompletion)(BOOL success, NSError *error);
 
 #pragma mark - Sending and Network
 
-- (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
-    return [socket sendCommandToCloud:sender error:outError];
+- (BOOL)internalSendToCloud:(SingleTon *)socket command:(GenericCommand *)command {
+    return [socket submitCommand:command];
 }
 
 - (void)postNotification:(NSString *)notificationName data:(id)payload {

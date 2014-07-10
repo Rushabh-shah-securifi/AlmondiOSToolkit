@@ -19,6 +19,7 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 };
 
 @class SingleTon;
+@class GenericCommand;
 
 @protocol SingleTonDelegate
 
@@ -42,14 +43,11 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 
 - (void)shutdown;
 
-// Called by clients that need to use the output stream. Blocks until the connection is set up or fails.
-// return YES when time out is reached; NO if connection established without timeout
-// On time out, the SingleTon will shut itself down
-- (BOOL)waitForConnectionEstablishment:(int)numSecsToWait;
-
 // Sends the specified command to the cloud
 // Returns YES on successful sending
 // Returns NO on failure to send
 - (BOOL)sendCommandToCloud:(id)command error:(NSError **)outError;
+
+- (BOOL)submitCommand:(GenericCommand*)command;
 
 @end
