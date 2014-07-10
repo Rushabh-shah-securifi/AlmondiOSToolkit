@@ -636,6 +636,7 @@
         }
 
         GenericCommand *obj = (GenericCommand *) sender;
+        DLog(@"Sending command, cmd:%@", obj.debugDescription);
 
         NSString *commandPayload;
         unsigned int commandLength = 0;
