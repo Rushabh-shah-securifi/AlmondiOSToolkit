@@ -178,6 +178,16 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 }
 
 - (void)_asyncInitSDK {
+    if (self.isShutdown) {
+        DLog(@"INIT SDK. Already shutdown. Returning.");
+        return;
+    }
+
+    if (self.initializing) {
+        DLog(@"INIT SDK. Already initializing.");
+        return;
+    }
+
     __weak SecurifiToolkit *block_self = self;
 
     dispatch_async(self.commandDispatchQueue, ^() {
@@ -241,7 +251,7 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
         block_self.initializing = NO;
 
         // Request updates to the almond; See onLoginResponse handler for logic handling first-time login and follow-on requests.
-        [block_self asyncRequestAlmondUpdates];
+        [block_self asyncRequestAlmondUpdates:singleTon];
     });
 }
 
@@ -357,7 +367,7 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 
             // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
             // But the client was not logged in. Send them now...
-            [self asyncRequestAlmondUpdates];
+            [self asyncRequestAlmondUpdates:self.networkSingleton];
         }
     }
     else {
@@ -458,11 +468,6 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     return [SFIOfflineDataManager readAlmondList];
 }
 
-- (void)asyncRequestAlmondList {
-    GenericCommand *cloudCommand = [self makeAlmondListCommand];
-    [self asyncSendToCloud:cloudCommand];
-}
-
 - (void)asyncRequestDeviceHash:(NSString *)almondMac {
     GenericCommand *cloudCommand = [self makeDeviceHashCommand:almondMac];
     [self asyncSendToCloud:cloudCommand];
@@ -479,25 +484,27 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     [self asyncSendToCloud:cloudCommand];
 }
 
-- (void)asyncRequestCurrentAlmondDeviceHash {
-    SFIAlmondPlus *plus = [self currentAlmond];
-    if (plus == nil) {
-        return;
-    }
-
-    GenericCommand *command = [self makeDeviceHashCommand:plus.almondplusMAC];
-    [self asyncSendToCloud:command];
-}
-
-- (void)asyncRequestAlmondUpdates {
+- (void)asyncRequestAlmondUpdates:(SingleTon *)socket  {
     // After successful login, refresh the Almond list and hash values.
     // This routine is important because the UI will listen for outcomes to these requests.
     // Specifically, the event kSFIDidUpdateAlmondList.
-    DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
-    [self asyncRequestAlmondList];
-
-    DLog(@"%s: requesting hash for current almond", __PRETTY_FUNCTION__);
-    [self asyncRequestCurrentAlmondDeviceHash];
+    
+    __weak SecurifiToolkit *block_self = self;
+    dispatch_async(self.commandDispatchQueue, ^() {
+        GenericCommand *cmd;
+    
+        DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
+        cmd = [block_self makeAlmondListCommand];
+        [block_self internalSendToCloud:socket command:cmd];
+    
+        SFIAlmondPlus *plus = [block_self currentAlmond];
+        if (plus == nil) {
+            return;
+        }
+        DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, plus.almondplusMAC);
+        cmd = [block_self makeDeviceHashCommand:plus.almondplusMAC];
+        [block_self internalSendToCloud:socket command:cmd];
+    });
 }
 
 #pragma mark - Device value updates
@@ -791,5 +798,42 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
+/*
+- (void)onDeviceHashResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    DeviceDataHashResponse *obj = (DeviceDataHashResponse *) [data valueForKey:@"data"];
+    if (!obj.isSuccessful) {
+        return;
+    }
+
+    NSString *currentHash = obj.almondHash;
+    if (currentHash.length == 0) {
+        return;
+    }
+
+    if (![currentHash isEqualToString:@"null"]) {
+        if ([currentHash isEqualToString:self.offlineHash]) {
+            //[SNLog Log:@"%s: Hash Match: Get Device Values", __PRETTY_FUNCTION__];
+            //Get Device Values
+            [self sendDeviceValueCommand];
+        }
+        else {
+            //Save hash in file for each almond
+            [SFIOfflineDataManager writeHashList:currentHash currentMAC:self.currentMAC];
+            //Get Device List
+            [self sendDeviceListCommand];
+        }
+    }
+    else {
+        //Hash sent by cloud as null - No Device
+//        [self.HUD hide:YES];
+    }
+}
+*/
 
 @end
