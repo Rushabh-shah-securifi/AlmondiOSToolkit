@@ -95,10 +95,10 @@
 
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
-    [description appendFormat:@"self.counterTag=%d", self.counterTag];
+    [description appendFormat:@"self.counterTag=%ld", (long)self.counterTag];
     [description appendFormat:@", self.command=%@", self.command];
     [description appendFormat:@", command.data=%@", self.command.command];
-    [description appendFormat:@", self.processingState=%d", self.processingState];
+    [description appendFormat:@", self.processingState=%lu", self.processingState];
     [description appendFormat:@", self.completion_latch=%@", self.completion_latch];
     [description appendString:@">"];
     return description;
