@@ -98,7 +98,10 @@ extern NSString *const kSFIDidChangeAlmondName;
 - (NSString*)currentAlmondName;
 
 - (NSArray*)almondList;
-- (void)asyncLoadAlmondList;
+
+- (void)asyncRequestDeviceHash:(NSString *)almondMac;
+
+- (void)asyncRequestDeviceList:(NSString *)almondMac;
 
 - (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac;
 

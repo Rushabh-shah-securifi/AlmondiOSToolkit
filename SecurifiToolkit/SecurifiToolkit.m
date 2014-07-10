@@ -29,9 +29,9 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property (nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
-@property (weak, nonatomic) SingleTon *networkSingleton;
-@property BOOL initializing; // when TRUE an op is already in progress to set up a network
-@property BOOL isShutdown;
+@property (nonatomic, weak) SingleTon *networkSingleton;
+@property (atomic) BOOL initializing; // when TRUE an op is already in progress to set up a network
+@property (atomic) BOOL isShutdown;
 @end
 
 @implementation SecurifiToolkit
@@ -61,8 +61,9 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
         [center addObserver:self selector:@selector(onLogoutResponse:) name:LOGOUT_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutAllResponse:) name:LOGOUT_ALL_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDynamicAlmondListAdd:) name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
-        [center addObserver:self selector:@selector(dynamicAlmondListDeleteCallback:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
-        [center addObserver:self selector:@selector(dynamicAlmondNameChangeCallback:) name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDynamicAlmondListDelete:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDynamicAlmondNameChange:) name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
     }
 
     return self;
@@ -77,6 +78,7 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     [center removeObserver:self name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
     [center removeObserver:self name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
     [center removeObserver:self name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
+    [center removeObserver:self name:ALMOND_LIST_NOTIFIER object:nil];
 }
 
 - (SingleTon*)setupNetworkSingleton {
@@ -99,6 +101,7 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     SingleTon *old = self.networkSingleton;
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
+
     DLog(@"Finished tear down of network singleton");
 }
 
@@ -175,65 +178,71 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 }
 
 - (void)_asyncInitSDK {
-    if (self.isShutdown) {
-        DLog(@"INIT SDK. Already shutdown. Returning.");
-        return;
-    }
-    if (self.initializing) {
-        DLog(@"INIT SDK. Already initializing.");
-        return;
-    }
-    self.initializing = YES;
-    NSLog(@"INIT SDK");
+    __weak SecurifiToolkit *block_self = self;
 
-    SingleTon *singleTon = [self setupNetworkSingleton];
+    dispatch_async(self.commandDispatchQueue, ^() {
+        if (block_self.isShutdown) {
+            DLog(@"INIT SDK. Already shutdown. Returning.");
+            return;
+        }
+        if (block_self.initializing) {
+            DLog(@"INIT SDK. Already initializing.");
+            return;
+        }
+        block_self.initializing = YES;
+        NSLog(@"INIT SDK");
 
-    // After setting up the network, we need to do some basic things
-    // 1. send sanity cmd to test the socket
-    // 2. logon
-    // 3. update the devices list
-    // 4. check hashes etc.
+        SingleTon *singleTon = [block_self setupNetworkSingleton];
 
-    GenericCommand *cmd;
-    BOOL cmdSendSuccess;
+        // After setting up the network, we need to do some basic things
+        // 1. send sanity cmd to test the socket
+        // 2. logon
+        // 3. update the devices list
+        // 4. check hashes etc.
 
-    // Send sanity command testing network connection
-    cmd = [self makeCloudSanityCommand];
-    cmdSendSuccess = [self internalSendToCloud:singleTon command:cmd];
-    if (!cmdSendSuccess) {
-        NSLog(@"%s: init SDK: send sanity failed:", __PRETTY_FUNCTION__);
-        singleTon.connectionState = SDKCloudStatusNetworkDown;
-        self.initializing = NO;
-        return;
-    }
+        GenericCommand *cmd;
+        BOOL cmdSendSuccess;
 
-    DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
-    DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+        // Send sanity command testing network connection
+        cmd = [block_self makeCloudSanityCommand];
+        cmdSendSuccess = [block_self internalSendToCloud:singleTon command:cmd];
+        if (!cmdSendSuccess) {
+            NSLog(@"%s: init SDK: send sanity failed:", __PRETTY_FUNCTION__);
+            singleTon.connectionState = SDKCloudStatusNetworkDown;
+            block_self.initializing = NO;
+            return;
+        }
 
-    // If no logon credentials, then initialization is completed.
-    if (![self hasLoginCredentials]) {
-        DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
-        singleTon.connectionState = SDKCloudStatusNotLoggedIn;
-        self.initializing = NO;
+        DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
+        DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
 
-        // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
-        [self postNotification:kSFIDidLogoutNotification data:nil];
-        return;
-    }
+        // If no logon credentials, then initialization is completed.
+        if (![block_self hasLoginCredentials]) {
+            DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
+            singleTon.connectionState = SDKCloudStatusNotLoggedIn;
+            block_self.initializing = NO;
 
-    // Send logon credentials
-    DLog(@"%s: Sending temp pass credentials", __PRETTY_FUNCTION__);
-    singleTon.connectionState = SDKCloudStatusLoginInProcess;
+            // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
+            // We probably should track things down and find a way to remove a dependency on this event in the UI.
+            [block_self postNotification:kSFIDidLogoutNotification data:nil];
+            return;
+        }
 
-    cmd = [self makeTempPassLoginCommand];
-    cmdSendSuccess = [self internalSendToCloud:singleTon command:cmd];
-    if (!cmdSendSuccess) {
-        DLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
-        singleTon.connectionState = SDKCloudStatusNetworkDown;
-    }
-    self.initializing = NO;
+        // Send logon credentials
+        singleTon.connectionState = SDKCloudStatusLoginInProcess;
 
+        DLog(@"%s: sending temp pass credentials", __PRETTY_FUNCTION__);
+        cmd = [block_self makeTempPassLoginCommand];
+        cmdSendSuccess = [block_self internalSendToCloud:singleTon command:cmd];
+        if (!cmdSendSuccess) {
+            DLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
+            singleTon.connectionState = SDKCloudStatusNetworkDown;
+        }
+        block_self.initializing = NO;
 
+        // Request updates to the almond; See onLoginResponse handler for logic handling first-time login and follow-on requests.
+        [block_self asyncRequestAlmondUpdates];
+    });
 }
 
 - (void)shutdown {
@@ -265,8 +274,14 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 //      b. if no response or bad response, kill connection and mark SingleTon as dead
 //      c. if good response, then process next command
 
+- (void)asyncSendToCloud:(GenericCommand*)command {
+    if (self.isShutdown) {
+        DLog(@"SDK is shutdown. Returning.");
+        return;
+    }
 
-- (void)asyncSendToCloud:(SingleTon *)socket command:(GenericCommand *)command {
+    // Initialize network if need be
+    SingleTon *socket = self.networkSingleton;
     if (socket == nil || (!socket.isStreamConnected && !self.initializing)) {
         // Set up network and wait
         //
@@ -274,22 +289,16 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
         [self _asyncInitSDK];
     }
 
-    BOOL success = [self internalSendToCloud:socket command:command];
-    if (success) {
-        DLog(@"[Generic cmd: %d] send success", command.commandType);
-    }
-    else {
-        DLog(@"[Generic cmd: %d] send error", command.commandType);
-    }
-}
-
-- (void)asyncSendToCloud:(GenericCommand*)command {
-    if (self.isShutdown) {
-        DLog(@"SDK is shutdown. Returning.");
-        return;
-    }
-
-    [self asyncSendToCloud:self.networkSingleton command:command];
+    __weak SecurifiToolkit *block_self = self;
+    dispatch_async(self.commandDispatchQueue, ^() {
+        BOOL success = [block_self internalSendToCloud:block_self.networkSingleton command:command];
+        if (success) {
+            DLog(@"[Generic cmd: %d] send success", command.commandType);
+        }
+        else {
+            DLog(@"[Generic cmd: %d] send error", command.commandType);
+        }
+    });
 }
 
 #pragma mark - Cloud Logon
@@ -340,8 +349,16 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     LoginResponse *res = info[@"data"];
 
     if (res.isSuccessful) {
-        // The response will contain the TempPass token, which we store in the keychain.
-        [self storeLoginCredentials:res];
+        // Password is always cleared prior to submitting a fresh login from the UI.
+        if (![self hasSecPassword]) {
+            // So, if no password is in the keychain, then we know the temp pass needs to be stored on successful login response.
+            // The response will contain the TempPass token, which we store in the keychain. The original password is not stored.
+            [self storeLoginCredentials:res];
+
+            // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
+            // But the client was not logged in. Send them now...
+            [self asyncRequestAlmondUpdates];
+        }
     }
     else {
         // Ensure all credentials are cleared
@@ -441,13 +458,49 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     return [SFIOfflineDataManager readAlmondList];
 }
 
-- (void)asyncLoadAlmondList {
+- (void)asyncRequestAlmondList {
+    GenericCommand *cloudCommand = [self makeAlmondListCommand];
+    [self asyncSendToCloud:cloudCommand];
+}
+
+- (void)asyncRequestDeviceHash:(NSString *)almondMac {
+    GenericCommand *cloudCommand = [self makeDeviceHashCommand:almondMac];
+    [self asyncSendToCloud:cloudCommand];
+}
+
+- (void)asyncRequestDeviceList:(NSString *)almondMac {
+    DeviceListRequest *deviceListCommand = [[DeviceListRequest alloc] init];
+    deviceListCommand.almondMAC = almondMac;
+
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = ALMOND_LIST;
-    cloudCommand.command = [AlmondListRequest new];
+    cloudCommand.commandType = DEVICEDATA;
+    cloudCommand.command = deviceListCommand;
 
     [self asyncSendToCloud:cloudCommand];
 }
+
+- (void)asyncRequestCurrentAlmondDeviceHash {
+    SFIAlmondPlus *plus = [self currentAlmond];
+    if (plus == nil) {
+        return;
+    }
+
+    GenericCommand *command = [self makeDeviceHashCommand:plus.almondplusMAC];
+    [self asyncSendToCloud:command];
+}
+
+- (void)asyncRequestAlmondUpdates {
+    // After successful login, refresh the Almond list and hash values.
+    // This routine is important because the UI will listen for outcomes to these requests.
+    // Specifically, the event kSFIDidUpdateAlmondList.
+    DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
+    [self asyncRequestAlmondList];
+
+    DLog(@"%s: requesting hash for current almond", __PRETTY_FUNCTION__);
+    [self asyncRequestCurrentAlmondDeviceHash];
+}
+
+#pragma mark - Device value updates
 
 - (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac {
     [SFIOfflineDataManager writeDeviceValueList:deviceList currentMAC:almondMac];
@@ -474,6 +527,24 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     return cloudCommand;
 }
 
+- (GenericCommand *)makeAlmondListCommand {
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = ALMOND_LIST;
+    cloudCommand.command = [AlmondListRequest new];
+    return cloudCommand;
+}
+
+- (GenericCommand *)makeDeviceHashCommand:(NSString *)almondMac {
+    DeviceDataHashRequest *deviceHashCommand = [[DeviceDataHashRequest alloc] init];
+    deviceHashCommand.almondMAC = almondMac;
+
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = DEVICEDATA_HASH;
+    cloudCommand.command = deviceHashCommand;
+
+    return cloudCommand;
+}
+
 #pragma mark - Network reconnection handling
 
 - (void)onReachabilityDidChange:(id)notification {
@@ -482,12 +553,6 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 
 #pragma mark - Keychain Access
 
-- (void)clearSecCredentials {
-    [KeyChainWrapper removeEntryForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
-    [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
-    [KeyChainWrapper removeEntryForUserEmail:SEC_USER_ID forService:SEC_SERVICE_NAME];
-}
-
 - (BOOL)hasLoginCredentials {
     // Keychains persist after an app is deleted. Therefore, to ensure credentials are "wiped out",
     // we keep track of whether this is a new install by storing a value in user defaults.
@@ -495,6 +560,12 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     BOOL logged_in_once = [defaults boolForKey:SEC_USER_DEFAULT_LOGGED_IN_ONCE];
 
     return logged_in_once && [self hasSecEmail] && [self hasSecPassword];
+}
+
+- (void)clearSecCredentials {
+    [KeyChainWrapper removeEntryForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_USER_ID forService:SEC_SERVICE_NAME];
 }
 
 - (BOOL)hasSecPassword {
@@ -616,7 +687,7 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
-- (void)dynamicAlmondListDeleteCallback:(id)sender {
+- (void)onDynamicAlmondListDelete:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -667,7 +738,7 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
-- (void)dynamicAlmondNameChangeCallback:(id)sender {
+- (void)onDynamicAlmondNameChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -702,6 +773,23 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     }
 }
 
+#pragma mark - Almond Responses
+
+- (void)onAlmondListResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
+    if (obj.isSuccessful) {
+        //Write Almond List offline
+        [SFIOfflineDataManager writeAlmondList:obj.almondPlusMACList];
+    }
+
+    [self postNotification:kSFIDidUpdateAlmondList data:nil];
+}
 
 
 @end
