@@ -64,8 +64,8 @@ extern NSString *const kSFIDidUpdateAlmondList;
 // Notification posted when an Almond's name has changed
 extern NSString *const kSFIDidChangeAlmondName;
 
-// Notification posted when a device's data has changed
-extern NSString *const kSFIDidChangeDeviceData;
+// Notification posted when the device list has changed
+extern NSString *const kSFIDidChangeDeviceList;
 
 extern NSString *const kSFIDidChangeDeviceValueList;
 
@@ -106,6 +106,8 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 - (void)asyncRequestDeviceHash:(NSString *)almondMac;
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac;
+
+- (void)asyncRequestDeviceValueList:(NSString *)almondMac;
 
 - (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac;
 
