@@ -45,7 +45,6 @@
 #import <SecurifiToolkit/SensorChangeResponse.h>
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>
 #import <SecurifiToolkit/DynamicAlmondNameChangeResponse.h>
-#import <SecurifiToolkit/SFIDatabaseUpdateService.h>
 #import <SecurifiToolkit/SFIOfflineDataManager.h>
 
 // Notification posted at the conclusion of a Login attempt.

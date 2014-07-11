@@ -28,8 +28,6 @@
 		1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBCE19480D6C00E353D1 /* Reachability.m */; };
 		1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */; };
-		1CA35360194ED4410042D429 /* SFIDatabaseUpdateService.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535C194ED4410042D429 /* SFIDatabaseUpdateService.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1CA35361194ED4410042D429 /* SFIDatabaseUpdateService.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535D194ED4410042D429 /* SFIDatabaseUpdateService.m */; };
 		1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */; };
 		1DF0303A77013C449B86C26B /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF033FE398C1B48B1CA5CCC /* SUnit.h */; };
@@ -181,8 +179,6 @@
 		1C23FBCE19480D6C00E353D1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIReachabilityManager.h; sourceTree = "<group>"; };
 		1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIReachabilityManager.m; sourceTree = "<group>"; };
-		1CA3535C194ED4410042D429 /* SFIDatabaseUpdateService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIDatabaseUpdateService.h; sourceTree = "<group>"; };
-		1CA3535D194ED4410042D429 /* SFIDatabaseUpdateService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIDatabaseUpdateService.m; sourceTree = "<group>"; };
 		1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIOfflineDataManager.h; sourceTree = "<group>"; };
 		1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIOfflineDataManager.m; sourceTree = "<group>"; };
 		1DF033FE398C1B48B1CA5CCC /* SUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUnit.h; path = Network/SUnit.h; sourceTree = "<group>"; };
@@ -342,8 +338,6 @@
 		1CA3535B194ED4410042D429 /* OfflineStorage */ = {
 			isa = PBXGroup;
 			children = (
-				1CA3535C194ED4410042D429 /* SFIDatabaseUpdateService.h */,
-				1CA3535D194ED4410042D429 /* SFIDatabaseUpdateService.m */,
 				1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */,
 				1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */,
 			);
@@ -651,7 +645,6 @@
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
-				1CA35360194ED4410042D429 /* SFIDatabaseUpdateService.h in Headers */,
 				1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */,
 				1DF0303A77013C449B86C26B /* SUnit.h in Headers */,
 			);
@@ -850,7 +843,6 @@
 				CE5EB65717EAD44E00985636 /* SFIDeviceValue.m in Sources */,
 				CE9A2917188D30270063D562 /* SensorChangeResponse.m in Sources */,
 				CE466A601823CFF900E55DF9 /* ResetPasswordRequest.m in Sources */,
-				1CA35361194ED4410042D429 /* SFIDatabaseUpdateService.m in Sources */,
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
 				22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */,
 				CE539F8F17FAD40B00640820 /* SNLog.m in Sources */,
