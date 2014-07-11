@@ -98,7 +98,7 @@
     [description appendFormat:@"self.counterTag=%ld", (long)self.counterTag];
     [description appendFormat:@", self.command=%@", self.command];
     [description appendFormat:@", command.data=%@", self.command.command];
-    [description appendFormat:@", self.processingState=%u", self.processingState];
+    [description appendFormat:@", self.processingState=%lu", (unsigned long)self.processingState];
     [description appendFormat:@", self.completion_latch=%@", self.completion_latch];
     [description appendString:@">"];
     return description;
