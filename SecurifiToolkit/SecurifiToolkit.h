@@ -65,6 +65,11 @@ extern NSString *const kSFIDidUpdateAlmondList;
 // Notification posted when an Almond's name has changed
 extern NSString *const kSFIDidChangeAlmondName;
 
+// Notification posted when a device's data has changed
+extern NSString *const kSFIDidChangeDeviceData;
+
+extern NSString *const kSFIDidChangeDeviceValueList;
+
 @interface SecurifiToolkit : NSObject
 
 + (instancetype)sharedInstance;

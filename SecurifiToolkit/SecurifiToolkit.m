@@ -25,6 +25,8 @@ NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
 NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
 NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
+NSString *const kSFIDidChangeDeviceData = @"kSFIDidChangeDeviceData";
+NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
@@ -63,6 +65,8 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
         [center addObserver:self selector:@selector(onDynamicAlmondListAdd:) name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDynamicAlmondListDelete:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDynamicAlmondNameChange:) name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDynamicDeviceDataChange:) name:DEVICE_DATA_CLOUD_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DEVICE_VALUE_CLOUD_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
     }
 
@@ -78,6 +82,8 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
     [center removeObserver:self name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
     [center removeObserver:self name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
     [center removeObserver:self name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
+    [center removeObserver:self name:DEVICE_DATA_CLOUD_NOTIFIER object:nil];
+    [center removeObserver:self name:DEVICE_VALUE_CLOUD_NOTIFIER object:nil];
     [center removeObserver:self name:ALMOND_LIST_NOTIFIER object:nil];
 }
 
@@ -173,7 +179,6 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
         return;
     }
 
-    [[SFIDatabaseUpdateService sharedInstance] startDatabaseUpdateService];
     [self _asyncInitSDK];
 }
 
@@ -268,8 +273,6 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
         [block_self tearDownNetworkSingleton];
         block_self.networkSingleton = nil;
     });
-
-    [[SFIDatabaseUpdateService sharedInstance] stopDatabaseUpdateService];
 }
 
 #pragma mark - Command dispatch
@@ -778,6 +781,121 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
             return;
         }
     }
+}
+
+- (void)onDynamicDeviceDataChange:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
+    if (!obj.isSuccessful) {
+        return;
+    }
+
+    NSMutableArray *deviceList = obj.deviceList;
+    NSString *currentMAC = obj.almondMAC;
+
+
+    // Compare the list with device value list size and correct the list accordingly if any device was deleted
+    // Read device value list from storage
+    NSArray *oldDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
+
+    // Delete from the device value list
+    NSMutableArray *newDeviceValueList = [[NSMutableArray alloc] init];
+
+    // Devices have been removed
+    BOOL removedDevices = [deviceList count] < [oldDeviceValueList count];
+
+    if (removedDevices) {
+        for (SFIDevice *currentDevice in deviceList) {
+            for (SFIDeviceValue *offlineDeviceValue in oldDeviceValueList) {
+                if (currentDevice.deviceID == offlineDeviceValue.deviceID) {
+                    offlineDeviceValue.isPresent = TRUE;
+                    break;
+                }
+            }
+        }
+
+        for (SFIDeviceValue *offlineDeviceValue in oldDeviceValueList) {
+            if (offlineDeviceValue.isPresent) {
+                [newDeviceValueList addObject:offlineDeviceValue];
+            }
+        }
+    }
+
+    // Update offline storage
+    [SFIOfflineDataManager writeDeviceList:deviceList currentMAC:currentMAC];
+    if (removedDevices) {
+        [SFIOfflineDataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
+    }
+
+    // Tell the world so they can update their view
+    [self postNotification:kSFIDidChangeDeviceData data:currentMAC];
+}
+
+- (void)onDynamicDeviceValueListChange:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
+
+    NSString *currentMAC = obj.almondMAC;
+    NSMutableArray *cloudDeviceValueList = obj.deviceValueList;
+    NSArray *currentDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
+
+    NSMutableArray *mobileDeviceValueList;
+    if (currentDeviceValueList != nil) {
+        BOOL isDeviceFound = FALSE;
+        for (SFIDeviceValue *currentMobileValue in currentDeviceValueList) {
+
+            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
+                if (currentMobileValue.deviceID == currentCloudValue.deviceID) {
+                    isDeviceFound = TRUE;
+                    currentCloudValue.isPresent = TRUE;
+
+                    NSMutableArray *mobileDeviceKnownValues = currentMobileValue.knownValues;
+                    NSMutableArray *cloudDeviceKnownValues = currentCloudValue.knownValues;
+
+                    for (SFIDeviceKnownValues *currentMobileKnownValue in mobileDeviceKnownValues) {
+
+                        for (SFIDeviceKnownValues *currentCloudKnownValue in cloudDeviceKnownValues) {
+                            if (currentMobileKnownValue.index == currentCloudKnownValue.index) {
+                                //Update Value
+                                [currentMobileKnownValue setValue:currentCloudKnownValue.value];
+                                break;
+                            }
+                        }
+                    }
+                    [currentMobileValue setKnownValues:mobileDeviceKnownValues];
+                }
+            }
+        }
+
+        mobileDeviceValueList = [NSMutableArray arrayWithArray:currentDeviceValueList];
+        if (!isDeviceFound) {
+            //Traverse the list and add the new value to offline list
+            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
+                if (!currentCloudValue.isPresent) {
+                    [mobileDeviceValueList addObject:currentCloudValue];
+                }
+            }
+        }
+    }
+    else {
+        mobileDeviceValueList = cloudDeviceValueList;
+    }
+
+    //deviceValueList = mobileDeviceValueList;
+    //Update offline storage
+    [SFIOfflineDataManager writeDeviceValueList:mobileDeviceValueList currentMAC:currentMAC];
+
+    [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
 
 #pragma mark - Almond Responses

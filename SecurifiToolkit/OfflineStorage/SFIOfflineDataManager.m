@@ -10,179 +10,278 @@
 #import "AlmondPlusSDKConstants.h"
 #import "SFIAlmondPlus.h"
 
+@interface SFIOfflineDataManager ()
+@property(nonatomic, readonly) NSObject *syncLocker;
+@end
+
 @implementation SFIOfflineDataManager
+
++ (instancetype)sharedInstance {
+    static dispatch_once_t once_predicate;
+    static SFIOfflineDataManager *singleton = nil;
+
+    dispatch_once(&once_predicate, ^{
+        singleton = [SFIOfflineDataManager new];
+    });
+
+    return singleton;
+}
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _syncLocker = [NSObject new];
+    }
+
+    return self;
+}
+
 
 //Write AlmondList for the current user to offline storage
 + (BOOL)writeAlmondList:(NSArray *)arrayAlmondList {
-//    SNFileLogger *logger = [[SNFileLogger alloc] init];
-//    [// [SNLog logManager] addLogStrategy:logger];
-    // [SNLog Log:@"Method Name: %s Write to file! Almond List", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:ALMONDLIST_FILENAME];
-
-    NSArray *arAlmondList = [arrayAlmondList copy];
-    BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:arAlmondList toFile:filePath];
-    // BOOL didWriteSuccessful = [arAlmondList writeToFile:filePath atomically:YES];
-    return didWriteSuccessful;
+    return [[SFIOfflineDataManager sharedInstance] _writeAlmondList:arrayAlmondList];
 }
+
+- (BOOL)_writeAlmondList:(NSArray *)arrayAlmondList {
+    @synchronized (self.syncLocker) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:ALMONDLIST_FILENAME];
+
+        NSArray *arAlmondList = [arrayAlmondList copy];
+        BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:arAlmondList toFile:filePath];
+        // BOOL didWriteSuccessful = [arAlmondList writeToFile:filePath atomically:YES];
+        return didWriteSuccessful;
+    }
+}
+
 
 //Read AlmondList for the current user from offline storage
 + (NSMutableArray *)readAlmondList {
-//    SNFileLogger *logger = [[SNFileLogger alloc] init];
-//    [// [SNLog logManager] addLogStrategy:logger];
-    // [SNLog Log:@"Method Name: %s Read from file! Almond List", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:ALMONDLIST_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _readAlmondList];
+}
 
-    //NSArray * arAlmondList = [NSArray arrayWithContentsOfFile:filePath];
-    NSArray *arAlmondList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    // [SNLog Log:@"Method Name: %s Almond List: Size: %d", __PRETTY_FUNCTION__,[arAlmondList count]];
-    return [NSMutableArray arrayWithArray:arAlmondList];
+//Read AlmondList for the current user from offline storage
+- (NSMutableArray *)_readAlmondList {
+    @synchronized (self.syncLocker) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:ALMONDLIST_FILENAME];
+
+        //NSArray * arAlmondList = [NSArray arrayWithContentsOfFile:filePath];
+        NSArray *arAlmondList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        // [SNLog Log:@"Method Name: %s Almond List: Size: %d", __PRETTY_FUNCTION__,[arAlmondList count]];
+        return [NSMutableArray arrayWithArray:arAlmondList];
+    }
 }
 
 //Write HashList for the current user to offline storage
 + (BOOL)writeHashList:(NSString *)strHashValue currentMAC:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Write to file! Hash List", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:HASH_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _writeHashList:strHashValue currentMAC:strCurrentMAC];
+}
 
-    NSMutableDictionary *mutableDictHashList = [NSMutableDictionary dictionary];
-    [mutableDictHashList setValue:strHashValue forKey:strCurrentMAC];
+//Write HashList for the current user to offline storage
+- (BOOL)_writeHashList:(NSString *)strHashValue currentMAC:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:HASH_FILENAME];
 
-    NSDictionary *dictHashList = [mutableDictHashList copy];
+        NSMutableDictionary *mutableDictHashList = [NSMutableDictionary dictionary];
+        [mutableDictHashList setValue:strHashValue forKey:strCurrentMAC];
 
-    //Write
-    BOOL didWriteSuccessful = [dictHashList writeToFile:filePath atomically:YES];
-    return didWriteSuccessful;
+        NSDictionary *dictHashList = [mutableDictHashList copy];
+
+        //Write
+        BOOL didWriteSuccessful = [dictHashList writeToFile:filePath atomically:YES];
+        return didWriteSuccessful;
+    }
 }
 
 //Read HashList for the current user from offline storage
 + (NSString *)readHashList:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Read from file! Hash List", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:HASH_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _readHashList:strCurrentMAC];
+}
 
-    NSDictionary *dictHashList = [NSDictionary dictionaryWithContentsOfFile:filePath];
-    //Read the current almond's device list from the hashmap
-    NSString *strHashValue = [dictHashList valueForKey:strCurrentMAC];
-    return strHashValue;
+//Read HashList for the current user from offline storage
+- (NSString *)_readHashList:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        // [SNLog Log:@"Method Name: %s Read from file! Hash List", __PRETTY_FUNCTION__];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:HASH_FILENAME];
+
+        NSDictionary *dictHashList = [NSDictionary dictionaryWithContentsOfFile:filePath];
+        //Read the current almond's device list from the hashmap
+        NSString *strHashValue = [dictHashList valueForKey:strCurrentMAC];
+        return strHashValue;
+    }
 }
 
 + (BOOL)purgeAll {
-    [SFIOfflineDataManager deleteFile:ALMONDLIST_FILENAME];
-    [SFIOfflineDataManager deleteFile:HASH_FILENAME];
-    [SFIOfflineDataManager deleteFile:DEVICELIST_FILENAME];
-    [SFIOfflineDataManager deleteFile:DEVICEVALUE_FILENAME];
-    return YES;
+    return [[SFIOfflineDataManager sharedInstance] _purgeAll];
+}
+
+- (BOOL)_purgeAll {
+    @synchronized (self.syncLocker) {
+        [SFIOfflineDataManager deleteFile:ALMONDLIST_FILENAME];
+        [SFIOfflineDataManager deleteFile:HASH_FILENAME];
+        [SFIOfflineDataManager deleteFile:DEVICELIST_FILENAME];
+        [SFIOfflineDataManager deleteFile:DEVICEVALUE_FILENAME];
+        return YES;
+    }
 }
 
 + (void)deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
-    NSString *mac = deletedAlmond.almondplusMAC;
-    [SFIOfflineDataManager deleteHashForAlmond:mac];
-    [SFIOfflineDataManager deleteDeviceDataForAlmond:mac];
-    [SFIOfflineDataManager deleteDeviceValueForAlmond:mac];
+    return [[SFIOfflineDataManager sharedInstance] _deleteAlmond:deletedAlmond];
+}
+
+- (void)_deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
+    @synchronized (self.syncLocker) {
+        NSString *mac = deletedAlmond.almondplusMAC;
+        [SFIOfflineDataManager deleteHashForAlmond:mac];
+        [SFIOfflineDataManager deleteDeviceDataForAlmond:mac];
+        [SFIOfflineDataManager deleteDeviceValueForAlmond:mac];
+    }
 }
 
 //Delete HashList for the deleted almond from offline storage
 + (void)deleteHashForAlmond:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Read from file! Delete Almond Hash", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:HASH_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _deleteHashForAlmond:strCurrentMAC];
+}
 
-    //Remove current hash from the dictionary
-    NSMutableDictionary *mutableDictHashList = [[NSDictionary dictionaryWithContentsOfFile:filePath] mutableCopy];
-    [mutableDictHashList removeObjectForKey:strCurrentMAC];
-    NSDictionary *dictHashList = [mutableDictHashList copy];
-    [dictHashList writeToFile:filePath atomically:YES];
+//Delete HashList for the deleted almond from offline storage
+- (void)_deleteHashForAlmond:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        // [SNLog Log:@"Method Name: %s Read from file! Delete Almond Hash", __PRETTY_FUNCTION__];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:HASH_FILENAME];
+
+        //Remove current hash from the dictionary
+        NSMutableDictionary *mutableDictHashList = [[NSDictionary dictionaryWithContentsOfFile:filePath] mutableCopy];
+        [mutableDictHashList removeObjectForKey:strCurrentMAC];
+        NSDictionary *dictHashList = [mutableDictHashList copy];
+        [dictHashList writeToFile:filePath atomically:YES];
+    }
 }
 
 //Write Device List for the current MAC to offline storage
 + (BOOL)writeDeviceList:(NSArray *)deviceList currentMAC:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Write to file! Device List", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _writeDeviceList:deviceList currentMAC:strCurrentMAC];
+}
 
-    //Read the entire dictionary from the list
-    NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    if (dictDeviceList == nil) {
-        // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
-        dictDeviceList = [[NSMutableDictionary alloc] init];
+//Write Device List for the current MAC to offline storage
+- (BOOL)_writeDeviceList:(NSArray *)deviceList currentMAC:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        // [SNLog Log:@"Method Name: %s Write to file! Device List", __PRETTY_FUNCTION__];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
+
+        //Read the entire dictionary from the list
+        NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        if (dictDeviceList == nil) {
+            // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
+            dictDeviceList = [[NSMutableDictionary alloc] init];
+        }
+        [dictDeviceList setObject:deviceList forKey:strCurrentMAC];
+        //Create NSDictionary for List and AlmondPlusMAC
+        BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
+        return didWriteSuccessful;
     }
-    [dictDeviceList setObject:deviceList forKey:strCurrentMAC];
-    //Create NSDictionary for List and AlmondPlusMAC
-    BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
-    return didWriteSuccessful;
 }
 
 //Read DeviceList for the current MAC from offline storage
 + (NSMutableArray *)readDeviceList:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Read from file! Device List", __PRETTY_FUNCTION__];
-    NSMutableArray *deviceList = nil;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _readDeviceList:strCurrentMAC];
+}
 
-    NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    //Read the current almond's device list from the hashmap
-    if (dictDeviceList != nil) {
-        deviceList = [dictDeviceList valueForKey:strCurrentMAC];
+//Read DeviceList for the current MAC from offline storage
+- (NSMutableArray *)_readDeviceList:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        // [SNLog Log:@"Method Name: %s Read from file! Device List", __PRETTY_FUNCTION__];
+        NSMutableArray *deviceList = nil;
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
+
+        NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        //Read the current almond's device list from the hashmap
+        if (dictDeviceList != nil) {
+            deviceList = [dictDeviceList valueForKey:strCurrentMAC];
+        }
+        return deviceList;
     }
-    return deviceList;
 }
 
 //Delete DeviceList for the deleted almond from offline storage
 + (void)deleteDeviceDataForAlmond:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Read from file! Delete Almond Device List", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _deleteDeviceDataForAlmond:strCurrentMAC];
+}
 
-    NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    //Remove the current almond's device list from the hashmap
-    [dictDeviceList removeObjectForKey:strCurrentMAC];
-    [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
+//Delete DeviceList for the deleted almond from offline storage
+- (void)_deleteDeviceDataForAlmond:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
+
+        NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        //Remove the current almond's device list from the hashmap
+        [dictDeviceList removeObjectForKey:strCurrentMAC];
+        [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
+    }
 }
 
 
 //Write DeviceValueList for the current MAC to offline storage
 + (BOOL)writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Write to file! Device Value List", __PRETTY_FUNCTION__];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICEVALUE_FILENAME];
+    return [[SFIOfflineDataManager sharedInstance] _writeDeviceValueList:deviceValueList currentMAC:strCurrentMAC];
+}
 
-    //Read the entire dictionary from the list
-    NSMutableDictionary *dictDeviceValueList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    if (dictDeviceValueList == nil) {
-        // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
-        dictDeviceValueList = [[NSMutableDictionary alloc] init];
+//Write DeviceValueList for the current MAC to offline storage
+- (BOOL)_writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        // [SNLog Log:@"Method Name: %s Write to file! Device Value List", __PRETTY_FUNCTION__];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICEVALUE_FILENAME];
+
+        //Read the entire dictionary from the list
+        NSMutableDictionary *dictDeviceValueList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        if (dictDeviceValueList == nil) {
+            // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
+            dictDeviceValueList = [[NSMutableDictionary alloc] init];
+        }
+        [dictDeviceValueList setObject:deviceValueList forKey:strCurrentMAC];
+        //Create NSDictionary for List and AlmondPlusMAC
+        BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceValueList toFile:filePath];
+        return didWriteSuccessful;
     }
-    [dictDeviceValueList setObject:deviceValueList forKey:strCurrentMAC];
-    //Create NSDictionary for List and AlmondPlusMAC
-    BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceValueList toFile:filePath];
-    return didWriteSuccessful;
 }
 
 //Read DeviceValueList for the current MAC from offline storage
-+ (NSMutableArray *)readDeviceValueList:(NSString *)strCurrentMAC {
-    // [SNLog Log:@"Method Name: %s Read from file! Device Value List", __PRETTY_FUNCTION__];
-    NSMutableArray *deviceValueList = nil;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = paths[0];
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICEVALUE_FILENAME];
++ (NSArray *)readDeviceValueList:(NSString *)strCurrentMAC {
+    return [[SFIOfflineDataManager sharedInstance] _readDeviceValueList:strCurrentMAC];
+}
 
-    NSMutableDictionary *dictDeviceValueList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    //Read the current almond's device list from the hashmap
-    if (dictDeviceValueList != nil) {
-        deviceValueList = [dictDeviceValueList valueForKey:strCurrentMAC];
+//Read DeviceValueList for the current MAC from offline storage
+- (NSArray *)_readDeviceValueList:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        // [SNLog Log:@"Method Name: %s Read from file! Device Value List", __PRETTY_FUNCTION__];
+        NSMutableArray *deviceValueList = nil;
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = paths[0];
+        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICEVALUE_FILENAME];
+
+        NSMutableDictionary *dictDeviceValueList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        //Read the current almond's device list from the hashmap
+        if (dictDeviceValueList != nil) {
+            deviceValueList = [dictDeviceValueList valueForKey:strCurrentMAC];
+        }
+        return deviceValueList;
     }
-    return deviceValueList;
 }
 
 //Delete DeviceValueList for the deleted almond from offline storage
