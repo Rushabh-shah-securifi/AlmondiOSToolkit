@@ -15,46 +15,17 @@
 
 @implementation SFIDatabaseUpdateService
 
-+ (instancetype)sharedInstance {
-    static dispatch_once_t once_predicate;
-    static SFIDatabaseUpdateService *singleton = nil;
-
-    dispatch_once(&once_predicate, ^{
-        singleton = [SFIDatabaseUpdateService new];
-    });
-
-    return singleton;
-}
-
 - (void)startDatabaseUpdateService {
     if (self.started) {
         return;
     }
     self.started = YES;
 
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
 
-    [center addObserver:self
-               selector:@selector(deviceDataCloudResponseCallback:)
-                   name:DEVICE_DATA_CLOUD_NOTIFIER
-                 object:nil];
-
-    [center addObserver:self
-               selector:@selector(deviceValueListResponseCallback:)
-                   name:DEVICE_VALUE_CLOUD_NOTIFIER
-                 object:nil];
 }
 
 - (void)stopDatabaseUpdateService {
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
 
-    [center removeObserver:self
-                      name:DEVICE_DATA_CLOUD_NOTIFIER
-                    object:nil];
-
-    [center removeObserver:self
-                      name:DEVICE_VALUE_CLOUD_NOTIFIER
-                    object:nil];
 }
 
 #pragma mark - Cloud command handlers

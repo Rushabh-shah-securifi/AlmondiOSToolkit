@@ -10,8 +10,6 @@
 
 @interface SFIDatabaseUpdateService : NSObject
 
-+ (instancetype)sharedInstance;
-
 - (void)startDatabaseUpdateService;
 
 - (void)stopDatabaseUpdateService;
