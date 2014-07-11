@@ -9,6 +9,7 @@
 #import "SFIOfflineDataManager.h"
 #import "AlmondPlusSDKConstants.h"
 #import "SFIAlmondPlus.h"
+#import "SecurifiCloudResources-Prefix.pch"
 
 @interface SFIOfflineDataManager ()
 @property(nonatomic, readonly) NSObject *syncLocker;
@@ -174,7 +175,8 @@
 //Write Device List for the current MAC to offline storage
 - (BOOL)_writeDeviceList:(NSArray *)deviceList currentMAC:(NSString *)strCurrentMAC {
     @synchronized (self.syncLocker) {
-        // [SNLog Log:@"Method Name: %s Write to file! Device List", __PRETTY_FUNCTION__];
+        DLog(@"writing device list: %@ %@", strCurrentMAC, deviceList);
+
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = paths[0];
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
@@ -200,14 +202,13 @@
 //Read DeviceList for the current MAC from offline storage
 - (NSMutableArray *)_readDeviceList:(NSString *)strCurrentMAC {
     @synchronized (self.syncLocker) {
-        // [SNLog Log:@"Method Name: %s Read from file! Device List", __PRETTY_FUNCTION__];
-        NSMutableArray *deviceList = nil;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = paths[0];
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
 
         NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        //Read the current almond's device list from the hashmap
+
+        NSMutableArray *deviceList = nil;
         if (dictDeviceList != nil) {
             deviceList = [dictDeviceList valueForKey:strCurrentMAC];
         }
@@ -243,7 +244,8 @@
 //Write DeviceValueList for the current MAC to offline storage
 - (BOOL)_writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC {
     @synchronized (self.syncLocker) {
-        // [SNLog Log:@"Method Name: %s Write to file! Device Value List", __PRETTY_FUNCTION__];
+        DLog(@"writing device value list: %@ %@", strCurrentMAC, deviceValueList);
+
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = paths[0];
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICEVALUE_FILENAME];
