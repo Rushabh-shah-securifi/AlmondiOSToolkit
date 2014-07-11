@@ -16,4 +16,10 @@
 //For Deletion Handling
 @property BOOL isPresent;
 
+- (id)initWithCoder:(NSCoder *)coder;
+
+- (void)encodeWithCoder:(NSCoder *)coder;
+
+- (NSString *)description;
+
 @end

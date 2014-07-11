@@ -10,28 +10,38 @@
 
 @implementation SFIDeviceKnownValues
 
-#define kName_AlmondIndex             @"Index"          //int
-#define kName_ValueName         @"ValueName"
-#define kName_ValueType         @"ValueType"
-#define kName_Value             @"Value"
-#define kName_IsUpdating        @"IsUpdating"
+- (id)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    if (self) {
+        self.index = (unsigned int) [coder decodeIntForKey:@"self.index"];
+        self.valueName = [coder decodeObjectForKey:@"self.valueName"];
+        self.valueType = [coder decodeObjectForKey:@"self.valueType"];
+        self.value = [coder decodeObjectForKey:@"self.value"];
+        self.isUpdating = [coder decodeBoolForKey:@"self.isUpdating"];
+    }
 
-- (void) encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:self.index forKey:kName_AlmondIndex];
-    [encoder encodeObject:self.valueName forKey:kName_ValueName];
-    [encoder encodeObject:self.valueType forKey:kName_ValueType];
-    [encoder encodeObject:self.value forKey:kName_Value];
-    [encoder encodeBool:self.isUpdating forKey:kName_IsUpdating];
-}
-
-- (id)initWithCoder:(NSCoder *)decoder {
-    self.index = (unsigned int)[decoder decodeIntForKey:kName_AlmondIndex];
-    self.valueName = [decoder decodeObjectForKey:kName_ValueName];
-    self.valueType = [decoder decodeObjectForKey:kName_ValueType];
-    self.value = [decoder decodeObjectForKey:kName_Value];
-    self.isUpdating = [decoder decodeBoolForKey:kName_IsUpdating];
     return self;
 }
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInt:self.index forKey:@"self.index"];
+    [coder encodeObject:self.valueName forKey:@"self.valueName"];
+    [coder encodeObject:self.valueType forKey:@"self.valueType"];
+    [coder encodeObject:self.value forKey:@"self.value"];
+    [coder encodeBool:self.isUpdating forKey:@"self.isUpdating"];
+}
+
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.index=%u", self.index];
+    [description appendFormat:@", self.valueName=%@", self.valueName];
+    [description appendFormat:@", self.valueType=%@", self.valueType];
+    [description appendFormat:@", self.value=%@", self.value];
+    [description appendFormat:@", self.isUpdating=%d", self.isUpdating];
+    [description appendString:@">"];
+    return description;
+}
+
 
 - (BOOL)hasValue {
     return self.value.length > 0;

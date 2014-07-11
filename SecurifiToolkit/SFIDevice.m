@@ -9,89 +9,88 @@
 #import "SFIDevice.h"
 
 @implementation SFIDevice
-@synthesize deviceID, deviceFunction, deviceName, deviceTechnology, deviceType, deviceTypeName;
-@synthesize zigBeeEUI64, zigBeeShortID;
-@synthesize allowNotification, associationTimestamp, friendlyDeviceType, OZWNode, valueCount;
-@synthesize isExpanded, imageName, mostImpValueIndex, mostImpValueName, stateIndex, isTampered;
-@synthesize isBatteryLow;
-@synthesize location, tamperValueIndex;
 
+- (id)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    if (self) {
+        self.deviceID = (unsigned int) [coder decodeIntForKey:@"self.deviceID"];
+        self.deviceName = [coder decodeObjectForKey:@"self.deviceName"];
+        self.OZWNode = [coder decodeObjectForKey:@"self.OZWNode"];
+        self.zigBeeShortID = [coder decodeObjectForKey:@"self.zigBeeShortID"];
+        self.zigBeeEUI64 = [coder decodeObjectForKey:@"self.zigBeeEUI64"];
+        self.deviceTechnology = (unsigned int) [coder decodeIntForKey:@"self.deviceTechnology"];
+        self.associationTimestamp = [coder decodeObjectForKey:@"self.associationTimestamp"];
+        self.deviceType = (unsigned int) [coder decodeIntForKey:@"self.deviceType"];
+        self.deviceTypeName = [coder decodeObjectForKey:@"self.deviceTypeName"];
+        self.friendlyDeviceType = [coder decodeObjectForKey:@"self.friendlyDeviceType"];
+        self.deviceFunction = [coder decodeObjectForKey:@"self.deviceFunction"];
+        self.allowNotification = [coder decodeObjectForKey:@"self.allowNotification"];
+        self.valueCount = (unsigned int) [coder decodeIntForKey:@"self.valueCount"];
+        self.location = [coder decodeObjectForKey:@"self.location"];
+        self.isExpanded = [coder decodeBoolForKey:@"self.isExpanded"];
+        self.imageName = [coder decodeObjectForKey:@"self.imageName"];
+        self.mostImpValueName = [coder decodeObjectForKey:@"self.mostImpValueName"];
+        self.mostImpValueIndex = [coder decodeIntForKey:@"self.mostImpValueIndex"];
+        self.stateIndex = [coder decodeIntForKey:@"self.stateIndex"];
+        self.isTampered = [coder decodeBoolForKey:@"self.isTampered"];
+        self.tamperValueIndex = [coder decodeIntForKey:@"self.tamperValueIndex"];
+        self.isBatteryLow = [coder decodeBoolForKey:@"self.isBatteryLow"];
+    }
 
-#define kName_ID                                @"ID"           //int
-#define kName_DeviceName                        @"DeviceName"
-#define kName_OZWNode                           @"OZWNode"
-#define kName_ZigBeeShortID                     @"ZigbeeShortID"
-#define kName_ZigBeeEUI64                       @"ZigbeeEUI64"
-#define kName_DeviceTechnology                  @"DeviceTechnology" //int
-#define kName_AssociationTimestamp              @"AssociationTimeStamp"
-#define kName_DeviceType                        @"DeviceType" //int
-#define kName_DeviceTypeName                    @"DeviceTypeName"
-#define kName_FriendlyDeviceType                @"FriendlyDeviceType"
-#define kName_DeviceFunction                    @"DeviceFunction"
-#define kName_AllowNotification                 @"AllowNotification"
-#define kName_ValueCount                        @"ValueCount" //int
-#define kName_IsExpanded                        @"IsExpanded" //bool
-#define kName_ImageName                         @"ImageName"
-#define kName_ImpValueName                      @"ImpValueName"
-#define kName_ImpValueIndex                     @"ImpValueIndex" //int
-#define kName_StateIndex                        @"StateIndex" //int
-#define kName_TamperIndex                       @"TamperIndex" //int
-#define kName_Location                          @"Location"
-#define kName_IsTampered                        @"Tampered" //BOOL
-#define kName_IsBatteryLow                      @"LowBattery" //BOOL
-
-- (void) encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:deviceID forKey:kName_ID];
-    [encoder encodeObject:deviceName forKey:kName_DeviceName];
-    [encoder encodeObject:OZWNode forKey:kName_OZWNode];
-    [encoder encodeObject:zigBeeShortID forKey:kName_ZigBeeShortID];
-    [encoder encodeObject:zigBeeEUI64 forKey:kName_ZigBeeEUI64];
-    [encoder encodeInteger:deviceTechnology forKey:kName_DeviceTechnology];
-    [encoder encodeObject:associationTimestamp forKey:kName_AssociationTimestamp];
-    [encoder encodeInteger:deviceType forKey:kName_DeviceType];
-    [encoder encodeObject:deviceTypeName forKey:kName_DeviceTypeName];
-    [encoder encodeObject:friendlyDeviceType forKey:kName_FriendlyDeviceType];
-    [encoder encodeObject:deviceFunction forKey:kName_DeviceFunction];
-    [encoder encodeObject:allowNotification forKey:kName_AllowNotification];
-    [encoder encodeInteger:valueCount forKey:kName_ValueCount];
-    [encoder encodeObject:location forKey:kName_Location];
-    
-    //PY 111013 - Integration with new UI
-    [encoder encodeBool:isExpanded forKey:kName_IsExpanded];
-    [encoder encodeObject:imageName forKey:kName_ImageName];
-    [encoder encodeObject:mostImpValueName forKey:kName_ImpValueName];
-    [encoder encodeInteger:mostImpValueIndex forKey:kName_ImpValueIndex];
-    [encoder encodeInteger:stateIndex forKey:kName_StateIndex];
-    [encoder encodeInteger:tamperValueIndex forKey:kName_TamperIndex];
-    [encoder encodeBool:isExpanded forKey:kName_IsTampered];
-    [encoder encodeBool:isExpanded forKey:kName_IsBatteryLow];
-}
-
-- (id)initWithCoder:(NSCoder *)decoder {
-    self.deviceID = (unsigned int) [decoder decodeIntForKey:kName_ID];
-    self.deviceName = [decoder decodeObjectForKey:kName_DeviceName];
-    self.OZWNode = [decoder decodeObjectForKey:kName_OZWNode];
-    self.zigBeeShortID = [decoder decodeObjectForKey:kName_ZigBeeShortID];
-    self.zigBeeEUI64 = [decoder decodeObjectForKey:kName_ZigBeeEUI64];
-    self.deviceTechnology = (unsigned int) [decoder decodeIntForKey:kName_DeviceTechnology];
-    self.associationTimestamp = [decoder decodeObjectForKey:kName_AssociationTimestamp];
-    self.deviceType = (unsigned int) [decoder decodeIntForKey:kName_DeviceType];
-    self.deviceTypeName = [decoder decodeObjectForKey:kName_DeviceTypeName];
-    self.friendlyDeviceType = [decoder decodeObjectForKey:kName_FriendlyDeviceType];
-    self.deviceFunction = [decoder decodeObjectForKey:kName_DeviceFunction];
-    self.allowNotification = [decoder decodeObjectForKey:kName_AllowNotification];
-    self.valueCount = (unsigned int) [decoder decodeIntForKey:kName_ValueCount];
-    self.location = [decoder decodeObjectForKey:kName_Location];
-    
-    //PY 111013 - Integration with new UI
-    self.isExpanded = [decoder decodeBoolForKey:kName_IsExpanded];
-    self.imageName = [decoder decodeObjectForKey:kName_ImageName];
-    self.mostImpValueName = [decoder decodeObjectForKey:kName_ImpValueName];
-    self.mostImpValueIndex = [decoder decodeIntForKey:kName_ImpValueIndex];
-    self.stateIndex = [decoder decodeIntForKey:kName_StateIndex];
-    self.isTampered = [decoder decodeBoolForKey:kName_IsTampered];
-    self.isBatteryLow = [decoder decodeBoolForKey:kName_IsBatteryLow];
-    self.tamperValueIndex = [decoder decodeIntForKey:kName_TamperIndex];
     return self;
 }
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInt:self.deviceID forKey:@"self.deviceID"];
+    [coder encodeObject:self.deviceName forKey:@"self.deviceName"];
+    [coder encodeObject:self.OZWNode forKey:@"self.OZWNode"];
+    [coder encodeObject:self.zigBeeShortID forKey:@"self.zigBeeShortID"];
+    [coder encodeObject:self.zigBeeEUI64 forKey:@"self.zigBeeEUI64"];
+    [coder encodeInt:self.deviceTechnology forKey:@"self.deviceTechnology"];
+    [coder encodeObject:self.associationTimestamp forKey:@"self.associationTimestamp"];
+    [coder encodeInt:self.deviceType forKey:@"self.deviceType"];
+    [coder encodeObject:self.deviceTypeName forKey:@"self.deviceTypeName"];
+    [coder encodeObject:self.friendlyDeviceType forKey:@"self.friendlyDeviceType"];
+    [coder encodeObject:self.deviceFunction forKey:@"self.deviceFunction"];
+    [coder encodeObject:self.allowNotification forKey:@"self.allowNotification"];
+    [coder encodeInt:self.valueCount forKey:@"self.valueCount"];
+    [coder encodeObject:self.location forKey:@"self.location"];
+    [coder encodeBool:self.isExpanded forKey:@"self.isExpanded"];
+    [coder encodeObject:self.imageName forKey:@"self.imageName"];
+    [coder encodeObject:self.mostImpValueName forKey:@"self.mostImpValueName"];
+    [coder encodeInt:self.mostImpValueIndex forKey:@"self.mostImpValueIndex"];
+    [coder encodeInt:self.stateIndex forKey:@"self.stateIndex"];
+    [coder encodeBool:self.isTampered forKey:@"self.isTampered"];
+    [coder encodeInt:self.tamperValueIndex forKey:@"self.tamperValueIndex"];
+    [coder encodeBool:self.isBatteryLow forKey:@"self.isBatteryLow"];
+}
+
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.deviceID=%u", self.deviceID];
+    [description appendFormat:@", self.deviceName=%@", self.deviceName];
+    [description appendFormat:@", self.OZWNode=%@", self.OZWNode];
+    [description appendFormat:@", self.zigBeeShortID=%@", self.zigBeeShortID];
+    [description appendFormat:@", self.zigBeeEUI64=%@", self.zigBeeEUI64];
+    [description appendFormat:@", self.deviceTechnology=%u", self.deviceTechnology];
+    [description appendFormat:@", self.associationTimestamp=%@", self.associationTimestamp];
+    [description appendFormat:@", self.deviceType=%u", self.deviceType];
+    [description appendFormat:@", self.deviceTypeName=%@", self.deviceTypeName];
+    [description appendFormat:@", self.friendlyDeviceType=%@", self.friendlyDeviceType];
+    [description appendFormat:@", self.deviceFunction=%@", self.deviceFunction];
+    [description appendFormat:@", self.allowNotification=%@", self.allowNotification];
+    [description appendFormat:@", self.valueCount=%u", self.valueCount];
+    [description appendFormat:@", self.location=%@", self.location];
+    [description appendFormat:@", self.isExpanded=%d", self.isExpanded];
+    [description appendFormat:@", self.imageName=%@", self.imageName];
+    [description appendFormat:@", self.mostImpValueName=%@", self.mostImpValueName];
+    [description appendFormat:@", self.mostImpValueIndex=%i", self.mostImpValueIndex];
+    [description appendFormat:@", self.stateIndex=%i", self.stateIndex];
+    [description appendFormat:@", self.isTampered=%d", self.isTampered];
+    [description appendFormat:@", self.tamperValueIndex=%i", self.tamperValueIndex];
+    [description appendFormat:@", self.isBatteryLow=%d", self.isBatteryLow];
+    [description appendString:@">"];
+    return description;
+}
+
 @end

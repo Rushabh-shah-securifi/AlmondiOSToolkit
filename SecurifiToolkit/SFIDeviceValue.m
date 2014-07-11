@@ -10,24 +10,34 @@
 
 @implementation SFIDeviceValue
 
-#define kName_ID                                @"ID"          //int
-#define kName_ValueCount                        @"ValueCount" //int
-#define kName_KnownValues                       @"KnownValue" 
-#define kName_IsPresent                         @"IsPresent"
+- (id)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    if (self) {
+        self.deviceID = (unsigned int) [coder decodeIntForKey:@"self.deviceID"];
+        self.valueCount = (unsigned int) [coder decodeIntForKey:@"self.valueCount"];
+        self.knownValues = [coder decodeObjectForKey:@"self.knownValues"];
+        self.isPresent = [coder decodeBoolForKey:@"self.isPresent"];
+    }
 
-- (void) encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:self.deviceID forKey:kName_ID];
-    [encoder encodeInteger:self.valueCount forKey:kName_ValueCount];
-    [encoder encodeObject:self.knownValues forKey:kName_KnownValues];
-    [encoder encodeBool:self.isPresent forKey:kName_IsPresent];
-    
-}
-
-- (id)initWithCoder:(NSCoder *)decoder {
-    self.deviceID = (unsigned int) [decoder decodeIntForKey:kName_ID];
-    self.valueCount = (unsigned int) [decoder decodeIntForKey:kName_ValueCount];
-    self.knownValues = [decoder decodeObjectForKey:kName_KnownValues];
-    self.isPresent = [decoder decodeBoolForKey:kName_IsPresent];
     return self;
 }
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInt:self.deviceID forKey:@"self.deviceID"];
+    [coder encodeInt:self.valueCount forKey:@"self.valueCount"];
+    [coder encodeObject:self.knownValues forKey:@"self.knownValues"];
+    [coder encodeBool:self.isPresent forKey:@"self.isPresent"];
+}
+
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.deviceID=%u", self.deviceID];
+    [description appendFormat:@", self.valueCount=%u", self.valueCount];
+    [description appendFormat:@", self.knownValues=%@", self.knownValues];
+    [description appendFormat:@", self.isPresent=%d", self.isPresent];
+    [description appendString:@">"];
+    return description;
+}
+
+
 @end

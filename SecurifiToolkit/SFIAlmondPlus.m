@@ -29,4 +29,14 @@
     [coder encodeInt:self.colorCodeIndex forKey:@"self.colorCodeIndex"];
 }
 
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.almondplusMAC=%@", self.almondplusMAC];
+    [description appendFormat:@", self.almondplusName=%@", self.almondplusName];
+    [description appendFormat:@", self.index=%i", self.index];
+    [description appendFormat:@", self.colorCodeIndex=%i", self.colorCodeIndex];
+    [description appendString:@">"];
+    return description;
+}
+
 @end

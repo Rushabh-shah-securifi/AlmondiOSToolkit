@@ -34,4 +34,11 @@
 @property BOOL                              isTampered;
 @property int                               tamperValueIndex;
 @property BOOL                              isBatteryLow;
+
+- (id)initWithCoder:(NSCoder *)coder;
+
+- (void)encodeWithCoder:(NSCoder *)coder;
+
+- (NSString *)description;
+
 @end

@@ -18,4 +18,6 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder;
 
+- (NSString *)description;
+
 @end
