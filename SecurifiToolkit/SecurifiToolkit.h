@@ -96,14 +96,15 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
 
 - (void)removeCurrentAlmond;
-- (void)setCurrentAlmond:(SFIAlmondPlus*)almond colorCodeIndex:(int)assignedColor;
+
+- (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
 
 - (SFIAlmondPlus*)currentAlmond;
 - (NSString*)currentAlmondName;
 
 - (NSArray*)almondList;
-
-- (void)asyncRequestDeviceHash:(NSString *)almondMac;
+- (NSArray*)deviceList:(NSString*)almondMac;
+- (NSArray*)deviceValuesList:(NSString*)almondMac;
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac;
 

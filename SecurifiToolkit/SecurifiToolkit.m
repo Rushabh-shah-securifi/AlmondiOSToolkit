@@ -452,17 +452,13 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
 - (void)removeCurrentAlmond {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs removeObjectForKey:kPREF_CURRENT_ALMOND];
-    [prefs removeObjectForKey:COLORCODE];
     [prefs synchronize];
 }
 
-- (void)setCurrentAlmond:(SFIAlmondPlus *)almond colorCodeIndex:(int)assignedColor {
-    almond.colorCodeIndex = assignedColor;
-
+- (void)setCurrentAlmond:(SFIAlmondPlus *)almond {
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
-    [defaults setInteger:assignedColor forKey:COLORCODE];
     [defaults synchronize];
 }
 
@@ -486,12 +482,16 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
     return [SFIOfflineDataManager readAlmondList];
 }
 
-#pragma mark - Device and Device Value Management
-
-- (void)asyncRequestDeviceHash:(NSString *)almondMac {
-    GenericCommand *cloudCommand = [self makeDeviceHashCommand:almondMac];
-    [self asyncSendToCloud:cloudCommand];
+- (NSArray *)deviceList:(NSString *)almondMac {
+    return [SFIOfflineDataManager readDeviceList:almondMac];
 }
+
+- (NSArray *)deviceValuesList:(NSString *)almondMac {
+    return [SFIOfflineDataManager readDeviceValueList:almondMac];
+}
+
+
+#pragma mark - Device and Device Value Management
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
     DeviceListRequest *deviceListCommand = [[DeviceListRequest alloc] init];
@@ -683,11 +683,19 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
     }
 
     AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
-    if (obj.isSuccessful) {
-        // Write Almond List offline
-        [SFIOfflineDataManager writeAlmondList:obj.almondPlusMACList];
+    if (!obj.isSuccessful) {
+        return;
     }
 
+    NSArray *almondList = obj.almondPlusMACList;
+
+    // Store the new list
+    [SFIOfflineDataManager writeAlmondList:almondList];
+
+    // Ensure Current Almond is consistent with new list
+    [self manageCurrentAlmondOnAlmondListUpdate:almondList];
+
+    // Tell the world
     [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
@@ -703,38 +711,15 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
         return;
     }
 
-    //Write Almond List offline - New list with added almond
     NSArray *almondList = obj.almondPlusMACList;
+
+    // Store the new list
     [SFIOfflineDataManager writeAlmondList:almondList];
+    
+    // Ensure Current Almond is consistent with new list
+    [self manageCurrentAlmondOnAlmondListUpdate:almondList];
 
-    // Manage the "Current selected Almond" value
-    if (almondList.count == 0) {
-        [self removeCurrentAlmond];
-    }
-    else if (almondList.count == 1) {
-        SFIAlmondPlus *currentAlmond = almondList[0];
-        [self setCurrentAlmond:currentAlmond colorCodeIndex:0];
-    }
-    else {
-        BOOL currentStillInList = NO;
-        SFIAlmondPlus *current = [self currentAlmond];
-
-        if (current) {
-            for (SFIAlmondPlus *almond in almondList) {
-                if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
-                    currentStillInList = YES;
-                    break;
-                }
-            }
-        }
-
-        if (!currentStillInList) {
-            // Just pick the first one in this case
-            SFIAlmondPlus *currentAlmond = almondList[0];
-            [self setCurrentAlmond:currentAlmond colorCodeIndex:0];
-        }
-    }
-
+    // Tell the world that this happened
     [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
@@ -750,41 +735,13 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
         return;
     }
 
-    NSArray *deletedAlmondList = obj.almondPlusMACList;
-    if (deletedAlmondList.count == 0) {
-        return;
-    }
-    SFIAlmondPlus *deletedAlmond = deletedAlmondList[0];
-
-    // Diff the current list, removing the deleted almond
-    NSArray *currentAlmondList = [SFIOfflineDataManager readAlmondList];
-    NSMutableArray *newAlmondList = [[NSMutableArray alloc] init];
-    //
-    // Update Almond List
-    for (SFIAlmondPlus *currentOfflineAlmond in currentAlmondList) {
-        if (![currentOfflineAlmond.almondplusMAC isEqualToString:deletedAlmond.almondplusMAC]) {
-            //Add the current Almond from list except the deleted one
-            [newAlmondList addObject:currentOfflineAlmond];
-        }
+    NSArray *newAlmondList = @[];
+    for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
+        newAlmondList = [SFIOfflineDataManager deleteAlmond:deleted];
     }
 
-    [SFIOfflineDataManager writeAlmondList:newAlmondList];
-    [SFIOfflineDataManager deleteAlmond:deletedAlmond];
-
-    // Manage the "Current Almond"
-    if (newAlmondList.count == 0) {
-        [self removeCurrentAlmond];
-    }
-    else if (newAlmondList.count == 1) {
-        SFIAlmondPlus *newAlmond = newAlmondList[0];
-        [self setCurrentAlmond:newAlmond colorCodeIndex:0];
-    }
-    else {
-        SFIAlmondPlus *plus = [self currentAlmond];
-        if ([plus.almondplusMAC isEqualToString:deletedAlmond.almondplusMAC]) {
-            [self removeCurrentAlmond];
-        }
-    }
+    // Ensure Current Almond is consistent with new list
+    [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList];
 
     [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
@@ -813,13 +770,46 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
             // Update the Current Almond
             SFIAlmondPlus *plus = [self currentAlmond];
             if ([plus.almondplusMAC isEqualToString:almond.almondplusMAC]) {
-                [self setCurrentAlmond:almond colorCodeIndex:plus.colorCodeIndex];
+                almond.colorCodeIndex = plus.colorCodeIndex;
+                [self setCurrentAlmond:almond];
             }
 
             // Tell the world so they can update their view
             [self postNotification:kSFIDidChangeAlmondName data:almond];
 
             return;
+        }
+    }
+}
+
+// When the almond list is changed, ensure the Current Almond setting is consistent with the list.
+// The setting may be changed by this method.
+- (void)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList {
+    // Manage the "Current selected Almond" value
+    if (almondList.count == 0) {
+        [self removeCurrentAlmond];
+    }
+    else if (almondList.count == 1) {
+        SFIAlmondPlus *currentAlmond = almondList[0];
+        [self setCurrentAlmond:currentAlmond];
+    }
+    else {
+        BOOL currentStillInList = NO;
+        SFIAlmondPlus *current = [self currentAlmond];
+
+        if (current) {
+            for (SFIAlmondPlus *almond in almondList) {
+                if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
+                    currentStillInList = YES;
+                    break;
+                }
+            }
+        }
+
+        if (!currentStillInList) {
+            // Just pick the first one in this case
+            SFIAlmondPlus *currentAlmond = almondList[0];
+            [self setCurrentAlmond:currentAlmond];
         }
     }
 }
@@ -834,12 +824,16 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
     }
 
     DeviceDataHashResponse *obj = (DeviceDataHashResponse *) [data valueForKey:@"data"];
-    if (!obj.isSuccessful) {
-        return;
-    }
-
     NSString *currentHash = obj.almondHash;
-    if (currentHash.length == 0) {
+    if (!obj.isSuccessful || currentHash.length == 0) {
+        // We assume, on failure, the Almond is no longer associated with this account and
+        // our list of Almonds is out of date. Therefore, issue a request for the Almond list.
+        
+        [self removeCurrentAlmond];
+
+        GenericCommand *cmd = [self makeAlmondListCommand];
+        [self asyncSendToCloud:cmd];
+
         return;
     }
 

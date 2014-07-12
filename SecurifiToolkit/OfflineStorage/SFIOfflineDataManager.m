@@ -133,16 +133,32 @@
     }
 }
 
-+ (void)deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
++ (NSArray*)deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
     return [[SFIOfflineDataManager sharedInstance] _deleteAlmond:deletedAlmond];
 }
 
-- (void)_deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
+- (NSArray*)_deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
     @synchronized (self.syncLocker) {
+        // Diff the current list, removing the deleted almond
+        NSArray *currentAlmondList = [self _readAlmondList];
+        NSMutableArray *newAlmondList = [NSMutableArray array];
+
         NSString *mac = deletedAlmond.almondplusMAC;
+
+        // Update Almond List
+        for (SFIAlmondPlus *current in currentAlmondList) {
+            if (![current.almondplusMAC isEqualToString:mac]) {
+                [newAlmondList addObject:current];
+            }
+        }
+
+        [self _writeAlmondList:newAlmondList];
+
         [SFIOfflineDataManager deleteHashForAlmond:mac];
         [SFIOfflineDataManager deleteDeviceDataForAlmond:mac];
         [SFIOfflineDataManager deleteDeviceValueForAlmond:mac];
+
+        return newAlmondList;
     }
 }
 

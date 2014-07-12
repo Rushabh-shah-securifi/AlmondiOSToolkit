@@ -30,6 +30,7 @@
 
 + (BOOL)purgeAll;
 
-+ (void)deleteAlmond:(SFIAlmondPlus*)almond;
+// removes the specified Almond and returns the new Almond List
++ (NSArray*)deleteAlmond:(SFIAlmondPlus*)almond;
 
 @end

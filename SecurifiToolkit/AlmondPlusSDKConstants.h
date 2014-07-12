@@ -64,7 +64,6 @@
 #define SDK_LOG_FILE_NAME  @"AlmondPlusSDKLog.log"
 
 #define COLORS @"colors"
-#define COLORCODE @"ColorCode"
 #define ALMONDLIST @"AlmondList"
 #define SETTINGS_LIST @"Settings"
 
