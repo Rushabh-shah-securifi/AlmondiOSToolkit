@@ -13,20 +13,21 @@
 #import "KeyChainWrapper.h"
 #import "SecurifiCloudResources-Prefix.pch"
 
-#define SEC_SERVICE_NAME                    @"securifiy.login_service"
-#define SEC_EMAIL                           @"com.securifi.email"
-#define SEC_PWD                             @"com.securifi.pwd"
-#define SEC_USER_ID                         @"com.securifi.userid"
+#define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
+#define kPREF_USER_DEFAULT_LOGGED_IN_ONCE                   @"kLoggedInOnce"
 
-#define SEC_USER_DEFAULT_LOGGED_IN_ONCE     @"kLoggedInOnce"
+#define SEC_SERVICE_NAME                                    @"securifiy.login_service"
+#define SEC_EMAIL                                           @"com.securifi.email"
+#define SEC_PWD                                             @"com.securifi.pwd"
+#define SEC_USER_ID                                         @"com.securifi.userid"
 
-NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
-NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
-NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
-NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
-NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
-NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
-NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
+NSString *const kSFIDidCompleteLoginNotification =          @"kSFIDidCompleteLoginNotification";
+NSString *const kSFIDidLogoutNotification =                 @"kSFIDidLogoutNotification";
+NSString *const kSFIDidLogoutAllNotification =              @"kSFIDidLogoutAllNotification";
+NSString *const kSFIDidUpdateAlmondList =                   @"kSFIDidUpdateAlmondList";
+NSString *const kSFIDidChangeAlmondName =                   @"kSFIDidChangeAlmondName";
+NSString *const kSFIDidChangeDeviceList =                   @"kSFIDidChangeDeviceData";
+NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDeviceValueList";
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property (nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
@@ -58,7 +59,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(onReachabilityDidChange:) name:kSFIReachabilityChangedNotification object:nil];
+
         [center addObserver:self selector:@selector(onLoginResponse:) name:LOGIN_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutResponse:) name:LOGOUT_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutAllResponse:) name:LOGOUT_ALL_NOTIFIER object:nil];
@@ -74,6 +75,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_NOTIFIER object:nil];
 
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDeviceHashResponse:) name:HASH_NOTIFIER object:nil];
     }
 
     return self;
@@ -81,7 +83,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
 - (void)dealloc {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center removeObserver:self name:kSFIReachabilityChangedNotification object:nil];
+
     [center removeObserver:self name:LOGIN_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_ALL_NOTIFIER object:nil];
@@ -97,30 +99,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     [center removeObserver:self name:DEVICE_VALUE_NOTIFIER object:nil];
 
     [center removeObserver:self name:ALMOND_LIST_NOTIFIER object:nil];
-}
-
-- (SingleTon*)setupNetworkSingleton {
-    NSLog(@"Setting up network singleton");
-
-    [self tearDownNetworkSingleton];
-
-    SingleTon *newSingleton = [SingleTon newSingleton:self.socketCallbackQueue];
-    newSingleton.delegate = self;
-    newSingleton.connectionState = SDKCloudStatusInitializing;
-
-    _networkSingleton = newSingleton;
-    [newSingleton initNetworkCommunication];
-
-    return newSingleton;
-}
-
-- (void)tearDownNetworkSingleton {
-    DLog(@"Starting tear down of network singleton");
-    SingleTon *old = self.networkSingleton;
-    old.delegate = nil; // no longer interested in callbacks from this instance
-    [old shutdown];
-
-    DLog(@"Finished tear down of network singleton");
+    [center removeObserver:self name:HASH_NOTIFIER object:nil];
 }
 
 #pragma mark - SDK state
@@ -180,6 +159,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
 #pragma mark - SDK Initialization
 
+// Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void)initSDK {
     if (self.isShutdown) {
         DLog(@"INIT SDK. Already shutdown. Returning.");
@@ -272,6 +252,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     });
 }
 
+// Shutdown the SDK. No further work may be done after this method has been invoked.
 - (void)shutdown {
     if (self.isShutdown) {
         return;
@@ -284,6 +265,30 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     dispatch_async(self.socketCallbackQueue, ^(void) {
         [block_self tearDownNetworkSingleton];
         block_self.networkSingleton = nil;
+    });
+}
+
+// Invokes post-connection set-up and login to request updates that had been made while the connection was down
+- (void)asyncRequestAlmondUpdates:(SingleTon *)socket  {
+    // After successful login, refresh the Almond list and hash values.
+    // This routine is important because the UI will listen for outcomes to these requests.
+    // Specifically, the event kSFIDidUpdateAlmondList.
+
+    __weak SecurifiToolkit *block_self = self;
+    dispatch_async(self.commandDispatchQueue, ^() {
+        GenericCommand *cmd;
+
+        DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
+        cmd = [block_self makeAlmondListCommand];
+        [block_self internalSendToCloud:socket command:cmd];
+
+        SFIAlmondPlus *plus = [block_self currentAlmond];
+        if (plus == nil) {
+            return;
+        }
+        DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, plus.almondplusMAC);
+        cmd = [block_self makeDeviceHashCommand:plus.almondplusMAC];
+        [block_self internalSendToCloud:socket command:cmd];
     });
 }
 
@@ -338,7 +343,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     [self setSecEmail:email];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:YES forKey:SEC_USER_DEFAULT_LOGGED_IN_ONCE];
+    [defaults setBool:YES forKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
 
     Login *loginCommand = [Login new];
     loginCommand.UserID = email;
@@ -353,6 +358,37 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
 - (NSString *)loginEmail {
     return [self secEmail];
+}
+
+- (void)asyncSendLogout {
+    if (self.isShutdown) {
+        DLog(@"SDK is shutdown. Returning.");
+        return;
+    }
+
+    if (self.isCloudOnline) {
+        GenericCommand *cmd = [[GenericCommand alloc] init];
+        cmd.commandType = LOGOUT_COMMAND;
+        cmd.command = nil;
+
+        [self asyncSendToCloud:cmd];
+    }
+    else {
+        // Not connected, so just purge on-device credentials and cache
+        [self onLogoutResponse:nil];
+    }
+}
+
+- (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password {
+    LogoutAllRequest *cmd = [[LogoutAllRequest alloc] init];
+    cmd.UserID = [NSString stringWithString:email];
+    cmd.Password = [NSString stringWithString:password];
+
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = LOGOUT_ALL_COMMAND;
+    cloudCommand.command = cmd;
+
+    [self asyncSendToCloud:cloudCommand];
 }
 
 - (void)storeLoginCredentials:(LoginResponse *)obj {
@@ -411,40 +447,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 }
 
-- (void)asyncSendLogout {
-    if (self.isShutdown) {
-        DLog(@"SDK is shutdown. Returning.");
-        return;
-    }
-
-    if (self.isCloudOnline) {
-        GenericCommand *cmd = [[GenericCommand alloc] init];
-        cmd.commandType = LOGOUT_COMMAND;
-        cmd.command = nil;
-
-        [self asyncSendToCloud:cmd];
-    }
-    else {
-        // Not connected, so just purge on-device credentials and cache
-        [self onLogoutResponse:nil];
-    }
-}
-
-- (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password {
-    LogoutAllRequest *cmd = [[LogoutAllRequest alloc] init];
-    cmd.UserID = [NSString stringWithString:email];
-    cmd.Password = [NSString stringWithString:password];
-
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = LOGOUT_ALL_COMMAND;
-    cloudCommand.command = cmd;
-
-    [self asyncSendToCloud:cloudCommand];
-}
-
-#pragma mark - Almond Lists
-
-#define kPREF_CURRENT_ALMOND @"kAlmondCurrent"
+#pragma mark - Almond Management
 
 - (void)removeCurrentAlmond {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
@@ -483,6 +486,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     return [SFIOfflineDataManager readAlmondList];
 }
 
+#pragma mark - Device and Device Value Management
+
 - (void)asyncRequestDeviceHash:(NSString *)almondMac {
     GenericCommand *cloudCommand = [self makeDeviceHashCommand:almondMac];
     [self asyncSendToCloud:cloudCommand];
@@ -508,30 +513,6 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     cloudCommand.command = command;
 
     [self asyncSendToCloud:cloudCommand];
-}
-
-
-- (void)asyncRequestAlmondUpdates:(SingleTon *)socket  {
-    // After successful login, refresh the Almond list and hash values.
-    // This routine is important because the UI will listen for outcomes to these requests.
-    // Specifically, the event kSFIDidUpdateAlmondList.
-    
-    __weak SecurifiToolkit *block_self = self;
-    dispatch_async(self.commandDispatchQueue, ^() {
-        GenericCommand *cmd;
-    
-        DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
-        cmd = [block_self makeAlmondListCommand];
-        [block_self internalSendToCloud:socket command:cmd];
-    
-        SFIAlmondPlus *plus = [block_self currentAlmond];
-        if (plus == nil) {
-            return;
-        }
-        DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, plus.almondplusMAC);
-        cmd = [block_self makeDeviceHashCommand:plus.almondplusMAC];
-        [block_self internalSendToCloud:socket command:cmd];
-    });
 }
 
 #pragma mark - Device value updates
@@ -579,19 +560,13 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     return cloudCommand;
 }
 
-#pragma mark - Network reconnection handling
-
-- (void)onReachabilityDidChange:(id)notification {
-    DLog(@"changed to reachable");
-}
-
 #pragma mark - Keychain Access
 
 - (BOOL)hasLoginCredentials {
     // Keychains persist after an app is deleted. Therefore, to ensure credentials are "wiped out",
     // we keep track of whether this is a new install by storing a value in user defaults.
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    BOOL logged_in_once = [defaults boolForKey:SEC_USER_DEFAULT_LOGGED_IN_ONCE];
+    BOOL logged_in_once = [defaults boolForKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
 
     return logged_in_once && [self hasSecEmail] && [self hasSecPassword];
 }
@@ -640,6 +615,32 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     [KeyChainWrapper createEntryForUser:SEC_USER_ID entryValue:userId forService:SEC_SERVICE_NAME];
 }
 
+#pragma mark - SingleTon management
+
+- (SingleTon*)setupNetworkSingleton {
+    NSLog(@"Setting up network singleton");
+
+    [self tearDownNetworkSingleton];
+
+    SingleTon *newSingleton = [SingleTon newSingleton:self.socketCallbackQueue];
+    newSingleton.delegate = self;
+    newSingleton.connectionState = SDKCloudStatusInitializing;
+
+    _networkSingleton = newSingleton;
+    [newSingleton initNetworkCommunication];
+
+    return newSingleton;
+}
+
+- (void)tearDownNetworkSingleton {
+    DLog(@"Starting tear down of network singleton");
+    SingleTon *old = self.networkSingleton;
+    old.delegate = nil; // no longer interested in callbacks from this instance
+    [old shutdown];
+
+    DLog(@"Finished tear down of network singleton");
+}
+
 #pragma mark - SingleTonDelegate methods
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {
@@ -649,7 +650,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 }
 
-#pragma mark - Sending and Network
+#pragma mark - Internal Command Dispatch and Notification
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(GenericCommand *)command {
     return [socket submitCommand:command];
@@ -672,7 +673,23 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     });
 }
 
-#pragma mark - Dynamic Updates
+#pragma mark - Almond Updates
+
+- (void)onAlmondListResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
+    if (obj.isSuccessful) {
+        // Write Almond List offline
+        [SFIOfflineDataManager writeAlmondList:obj.almondPlusMACList];
+    }
+
+    [self postNotification:kSFIDidUpdateAlmondList data:nil];
+}
 
 - (void)onDynamicAlmondListAdd:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
@@ -680,10 +697,10 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     if (data == nil) {
         return;
     }
-    
+
     AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
     if (!obj.isSuccessful) {
-        return;        
+        return;
     }
 
     //Write Almond List offline - New list with added almond
@@ -727,12 +744,12 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     if (data == nil) {
         return;
     }
-    
+
     AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
     if (!obj.isSuccessful) {
         return;
     }
-    
+
     NSArray *deletedAlmondList = obj.almondPlusMACList;
     if (deletedAlmondList.count == 0) {
         return;
@@ -807,6 +824,47 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 }
 
+#pragma mark - Device Updates
+
+- (void)onDeviceHashResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    DeviceDataHashResponse *obj = (DeviceDataHashResponse *) [data valueForKey:@"data"];
+    if (!obj.isSuccessful) {
+        return;
+    }
+
+    NSString *currentHash = obj.almondHash;
+    if (currentHash.length == 0) {
+        return;
+    }
+
+    SFIAlmondPlus *plus = [self currentAlmond];
+    NSString *currentMac = plus.almondplusMAC;
+    NSString *storedHash = [SFIOfflineDataManager readHashList:currentMac];
+
+    if ([currentHash isEqualToString:@"null"]) {
+        //Hash sent by cloud as null - No Device
+        [self asyncRequestDeviceList:currentMac];
+    }
+    else {
+        if ([storedHash isEqualToString:storedHash]) {
+            // Devices list is fresh. Update the device values.
+            [self asyncRequestDeviceValueList:currentMac];
+        }
+        else {
+            //Save hash in file for each almond
+            [SFIOfflineDataManager writeHashList:currentHash currentMAC:currentMac];
+            // and update the device list -- on receipt of the device list, then the values will be updated
+            [self asyncRequestDeviceList:currentMac];
+        }
+    }
+}
+
 - (void)onDynamicDeviceListChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
@@ -876,7 +934,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     SFIAlmondPlus *plus = [self currentAlmond];
     NSString *currentMAC = plus.almondplusMAC;
-    
+
     if (![obj.almondMAC isEqualToString:currentMAC]) {
         return;
     }
@@ -890,6 +948,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     // And tell the world there is a new list
     [self postNotification:kSFIDidChangeDeviceList data:currentMAC];
 }
+
+#pragma mark - Device Value Updates
 
 - (void)onDynamicDeviceValueListChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
@@ -972,61 +1032,5 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
-
-#pragma mark - Almond Responses
-
-- (void)onAlmondListResponse:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-
-    AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
-    if (obj.isSuccessful) {
-        //Write Almond List offline
-        [SFIOfflineDataManager writeAlmondList:obj.almondPlusMACList];
-    }
-
-    [self postNotification:kSFIDidUpdateAlmondList data:nil];
-}
-
-/*
-- (void)onDeviceHashResponse:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-
-    DeviceDataHashResponse *obj = (DeviceDataHashResponse *) [data valueForKey:@"data"];
-    if (!obj.isSuccessful) {
-        return;
-    }
-
-    NSString *currentHash = obj.almondHash;
-    if (currentHash.length == 0) {
-        return;
-    }
-
-    if (![currentHash isEqualToString:@"null"]) {
-        if ([currentHash isEqualToString:self.offlineHash]) {
-            //[SNLog Log:@"%s: Hash Match: Get Device Values", __PRETTY_FUNCTION__];
-            //Get Device Values
-            [self sendDeviceValueCommand];
-        }
-        else {
-            //Save hash in file for each almond
-            [SFIOfflineDataManager writeHashList:currentHash currentMAC:self.currentMAC];
-            //Get Device List
-            [self sendDeviceListCommand];
-        }
-    }
-    else {
-        //Hash sent by cloud as null - No Device
-//        [self.HUD hide:YES];
-    }
-}
-*/
 
 @end
