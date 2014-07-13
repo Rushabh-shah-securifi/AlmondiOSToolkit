@@ -13,6 +13,8 @@
 @property id command;
 @property unsigned int commandType;
 
+- (NSString *)description;
+
 - (NSString *)debugDescription;
 
 @end

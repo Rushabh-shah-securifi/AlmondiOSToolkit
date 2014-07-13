@@ -10,12 +10,16 @@
 
 @implementation GenericCommand
 
-- (NSString *)debugDescription {
+- (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.command=%@", self.command];
     [description appendFormat:@", self.commandType=%u", self.commandType];
     [description appendString:@">"];
     return description;
+}
+
+- (NSString *)debugDescription {
+    return [self description];
 }
 
 @end
