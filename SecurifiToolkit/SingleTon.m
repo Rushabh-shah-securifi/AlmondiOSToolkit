@@ -216,6 +216,16 @@
 // return YES when time out is reached; NO if connection established without timeout
 // On time out, the SingleTon will shut itself down
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
+    dispatch_semaphore_t latch = self.network_established_latch;
+    return [self waitOnLatch:numSecsToWait latch:latch];
+}
+
+- (BOOL)waitForCloudInitialization:(int)numSecsToWait {
+    dispatch_semaphore_t latch = self.cloud_initialized_latch;
+    return [self waitOnLatch:numSecsToWait latch:latch];
+}
+
+- (BOOL)waitOnLatch:(int)numSecsToWait latch:(dispatch_semaphore_t)latch {
     dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
 
     BOOL timedOut = NO;
@@ -239,10 +249,10 @@
             break;
         }
     }
-    while (0 != dispatch_semaphore_wait(self.network_established_latch, blockingSleepSecondsIfNotDone));
+    while (0 != dispatch_semaphore_wait(latch, blockingSleepSecondsIfNotDone));
 
     // make sure...
-    dispatch_semaphore_signal(self.network_established_latch);
+    dispatch_semaphore_signal(latch);
 
     if (self.isStreamConnected) {
         return NO;
@@ -746,7 +756,10 @@
             return;
         }
         if (waitForNetworkInitializedLatch) {
-            dispatch_semaphore_wait(block_self.cloud_initialized_latch, DISPATCH_TIME_FOREVER);
+            BOOL timedOut = [block_self waitForCloudInitialization:20];
+            if (timedOut) {
+                return;
+            }
         }
         if (block_self.networkShutdown) {
             DLog(@"Command Queue: aborting unit: network is shutdown");
