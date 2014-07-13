@@ -286,9 +286,16 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
         if (plus == nil) {
             return;
         }
-        DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, plus.almondplusMAC);
-        cmd = [block_self makeDeviceHashCommand:plus.almondplusMAC];
-        [block_self internalSendToCloud:socket command:cmd];
+
+        NSString *mac = plus.almondplusMAC;
+
+        if (![socket wasHashFetchedForAlmond:mac]) {
+            [socket markHashFetchedForAlmond:mac];
+            
+            DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
+            cmd = [block_self makeDeviceHashCommand:mac];
+            [block_self internalSendToCloud:socket command:cmd];
+        }
     });
 }
 
@@ -456,10 +463,32 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
 }
 
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond {
+    if (!almond) {
+        return;
+    }
+
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
     [defaults synchronize];
+
+    NSString *mac = almond.almondplusMAC;
+
+    NSArray *devices = [self deviceList:mac];
+    if (devices.count == 0) {
+        DLog(@"%s: devices empty: requesting device list for current almond: %@", __PRETTY_FUNCTION__, mac);
+        [self asyncRequestDeviceList:mac];
+    }
+    else if (![self.networkSingleton wasHashFetchedForAlmond:mac]) {
+        [self.networkSingleton markHashFetchedForAlmond:mac];
+        
+        DLog(@"%s: hash not checked on this connection: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
+        GenericCommand *cmd = [self makeDeviceHashCommand:mac];
+        [self asyncSendToCloud:cmd];
+    }
+    else {
+        DLog(@"%s: hash already checked on this connection for current almond: %@", __PRETTY_FUNCTION__, mac);
+    }
 }
 
 - (SFIAlmondPlus *)currentAlmond {
@@ -838,6 +867,10 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
     }
 
     SFIAlmondPlus *plus = [self currentAlmond];
+    if (plus == nil) {
+        return;
+    }
+
     NSString *currentMac = plus.almondplusMAC;
     NSString *storedHash = [SFIOfflineDataManager readHashList:currentMac];
 
@@ -872,11 +905,11 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
     }
 
     NSMutableArray *deviceList = obj.deviceList;
-    NSString *currentMAC = obj.almondMAC;
+    NSString *almondMAC = obj.almondMAC;
 
     // Compare the list with device value list size and correct the list accordingly if any device was deleted
     // Read device value list from storage
-    NSArray *oldDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
+    NSArray *oldDeviceValueList = [SFIOfflineDataManager readDeviceValueList:almondMAC];
 
     // Delete from the device value list
     NSMutableArray *newDeviceValueList = [[NSMutableArray alloc] init];
@@ -902,16 +935,16 @@ NSString *const kSFIDidChangeDeviceValueList =              @"kSFIDidChangeDevic
     }
 
     // Update offline storage
-    [SFIOfflineDataManager writeDeviceList:deviceList currentMAC:currentMAC];
+    [SFIOfflineDataManager writeDeviceList:deviceList currentMAC:almondMAC];
     if (removedDevices) {
-        [SFIOfflineDataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
+        [SFIOfflineDataManager writeDeviceValueList:newDeviceValueList currentMAC:almondMAC];
     }
 
     // Request values for devices
-    [self asyncRequestDeviceValueList:currentMAC];
+    [self asyncRequestDeviceValueList:almondMAC];
 
     // Tell the world so they can update their view
-    [self postNotification:kSFIDidChangeDeviceList data:currentMAC];
+    [self postNotification:kSFIDidChangeDeviceList data:almondMAC];
 }
 
 - (void)onDeviceListResponse:(id)sender {

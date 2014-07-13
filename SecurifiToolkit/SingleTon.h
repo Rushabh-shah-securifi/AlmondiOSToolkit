@@ -48,4 +48,13 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 // Returns NO on failure to queue
 - (BOOL)submitCommand:(GenericCommand*)command;
 
+// Provides a per-connection ledger for tracking Device Hash requests.
+// A Hash is requested for a current Almond on each connection because
+// the state could have changed while the app was not connected to the cloud.
+- (void)markHashFetchedForAlmond:(NSString *)aAlmondMac;
+
+// Tests whether a Hash was requested already.
+// TRUE if requested. FALSE otherwise.
+- (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac;
+
 @end

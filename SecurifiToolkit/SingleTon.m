@@ -34,6 +34,10 @@
 @property(nonatomic) NSInputStream *inputStream;
 @property(nonatomic) NSOutputStream *outputStream;
 @property BOOL sendCommandFail;
+
+@property (nonatomic, readonly) NSObject *almondTableSyncLocker;
+@property(readonly) NSMutableSet *hashCheckedForAlmondTable;
+
 @end
 
 @implementation SingleTon
@@ -55,6 +59,9 @@
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
         _callbackQueue = callbackQueue;
         _network_established_latch = dispatch_semaphore_create(0);
+
+        _almondTableSyncLocker = [NSObject new];
+        _hashCheckedForAlmondTable = [NSMutableSet new];
     }
     
     return self;
@@ -701,6 +708,19 @@
 
     return YES;
 }
+
+- (void)markHashFetchedForAlmond:(NSString *)aAlmondMac {
+    @synchronized (self.almondTableSyncLocker) {
+        [self.hashCheckedForAlmondTable addObject:aAlmondMac];
+    }
+}
+
+- (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac {
+    @synchronized (self.almondTableSyncLocker) {
+        return [self.hashCheckedForAlmondTable containsObject:aAlmondMac];
+    }
+}
+
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
     DLog(@"%s: Waiting to enter sync block",__PRETTY_FUNCTION__);
