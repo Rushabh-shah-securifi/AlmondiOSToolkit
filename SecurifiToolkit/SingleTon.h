@@ -15,6 +15,7 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
     SDKCloudStatusNotLoggedIn,
     SDKCloudStatusLoginInProcess,
     SDKCloudStatusLoggedIn,
+    SDKCloudStatusInitialized,
     SDKCloudStatusCloudConnectionShutdown,
 };
 
@@ -42,6 +43,12 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 - (void)initNetworkCommunication;
 
 - (void)shutdown;
+
+// Queues the specified command to the cloud. This is a special command queue that is used for initializing the singleton.
+- (BOOL)submitCloudInitializationCommand:(GenericCommand*)command;
+
+// After all initialization has been completed, this method MUST BE CALLED for normal command processing to start
+- (void)markCloudInitialized;
 
 // Queues the specified command to the cloud
 // Returns YES on successful submission

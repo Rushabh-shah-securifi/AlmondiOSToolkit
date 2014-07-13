@@ -20,10 +20,12 @@
 @property (atomic) NSInteger currentUnitCounter;
 @property (atomic) SUnit *currentUnit;
 
-@property(nonatomic, readonly) dispatch_queue_t commandQueue;    // serial queue to which commands submitted to the system are added
-@property(nonatomic, readonly) dispatch_queue_t backgroundQueue; // queue on which the streams are managed
-@property(nonatomic, readonly) dispatch_queue_t callbackQueue;   // queue used for posting notifications
+@property(nonatomic, readonly) dispatch_queue_t initializationQueue;    // serial queue to which network initialization commands submitted to the system are added
+@property(nonatomic, readonly) dispatch_queue_t commandQueue;           // serial queue to which commands submitted to the system are added
+@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;        // queue on which the streams are managed
+@property(nonatomic, readonly) dispatch_queue_t callbackQueue;          // queue used for posting notifications
 @property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
+@property(nonatomic, readonly) dispatch_semaphore_t cloud_initialized_latch;
 
 @property(nonatomic) SecCertificateRef certificate;
 @property BOOL certificateTrusted;
@@ -55,10 +57,15 @@
         self.networkShutdown = NO;
         self.connectionState = SDKCloudStatusUninitialized;
         _syncLocker = [NSObject new];
+
+        _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
         _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
+
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
         _callbackQueue = callbackQueue;
+
         _network_established_latch = dispatch_semaphore_create(0);
+        _cloud_initialized_latch = dispatch_semaphore_create(0);
 
         _almondTableSyncLocker = [NSObject new];
         _hashCheckedForAlmondTable = [NSMutableSet new];
@@ -173,15 +180,16 @@
     dispatch_sync(self.backgroundQueue, ^(void) {
         NSLog(@"[%@] Singleton is shutting down", block_self.debugDescription);
 
-        [block_self tryAbortUnit];
-
         block_self.networkShutdown = YES;
         block_self.isLoggedIn = NO;
         block_self.connectionState = SDKCloudStatusCloudConnectionShutdown;
         block_self.isStreamConnected = NO;
 
+        [block_self tryAbortUnit];
+
         // Signal to any waiting loops to exit
         dispatch_semaphore_signal(block_self.network_established_latch);
+        dispatch_semaphore_signal(block_self.cloud_initialized_latch);
 
         NSInputStream *in_stream = block_self.inputStream;
         NSOutputStream *out_stream = block_self.outputStream;
@@ -244,7 +252,6 @@
     }
     return timedOut;
 }
-
 
 #pragma mark - NSStreamDelegate methods
 
@@ -609,7 +616,6 @@
     });
 }
 
-
 #pragma mark - SSL certificates
 
 - (void)loadCertificate {
@@ -661,34 +667,99 @@
     return trusted;
 }
 
+#pragma mark - Hash value management
+
+- (void)markHashFetchedForAlmond:(NSString *)aAlmondMac {
+    @synchronized (self.almondTableSyncLocker) {
+        [self.hashCheckedForAlmondTable addObject:aAlmondMac];
+    }
+}
+
+- (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac {
+    @synchronized (self.almondTableSyncLocker) {
+        return [self.hashCheckedForAlmondTable containsObject:aAlmondMac];
+    }
+}
+
+#pragma mark - Command submission
+
 - (NSInteger)nextUnitCounter {
     NSInteger next = self.currentUnitCounter + 1;
     self.currentUnitCounter = next;
     return next;
 }
 
+- (void)markCloudInitialized {
+    self.connectionState = SDKCloudStatusInitialized;
+    dispatch_semaphore_signal(self.cloud_initialized_latch);
+}
+
+- (BOOL)submitCloudInitializationCommand:(GenericCommand *)command {
+    if (self.connectionState == SDKCloudStatusInitialized) {
+        return NO;
+    }
+
+    dispatch_queue_t queue = self.initializationQueue;
+    BOOL waitForInit = NO;
+    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit];
+}
+
 - (BOOL)submitCommand:(GenericCommand *)command {
+    dispatch_queue_t queue = self.commandQueue;
+    BOOL waitForInit = YES;
+
+    switch (self.connectionState) {
+        case SDKCloudStatusNetworkDown:
+        case SDKCloudStatusCloudConnectionShutdown:
+            // don't even queue; just get out
+            return NO;
+
+        case SDKCloudStatusInitialized:
+            waitForInit = NO;
+            break;
+
+        case SDKCloudStatusUninitialized:break;
+        case SDKCloudStatusInitializing:break;
+        case SDKCloudStatusNotLoggedIn:break;
+        case SDKCloudStatusLoginInProcess:break;
+        case SDKCloudStatusLoggedIn:break;
+    }
+
+    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit];
+}
+
+// we manage two different queues, one for initializing the network, and one for normal network operation.
+// this mechanism allows the initialization logic to be determined by the toolkit as responses are returned.
+// when initializing, the normal command queue blocks on the network_initialized_latch semaphore
+- (BOOL)internalSubmitCommand:(GenericCommand *)command queue:(dispatch_queue_t)queue waitForNetworkInitializedLatch:(BOOL)waitForNetworkInitializedLatch {
     if (self.networkShutdown) {
         DLog(@"SubmitCommand failed: network is shutdown");
         return NO;
     }
 
-    DLog(@"Command Queue: queueing command: %@", command);
+    DLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
 
     __weak SingleTon *block_self = self;
-    dispatch_async(self.commandQueue, ^() {
+    dispatch_async(queue, ^() {
+        if (block_self.networkShutdown) {
+            DLog(@"Command Queue: aborting unit: network is shutdown");
+            return;
+        }
+        if (waitForNetworkInitializedLatch) {
+            dispatch_semaphore_wait(block_self.cloud_initialized_latch, DISPATCH_TIME_FOREVER);
+        }
         if (block_self.networkShutdown) {
             DLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
 
         NSInteger tag = [block_self nextUnitCounter];
-        
+
         SUnit *unit = [[SUnit alloc] initWithCommand:command];
         [unit markWorking: tag];
         block_self.currentUnit = unit;
 
-        DLog(@"Command Queue: sending sunit to cloud: %ld", (long)tag);
+        DLog(@"Command Queue: sending command %@ to cloud: %ld", [command description], (long)tag);
 
         NSError *error;
         BOOL success = [block_self internalSendToCloud:block_self command:unit.command error:&error];
@@ -708,19 +779,6 @@
 
     return YES;
 }
-
-- (void)markHashFetchedForAlmond:(NSString *)aAlmondMac {
-    @synchronized (self.almondTableSyncLocker) {
-        [self.hashCheckedForAlmondTable addObject:aAlmondMac];
-    }
-}
-
-- (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac {
-    @synchronized (self.almondTableSyncLocker) {
-        return [self.hashCheckedForAlmondTable containsObject:aAlmondMac];
-    }
-}
-
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
     DLog(@"%s: Waiting to enter sync block",__PRETTY_FUNCTION__);
