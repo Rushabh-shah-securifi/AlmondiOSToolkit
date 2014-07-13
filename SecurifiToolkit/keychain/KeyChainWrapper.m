@@ -7,6 +7,7 @@
 // ruralcoder.com.
 
 #import "KeyChainWrapper.h"
+#import "SecurifiCloudResources-Prefix.pch"
 
 
 @implementation KeyChainWrapper
@@ -74,8 +75,8 @@
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, (CFTypeRef *)&searchResults);
 
     if (status != errSecSuccess) {
-        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
-        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
+        DLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        DLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         return nil;
     }
 
@@ -101,8 +102,8 @@
 
     OSStatus status = SecItemAdd((__bridge CFDictionaryRef) searchQuery, NULL);
     if (status != errSecSuccess) {
-        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
-        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
+        DLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        DLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         [self printAttributes:searchQuery];
     }
 
@@ -118,8 +119,8 @@
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef) searchQuery, &entryDataRef);
 
     if (status != errSecSuccess) {
-        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
-        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
+        DLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        DLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         return nil;
     }
 
@@ -140,8 +141,8 @@
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, &entryDataRef);
 
     if (status != errSecSuccess && status != errSecItemNotFound) {
-        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
-        NSLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
+        DLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        DLog(@"    KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         [self printAttributes:searchQuery];
     }
 
@@ -160,8 +161,8 @@
     OSStatus status = SecItemDelete((__bridge CFDictionaryRef) searchQuery);
 
     if (status != errSecSuccess && status != errSecItemNotFound) {
-        NSLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
-        NSLog(@"KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
+        DLog(@"%s: userEmail: '%@'  service: '%@'", __PRETTY_FUNCTION__, userEmail, service);
+        DLog(@"KeyChain status: %@", [KeyChainWrapper keyChainErrorToString:status]);
         [self printAttributes:searchQuery];
     }
 
