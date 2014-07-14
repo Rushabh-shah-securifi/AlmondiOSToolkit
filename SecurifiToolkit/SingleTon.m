@@ -212,20 +212,28 @@
     });
 }
 
+#pragma mark - Semaphores
+
 // Called during command process need to use the output stream. Blocks until the connection is set up or fails.
 // return YES when time out is reached; NO if connection established without timeout
 // On time out, the SingleTon will shut itself down
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.network_established_latch;
-    return [self waitOnLatch:numSecsToWait latch:latch];
+    return [self waitOnLatch:latch timeout:numSecsToWait logMsg:@"Giving up on connection establishment"];
 }
 
+// Called by commands submitted to the normal command queue that have to wait for the cloud initialization
+// sequence to complete. Like network establishment procedures, this process can time out in which case the
+// SingleTon is shutdown.
 - (BOOL)waitForCloudInitialization:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.cloud_initialized_latch;
-    return [self waitOnLatch:numSecsToWait latch:latch];
+    return [self waitOnLatch:latch timeout:numSecsToWait logMsg:@"Giving up on cloud initialization"];
 }
 
-- (BOOL)waitOnLatch:(int)numSecsToWait latch:(dispatch_semaphore_t)latch {
+// Waits up to the specified number of seconds for the semaphore to be signalled.
+// On timeout, the SingleTon is shutdown and YES is returned.
+// Returns NO when the signal has been received before the time out.
+- (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString*)msg {
     dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
 
     BOOL timedOut = NO;
@@ -233,11 +241,11 @@
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
         if (self.networkShutdown) {
-            NSLog(@"Giving up on network establishment. Network was shutdown.");
+            NSLog(@"%@. Network was shutdown.", msg);
             break;
         }
         if (self.sendCommandFail) {
-            NSLog(@"Giving up on network establishment. Failed to send cmd.");
+            NSLog(@"%@. Failed to send cmd.", msg);
             break;
         }
 
@@ -245,7 +253,7 @@
 
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
-            NSLog(@"Giving up on network establishment. Timeout reached.");
+            NSLog(@"%@. Timeout reached.", msg);
             break;
         }
     }
@@ -700,6 +708,7 @@
 }
 
 - (void)markCloudInitialized {
+    NSLog(@"Mark cloud iniitialized");
     self.connectionState = SDKCloudStatusInitialized;
     dispatch_semaphore_signal(self.cloud_initialized_latch);
 }
