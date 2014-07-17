@@ -47,7 +47,7 @@
 
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
-            NSLog(@"Giving up on network establishment. Timeout reached.");
+            NSLog(@"Giving up on network establishment. Timeout reached: %@", self);
             break;
         }
     }

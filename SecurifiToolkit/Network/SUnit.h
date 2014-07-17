@@ -30,7 +30,7 @@ typedef NS_ENUM(NSUInteger, SUnitState) {
 @property (readonly) GenericCommand *command;
 
 // The current processing state
-@property (readonly) SUnitState processingState;
+@property (nonatomic, readonly) SUnitState processingState;
 
 - (instancetype)initWithCommand:(GenericCommand *)command;
 
