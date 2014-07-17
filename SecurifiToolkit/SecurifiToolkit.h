@@ -95,22 +95,35 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 - (void)asyncSendLogout;
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
 
+// Nils out the current Almond selection
 - (void)removeCurrentAlmond;
 
+// Specify the currently "viewed" Almond. May perform updates in the background to check on Hash values.
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
 
+// Returns the designated "current" Almond, or nil.
 - (SFIAlmondPlus*)currentAlmond;
+
+// Convenience method for fetching the current Almond's name, or nil.
 - (NSString*)currentAlmondName;
 
+// Fetch the local copy of the Almond's attached to the logon account
 - (NSArray*)almondList;
+
+// Fetch the locally stored devices list for the Almond
 - (NSArray*)deviceList:(NSString*)almondMac;
+
+// Fetch the locally stored values for the Almond's devices
 - (NSArray*)deviceValuesList:(NSString*)almondMac;
 
+// Synchronously locally store the device list
+- (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac;
+
+// Send a command to the cloud requesting a device list for the specified Almond
 - (void)asyncRequestDeviceList:(NSString *)almondMac;
 
+// Send a command to the cloud requesting current values for the Almond's devices
 - (void)asyncRequestDeviceValueList:(NSString *)almondMac;
-
-- (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac;
 
 @end
  

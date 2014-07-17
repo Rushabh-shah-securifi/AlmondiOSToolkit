@@ -1050,6 +1050,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
     NSString *currentMAC = [self currentAlmond].almondplusMAC;
+
     [self processDeviceValueResponse:obj currentMAC:currentMAC];
 }
 
@@ -1061,51 +1062,53 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     NSMutableArray *cloudDeviceValueList = obj.deviceValueList;
     NSArray *currentDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
 
-    NSMutableArray *mobileDeviceValueList;
+    NSMutableArray *newDeviceValueList;
     if (currentDeviceValueList != nil) {
-        BOOL isDeviceFound = FALSE;
-        for (SFIDeviceValue *currentMobileValue in currentDeviceValueList) {
+        for (SFIDeviceValue *currentValue in currentDeviceValueList) {
+            for (SFIDeviceValue *cloudValue in cloudDeviceValueList) {
+                if (currentValue.deviceID == cloudValue.deviceID) {
+                    cloudValue.isPresent = YES;
 
-            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
-                if (currentMobileValue.deviceID == currentCloudValue.deviceID) {
-                    isDeviceFound = TRUE;
-                    currentCloudValue.isPresent = TRUE;
+                    NSMutableArray *currentValues = currentValue.knownValues;
+                    NSMutableArray *cloudValues = cloudValue.knownValues;
 
-                    NSMutableArray *mobileDeviceKnownValues = currentMobileValue.knownValues;
-                    NSMutableArray *cloudDeviceKnownValues = currentCloudValue.knownValues;
-
-                    for (SFIDeviceKnownValues *currentMobileKnownValue in mobileDeviceKnownValues) {
-
-                        for (SFIDeviceKnownValues *currentCloudKnownValue in cloudDeviceKnownValues) {
+                    for (SFIDeviceKnownValues *currentMobileKnownValue in currentValues) {
+                        for (SFIDeviceKnownValues *currentCloudKnownValue in cloudValues) {
                             if (currentMobileKnownValue.index == currentCloudKnownValue.index) {
-                                //Update Value
-                                [currentMobileKnownValue setValue:currentCloudKnownValue.value];
+                                currentMobileKnownValue.value = currentCloudKnownValue.value;
                                 break;
                             }
                         }
                     }
-                    [currentMobileValue setKnownValues:mobileDeviceKnownValues];
+                    [currentValue setKnownValues:currentValues];
                 }
             }
         }
 
-        mobileDeviceValueList = [NSMutableArray arrayWithArray:currentDeviceValueList];
-        if (!isDeviceFound) {
-            //Traverse the list and add the new value to offline list
-            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
-                if (!currentCloudValue.isPresent) {
-                    [mobileDeviceValueList addObject:currentCloudValue];
-                }
+        newDeviceValueList = [NSMutableArray arrayWithArray:currentDeviceValueList];
+
+        // Traverse the list and add the new value to offline list
+        // If there are new values without corresponding devices, we know to request the device list.
+        BOOL isDeviceMissing = NO;
+        for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
+            if (!currentCloudValue.isPresent) {
+                [newDeviceValueList addObject:currentCloudValue];
+                isDeviceMissing = YES;
             }
+        }
+
+        if (isDeviceMissing) {
+            NSLog(@"Missing devices for values. Requesting device hash for %@", currentMAC);
+            GenericCommand *command = [self makeDeviceHashCommand:currentMAC];
+            [self asyncSendToCloud:command];
         }
     }
     else {
-        mobileDeviceValueList = cloudDeviceValueList;
+        newDeviceValueList = cloudDeviceValueList;
     }
 
-    //deviceValueList = mobileDeviceValueList;
-    //Update offline storage
-    [SFIOfflineDataManager writeDeviceValueList:mobileDeviceValueList currentMAC:currentMAC];
+    // Update offline storage
+    [SFIOfflineDataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
 
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
