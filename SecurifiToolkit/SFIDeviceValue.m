@@ -16,7 +16,6 @@
         self.deviceID = (unsigned int) [coder decodeIntForKey:@"self.deviceID"];
         self.valueCount = (unsigned int) [coder decodeIntForKey:@"self.valueCount"];
         self.knownValues = [coder decodeObjectForKey:@"self.knownValues"];
-        self.isPresent = [coder decodeBoolForKey:@"self.isPresent"];
     }
 
     return self;
@@ -26,7 +25,6 @@
     [coder encodeInt:self.deviceID forKey:@"self.deviceID"];
     [coder encodeInt:self.valueCount forKey:@"self.valueCount"];
     [coder encodeObject:self.knownValues forKey:@"self.knownValues"];
-    [coder encodeBool:self.isPresent forKey:@"self.isPresent"];
 }
 
 - (NSString *)description {

@@ -13,8 +13,9 @@
 @property unsigned int      valueCount;
 @property NSMutableArray   *knownValues;
 
-//For Deletion Handling
-@property BOOL isPresent;
+// Ephemeral value holder useful for managing deleted or missing devices.
+// Value is not persistent. Defaults to NO.
+@property (nonatomic) BOOL isPresent;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
