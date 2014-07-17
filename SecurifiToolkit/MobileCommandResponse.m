@@ -9,5 +9,5 @@
 #import "MobileCommandResponse.h"
 
 @implementation MobileCommandResponse
-@synthesize mobileInternalIndex, reason, isSuccessful;
+
 @end

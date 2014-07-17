@@ -11,5 +11,5 @@
 @interface MobileCommandResponse : NSObject
 @property BOOL isSuccessful;
 @property unsigned int mobileInternalIndex;
-@property NSString *reason;
+@property (copy) NSString *reason;
 @end
