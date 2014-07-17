@@ -253,7 +253,7 @@
             break;
         }
 
-        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC);
+        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, 500 * NSEC_PER_MSEC);
 
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
