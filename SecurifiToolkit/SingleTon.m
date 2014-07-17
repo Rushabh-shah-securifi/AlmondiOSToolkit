@@ -715,6 +715,9 @@
     if (self.connectionState == SDKCloudStatusInitialized) {
         return;
     }
+    if (self.connectionState == SDKCloudStatusCloudConnectionShutdown) {
+        return;
+    }
 
     // There may be other commands in the initialization queue still waiting for responses.
     // Let them complete or timeout before opening up the main command queue.
@@ -724,9 +727,19 @@
 
     __weak SingleTon *block_self = self;
     dispatch_async(self.initializationQueue, ^() {
+        if (self.connectionState == SDKCloudStatusInitialized) {
+            return;
+        }
+        if (self.connectionState == SDKCloudStatusCloudConnectionShutdown) {
+            return;
+        }
+
         block_self.connectionState = SDKCloudStatusInitialized;
-        dispatch_semaphore_signal(block_self.cloud_initialized_latch);
-        NSLog(@"Executed cloud initialization completed command");
+        dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
+        if (latch) {
+            dispatch_semaphore_signal(latch);
+            NSLog(@"Executed cloud initialization completed command");
+        }
     });
 }
 
