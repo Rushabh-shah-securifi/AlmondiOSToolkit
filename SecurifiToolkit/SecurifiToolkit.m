@@ -763,13 +763,13 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     [SFIOfflineDataManager writeAlmondList:almondList];
 
     // Ensure Current Almond is consistent with new list
-    [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
+    SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
 
     // After requesting the Almond list, we then want to get additional info
     [self asyncInitializeConnection2:self.networkSingleton];
 
     // Tell the world
-    [self postNotification:kSFIDidUpdateAlmondList data:nil];
+    [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
 - (void)onDynamicAlmondListAdd:(id)sender {
@@ -790,10 +790,10 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     [SFIOfflineDataManager writeAlmondList:almondList];
 
     // Ensure Current Almond is consistent with new list
-    [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:YES];
+    SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:YES];
 
     // Tell the world that this happened
-    [self postNotification:kSFIDidUpdateAlmondList data:nil];
+    [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
 - (void)onDynamicAlmondListDelete:(id)sender {
@@ -814,9 +814,9 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 
     // Ensure Current Almond is consistent with new list
-    [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
+    SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
 
-    [self postNotification:kSFIDidUpdateAlmondList data:nil];
+    [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
 - (void)onDynamicAlmondNameChange:(id)sender {
@@ -857,11 +857,13 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
 // When the almond list is changed, ensure the Current Almond setting is consistent with the list.
 // The setting may be changed by this method.
-- (void)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
+// Returns the current Almond, which might or might not be the same as the old one. May return nil.
+- (SFIAlmondPlus*)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
     // Manage the "Current selected Almond" value
     if (almondList.count == 0) {
         [self removeCurrentAlmond];
         [SFIOfflineDataManager purgeAll];
+        return nil;
     }
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
@@ -871,30 +873,30 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         else {
             [self writeCurrentAlmond:currentAlmond];
         }
+        return currentAlmond;
     }
     else {
-        BOOL currentStillInList = NO;
         SFIAlmondPlus *current = [self currentAlmond];
 
         if (current) {
             for (SFIAlmondPlus *almond in almondList) {
                 if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
-                    currentStillInList = YES;
-                    break;
+                    // Current one is still in list, so leave it as current.
+                    return almond;
                 }
             }
         }
 
-        if (!currentStillInList) {
-            // Just pick the first one in this case
-            SFIAlmondPlus *currentAlmond = almondList[0];
-            if (doManage) {
-                [self setCurrentAlmond:currentAlmond];
-            }
-            else {
-                [self writeCurrentAlmond:currentAlmond];
-            }
+        // Current one is not in new list.
+        // Just pick the first one in this case
+        SFIAlmondPlus *currentAlmond = almondList[0];
+        if (doManage) {
+            [self setCurrentAlmond:currentAlmond];
         }
+        else {
+            [self writeCurrentAlmond:currentAlmond];
+        }
+        return currentAlmond;
     }
 }
 
@@ -1090,10 +1092,15 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         // Traverse the list and add the new value to offline list
         // If there are new values without corresponding devices, we know to request the device list.
         BOOL isDeviceMissing = NO;
-        for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
-            if (!currentCloudValue.isPresent) {
-                [newDeviceValueList addObject:currentCloudValue];
-                isDeviceMissing = YES;
+        if (cloudDeviceValueList.count > 0 && currentDeviceValueList.count == 0) {
+            isDeviceMissing = YES;
+        }
+        else {
+            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
+                if (!currentCloudValue.isPresent) {
+                    [newDeviceValueList addObject:currentCloudValue];
+                    isDeviceMissing = YES;
+                }
             }
         }
 
