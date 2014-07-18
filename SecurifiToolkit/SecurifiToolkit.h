@@ -64,7 +64,7 @@ extern NSString *const kSFIDidUpdateAlmondList;
 // Notification posted when an Almond's name has changed
 extern NSString *const kSFIDidChangeAlmondName;
 
-// Notification posted when the device list has changed
+// Notification posted when a device has been added or removed. Does not post on changes to attributes like device names.
 extern NSString *const kSFIDidChangeDeviceList;
 
 extern NSString *const kSFIDidChangeDeviceValueList;

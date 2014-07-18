@@ -961,7 +961,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         return;
     }
 
-    NSMutableArray *deviceList = obj.deviceList;
+    NSMutableArray *newDeviceList = obj.deviceList;
     NSString *almondMAC = obj.almondMAC;
 
     // Compare the list with device value list size and correct the list accordingly if any device was deleted
@@ -972,10 +972,10 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     NSMutableArray *newDeviceValueList = [[NSMutableArray alloc] init];
 
     // Devices have been removed
-    BOOL removedDevices = [deviceList count] < [oldDeviceValueList count];
+    BOOL removedDevices = [newDeviceList count] < [oldDeviceValueList count];
 
     if (removedDevices) {
-        for (SFIDevice *currentDevice in deviceList) {
+        for (SFIDevice *currentDevice in newDeviceList) {
             for (SFIDeviceValue *offlineDeviceValue in oldDeviceValueList) {
                 if (currentDevice.deviceID == offlineDeviceValue.deviceID) {
                     offlineDeviceValue.isPresent = TRUE;
@@ -992,7 +992,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 
     // Update offline storage
-    [SFIOfflineDataManager writeDeviceList:deviceList currentMAC:almondMAC];
+    [SFIOfflineDataManager writeDeviceList:newDeviceList currentMAC:almondMAC];
     if (removedDevices) {
         [SFIOfflineDataManager writeDeviceValueList:newDeviceValueList currentMAC:almondMAC];
     }
@@ -1000,8 +1000,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     // Request values for devices
     [self asyncRequestDeviceValueList:almondMAC];
 
-    // Tell the world so they can update their view
-    [self postNotification:kSFIDidChangeDeviceList data:almondMAC];
+    NSArray *currentDevices = [SFIOfflineDataManager readDeviceList:almondMAC];
+    [self diffDeviceListsAndNotify:almondMAC currentDevices:currentDevices newDevices:newDeviceList];
 }
 
 - (void)onDeviceListResponse:(id)sender {
@@ -1020,7 +1020,12 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     NSArray *currentDevices = [SFIOfflineDataManager readDeviceList:mac];
     NSArray *newDevices = obj.deviceList;
-    
+
+    [self diffDeviceListsAndNotify:mac currentDevices:currentDevices newDevices:newDevices];
+}
+
+// Diffs the old and new device lists, and if they are different posts a notification
+- (void)diffDeviceListsAndNotify:(NSString *)mac currentDevices:(NSArray *)currentDevices newDevices:(NSArray *)newDevices {
     BOOL didChange;
     if (currentDevices.count != newDevices.count) {
         didChange = YES;
