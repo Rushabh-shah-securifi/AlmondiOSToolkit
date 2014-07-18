@@ -1018,14 +1018,46 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     NSString *mac = obj.almondMAC;
 
-    // Save list
-    [SFIOfflineDataManager writeDeviceList:obj.deviceList currentMAC:mac];
+    NSArray *currentDevices = [SFIOfflineDataManager readDeviceList:mac];
+    NSArray *newDevices = obj.deviceList;
+    
+    BOOL didChange;
+    if (currentDevices.count != newDevices.count) {
+        didChange = YES;
+    }
+    else {
+        // see if the device ID's are all the same
+        NSMutableSet *currentSet = [NSMutableSet set];
+        NSMutableSet *newSet = [NSMutableSet set];
 
-    // Request values for devices
-    [self asyncRequestDeviceValueList:mac];
+        for (SFIDevice *device in currentDevices) {
+            unsigned int id_int = device.deviceID;
+            [currentSet addObject:[NSNumber numberWithInt:id_int]];
+        }
 
-    // And tell the world there is a new list
-    [self postNotification:kSFIDidChangeDeviceList data:mac];
+        for (SFIDevice *device in newDevices) {
+            unsigned int id_int = device.deviceID;
+            [newSet addObject:[NSNumber numberWithInt:id_int]];
+        }
+
+        if ([newSet isEqualToSet:currentSet]) {
+            didChange = NO;
+        }
+        else {
+            didChange = YES;
+        }
+    }
+
+    // Save new list
+    if (didChange) {
+        [SFIOfflineDataManager writeDeviceList:newDevices currentMAC:mac];
+
+        // Request values for devices
+        [self asyncRequestDeviceValueList:mac];
+
+        // And tell the world there is a new list
+        [self postNotification:kSFIDidChangeDeviceList data:mac];
+    }
 }
 
 #pragma mark - Device Value Updates
