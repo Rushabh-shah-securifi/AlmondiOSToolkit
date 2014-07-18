@@ -219,7 +219,13 @@
 // On time out, the SingleTon will shut itself down
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.network_established_latch;
-    return [self waitOnLatch:latch timeout:numSecsToWait logMsg:@"Giving up on connection establishment"];
+    NSString *msg = @"Giving up on connection establishment";
+    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
+    if (timedOut) {
+        NSLog(@"%@. Issuing shutdown on timeout", msg);
+        [self shutdown];
+    }
+    return timedOut;
 }
 
 // Called by commands submitted to the normal command queue that have to wait for the cloud initialization
@@ -253,7 +259,7 @@
             break;
         }
 
-        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, 500 * NSEC_PER_MSEC);
+        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, 50 * NSEC_PER_MSEC);
 
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
@@ -268,9 +274,6 @@
 
     if (self.isStreamConnected) {
         return NO;
-    }
-    if (timedOut) {
-        [self shutdown];
     }
     return timedOut;
 }
@@ -712,10 +715,11 @@
 }
 
 - (void)markCloudInitialized {
-    if (self.connectionState == SDKCloudStatusInitialized) {
+    SDKCloudStatus cloudStatus = self.connectionState;
+    if (cloudStatus == SDKCloudStatusInitialized) {
         return;
     }
-    if (self.connectionState == SDKCloudStatusCloudConnectionShutdown) {
+    if (cloudStatus == SDKCloudStatusCloudConnectionShutdown) {
         return;
     }
 
@@ -727,10 +731,11 @@
 
     __weak SingleTon *block_self = self;
     dispatch_async(self.initializationQueue, ^() {
-        if (self.connectionState == SDKCloudStatusInitialized) {
+        SDKCloudStatus status = block_self.connectionState;
+        if (status == SDKCloudStatusInitialized) {
             return;
         }
-        if (self.connectionState == SDKCloudStatusCloudConnectionShutdown) {
+        if (status == SDKCloudStatusCloudConnectionShutdown) {
             return;
         }
 
@@ -745,6 +750,7 @@
 
 - (BOOL)submitCloudInitializationCommand:(GenericCommand *)command {
     if (self.connectionState == SDKCloudStatusInitialized) {
+        NSLog(@"Rejected cloud initialization command submission: already marked as initialized");
         return NO;
     }
 
@@ -795,8 +801,9 @@
             return;
         }
         if (waitForNetworkInitializedLatch) {
-            BOOL timedOut = [block_self waitForCloudInitialization:20];
-            if (timedOut) {
+            int const timeOutSecs = 10;
+            [block_self waitForCloudInitialization:timeOutSecs];
+            if (block_self.connectionState != SDKCloudStatusInitialized) {
                 return;
             }
         }
@@ -816,15 +823,15 @@
         NSError *error;
         BOOL success = [block_self internalSendToCloud:block_self command:command error:&error];
         if (!success) {
-            NSLog(@"Command Queue: send error: %@, tag:%ld", error.localizedDescription, (long)tag);
+            NSLog(@"Command Queue: send error: %@, tag:%ld", error.description, (long)tag);
             [unit markResponse:NO];
             return;
         }
 
         DLog(@"Command Queue: waiting for response: %ld", (long)tag);
 
-        int timeoutSecs = 10;
-        [unit waitForResponse:timeoutSecs];
+        int const waitAtMostSecs = 5;
+        [unit waitForResponse:waitAtMostSecs];
 
         DLog(@"Command Queue: done waiting for response: %ld", (long)tag);
     });
