@@ -210,6 +210,8 @@
             block_self.inputStream = nil;
         }
     });
+
+    [self.delegate singletTonCloudConnectionDidClose:self];
 }
 
 #pragma mark - Semaphores
