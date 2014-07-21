@@ -10,4 +10,6 @@
 
 @interface DeviceValueRequest : NSObject
 @property NSString *almondMAC;
+
+- (NSString *)description;
 @end

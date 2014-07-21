@@ -9,5 +9,5 @@
 #import "DeviceDataHashResponse.h"
 
 @implementation DeviceDataHashResponse
-@synthesize isSuccessful, almondHash, reason;
+
 @end

@@ -603,9 +603,9 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         
         if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
-            [parser.command setIsSuccessful:1];
+            [parser.command setIsSuccessful:YES];
         }else{
-            [parser.command setIsSuccessful:0];
+            [parser.command setIsSuccessful:NO];
         }
         
         parser.parsingCommand = YES;

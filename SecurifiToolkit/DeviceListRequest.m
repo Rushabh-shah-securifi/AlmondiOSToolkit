@@ -9,6 +9,13 @@
 #import "DeviceListRequest.h"
 
 @implementation DeviceListRequest
-@synthesize almondMAC;
+
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.almondMAC=%@", self.almondMAC];
+    [description appendString:@">"];
+    return description;
+}
+
 
 @end

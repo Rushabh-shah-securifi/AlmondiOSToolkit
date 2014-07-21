@@ -10,4 +10,7 @@
 
 @interface DeviceListRequest : NSObject
 @property NSString *almondMAC;
+
+- (NSString *)description;
+
 @end
