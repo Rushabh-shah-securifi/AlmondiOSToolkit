@@ -38,7 +38,7 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 @property BOOL isLoggedIn;
 
 // queue on which notifications will be posted
-+ (SingleTon *)newSingleton:(dispatch_queue_t)callbackQueue;
++ (SingleTon *)newSingletonWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)callbackQueue;
 
 - (void)initNetworkCommunication;
 

@@ -11,7 +11,6 @@
 #import "Commandparser.h"
 #import "PrivateCommandTypes.h"
 #import "LoginTempPass.h"
-#import "SecurifiCloudResources-Prefix.pch"
 #import "SUnit.h"
 
 @interface SingleTon ()
@@ -24,6 +23,7 @@
 @property(nonatomic, readonly) dispatch_queue_t commandQueue;           // serial queue to which commands submitted to the system are added
 @property(nonatomic, readonly) dispatch_queue_t backgroundQueue;        // queue on which the streams are managed
 @property(nonatomic, readonly) dispatch_queue_t callbackQueue;          // queue used for posting notifications
+@property(nonatomic, readonly) dispatch_queue_t dynamicCallbackQueue;          // queue used for posting notifications
 @property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
 @property(nonatomic, readonly) dispatch_semaphore_t cloud_initialized_latch;
 
@@ -45,11 +45,11 @@
 
 @implementation SingleTon
 
-+ (SingleTon *)newSingleton:(dispatch_queue_t)callbackQueue {
-    return [[SingleTon alloc] initWithQueue:callbackQueue];
++ (SingleTon *)newSingletonWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue {
+    return [[SingleTon alloc] initWithQueue:callbackQueue dynamicCallbackQueue:dynamicCallbackQueue];
 }
 
-- (id)initWithQueue:(dispatch_queue_t)callbackQueue {
+- (id)initWithQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue {
     self = [super init];
     if (self) {
         self.isLoggedIn = NO;
@@ -64,6 +64,7 @@
 
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
         _callbackQueue = callbackQueue;
+        _dynamicCallbackQueue = dynamicCallbackQueue;
 
         _network_established_latch = dispatch_semaphore_create(0);
         _cloud_initialized_latch = dispatch_semaphore_create(0);
@@ -458,7 +459,7 @@
                                             //PY 170913 - Device Data Hash Response
                                         case DEVICEDATA_HASH_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:DEVICEDATA_HASH_RESPONSE];
-                                            [self postData:HASH_NOTIFIER data:temp.command];
+                                            [self postData:DEVICEDATA_HASH_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 170913 - Device Data  Response
@@ -471,7 +472,7 @@
                                         case DEVICE_VALUE_LIST_RESPONSE: {
                                             // [SNLog Log:@"%s: Received Device Value Mobile Response", __PRETTY_FUNCTION__];
                                             [self tryMarkUnitCompletion:YES responseType:DEVICE_VALUE_LIST_RESPONSE];
-                                            [self postData:DEVICE_VALUE_NOTIFIER data:temp.command];
+                                            [self postData:DEVICE_VALUE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 200913 - Mobile Command Response
@@ -484,14 +485,14 @@
                                             //PY 230913 - Device List Command - 81 -  Response
                                         case DYNAMIC_DEVICE_DATA: {
                                             // [SNLog Log:@"%s: Received DYNAMIC_DEVICE_DATA", __PRETTY_FUNCTION__];
-                                            [self postData:DEVICE_DATA_CLOUD_NOTIFIER data:temp.command];
+                                            [self postDataDynamic:DYNAMIC_DEVICE_DATA_NOTIFIER data:temp.command];
                                             break;
                                         }
 
                                             //PY 230913 - Device Value Command - 82 -  Response
                                         case DYNAMIC_DEVICE_VALUE_LIST: {
                                             // [SNLog Log:@"%s: Received DEVICE_VALUE_LIST_RESPONSE", __PRETTY_FUNCTION__];
-                                            [self postData:DEVICE_VALUE_CLOUD_NOTIFIER data:temp.command];
+                                            [self postDataDynamic:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
                                             //PY 291013 - Generic Command Response
@@ -534,12 +535,12 @@
                                         }
                                         case DYNAMIC_ALMOND_ADD: {
                                             // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_ADD", __PRETTY_FUNCTION__];
-                                            [self postData:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:temp.command];
+                                            [self postDataDynamic:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case DYNAMIC_ALMOND_DELETE: {
                                             // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_DELETE", __PRETTY_FUNCTION__];
-                                            [self postData:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:temp.command];
+                                            [self postDataDynamic:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case SENSOR_CHANGE_RESPONSE: {
@@ -550,7 +551,7 @@
                                         }
                                         case DYNAMIC_ALMOND_NAME_CHANGE: {
                                             // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_NAME_CHANGE", __PRETTY_FUNCTION__];
-                                            [self postData:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
+                                            [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
 
@@ -632,10 +633,22 @@
     // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
     // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
     // UI can easily become confused. This needs to be sorted out.
+    SLog(@"Posting %@", notificationName);
+    [self post:notificationName payload:payload queue:self.callbackQueue];
+}
 
+- (void)postDataDynamic:(NSString*)notificationName data:(id)payload {
+    // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
+    // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
+    // UI can easily become confused. This needs to be sorted out.
+    SLog(@"Posting dynamic %@", notificationName);
+    [self post:notificationName payload:payload queue:self.dynamicCallbackQueue];
+}
+
+- (void)post:(NSString *)notificationName payload:(id)payload queue:(dispatch_queue_t)queue {
     __weak id block_payload = payload;
 
-    dispatch_sync(self.callbackQueue, ^() {
+    dispatch_sync(queue, ^() {
         NSDictionary *data = nil;
         if (payload) {
             data = @{@"data" : block_payload};
@@ -813,18 +826,15 @@
     __weak SingleTon *block_self = self;
     dispatch_async(queue, ^() {
         if (block_self.networkShutdown) {
-            DLog(@"Command Queue: aborting unit: network is shutdown");
+            SLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
         if (waitForNetworkInitializedLatch) {
             int const timeOutSecs = 10;
             [block_self waitForCloudInitialization:timeOutSecs];
-            if (block_self.connectionState != SDKCloudStatusInitialized) {
-                return;
-            }
         }
         if (block_self.networkShutdown) {
-            DLog(@"Command Queue: aborting unit: network is shutdown");
+            SLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
 
@@ -834,7 +844,7 @@
         [unit markWorking: tag];
         block_self.currentUnit = unit;
 
-        DLog(@"Command Queue: sending command %@ to cloud: %ld", [command description], (long)tag);
+        SLog(@"Command Queue: sending %ld (%@)", (long)tag, command);
 
         NSError *error;
         BOOL success = [block_self internalSendToCloud:block_self command:command error:&error];
@@ -844,12 +854,12 @@
             return;
         }
 
-        DLog(@"Command Queue: waiting for response: %ld", (long)tag);
+        SLog(@"Command Queue: waiting for response: %ld (%@)", (long)tag, command);
 
         int const waitAtMostSecs = 5;
         [unit waitForResponse:waitAtMostSecs];
 
-        DLog(@"Command Queue: done waiting for response: %ld", (long)tag);
+        SLog(@"Command Queue: done waiting for response: %ld (%@)", (long)tag, command);
     });
 
     return YES;
