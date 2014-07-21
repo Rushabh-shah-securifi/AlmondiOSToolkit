@@ -9,5 +9,5 @@
 #import "DeviceDataHashRequest.h"
 
 @implementation DeviceDataHashRequest
-@synthesize almondMAC;
+
 @end

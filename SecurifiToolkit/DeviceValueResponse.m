@@ -9,5 +9,4 @@
 #import "DeviceValueResponse.h"
 
 @implementation DeviceValueResponse
-@synthesize deviceValueList, deviceCount, almondMAC, isSuccessful, reason;
 @end
