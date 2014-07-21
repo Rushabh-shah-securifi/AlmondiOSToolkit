@@ -12,6 +12,29 @@
 #import "GenericCommand.h"
 #import "PrivateCommandTypes.h"
 
+#import <libxml2/libxml/tree.h>
+#import "LoginResponse.h"
+#import "LogoutResponse.h"
+#import "LogoutAllResponse.h"
+#import "SignupResponse.h"
+#import "SanityResponse.h"
+#import "CommandTypes.h"
+#import "AffiliationUserComplete.h"
+#import "AlmondListResponse.h"
+#import "DeviceDataHashResponse.h"
+#import "DeviceListResponse.h"
+#import "SFIDevice.h"
+#import "DeviceValueResponse.h"
+#import "SFIDeviceValue.h"
+#import "SFIDeviceKnownValues.h"
+#import "MobileCommandResponse.h"
+#import "GenericCommandResponse.h"
+#import "SFIAlmondPlus.h"
+#import "ValidateAccountResponse.h"
+#import "ResetPasswordResponse.h"
+#import "SensorChangeResponse.h"
+#import "DynamicAlmondNameChangeResponse.h"
+
 #pragma mark Constants
 
 // The following constants are the XML element names and their string lengths for parsing comparison.
@@ -156,19 +179,26 @@ static void errorEncounteredSAX(void * ctx, const char * msg, ...);
 // Forward reference. The structure is defined in full at the end of the file.
 static xmlSAXHandler simpleSAXHandlerStruct;
 
-@implementation CommandParser
-@synthesize characterBuffer;
-@synthesize storingCommandType;
-@synthesize storingCharacters;
-@synthesize parsingCommand;
-@synthesize done;
-@synthesize command;
-@synthesize commandType;
-@synthesize tmpAlmondList;
-@synthesize tmpDeviceList, tmpDevice;
-@synthesize currentTmpMACValue;
+@interface CommandParser ()
+@property(nonatomic, readonly) xmlParserCtxtPtr context;
+@property(nonatomic) NSMutableArray *tmpAlmondList;
+@property(nonatomic) NSMutableArray *tmpDeviceList;
+@property(nonatomic) SFIDevice *tmpDevice;
+@property(nonatomic) SFIDeviceValue *tmpDeviceValue;
+@property(nonatomic) NSMutableArray *deviceValues;
+@property(nonatomic) NSMutableArray *knownDeviceValues;
+@property(nonatomic) SFIDeviceKnownValues *tmpDeviceKnownValue;
+@property(nonatomic) NSString *currentTmpMACValue;
+@property(nonatomic) SFIAlmondPlus *tmpAlmond;
+@property BOOL storingCharacters;
+@property(nonatomic) NSMutableData *characterBuffer;
+@property BOOL parsingCommand;
+@property unsigned int commandType;
+@property unsigned int storingCommandType;
+@property(nonatomic) id command;
+@end
 
-//@synthesize loginResponse, logoutAllResponse,logoutResponse,signupResponse,affiliationResponse;
+@implementation CommandParser
 
 - (id) parseXML:(NSData *)xmlData
 {
@@ -177,11 +207,12 @@ static xmlSAXHandler simpleSAXHandlerStruct;
     
     @try{
         self.characterBuffer = [[NSMutableData alloc] init];
-        context = xmlCreatePushParserCtxt(&simpleSAXHandlerStruct, (__bridge void *)(self), NULL, 0, NULL);
+        _context = xmlCreatePushParserCtxt(&simpleSAXHandlerStruct, (__bridge void *)(self), NULL, 0, NULL);
+
         NSUInteger length = [xmlData length];
-        xmlParseChunk(context, (const char *)[xmlData bytes], (int) length, 0);
-        xmlParseChunk(context, NULL, 0, 1);// 1 to end parsing
-        done = YES;
+        xmlParseChunk(self.context, (const char *)[xmlData bytes], (int) length, 0);
+        xmlParseChunk(self.context, NULL, 0, 1);// 1 to end parsing
+//        done = YES;
         
         self.characterBuffer = nil;
     }
@@ -192,7 +223,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
     //// NSLog(@"Returning LoginResponse object ");
     //// NSLog(@"object data \n UserID: %@  tempPass: %@ ",[self.command userID], [self.command tempPass]);
     self.characterBuffer=nil;
-    xmlFreeParserCtxt(context);
+    xmlFreeParserCtxt(self.context);
     
     GenericCommand *obj = [[GenericCommand alloc] init];
     if (self.commandType == LOGIN_RESPONSE)
@@ -336,13 +367,13 @@ static xmlSAXHandler simpleSAXHandlerStruct;
 
 - (void)appendCharacters:(const char *)charactersFound length:(NSInteger)length {
     //// NSLog(@"Buffer : %@",[characterBuffer bytes]);
-    [characterBuffer appendBytes:charactersFound length:(NSUInteger) length];
+    [self.characterBuffer appendBytes:charactersFound length:(NSUInteger) length];
 }
 
 - (NSString *)currentString {
     // Create a string with the character data using UTF-8 encoding. UTF-8 is the default XML data encoding.
-    NSString *currentString = [[NSString alloc] initWithData:characterBuffer encoding:NSUTF8StringEncoding];
-    [characterBuffer setLength:0];
+    NSString *currentString = [[NSString alloc] initWithData:self.characterBuffer encoding:NSUTF8StringEncoding];
+    [self.characterBuffer setLength:0];
     return currentString;
 }
 
@@ -1451,14 +1482,18 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         {
             [parser.deviceValues addObject:parser.tmpDeviceValue];
             
-        }else if (!strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)
+        }
+        else if (!strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)
                   && (parser.storingCommandType == DEVICE_VALUE_LIST_RESPONSE))
         {
             [parser.command setDeviceValueList:parser.deviceValues];
-            // [SNLog Log:@"Method Name: %s Device Value Command Parsing done Size: %d " , __PRETTY_FUNCTION__, [parser.deviceValues count]];
             parser.commandType = DEVICE_VALUE_LIST_RESPONSE;
             parser.parsingCommand = NO;
-            
+
+            if (parser.currentTmpMACValue != nil) {
+                [parser.command setAlmondMAC:parser.currentTmpMACValue];
+                parser.currentTmpMACValue = nil;
+            }
         }
         
         //Device Value Response - END
