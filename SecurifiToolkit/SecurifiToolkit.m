@@ -11,7 +11,6 @@
 #import "LoginTempPass.h"
 #import "PrivateCommandTypes.h"
 #import "KeyChainWrapper.h"
-#import "SecurifiCloudResources-Prefix.pch"
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
 #define kPREF_USER_DEFAULT_LOGGED_IN_ONCE                   @"kLoggedInOnce"
@@ -31,6 +30,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
+@property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property(nonatomic, weak) SingleTon *networkSingleton;
 @property(atomic) BOOL initializing; // when TRUE an op is already in progress to set up a network
@@ -56,6 +56,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     self = [super init];
     if (self) {
         _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
+        _socketDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
+
         _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -68,14 +70,14 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         [center addObserver:self selector:@selector(onDynamicAlmondListDelete:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDynamicAlmondNameChange:) name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
 
-        [center addObserver:self selector:@selector(onDynamicDeviceListChange:) name:DEVICE_DATA_CLOUD_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDynamicDeviceListChange:) name:DYNAMIC_DEVICE_DATA_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceListResponse:) name:DEVICE_DATA_NOTIFIER object:nil];
 
-        [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DEVICE_VALUE_CLOUD_NOTIFIER object:nil];
-        [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
 
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
-        [center addObserver:self selector:@selector(onDeviceHashResponse:) name:HASH_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDeviceHashResponse:) name:DEVICEDATA_HASH_NOTIFIER object:nil];
     }
 
     return self;
@@ -92,14 +94,14 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     [center removeObserver:self name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
     [center removeObserver:self name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
 
-    [center removeObserver:self name:DEVICE_DATA_CLOUD_NOTIFIER object:nil];
+    [center removeObserver:self name:DYNAMIC_DEVICE_DATA_NOTIFIER object:nil];
     [center removeObserver:self name:DEVICE_DATA_NOTIFIER object:nil];
 
-    [center removeObserver:self name:DEVICE_VALUE_CLOUD_NOTIFIER object:nil];
-    [center removeObserver:self name:DEVICE_VALUE_NOTIFIER object:nil];
+    [center removeObserver:self name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
+    [center removeObserver:self name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
 
     [center removeObserver:self name:ALMOND_LIST_NOTIFIER object:nil];
-    [center removeObserver:self name:HASH_NOTIFIER object:nil];
+    [center removeObserver:self name:DEVICEDATA_HASH_NOTIFIER object:nil];
 }
 
 #pragma mark - SDK state
@@ -697,7 +699,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     [self tearDownNetworkSingleton];
 
-    SingleTon *newSingleton = [SingleTon newSingleton:self.socketCallbackQueue];
+    SingleTon *newSingleton = [SingleTon newSingletonWithResponseCallbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];
     newSingleton.delegate = self;
     newSingleton.connectionState = SDKCloudStatusInitializing;
 
@@ -755,6 +757,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 #pragma mark - Almond Updates
 
 - (void)onAlmondListResponse:(id)sender {
+    NSLog(@"Received Almond list response");
+
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -914,6 +918,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 #pragma mark - Device Updates
 
 - (void)onDeviceHashResponse:(id)sender {
+    NSLog(@"Received Almond hash response");
+
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -925,6 +931,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     if (!obj.isSuccessful || currentHash.length == 0) {
         // We assume, on failure, the Almond is no longer associated with this account and
         // our list of Almonds is out of date. Therefore, issue a request for the Almond list.
+        NSLog(@"Device hash response failed; requesting Almond list");
 
         [self removeCurrentAlmond];
 
@@ -936,27 +943,29 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     SFIAlmondPlus *plus = [self currentAlmond];
     if (plus == nil) {
+        NSLog(@"Device Hash Response failed: No current Almond");
         return;
     }
 
     NSString *currentMac = plus.almondplusMAC;
     NSString *storedHash = [SFIOfflineDataManager readHashList:currentMac];
 
-    if ([currentHash isEqualToString:@"null"]) {
+    if (currentHash == nil || [currentHash isEqualToString:@"null"]) {
         //Hash sent by cloud as null - No Device
+        NSLog(@"Device Hash Response: null; request devices");
         [self asyncRequestDeviceList:currentMac];
     }
+    else if (storedHash.length > 0 && currentMac.length > 0 && [storedHash isEqualToString:currentHash]) {
+        // Devices list is fresh. Update the device values.
+        NSLog(@"Device Hash Response: matched; request values");
+        [self tryRequestDeviceValueList:currentMac];
+    }
     else {
-        if ([storedHash isEqualToString:currentHash]) {
-            // Devices list is fresh. Update the device values.
-            [self asyncRequestDeviceValueList:currentMac];
-        }
-        else {
-            //Save hash in file for each almond
-            [SFIOfflineDataManager writeHashList:currentHash currentMAC:currentMac];
-            // and update the device list -- on receipt of the device list, then the values will be updated
-            [self asyncRequestDeviceList:currentMac];
-        }
+        //Save hash in file for each almond
+        NSLog(@"Device Hash Response: mismatch; requesting devices; mac:%@, current:%@, stored:%@", currentMac, currentHash, storedHash);
+        [SFIOfflineDataManager writeHashList:currentHash currentMAC:currentMac];
+        // and update the device list -- on receipt of the device list, then the values will be updated
+        [self asyncRequestDeviceList:currentMac];
     }
 }
 
@@ -1016,6 +1025,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 }
 
 - (void)onDeviceListResponse:(id)sender {
+    NSLog(@"Received device list response");
+
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -1024,6 +1035,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
     if (!obj.isSuccessful) {
+        NSLog(@"Device list response was not successful; stopping");
         return;
     }
 
@@ -1066,6 +1078,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     // Save new list
     if (didChange) {
+        NSLog(@"Device list response had differences");
+
         [SFIOfflineDataManager writeDeviceList:newDevices currentMAC:mac];
 
         // Request values for devices
