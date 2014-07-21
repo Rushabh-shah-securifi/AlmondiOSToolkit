@@ -64,4 +64,13 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 // TRUE if requested. FALSE otherwise.
 - (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac;
 
+// Provides a per-connection ledger for tracking Device Value List requests.
+// A list is should be requested at least once per each connection, but it
+// should not be requested repeatedly. This ledger helps manage the process.
+- (void)markDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac;
+
+// Tests whether a Device Values List was requested already.
+// TRUE if requested. FALSE otherwise.
+- (BOOL)wasDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac;
+
 @end

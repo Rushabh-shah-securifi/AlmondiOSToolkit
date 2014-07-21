@@ -39,6 +39,7 @@
 
 @property (nonatomic, readonly) NSObject *almondTableSyncLocker;
 @property(readonly) NSMutableSet *hashCheckedForAlmondTable;
+@property(readonly) NSMutableSet *deviceValuesCheckedForAlmondTable;
 
 @end
 
@@ -69,6 +70,7 @@
 
         _almondTableSyncLocker = [NSObject new];
         _hashCheckedForAlmondTable = [NSMutableSet new];
+        _deviceValuesCheckedForAlmondTable = [NSMutableSet new];
     }
     
     return self;
@@ -705,6 +707,18 @@
 - (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac {
     @synchronized (self.almondTableSyncLocker) {
         return [self.hashCheckedForAlmondTable containsObject:aAlmondMac];
+    }
+}
+
+- (void)markDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac {
+    @synchronized (self.almondTableSyncLocker) {
+        [self.deviceValuesCheckedForAlmondTable addObject:aAlmondMac];
+    }
+}
+
+- (BOOL)wasDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac {
+    @synchronized (self.almondTableSyncLocker) {
+        return [self.deviceValuesCheckedForAlmondTable containsObject:aAlmondMac];
     }
 }
 

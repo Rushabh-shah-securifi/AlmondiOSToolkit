@@ -576,7 +576,18 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     cloudCommand.commandType = DEVICE_VALUE;
     cloudCommand.command = command;
 
+    [self.networkSingleton markDeviceValuesFetchedForAlmond:almondMac];
     [self asyncSendToCloud:cloudCommand];
+}
+
+- (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
+    if ([self.networkSingleton wasDeviceValuesFetchedForAlmond:almondMac]) {
+        return NO;
+    }
+
+    [self.networkSingleton markDeviceValuesFetchedForAlmond:almondMac];
+    [self asyncRequestDeviceValueList:almondMac];
+    return YES;
 }
 
 #pragma mark - Device value updates
@@ -1088,7 +1099,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
-    NSString *currentMAC = [self currentAlmond].almondplusMAC;
+    NSString *currentMAC = obj.almondMAC;
 
     [self processDeviceValueResponse:obj currentMAC:currentMAC];
 }

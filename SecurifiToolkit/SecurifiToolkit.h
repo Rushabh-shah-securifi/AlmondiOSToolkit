@@ -125,5 +125,9 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 // Send a command to the cloud requesting current values for the Almond's devices
 - (void)asyncRequestDeviceValueList:(NSString *)almondMac;
 
+// Send a command to the cloud requesting current values for the Almond's devices if device values have not been
+// already requested once already on the same network connection
+- (BOOL)tryRequestDeviceValueList:(NSString *)almondMac;
+
 @end
  
