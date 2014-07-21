@@ -771,7 +771,10 @@
         block_self.connectionState = SDKCloudStatusInitialized;
         dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
         if (latch) {
-            dispatch_semaphore_signal(latch);
+            NSInteger limit = self.currentUnitCounter;
+            for (NSInteger i=0; i < limit; i++) {
+                dispatch_semaphore_signal(latch);
+            }
             NSLog(@"Executed cloud initialization completed command");
         }
     });
