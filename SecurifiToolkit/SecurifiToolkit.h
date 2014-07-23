@@ -58,6 +58,9 @@ extern NSString *const kSFIDidLogoutNotification;
 // Notification posted when Logout All has been received
 extern NSString *const kSFIDidLogoutAllNotification;
 
+// Posted when the current Almond selection is changed
+extern NSString *const kSFIDidChangeCurrentAlmond;
+
 // Notification posted when the Almond list has been updated
 extern NSString *const kSFIDidUpdateAlmondList;
 

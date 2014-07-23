@@ -23,6 +23,7 @@
 NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
 NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
 NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
+NSString *const kSFIDidChangeCurrentAlmond = @"kSFIDidChangeCurrentAlmond";
 NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
@@ -484,6 +485,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
+
+    [self postNotification:kSFIDidChangeCurrentAlmond data:almond];
 }
 
 - (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
