@@ -38,7 +38,7 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 @property BOOL isLoggedIn;
 
 // queue on which notifications will be posted
-+ (SingleTon *)newSingletonWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)callbackQueue;
++ (SingleTon *)newSingletonWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;
 
 - (void)initNetworkCommunication;
 
@@ -63,6 +63,18 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 // Tests whether a Hash was requested already.
 // TRUE if requested. FALSE otherwise.
 - (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac;
+
+// Provides a way to flag that a Device List is being fetched.
+// Used to prevent sending multiple same requests.
+// Caller should call clearWillFetchDeviceListForAlmond: on receiving a reply
+- (void)markWillFetchDeviceListForAlmond:(NSString *)aAlmondMac;
+
+// Tests whether a Device List has been requested already.
+// TRUE if requested. FALSE otherwise.
+- (BOOL)willFetchDeviceListFetchedForAlmond:(NSString *)aAlmondMac;
+
+// Clears the flag indicating that a Device List is being fetched
+- (void)clearWillFetchDeviceListForAlmond:(NSString *)aAlmondMac;
 
 // Provides a per-connection ledger for tracking Device Value List requests.
 // A list is should be requested at least once per each connection, but it

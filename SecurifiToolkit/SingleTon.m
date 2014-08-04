@@ -40,6 +40,7 @@
 @property (nonatomic, readonly) NSObject *almondTableSyncLocker;
 @property(readonly) NSMutableSet *hashCheckedForAlmondTable;
 @property(readonly) NSMutableSet *deviceValuesCheckedForAlmondTable;
+@property(readonly) NSMutableSet *willFetchDeviceListFlag;
 
 @end
 
@@ -72,6 +73,7 @@
         _almondTableSyncLocker = [NSObject new];
         _hashCheckedForAlmondTable = [NSMutableSet new];
         _deviceValuesCheckedForAlmondTable = [NSMutableSet new];
+        _willFetchDeviceListFlag = [NSMutableSet new];
     }
     
     return self;
@@ -721,6 +723,27 @@
     @synchronized (self.almondTableSyncLocker) {
         return [self.hashCheckedForAlmondTable containsObject:aAlmondMac];
     }
+}
+
+- (void)markWillFetchDeviceListForAlmond:(NSString *)aAlmondMac {
+    if (aAlmondMac.length == 0) {
+        return;
+    }
+    [self.willFetchDeviceListFlag addObject:aAlmondMac];
+}
+
+- (BOOL)willFetchDeviceListFetchedForAlmond:(NSString *)aAlmondMac {
+    if (aAlmondMac.length == 0) {
+        return NO;
+    }
+    return [self.willFetchDeviceListFlag containsObject:aAlmondMac];
+}
+
+- (void)clearWillFetchDeviceListForAlmond:(NSString *)aAlmondMac {
+    if (aAlmondMac.length == 0) {
+        return;
+    }
+    [self.willFetchDeviceListFlag removeObject:aAlmondMac];
 }
 
 - (void)markDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac {

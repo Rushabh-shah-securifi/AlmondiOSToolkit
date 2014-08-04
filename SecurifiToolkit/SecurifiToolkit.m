@@ -563,6 +563,11 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 #pragma mark - Device and Device Value Management
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
+    if ([self.networkSingleton willFetchDeviceListFetchedForAlmond:almondMac]) {
+        return;
+    }
+    [self.networkSingleton markWillFetchDeviceListForAlmond:almondMac];
+
     DeviceListRequest *deviceListCommand = [[DeviceListRequest alloc] init];
     deviceListCommand.almondMAC = almondMac;
 
@@ -980,51 +985,17 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 
     DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
+
+    [self.networkSingleton clearWillFetchDeviceListForAlmond:obj.almondMAC];
+
     if (!obj.isSuccessful) {
         return;
     }
 
-    NSMutableArray *newDeviceList = obj.deviceList;
     NSString *almondMAC = obj.almondMAC;
+    NSMutableArray *newDeviceList = obj.deviceList;
 
-    // Compare the list with device value list size and correct the list accordingly if any device was deleted
-    // Read device value list from storage
-    NSArray *oldDeviceValueList = [SFIOfflineDataManager readDeviceValueList:almondMAC];
-
-    // Delete from the device value list
-    NSMutableArray *newDeviceValueList = [[NSMutableArray alloc] init];
-
-    // Devices have been removed
-    BOOL removedDevices = [newDeviceList count] < [oldDeviceValueList count];
-
-    if (removedDevices) {
-        for (SFIDevice *currentDevice in newDeviceList) {
-            for (SFIDeviceValue *offlineDeviceValue in oldDeviceValueList) {
-                if (currentDevice.deviceID == offlineDeviceValue.deviceID) {
-                    offlineDeviceValue.isPresent = TRUE;
-                    break;
-                }
-            }
-        }
-
-        for (SFIDeviceValue *offlineDeviceValue in oldDeviceValueList) {
-            if (offlineDeviceValue.isPresent) {
-                [newDeviceValueList addObject:offlineDeviceValue];
-            }
-        }
-    }
-
-    // Update offline storage
-    [SFIOfflineDataManager writeDeviceList:newDeviceList currentMAC:almondMAC];
-    if (removedDevices) {
-        [SFIOfflineDataManager writeDeviceValueList:newDeviceValueList currentMAC:almondMAC];
-    }
-
-    // Request values for devices
-    [self asyncRequestDeviceValueList:almondMAC];
-
-    NSArray *currentDevices = [SFIOfflineDataManager readDeviceList:almondMAC];
-    [self diffDeviceListsAndNotify:almondMAC currentDevices:currentDevices newDevices:newDeviceList];
+    [self processDeviceListChange:almondMAC newDevices:newDeviceList];
 }
 
 - (void)onDeviceListResponse:(id)sender {
@@ -1037,60 +1008,30 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 
     DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
+
+    [self.networkSingleton clearWillFetchDeviceListForAlmond:obj.almondMAC];
+
     if (!obj.isSuccessful) {
         NSLog(@"Device list response was not successful; stopping");
         return;
     }
 
     NSString *mac = obj.almondMAC;
-
-    NSArray *currentDevices = [SFIOfflineDataManager readDeviceList:mac];
     NSArray *newDevices = obj.deviceList;
 
-    [self diffDeviceListsAndNotify:mac currentDevices:currentDevices newDevices:newDevices];
+    [self processDeviceListChange:mac newDevices:newDevices];
 }
 
-// Diffs the old and new device lists, and if they are different posts a notification
-- (void)diffDeviceListsAndNotify:(NSString *)mac currentDevices:(NSArray *)currentDevices newDevices:(NSArray *)newDevices {
-    BOOL didChange;
-    if (currentDevices.count != newDevices.count) {
-        didChange = YES;
-    }
-    else {
-        // see if the device ID's are all the same
-        NSMutableSet *currentSet = [NSMutableSet set];
-        NSMutableSet *newSet = [NSMutableSet set];
+// Processes device lists received in dynamic and on-demand updates.
+// After storing the new list, a notification is posted and an updated values list is requested
+- (void)processDeviceListChange:(NSString *)mac newDevices:(NSArray *)newDevices {
+    [SFIOfflineDataManager writeDeviceList:newDevices currentMAC:mac];
 
-        for (SFIDevice *device in currentDevices) {
-            unsigned int id_int = device.deviceID;
-            [currentSet addObject:[NSNumber numberWithInt:id_int]];
-        }
+    // Request values for devices
+    [self asyncRequestDeviceValueList:mac];
 
-        for (SFIDevice *device in newDevices) {
-            unsigned int id_int = device.deviceID;
-            [newSet addObject:[NSNumber numberWithInt:id_int]];
-        }
-
-        if ([newSet isEqualToSet:currentSet]) {
-            didChange = NO;
-        }
-        else {
-            didChange = YES;
-        }
-    }
-
-    // Save new list
-    if (didChange) {
-        NSLog(@"Device list response had differences");
-
-        [SFIOfflineDataManager writeDeviceList:newDevices currentMAC:mac];
-
-        // Request values for devices
-        [self asyncRequestDeviceValueList:mac];
-
-        // And tell the world there is a new list
-        [self postNotification:kSFIDidChangeDeviceList data:mac];
-    }
+    // And tell the world there is a new list
+    [self postNotification:kSFIDidChangeDeviceList data:mac];
 }
 
 #pragma mark - Device Value Updates
@@ -1105,7 +1046,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
     NSString *currentMAC = obj.almondMAC;
 
-    [self processDeviceValueResponse:obj currentMAC:currentMAC];
+    [self processDynamicDeviceValueChange:obj currentMAC:currentMAC];
 }
 
 - (void)onDeviceValueListChange:(id)sender {
@@ -1118,10 +1059,18 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
     NSString *currentMAC = obj.almondMAC;
 
-    [self processDeviceValueResponse:obj currentMAC:currentMAC];
+    if (currentMAC.length == 0) {
+        return;
+    }
+
+    // Update offline storage
+    [SFIOfflineDataManager writeDeviceValueList:obj.deviceValueList currentMAC:currentMAC];
+
+    [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
 
-- (void)processDeviceValueResponse:(DeviceValueResponse *)obj currentMAC:(NSString *)currentMAC {
+// Processes a dynamic change to a device value
+- (void)processDynamicDeviceValueChange:(DeviceValueResponse *)obj currentMAC:(NSString *)currentMAC {
     if (currentMAC.length == 0) {
         return;
     }
@@ -1147,7 +1096,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
                             }
                         }
                     }
-                    [currentValue setKnownValues:currentValues];
+
+                    currentValue.knownValues = currentValues;
                 }
             }
         }
