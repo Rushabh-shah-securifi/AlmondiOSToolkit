@@ -37,10 +37,12 @@
 @property(nonatomic) NSOutputStream *outputStream;
 @property BOOL sendCommandFail;
 
-@property (nonatomic, readonly) NSObject *almondTableSyncLocker;
-@property(readonly) NSMutableSet *hashCheckedForAlmondTable;
-@property(readonly) NSMutableSet *deviceValuesCheckedForAlmondTable;
-@property(readonly) NSMutableSet *willFetchDeviceListFlag;
+@property(nonatomic, readonly) NSObject *almondTableSyncLocker;
+@property(nonatomic, readonly) NSMutableSet *hashCheckedForAlmondTable;
+@property(nonatomic, readonly) NSMutableSet *deviceValuesCheckedForAlmondTable;
+
+@property(nonatomic, readonly) NSObject *willFetchDeviceListFlagSyncLocker;
+@property(nonatomic, readonly) NSMutableSet *willFetchDeviceListFlag;
 
 @end
 
@@ -73,6 +75,8 @@
         _almondTableSyncLocker = [NSObject new];
         _hashCheckedForAlmondTable = [NSMutableSet new];
         _deviceValuesCheckedForAlmondTable = [NSMutableSet new];
+
+        _willFetchDeviceListFlagSyncLocker = [NSObject new];
         _willFetchDeviceListFlag = [NSMutableSet new];
     }
     
@@ -729,21 +733,27 @@
     if (aAlmondMac.length == 0) {
         return;
     }
-    [self.willFetchDeviceListFlag addObject:aAlmondMac];
+    @synchronized (self.willFetchDeviceListFlagSyncLocker) {
+        [self.willFetchDeviceListFlag addObject:aAlmondMac];
+    }
 }
 
 - (BOOL)willFetchDeviceListFetchedForAlmond:(NSString *)aAlmondMac {
     if (aAlmondMac.length == 0) {
         return NO;
     }
-    return [self.willFetchDeviceListFlag containsObject:aAlmondMac];
+    @synchronized (self.willFetchDeviceListFlagSyncLocker) {
+        return [self.willFetchDeviceListFlag containsObject:aAlmondMac];
+    }
 }
 
 - (void)clearWillFetchDeviceListForAlmond:(NSString *)aAlmondMac {
     if (aAlmondMac.length == 0) {
         return;
     }
-    [self.willFetchDeviceListFlag removeObject:aAlmondMac];
+    @synchronized (self.willFetchDeviceListFlagSyncLocker) {
+        [self.willFetchDeviceListFlag removeObject:aAlmondMac];
+    }
 }
 
 - (void)markDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac {
