@@ -41,4 +41,7 @@
 
 - (NSString *)description;
 
+// returns the imageName property value or when null returns the default value
+- (NSString*)imageName:(NSString*)defaultName;
+
 @end

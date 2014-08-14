@@ -93,4 +93,9 @@
     return description;
 }
 
+- (NSString *)imageName:(NSString *)defaultName {
+    return self.imageName ? self.imageName : defaultName;
+}
+
+
 @end
