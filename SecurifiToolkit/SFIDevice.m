@@ -7,6 +7,12 @@
 //
 
 #import "SFIDevice.h"
+#import "SFIDeviceKnownValues.h"
+#import "SFIDeviceValue.h"
+
+#define STATE @"STATE"
+#define TAMPER @"TAMPER"
+#define LOW_BATTERY @"LOW BATTERY"
 
 @implementation SFIDevice
 
@@ -95,6 +101,315 @@
 
 - (NSString *)imageName:(NSString *)defaultName {
     return self.imageName ? self.imageName : defaultName;
+}
+
+- (void)initializeFromValues:(SFIDeviceValue *)values {
+    self.imageName = @"Reload_icon.png";
+
+    if (values == nil) {
+        return;
+    }
+
+    NSString *deviceTypeName;
+    NSArray *currentKnownValues = values.knownValues;
+
+    switch (self.deviceType) {
+        case 1: {
+//            SFIDeviceKnownValues *curDeviceValues = currentKnownValues[0];
+            break;
+        }
+
+        case 2: {
+            //Multilevel switch
+            for (unsigned int index = 0; index < currentKnownValues.count; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"SWITCH MULTILEVEL"]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                    break;
+                }
+            }
+            break;
+        }
+
+        case 3: {
+            for (unsigned int  index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues;
+                curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"SENSOR BINARY"]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        case 4: {
+            //Level Control
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues;
+                curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"SWITCH BINARY"]) {
+                    self.stateIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:@"SWITCH MULTILEVEL"]) {
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+            }
+            break;
+        }
+
+        case 5: {
+            //Door Lock
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"DOOR LOCK "]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                    break;
+                }
+            }
+            break;
+        }
+        case 6: {
+            //Alarm : TODO Later
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"LOCK_STATE"]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                    break;
+                }
+            }
+            break;
+        }
+
+        case 11: {
+            //Motion Sensor
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:STATE]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+                else if ([deviceTypeName isEqualToString:TAMPER]) {
+                    self.isTampered = [curDeviceValues.value boolValue];
+                    self.tamperValueIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:LOW_BATTERY]) {
+                    self.isBatteryLow = [curDeviceValues.value boolValue];
+                }
+            }
+            break;
+        }
+
+        case 12: {
+            //Contact Switch
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:STATE]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+                else if ([deviceTypeName isEqualToString:TAMPER]) {
+                    self.isTampered = [curDeviceValues.value boolValue];
+                    self.tamperValueIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:LOW_BATTERY]) {
+                    self.isBatteryLow = [curDeviceValues.value boolValue];
+                }
+            }
+            break;
+        }
+
+        case 13: {
+            //Fire Sensor
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:STATE]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+                else if ([deviceTypeName isEqualToString:TAMPER]) {
+                    self.isTampered = [curDeviceValues.value boolValue];
+                    self.tamperValueIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:LOW_BATTERY]) {
+                    self.isBatteryLow = [curDeviceValues.value boolValue];
+                }
+            }
+            break;
+        }
+
+        case 14: {
+            //Water Sensor
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:STATE]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+                else if ([deviceTypeName isEqualToString:TAMPER]) {
+                    self.isTampered = [curDeviceValues.value boolValue];
+                    self.tamperValueIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:LOW_BATTERY]) {
+                    self.isBatteryLow = [curDeviceValues.value boolValue];
+                }
+            }
+            break;
+        }
+
+        case 15: {
+            //Gas Sensor
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:STATE]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+                else if ([deviceTypeName isEqualToString:TAMPER]) {
+                    self.isTampered = [curDeviceValues.value boolValue];
+                    self.tamperValueIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:LOW_BATTERY]) {
+                    self.isBatteryLow = [curDeviceValues.value boolValue];
+                }
+            }
+            break;
+        }
+
+        case 17: {
+            //Vibration Sensor
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:STATE]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+                else if ([deviceTypeName isEqualToString:TAMPER]) {
+                    self.isTampered = [curDeviceValues.value boolValue];
+                    self.tamperValueIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:LOW_BATTERY]) {
+                    self.isBatteryLow = [curDeviceValues.value boolValue];
+                }
+            }
+            break;
+        }
+
+        case 19: {
+            //Keyfob
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:STATE]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                }
+                else if ([deviceTypeName isEqualToString:TAMPER]) {
+                    self.isTampered = [curDeviceValues.value boolValue];
+                    self.tamperValueIndex = index;
+                }
+                else if ([deviceTypeName isEqualToString:LOW_BATTERY]) {
+                    self.isBatteryLow = [curDeviceValues.value boolValue];
+                }
+            }
+
+            break;
+        }
+
+        case 22: {
+            //Electric Measurement switch - AC
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"SWITCH BINARY"]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                    break;
+                }
+            }
+            break;
+        }
+
+        case 23: {
+            //Electric Measurement switch - DC
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"SWITCH BINARY"]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                    break;
+                }
+            }
+            break;
+        }
+
+        case 34: {
+            //Shade
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
+                SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
+                deviceTypeName = curDeviceValues.valueName;
+
+                if ([deviceTypeName isEqualToString:@"SWITCH BINARY"]) {
+                    self.stateIndex = index;
+                    self.mostImpValueIndex = index;
+                    self.mostImpValueName = deviceTypeName;
+                    break;
+                }
+            }
+            break;
+        }
+
+        default: {
+            self.imageName = @"default_device.png";
+            break;
+        }
+    };
 }
 
 

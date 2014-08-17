@@ -9,13 +9,13 @@
 #import <Foundation/Foundation.h>
 
 @interface SFIDeviceValue : NSObject <NSCoding>
-@property unsigned int      deviceID;
-@property unsigned int      valueCount;
-@property NSMutableArray   *knownValues;
+@property unsigned int deviceID;
+@property unsigned int valueCount;
+@property NSMutableArray *knownValues;
 
 // Ephemeral value holder useful for managing deleted or missing devices.
 // Value is not persistent. Defaults to NO.
-@property (nonatomic) BOOL isPresent;
+@property(nonatomic) BOOL isPresent;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
