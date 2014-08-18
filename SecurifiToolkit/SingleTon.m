@@ -231,12 +231,7 @@
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.network_established_latch;
     NSString *msg = @"Giving up on connection establishment";
-    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
-    if (timedOut) {
-        NSLog(@"%@. Issuing shutdown on timeout", msg);
-        [self shutdown];
-    }
-    return timedOut;
+    return [self commonWaitForInitializationOrShutdown:numSecsToWait latch:latch msg:msg];
 }
 
 // Called by commands submitted to the normal command queue that have to wait for the cloud initialization
@@ -244,7 +239,18 @@
 // SingleTon is shutdown.
 - (BOOL)waitForCloudInitialization:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.cloud_initialized_latch;
-    return [self waitOnLatch:latch timeout:numSecsToWait logMsg:@"Giving up on cloud initialization"];
+    NSString *msg = @"Giving up on cloud initialization";
+    return [self commonWaitForInitializationOrShutdown:numSecsToWait latch:latch msg:msg];
+}
+
+// Encapsulates common behaviour: wait or timeout, and on timeout shutdown the network connection
+- (BOOL)commonWaitForInitializationOrShutdown:(int)numSecsToWait latch:(dispatch_semaphore_t)latch msg:(NSString *)msg {
+    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
+    if (timedOut) {
+        NSLog(@"%@. Issuing shutdown on timeout", msg);
+        [self shutdown];
+    }
+    return timedOut;
 }
 
 // Waits up to the specified number of seconds for the semaphore to be signalled.
@@ -283,9 +289,9 @@
     // make sure...
     dispatch_semaphore_signal(latch);
 
-    if (self.isStreamConnected) {
-        return NO;
-    }
+//    if (self.isStreamConnected) {
+//        return NO;
+//    }
     return timedOut;
 }
 
