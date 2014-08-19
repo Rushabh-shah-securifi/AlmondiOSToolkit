@@ -110,8 +110,8 @@
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
             block_self.outputStream = (__bridge_transfer NSOutputStream *) writeStream;
 
-            [block_self.inputStream setDelegate:block_self];
-            [block_self.outputStream setDelegate:block_self];
+            block_self.inputStream.delegate = block_self;
+            block_self.outputStream.delegate = block_self;
 
             [block_self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
             [block_self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
@@ -184,42 +184,50 @@
 - (void)shutdown {
     NSLog(@"Shutting down network singleton");
 
+    // Take weak reference to prevent retain cycles
     __weak SingleTon *block_self = self;
 
     dispatch_sync(self.backgroundQueue, ^(void) {
         NSLog(@"[%@] Singleton is shutting down", block_self.debugDescription);
 
+        // Signal shutdown
+        //
         block_self.networkShutdown = YES;
         block_self.isLoggedIn = NO;
         block_self.connectionState = SDKCloudStatusCloudConnectionShutdown;
         block_self.isStreamConnected = NO;
 
+        // Clean up command queue
+        //
         [block_self tryAbortUnit];
-
-        // Signal to any waiting loops to exit
         dispatch_semaphore_signal(block_self.network_established_latch);
         dispatch_semaphore_signal(block_self.cloud_initialized_latch);
 
-        NSInputStream *in_stream = block_self.inputStream;
-        NSOutputStream *out_stream = block_self.outputStream;
+        // Synchronize access: wait for other readers/writers before tearing down the sockets
+        //
+        @synchronized (self.syncLocker) {
+            NSInputStream *in_stream = block_self.inputStream;
+            NSOutputStream *out_stream = block_self.outputStream;
 
-        NSRunLoop *loop = [NSRunLoop currentRunLoop];
+            NSRunLoop *loop = [NSRunLoop currentRunLoop];
 
-        if (out_stream != nil) {
-            out_stream.delegate = nil;
-            [out_stream close];
-            [out_stream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
-            block_self.outputStream = nil;
-        }
+            if (out_stream != nil) {
+                out_stream.delegate = nil;
+                [out_stream close];
+                [out_stream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+                block_self.outputStream = nil;
+            }
 
-        if (in_stream != nil) {
-            in_stream.delegate = nil;
-            [in_stream close];
-            [in_stream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
-            block_self.inputStream = nil;
+            if (in_stream != nil) {
+                in_stream.delegate = nil;
+                [in_stream close];
+                [in_stream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
+                block_self.inputStream = nil;
+            }
         }
     });
 
+    // Tell delegate of shutdown
     [self.delegate singletTonCloudConnectionDidClose:self];
 }
 
