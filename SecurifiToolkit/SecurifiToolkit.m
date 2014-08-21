@@ -703,7 +703,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 #pragma mark - SingleTon management
 
 - (SingleTon *)setupNetworkSingleton {
-    NSLog(@"Setting up network singleton");
+    NSLog(@"Setting up network");
 
     [self tearDownNetworkSingleton];
 
@@ -718,12 +718,13 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 }
 
 - (void)tearDownNetworkSingleton {
-    DLog(@"Starting tear down of network singleton");
+    NSLog(@"Starting tear down of network");
+
     SingleTon *old = self.networkSingleton;
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
 
-    DLog(@"Finished tear down of network singleton");
+    NSLog(@"Finished tear down of network");
 }
 
 #pragma mark - SingleTonDelegate methods
