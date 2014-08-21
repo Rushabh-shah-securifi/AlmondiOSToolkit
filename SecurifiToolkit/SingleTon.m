@@ -239,7 +239,17 @@
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.network_established_latch;
     NSString *msg = @"Giving up on connection establishment";
-    return [self commonWaitForInitializationOrShutdown:numSecsToWait latch:latch msg:msg];
+    
+    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
+    if (self.isStreamConnected) {
+        // If the connection is up by now, no need to worry about the timeout.
+        return NO;
+    }
+    if (timedOut) {
+        NSLog(@"%@. Issuing shutdown on timeout", msg);
+        [self shutdown];
+    }
+    return timedOut;
 }
 
 // Called by commands submitted to the normal command queue that have to wait for the cloud initialization
@@ -248,11 +258,7 @@
 - (BOOL)waitForCloudInitialization:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.cloud_initialized_latch;
     NSString *msg = @"Giving up on cloud initialization";
-    return [self commonWaitForInitializationOrShutdown:numSecsToWait latch:latch msg:msg];
-}
 
-// Encapsulates common behaviour: wait or timeout, and on timeout shutdown the network connection
-- (BOOL)commonWaitForInitializationOrShutdown:(int)numSecsToWait latch:(dispatch_semaphore_t)latch msg:(NSString *)msg {
     BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
     if (timedOut) {
         NSLog(@"%@. Issuing shutdown on timeout", msg);
@@ -262,8 +268,8 @@
 }
 
 // Waits up to the specified number of seconds for the semaphore to be signalled.
-// On timeout, the SingleTon is shutdown and YES is returned.
-// Returns NO when the signal has been received before the time out.
+// Returns YES on timeout waiting on the latch.
+// Returns NO when the signal has been received before the timeout.
 - (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString*)msg {
     dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
 
@@ -297,9 +303,6 @@
     // make sure...
     dispatch_semaphore_signal(latch);
 
-//    if (self.isStreamConnected) {
-//        return NO;
-//    }
     return timedOut;
 }
 
@@ -613,6 +616,7 @@
             if (!self.certificateTrusted) {
                 BOOL trusted = [self isTrustedCertificate:theStream];
                 if (!trusted) {
+                    NSLog(@"%s: SSL Cert is not trusted. Issuing shutdown.", __PRETTY_FUNCTION__);
                     [self shutdown];
                 }
                 self.certificateTrusted = trusted;
