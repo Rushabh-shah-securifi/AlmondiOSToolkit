@@ -43,8 +43,8 @@
             break;
         }
 
-        int const timeOutSecs = 10;
-        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, timeOutSecs * NSEC_PER_MSEC);
+        const int waitMs = 5;
+        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, waitMs * NSEC_PER_MSEC);
 
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
