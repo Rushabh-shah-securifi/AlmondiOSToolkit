@@ -51,8 +51,16 @@
     return [self.value isEqualToString:@"true"];
 }
 
+- (int)intValue {
+    return [self.value intValue];
+}
+
 - (float)floatValue {
     return [self.value floatValue];
+}
+
+- (void)setIntValue:(int)value {
+    self.value = [NSString stringWithFormat:@"%d", value];
 }
 
 - (void)setBoolValue:(BOOL)value {

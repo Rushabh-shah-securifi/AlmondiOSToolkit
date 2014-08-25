@@ -19,7 +19,10 @@
 - (BOOL)hasValue;
 
 - (BOOL)boolValue;
+- (int)intValue;
 - (float)floatValue;
+
+- (void)setIntValue:(int)value;
 
 // Sets the value property with the appropriate string representation
 - (void)setBoolValue:(BOOL)value;
