@@ -21,6 +21,9 @@
 - (BOOL)boolValue;
 - (float)floatValue;
 
+// Sets the value property with the appropriate string representation
+- (void)setBoolValue:(BOOL)value;
+
 // Interprets the value as a numeric (level switch)
 - (BOOL)isZeroLevelValue;
 

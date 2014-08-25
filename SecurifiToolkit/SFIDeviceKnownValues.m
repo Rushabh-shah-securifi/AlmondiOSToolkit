@@ -55,6 +55,15 @@
     return [self.value floatValue];
 }
 
+- (void)setBoolValue:(BOOL)value {
+    if (value) {
+        self.value = @"true";
+    }
+    else {
+        self.value = @"false";
+    }
+}
+
 
 - (BOOL)isZeroLevelValue {
     return [self.value isEqualToString:@"0"];
