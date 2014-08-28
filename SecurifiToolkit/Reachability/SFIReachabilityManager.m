@@ -10,6 +10,7 @@
 #import "Reachability.h"
 #import "AlmondPlusSDKConstants.h"
 
+
 NSString *const kSFIReachabilityChangedNotification = @"kReachabilityChangedNotification"; // clone the constant from Reachability.h
 
 @interface SFIReachabilityManager ()

@@ -9,7 +9,6 @@
 #import "SFIOfflineDataManager.h"
 #import "AlmondPlusSDKConstants.h"
 #import "SFIAlmondPlus.h"
-#import "SecurifiCloudResources-Prefix.pch"
 
 @interface SFIOfflineDataManager ()
 @property(nonatomic, readonly) NSObject *syncLocker;
@@ -203,8 +202,8 @@
             // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
             dictDeviceList = [[NSMutableDictionary alloc] init];
         }
-        [dictDeviceList setObject:deviceList forKey:strCurrentMAC];
-        //Create NSDictionary for List and AlmondPlusMAC
+        dictDeviceList[strCurrentMAC] = deviceList;
+
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
         return didWriteSuccessful;
     }
@@ -245,7 +244,7 @@
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICELIST_FILENAME];
 
         NSMutableDictionary *dictDeviceList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        //Remove the current almond's device list from the hashmap
+
         [dictDeviceList removeObjectForKey:strCurrentMAC];
         [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
     }
@@ -272,8 +271,8 @@
             // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
             dictDeviceValueList = [[NSMutableDictionary alloc] init];
         }
-        [dictDeviceValueList setObject:deviceValueList forKey:strCurrentMAC];
-        //Create NSDictionary for List and AlmondPlusMAC
+        dictDeviceValueList[strCurrentMAC] = deviceValueList;
+
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceValueList toFile:filePath];
         return didWriteSuccessful;
     }
@@ -294,7 +293,7 @@
         NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICEVALUE_FILENAME];
 
         NSMutableDictionary *dictDeviceValueList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        //Read the current almond's device list from the hashmap
+
         if (dictDeviceValueList != nil) {
             deviceValueList = [dictDeviceValueList valueForKey:strCurrentMAC];
         }
@@ -310,7 +309,7 @@
     NSString *filePath = [documentsDirectory stringByAppendingPathComponent:DEVICEVALUE_FILENAME];
 
     NSMutableDictionary *dictDeviceValueList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-    //Remove the current almond's device list from the hashmap
+
     [dictDeviceValueList removeObjectForKey:strCurrentMAC];
     [NSKeyedArchiver archiveRootObject:dictDeviceValueList toFile:filePath];
 }

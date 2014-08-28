@@ -6,10 +6,11 @@
 //  Copyright (c) 2013 Nirav Uchat. All rights reserved.
 //
 
-#import "Base64.h"
-
 #ifndef SecurifiToolkit_Header_h
 #define SecurifiToolkit_Header_h
+
+#import <SecurifiToolkit/Base64.h>
+
 
 //PY: ec2-50-16-22-86.compute-1.amazonaws.com
 //AD: "ec2-54-226-113-110.compute-1.amazonaws.com"
