@@ -31,8 +31,8 @@
         copy.connectionFailedCount = self.connectionFailedCount;
         copy.reachabilityChangedCount = self.reachabilityChangedCount;
         copy.dynamicUpdateCount = self.dynamicUpdateCount;
-        copy.requestCount = self.requestCount;
-        copy.responseCount = self.responseCount;
+        copy.commandRequestCount = self.commandRequestCount;
+        copy.commandResponseCount = self.commandResponseCount;
     }
 
     return copy;

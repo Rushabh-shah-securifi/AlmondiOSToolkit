@@ -92,6 +92,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 - (void)dealloc {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
 
+    [center removeObserver:self name:kSFIReachabilityChangedNotification object:nil];
+
     [center removeObserver:self name:LOGIN_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_ALL_NOTIFIER object:nil];
@@ -747,11 +749,11 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 }
 
 - (void)singletTonDidSendCommand:(SingleTon *)singleTon {
-    self.stats.requestCount++;
+    self.stats.commandRequestCount++;
 }
 
 - (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon {
-    self.stats.responseCount++;
+    self.stats.commandResponseCount++;
 }
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {

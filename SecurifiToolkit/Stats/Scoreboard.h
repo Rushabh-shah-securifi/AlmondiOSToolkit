@@ -23,13 +23,23 @@ hit, Track sensor, login , affiliation and Router, Sign up page hits.
 @property NSUInteger affiliationCount;
 @property NSUInteger signUpPageCount;
 
+// Number of connection establishments made
 @property NSUInteger connectionCount;
+
+// Number of connection failures; does not count normal shutdowns
 @property NSUInteger connectionFailedCount;
+
+// Number of events from the Reachability manager
 @property NSUInteger reachabilityChangedCount;
 
+// Number of dynamic updates across all connections
 @property NSUInteger dynamicUpdateCount;
-@property NSUInteger requestCount;
-@property NSUInteger responseCount;
+
+// Number of commands sent to the cloud
+@property NSUInteger commandRequestCount;
+
+// Number of responses received for commands sent to the cloud
+@property NSUInteger commandResponseCount;
 
 - (id)copyWithZone:(NSZone *)zone;
 
