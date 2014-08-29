@@ -30,6 +30,7 @@ NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
 NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
 @interface SecurifiToolkit () <SingleTonDelegate>
+@property(nonatomic, readonly) Scoreboard *stats;
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
@@ -56,12 +57,16 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 - (id)init {
     self = [super init];
     if (self) {
+        _stats = [Scoreboard new];
+
         _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
         _socketDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
 
         _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+        [center addObserver:self selector:@selector(onReachabilityChanged:) name:kSFIReachabilityChangedNotification object:nil];
 
         [center addObserver:self selector:@selector(onLoginResponse:) name:LOGIN_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutResponse:) name:LOGOUT_NOTIFIER object:nil];
@@ -160,6 +165,10 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     else {
         return SDKCloudStatusUninitialized;
     }
+}
+
+- (void)onReachabilityChanged:(id)notice {
+    self.stats.reachabilityChangedCount++;
 }
 
 #pragma mark - SDK Initialization
@@ -271,7 +280,6 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 
     dispatch_async(self.socketCallbackQueue, ^(void) {
         [block_self tearDownNetworkSingleton];
-        block_self.networkSingleton = nil;
     });
 }
 
@@ -286,6 +294,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
         GenericCommand *cmd = [block_self makeAlmondListCommand];
         [block_self internalInitializeCloud:socket command:cmd];
+        block_self.stats.connectionCount++;
     });
 }
 
@@ -360,6 +369,8 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         DLog(@"SDK is shutdown. Returning.");
         return;
     }
+
+    self.stats.loginCount++;
 
     [self tearDownLoginSession];
     [self setSecEmail:email];
@@ -543,10 +554,6 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     }
 }
 
-- (NSString *)currentAlmondName {
-    return [[self currentAlmond] almondplusName];
-}
-
 - (NSArray *)almondList {
     return [SFIOfflineDataManager readAlmondList];
 }
@@ -598,6 +605,10 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     [self.networkSingleton markDeviceValuesFetchedForAlmond:almondMac];
     [self asyncRequestDeviceValueList:almondMac];
     return YES;
+}
+
+- (Scoreboard *)scoreboard {
+    return [self.stats copy];
 }
 
 #pragma mark - Device value updates
@@ -724,10 +735,24 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
 
+    self.networkSingleton = nil;
+
     NSLog(@"Finished tear down of network");
 }
 
 #pragma mark - SingleTonDelegate methods
+
+- (void)singletTonDidReceiveDynamicUpdate:(SingleTon *)singleTon {
+    self.stats.dynamicUpdateCount++;
+}
+
+- (void)singletTonDidSendCommand:(SingleTon *)singleTon {
+    self.stats.requestCount++;
+}
+
+- (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon {
+    self.stats.responseCount++;
+}
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {
     if (singleTon == self.networkSingleton) {

@@ -42,6 +42,7 @@
 #import <SecurifiToolkit/ResetPasswordResponse.h>
 #import <SecurifiToolkit/SensorForcedUpdateRequest.h>
 #import <SecurifiToolkit/SensorChangeRequest.h>
+#import <SecurifiToolkit/Scoreboard.h>
 #import <SecurifiToolkit/SensorChangeResponse.h>
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>
 #import <SecurifiToolkit/DynamicAlmondNameChangeResponse.h>
@@ -107,9 +108,6 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 // Returns the designated "current" Almond, or nil.
 - (SFIAlmondPlus*)currentAlmond;
 
-// Convenience method for fetching the current Almond's name, or nil.
-- (NSString*)currentAlmondName;
-
 // Fetch the local copy of the Almond's attached to the logon account
 - (NSArray*)almondList;
 
@@ -131,6 +129,8 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 // Send a command to the cloud requesting current values for the Almond's devices if device values have not been
 // already requested once already on the same network connection
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac;
+
+- (Scoreboard*)scoreboard;
 
 @end
  

@@ -316,6 +316,8 @@
         DLog(@"Marking response %i for unit: %@", responseType, unit.description);
         [unit markResponse:success];
     }
+
+    [self.delegate singletTonDidReceiveCommandResponse:self];
 }
 
 - (void)tryAbortUnit {
@@ -668,6 +670,7 @@
     // UI can easily become confused. This needs to be sorted out.
     SLog(@"Posting dynamic %@", notificationName);
     [self post:notificationName payload:payload queue:self.dynamicCallbackQueue];
+    [self.delegate singletTonDidReceiveDynamicUpdate:self];
 }
 
 - (void)post:(NSString *)notificationName payload:(id)payload queue:(dispatch_queue_t)queue {
@@ -908,6 +911,7 @@
             [unit markResponse:NO];
             return;
         }
+        [block_self.delegate singletTonDidSendCommand:block_self];
 
         SLog(@"Command Queue: waiting for response: %ld (%@)", (long)tag, command);
 
