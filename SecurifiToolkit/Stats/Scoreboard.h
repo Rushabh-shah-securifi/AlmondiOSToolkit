@@ -8,10 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-/*
-We need to capture Timing of Sensor On/Off, how many times Router Reboot is
-hit, Track sensor, login , affiliation and Router, Sign up page hits.
- */
 
 
 @interface Scoreboard : NSObject <NSCopying>
