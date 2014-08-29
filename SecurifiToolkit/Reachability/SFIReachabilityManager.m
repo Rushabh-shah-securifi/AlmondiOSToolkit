@@ -38,7 +38,7 @@ NSString *const kSFIReachabilityChangedNotification = @"kReachabilityChangedNoti
     self = [super init];
     if (self) {
         // Initialize Reachability
-        _reachability = [Reachability reachabilityWithHostname:CLOUD_SERVER];
+        _reachability = [Reachability reachabilityWithHostname:CLOUD_PROD_SERVER];
         // Start Monitoring
         [self.reachability startNotifier];
     }

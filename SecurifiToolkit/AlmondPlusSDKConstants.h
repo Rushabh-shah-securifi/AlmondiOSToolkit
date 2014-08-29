@@ -17,6 +17,9 @@
 //NU: ec2-54-226-114-39.compute-1.amazonaws.com
 //ec2-54-224-16-165.compute-1.amazonaws.com
 
+#define CLOUD_PROD_SERVER  @"cloud.securifi.com"
+#define CLOUD_DEV_SERVER  @"clouddev.securifi.com"
+
 //#define CLOUD_SERVER  @"ec2-54-226-114-39.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"nodeLB-1553508487.us-east-1.elb.amazonaws.com"
 //#define CLOUD_SERVER  @"ec2-54-226-113-110.compute-1.amazonaws.com"
@@ -25,9 +28,7 @@
 //#define CLOUD_SERVER  @"ec2-54-226-236-86.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"ec2-54-80-216-255.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"nodeLB-1553508487.us-east-1.elb.amazonaws.com"
-#define CLOUD_SERVER  @"cloud.securifi.com"
 //#define CLOUD_SERVER  @"ec2-54-226-236-86.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"clouddev.securifi.com"
 //#define CLOUD_SERVER  @"ec2-54-227-49-52.compute-1.amazonaws.com"
 //Notifiers
 

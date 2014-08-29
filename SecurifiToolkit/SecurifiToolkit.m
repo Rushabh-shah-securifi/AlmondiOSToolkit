@@ -57,7 +57,12 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 - (id)init {
     self = [super init];
     if (self) {
+        [SFIReachabilityManager sharedManager];
+
         _stats = [Scoreboard new];
+
+        // default; do not change
+        self.useProductionCloud = YES;
 
         _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
         _socketDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
@@ -176,7 +181,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 #pragma mark - SDK Initialization
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
-- (void)initSDK {
+- (void)initToolkit {
     if (self.isShutdown) {
         DLog(@"INIT SDK. Already shutdown. Returning.");
         return;
@@ -187,10 +192,10 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         return;
     }
 
-    [self _asyncInitSDK];
+    [self _asyncInitToolkit];
 }
 
-- (void)_asyncInitSDK {
+- (void)_asyncInitToolkit {
     if (self.isShutdown) {
         DLog(@"INIT SDK. Already shutdown. Returning.");
         return;
@@ -271,7 +276,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 }
 
 // Shutdown the SDK. No further work may be done after this method has been invoked.
-- (void)shutdown {
+- (void)shutdownToolkit {
     if (self.isShutdown) {
         return;
     }
@@ -337,6 +342,10 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 //      b. if no response or bad response, kill connection and mark SingleTon as dead
 //      c. if good response, then process next command
 
+- (void)closeConnection {
+    [self tearDownNetworkSingleton];
+}
+
 - (void)asyncSendToCloud:(GenericCommand *)command {
     if (self.isShutdown) {
         DLog(@"SDK is shutdown. Returning.");
@@ -349,7 +358,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
         // Set up network and wait
         //
         NSLog(@"Waiting to initialize socket");
-        [self _asyncInitSDK];
+        [self _asyncInitToolkit];
     }
 
     __weak SecurifiToolkit *block_self = self;
@@ -725,7 +734,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     newSingleton.connectionState = SDKCloudStatusInitializing;
 
     _networkSingleton = newSingleton;
-    [newSingleton initNetworkCommunication];
+    [newSingleton initNetworkCommunication:self.useProductionCloud];
 
     return newSingleton;
 }

@@ -44,7 +44,7 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 // queue on which notifications will be posted
 + (SingleTon *)newSingletonWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;
 
-- (void)initNetworkCommunication;
+- (void)initNetworkCommunication:(BOOL)useProductionCloud;
 
 - (void)shutdown;
 

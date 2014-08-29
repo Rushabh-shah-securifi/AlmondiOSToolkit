@@ -75,11 +75,19 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 
 @interface SecurifiToolkit : NSObject
 
+// When YES connections will be made to the Securifi Production cloud servers.
+// When NO the development servers will be used.
+// Default is YES
+// Changes take effect on next connection attempt. Use closeConnection to force a connection change.
+@property(nonatomic) BOOL useProductionCloud;
+
 + (instancetype)sharedInstance;
 
-- (void)initSDK;
+- (void)initToolkit;
 
-- (void)shutdown;
+- (void)shutdownToolkit;
+
+- (void)closeConnection;
 
 - (void)asyncSendToCloud:(GenericCommand *)command;
 
@@ -130,6 +138,7 @@ extern NSString *const kSFIDidChangeDeviceValueList;
 // already requested once already on the same network connection
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac;
 
+// Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard*)scoreboard;
 
 @end

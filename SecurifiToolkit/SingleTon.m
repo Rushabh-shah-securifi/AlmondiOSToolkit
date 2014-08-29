@@ -83,7 +83,7 @@
     return self;
 }
 
-- (void)initNetworkCommunication {
+- (void)initNetworkCommunication:(BOOL)useProductionCloud {
     NSLog(@"Initialzing network communication");
 
     __strong SingleTon *block_self = self;
@@ -103,7 +103,8 @@
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
 
-            CFStringRef host = (__bridge CFStringRef) CLOUD_SERVER;
+            NSString *server = useProductionCloud ? CLOUD_PROD_SERVER : CLOUD_DEV_SERVER;
+            CFStringRef host = (__bridge CFStringRef) server;
             UInt32 port = 1028;
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
 
