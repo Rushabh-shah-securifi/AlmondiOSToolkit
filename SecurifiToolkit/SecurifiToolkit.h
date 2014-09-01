@@ -73,6 +73,11 @@ extern NSString *const kSFIDidChangeDeviceList;
 
 extern NSString *const kSFIDidChangeDeviceValueList;
 
+// Notification posted when a MobileCommand request has completed. Payload contains the command itself, and
+// a boxed NSTimeInterval indicating how long the request-response cycle took.
+extern NSString *const kSFIDidCompleteMobileCommandRequest;
+
+
 @interface SecurifiToolkit : NSObject
 
 // When YES connections will be made to the Securifi Production cloud servers.

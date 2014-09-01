@@ -28,6 +28,7 @@ NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
 NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
+NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property(nonatomic, readonly) Scoreboard *stats;
@@ -761,8 +762,19 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
     self.stats.commandRequestCount++;
 }
 
-- (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon {
+- (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime {
     self.stats.commandResponseCount++;
+
+    id p_cmd = cmd.command;
+    if ([p_cmd isKindOfClass:[MobileCommandRequest class]]) {
+        NSDictionary *payload = @{
+                @"command" : p_cmd,
+                @"timing" : @(roundTripTime)
+        };
+        [self postNotification:kSFIDidCompleteMobileCommandRequest data:payload];
+    }
+
+    NSLog(@"Command completion: cmd:%@, %0.2f secs", cmd, roundTripTime);
 }
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {

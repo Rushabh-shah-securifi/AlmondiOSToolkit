@@ -9,6 +9,8 @@
 
 @interface SUnit ()
 @property(nonatomic, readonly) dispatch_semaphore_t completion_latch;
+@property(nonatomic, readonly) NSDate *startDispatchTime;
+@property(nonatomic, readonly) NSDate *endDispatchTime;
 @end
 
 @implementation SUnit
@@ -30,6 +32,7 @@
     }
     _counterTag = counterTag;
     _processingState = SUnitStateWorking;
+    _startDispatchTime = [NSDate date];
 }
 
 - (BOOL)waitForResponse:(int)numSecsToWait {
@@ -75,6 +78,7 @@
         return;
     }
     _processingState = success ? SUnitStateCompletedSuccess : SUnitStateCompletedFailed;
+    _endDispatchTime = [NSDate date];
 }
 
 - (void)abort {
@@ -103,6 +107,13 @@
     [description appendFormat:@", self.completion_latch=%@", self.completion_latch];
     [description appendString:@">"];
     return description;
+}
+
+- (NSTimeInterval)timeToCompletionSuccess {
+    if (self.processingState == SUnitStateCompletedSuccess) {
+        return [self.endDispatchTime timeIntervalSinceDate:self.startDispatchTime];
+    }
+    return 0;
 }
 
 @end

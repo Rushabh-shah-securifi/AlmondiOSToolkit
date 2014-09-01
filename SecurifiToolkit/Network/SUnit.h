@@ -53,6 +53,6 @@ typedef NS_ENUM(NSUInteger, SUnitState) {
 
 - (NSString *)description;
 
-
+- (NSTimeInterval)timeToCompletionSuccess;
 
 @end

@@ -26,7 +26,7 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 
 - (void)singletTonDidReceiveDynamicUpdate:(SingleTon *)singleTon;
 - (void)singletTonDidSendCommand:(SingleTon *)singleTon;
-- (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon;
+- (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime;
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon;
 

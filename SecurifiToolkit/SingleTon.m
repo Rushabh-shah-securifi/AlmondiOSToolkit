@@ -316,9 +316,11 @@
     if (unit) {
         DLog(@"Marking response %i for unit: %@", responseType, unit.description);
         [unit markResponse:success];
+        [self.delegate singletTonDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess];
     }
-
-    [self.delegate singletTonDidReceiveCommandResponse:self];
+    else {
+        [self.delegate singletTonDidReceiveCommandResponse:self command:nil timeToCompletion:0];
+    }
 }
 
 - (void)tryAbortUnit {
