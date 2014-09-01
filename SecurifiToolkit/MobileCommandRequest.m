@@ -9,5 +9,5 @@
 #import "MobileCommandRequest.h"
 
 @implementation MobileCommandRequest
-@synthesize almondMAC, deviceID, indexID, internalIndex, changedValue;
+
 @end

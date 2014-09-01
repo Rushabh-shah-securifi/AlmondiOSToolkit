@@ -7,10 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SFIDevice.h"
+
+//todo encapsulate this (a designated initializer)
 
 @interface MobileCommandRequest : NSObject
 @property NSString *almondMAC;
 @property NSString *deviceID;
+@property SFIDeviceType deviceType;
 @property NSString *indexID;
 @property NSString *changedValue;
 @property NSString *internalIndex;
