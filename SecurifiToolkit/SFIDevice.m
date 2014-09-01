@@ -26,7 +26,7 @@
         self.zigBeeEUI64 = [coder decodeObjectForKey:@"self.zigBeeEUI64"];
         self.deviceTechnology = (unsigned int) [coder decodeIntForKey:@"self.deviceTechnology"];
         self.associationTimestamp = [coder decodeObjectForKey:@"self.associationTimestamp"];
-        self.deviceType = (unsigned int) [coder decodeIntForKey:@"self.deviceType"];
+        self.deviceType = (SFIDeviceType) [coder decodeIntForKey:@"self.deviceType"];
         self.deviceTypeName = [coder decodeObjectForKey:@"self.deviceTypeName"];
         self.friendlyDeviceType = [coder decodeObjectForKey:@"self.friendlyDeviceType"];
         self.deviceFunction = [coder decodeObjectForKey:@"self.deviceFunction"];
@@ -114,13 +114,11 @@
     NSArray *currentKnownValues = values.knownValues;
 
     switch (self.deviceType) {
-        case 1: {
-//            SFIDeviceKnownValues *curDeviceValues = currentKnownValues[0];
+        case SFIDeviceType_BinarySwitch_1: {
+            //            SFIDeviceKnownValues *curDeviceValues = currentKnownValues[0];
             break;
         }
-
-        case 2: {
-            //Multilevel switch
+        case SFIDeviceType_MultiLevelSwitch_2: {
             for (unsigned int index = 0; index < currentKnownValues.count; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -134,9 +132,8 @@
             }
             break;
         }
-
-        case 3: {
-            for (unsigned int  index = 0; index < [currentKnownValues count]; index++) {
+        case SFIDeviceType_BinarySensor_3: {
+            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues;
                 curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -151,9 +148,7 @@
 
             break;
         }
-
-        case 4: {
-            //Level Control
+        case SFIDeviceType_MultiLevelOnOff_4: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues;
                 curDeviceValues = currentKnownValues[index];
@@ -169,9 +164,7 @@
             }
             break;
         }
-
-        case 5: {
-            //Door Lock
+        case SFIDeviceType_DoorLock_5: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -185,7 +178,8 @@
             }
             break;
         }
-        case 6: {
+
+        case SFIDeviceType_Alarm_6: {
             //Alarm : TODO Later
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
@@ -201,8 +195,7 @@
             break;
         }
 
-        case 11: {
-            //Motion Sensor
+        case SFIDeviceType_MotionSensor_11: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -223,8 +216,7 @@
             break;
         }
 
-        case 12: {
-            //Contact Switch
+        case SFIDeviceType_ContactSwitch_12: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
 
@@ -246,8 +238,7 @@
             break;
         }
 
-        case 13: {
-            //Fire Sensor
+        case SFIDeviceType_FireSensor_13: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -268,8 +259,7 @@
             break;
         }
 
-        case 14: {
-            //Water Sensor
+        case SFIDeviceType_WaterSensor_14: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -290,7 +280,7 @@
             break;
         }
 
-        case 15: {
+        case SFIDeviceType_GasSensor_15: {
             //Gas Sensor
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
@@ -312,7 +302,7 @@
             break;
         }
 
-        case 17: {
+        case SFIDeviceType_VibrationOrMovementSensor_17: {
             //Vibration Sensor
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
@@ -334,8 +324,8 @@
             break;
         }
 
-        case 19: {
-            //Keyfob
+
+        case SFIDeviceType_KeyFob_19: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -357,8 +347,7 @@
             break;
         }
 
-        case 22: {
-            //Electric Measurement switch - AC
+        case SFIDeviceType_SmartACSwitch_22: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -373,8 +362,7 @@
             break;
         }
 
-        case 23: {
-            //Electric Measurement switch - DC
+        case SFIDeviceType_SmartDCSwitch_23: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -389,8 +377,7 @@
             break;
         }
 
-        case 34: {
-            //Shade
+        case SFIDeviceType_Shade_34: {
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
@@ -405,6 +392,34 @@
             break;
         }
 
+        case SFIDeviceType_UnknownDevice_0:
+        case SFIDeviceType_Thermostat_7:
+        case SFIDeviceType_Controller_8:
+        case SFIDeviceType_SceneController_9:
+        case SFIDeviceType_StandardCIE_10:
+        case SFIDeviceType_PersonalEmergencyDevice_16:
+        case SFIDeviceType_RemoteControl_18:
+        case SFIDeviceType_Keypad_20:
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_OccupancySensor_24:
+        case SFIDeviceType_LightSensor_25:
+        case SFIDeviceType_WindowCovering_26:
+        case SFIDeviceType_TemperatureSensor_27:
+        case SFIDeviceType_SimpleMetering_28:
+        case SFIDeviceType_ColorControl_29:
+        case SFIDeviceType_PressureSensor_30:
+        case SFIDeviceType_FlowSensor_31:
+        case SFIDeviceType_ColorDimmableLight_32:
+        case SFIDeviceType_HAPump_33:
+        case SFIDeviceType_SmokeDetector_36:
+        case SFIDeviceType_FloodSensor_37:
+        case SFIDeviceType_ShockSensor_38:
+        case SFIDeviceType_DoorSensor_39:
+        case SFIDeviceType_MoistureSensor_40:
+        case SFIDeviceType_MovementSensor_41:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_MultiSwitch_43:
+        case SFIDeviceType_UnknownOnOffModule_44:
         default: {
             self.imageName = @"default_device.png";
             break;
