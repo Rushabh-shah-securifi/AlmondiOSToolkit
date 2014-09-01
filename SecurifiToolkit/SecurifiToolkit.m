@@ -374,6 +374,26 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     });
 }
 
+- (void)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
+    // Generate internal index between 1 to 100
+    unsigned int internalIndex = (arc4random() % 100) + 1;
+
+    MobileCommandRequest *mobileCommand = [[MobileCommandRequest alloc] init];
+    mobileCommand.almondMAC = almond.almondplusMAC;
+    mobileCommand.deviceID = [NSString stringWithFormat:@"%d", device.deviceID];
+    mobileCommand.deviceType = device.deviceType;
+    mobileCommand.indexID = [NSString stringWithFormat:@"%d", newValue.index];
+    mobileCommand.changedValue = newValue.value;
+    mobileCommand.internalIndex = [NSString stringWithFormat:@"%d", internalIndex];
+
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = MOBILE_COMMAND;
+    command.command = mobileCommand;
+
+    [self asyncSendToCloud:command];
+}
+
+
 #pragma mark - Cloud Logon
 
 - (void)asyncSendLoginWithEmail:(NSString *)email password:(NSString *)password {

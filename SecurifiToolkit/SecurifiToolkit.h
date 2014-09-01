@@ -96,6 +96,10 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 - (void)asyncSendToCloud:(GenericCommand *)command;
 
+// Sends an update to a sensor device property.
+// On completion, kSFIDidCompleteMobileCommandRequest is posted
+- (void)asyncChangeAlmond:(SFIAlmondPlus*)almond device:(SFIDevice*)device value:(SFIDeviceKnownValues *)newValue;
+
 - (BOOL)isCloudConnecting;
 
 - (BOOL)isCloudOnline;
