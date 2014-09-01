@@ -83,6 +83,9 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 @property(nonatomic) int tamperValueIndex;
 @property(nonatomic) BOOL isBatteryLow;
 
+// Converts a type into a standard mnemonic name suitable for event logging
++ (NSString*)nameForType:(SFIDeviceType)type;
+
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
