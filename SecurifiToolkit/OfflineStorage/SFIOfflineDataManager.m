@@ -210,12 +210,12 @@
 }
 
 //Read DeviceList for the current MAC from offline storage
-+ (NSMutableArray *)readDeviceList:(NSString *)strCurrentMAC {
++ (NSArray *)readDeviceList:(NSString *)strCurrentMAC {
     return [[SFIOfflineDataManager sharedInstance] _readDeviceList:strCurrentMAC];
 }
 
 //Read DeviceList for the current MAC from offline storage
-- (NSMutableArray *)_readDeviceList:(NSString *)strCurrentMAC {
+- (NSArray *)_readDeviceList:(NSString *)strCurrentMAC {
     @synchronized (self.syncLocker) {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = paths[0];

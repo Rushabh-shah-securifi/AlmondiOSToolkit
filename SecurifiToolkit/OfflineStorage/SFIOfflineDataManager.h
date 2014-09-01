@@ -22,7 +22,7 @@
 
 + (BOOL)writeDeviceList:(NSArray *)deviceList currentMAC:(NSString *)strCurrentMAC;
 
-+ (NSMutableArray *)readDeviceList:(NSString *)strCurrentMAC;
++ (NSArray *)readDeviceList:(NSString *)strCurrentMAC;
 
 + (BOOL)writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC;
 
