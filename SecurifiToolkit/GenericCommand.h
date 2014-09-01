@@ -10,8 +10,8 @@
 
 @interface GenericCommand : NSObject
 
-@property id command;
-@property unsigned int commandType;
+@property(nonatomic) id command;
+@property(nonatomic) unsigned int commandType;
 
 - (NSString *)description;
 
