@@ -437,13 +437,14 @@
 
                                             break;
                                         }
+
                                         case SIGNUP_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:SIGNUP_RESPONSE];
                                             [self postData:SIGN_UP_NOTIFIER data:temp.command];
                                             break;
                                         }
+
                                         case KEEP_ALIVE: {
-//                                            [self tryMarkUnitCompletion:YES];
                                             break;
                                         }
 
@@ -451,13 +452,13 @@
                                             [self tryMarkUnitCompletion:YES responseType:CLOUD_SANITY_RESPONSE];
                                             break;
                                         }
-                                            //PY 250214 - Logout Response
+
                                         case LOGOUT_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:LOGOUT_RESPONSE];
                                             [self postData:LOGOUT_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            //PY 250214 - Logout All Response
+
                                         case LOGOUT_ALL_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:LOGOUT_ALL_RESPONSE];
                                             [self postData:LOGOUT_ALL_NOTIFIER data:temp.command];
@@ -481,54 +482,43 @@
                                             //                                            temp=nil;
                                             //                                        }
                                             //                                            break;
-                                            //PY 160913 - Almond List Response
                                         case ALMOND_LIST_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:ALMOND_LIST_RESPONSE];
                                             [self postData:ALMOND_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            //PY 170913 - Device Data Hash Response
+
                                         case DEVICEDATA_HASH_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:DEVICEDATA_HASH_RESPONSE];
                                             [self postData:DEVICEDATA_HASH_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            //PY 170913 - Device Data  Response
+
                                         case DEVICEDATA_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:DEVICEDATA_RESPONSE];
                                             [self postData:DEVICE_DATA_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            //PY 170913 - Device Data  Response
+
                                         case DEVICE_VALUE_LIST_RESPONSE: {
-                                            // [SNLog Log:@"%s: Received Device Value Mobile Response", __PRETTY_FUNCTION__];
                                             [self tryMarkUnitCompletion:YES responseType:DEVICE_VALUE_LIST_RESPONSE];
                                             [self postData:DEVICE_VALUE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            //PY 200913 - Mobile Command Response
                                         case MOBILE_COMMAND_RESPONSE: {
-                                            // [SNLog Log:@"%s: Received Mobile Command Response", __PRETTY_FUNCTION__];
                                             [self tryMarkUnitCompletion:YES responseType:MOBILE_COMMAND_RESPONSE];
                                             [self postData:MOBILE_COMMAND_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            //PY 230913 - Device List Command - 81 -  Response
                                         case DYNAMIC_DEVICE_DATA: {
-                                            // [SNLog Log:@"%s: Received DYNAMIC_DEVICE_DATA", __PRETTY_FUNCTION__];
                                             [self postDataDynamic:DYNAMIC_DEVICE_DATA_NOTIFIER data:temp.command];
                                             break;
                                         }
-
-                                            //PY 230913 - Device Value Command - 82 -  Response
                                         case DYNAMIC_DEVICE_VALUE_LIST: {
-                                            // [SNLog Log:@"%s: Received DEVICE_VALUE_LIST_RESPONSE", __PRETTY_FUNCTION__];
                                             [self postDataDynamic:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            //PY 291013 - Generic Command Response
                                         case GENERIC_COMMAND_RESPONSE: {
-                                            // [SNLog Log:@"%s: Received Generic Command Response", __PRETTY_FUNCTION__];
                                             GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
                                             obj.decodedData = decodedData;
@@ -537,9 +527,7 @@
                                             [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
                                             break;
                                         }
-                                            //PY 301013 - Generic Command Notification
                                         case GENERIC_COMMAND_NOTIFICATION: {
-                                            // [SNLog Log:@"%s: Received Generic Command Notification", __PRETTY_FUNCTION__];
                                             GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
 
                                             //Decode using Base64
@@ -551,37 +539,30 @@
 
                                             break;
                                         }
-                                            //PY 011113 - Validate Account Response
                                         case VALIDATE_RESPONSE: {
-                                            // [SNLog Log:@"%s: Received VALIDATE_RESPONSE", __PRETTY_FUNCTION__];
                                             [self tryMarkUnitCompletion:YES responseType:VALIDATE_RESPONSE];
                                             [self postData:VALIDATE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case RESET_PASSWORD_RESPONSE: {
-                                            // [SNLog Log:@"%s: Received RESET_PASSWORD_RESPONSE", __PRETTY_FUNCTION__];
                                             [self tryMarkUnitCompletion:YES responseType:RESET_PASSWORD_RESPONSE];
                                             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case DYNAMIC_ALMOND_ADD: {
-                                            // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_ADD", __PRETTY_FUNCTION__];
                                             [self postDataDynamic:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case DYNAMIC_ALMOND_DELETE: {
-                                            // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_DELETE", __PRETTY_FUNCTION__];
                                             [self postDataDynamic:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case SENSOR_CHANGE_RESPONSE: {
-                                            //[SNLog Log:@"%s: Received SENSOR_CHANGE_RESPONSE", __PRETTY_FUNCTION__];
                                             [self tryMarkUnitCompletion:YES responseType:SENSOR_CHANGE_RESPONSE];
                                             [self postData:SENSOR_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
                                         case DYNAMIC_ALMOND_NAME_CHANGE: {
-                                            // [SNLog Log:@"%s: Received DYNAMIC_ALMOND_NAME_CHANGE", __PRETTY_FUNCTION__];
                                             [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
