@@ -119,5 +119,18 @@
     return aNonNilValue;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    SFIDeviceKnownValues *copy = [[[self class] allocWithZone:zone] init];
+
+    if (copy != nil) {
+        copy.index = self.index;
+        copy.valueName = self.valueName;
+        copy.valueType = self.valueType;
+        copy.value = self.value;
+        copy.isUpdating = self.isUpdating;
+    }
+
+    return copy;
+}
 
 @end

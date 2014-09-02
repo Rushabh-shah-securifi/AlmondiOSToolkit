@@ -8,18 +8,20 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SFIDeviceKnownValues : NSObject <NSCoding>
-@property unsigned int      index;
-@property NSString          *valueName;
-@property NSString          *valueType;
-@property NSString          *value;
-@property BOOL              isUpdating;
+@interface SFIDeviceKnownValues : NSObject <NSCoding, NSCopying>
+@property(nonatomic) unsigned int index;
+@property(nonatomic) NSString *valueName;
+@property(nonatomic) NSString *valueType;
+@property(nonatomic) NSString *value;
+@property(nonatomic) BOOL isUpdating;
 
 // true when a non-nil and non-empty value is present
 - (BOOL)hasValue;
 
 - (BOOL)boolValue;
+
 - (int)intValue;
+
 - (float)floatValue;
 
 - (void)setIntValue:(int)value;
@@ -43,5 +45,7 @@
 - (void)encodeWithCoder:(NSCoder *)coder;
 
 - (NSString *)description;
+
+- (id)copyWithZone:(NSZone *)zone;
 
 @end

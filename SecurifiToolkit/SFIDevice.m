@@ -149,6 +149,38 @@
     return description;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    SFIDevice *copy = [[[self class] allocWithZone:zone] init];
+
+    if (copy != nil) {
+        copy.deviceID = self.deviceID;
+        copy.deviceName = self.deviceName;
+        copy.OZWNode = self.OZWNode;
+        copy.zigBeeShortID = self.zigBeeShortID;
+        copy.zigBeeEUI64 = self.zigBeeEUI64;
+        copy.deviceTechnology = self.deviceTechnology;
+        copy.associationTimestamp = self.associationTimestamp;
+        copy.deviceType = self.deviceType;
+        copy.deviceTypeName = self.deviceTypeName;
+        copy.friendlyDeviceType = self.friendlyDeviceType;
+        copy.deviceFunction = self.deviceFunction;
+        copy.allowNotification = self.allowNotification;
+        copy.valueCount = self.valueCount;
+        copy.location = self.location;
+        copy.isExpanded = self.isExpanded;
+        copy.imageName = self.imageName;
+        copy.mostImpValueName = self.mostImpValueName;
+        copy.mostImpValueIndex = self.mostImpValueIndex;
+        copy.stateIndex = self.stateIndex;
+        copy.isTampered = self.isTampered;
+        copy.tamperValueIndex = self.tamperValueIndex;
+        copy.isBatteryLow = self.isBatteryLow;
+    }
+
+    return copy;
+}
+
+
 - (NSString *)imageName:(NSString *)defaultName {
     return self.imageName ? self.imageName : defaultName;
 }

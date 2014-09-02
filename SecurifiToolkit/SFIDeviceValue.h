@@ -8,10 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SFIDeviceValue : NSObject <NSCoding>
-@property unsigned int deviceID;
-@property unsigned int valueCount;
-@property NSMutableArray *knownValues;
+@interface SFIDeviceValue : NSObject <NSCoding, NSCopying>
+@property(nonatomic) unsigned int deviceID;
+@property(nonatomic) unsigned int valueCount;
+@property(nonatomic) NSMutableArray *knownValues;
 
 // Ephemeral value holder useful for managing deleted or missing devices.
 // Value is not persistent. Defaults to NO.
@@ -22,5 +22,7 @@
 - (void)encodeWithCoder:(NSCoder *)coder;
 
 - (NSString *)description;
+
+- (id)copyWithZone:(NSZone *)zone;
 
 @end

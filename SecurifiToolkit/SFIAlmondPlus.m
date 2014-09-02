@@ -39,4 +39,18 @@
     return description;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    SFIAlmondPlus *copy = [[[self class] allocWithZone:zone] init];
+
+    if (copy != nil) {
+        copy.almondplusMAC = self.almondplusMAC;
+        copy.almondplusName = self.almondplusName;
+        copy.index = self.index;
+        copy.colorCodeIndex = self.colorCodeIndex;
+    }
+
+    return copy;
+}
+
+
 @end

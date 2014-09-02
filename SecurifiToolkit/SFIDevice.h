@@ -57,7 +57,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 
 @class SFIDeviceValue;
 
-@interface SFIDevice : NSObject <NSCoding>
+@interface SFIDevice : NSObject <NSCoding, NSCopying>
 
 @property(nonatomic) unsigned int deviceID;
 @property(nonatomic) NSString *deviceName;
@@ -99,5 +99,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 - (BOOL)isTamperMostImportantValue;
 
 - (void)initializeFromValues:(SFIDeviceValue *)values;
+
+- (id)copyWithZone:(NSZone *)zone;
 
 @end

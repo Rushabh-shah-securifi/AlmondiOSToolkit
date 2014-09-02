@@ -8,16 +8,19 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SFIAlmondPlus : NSObject <NSCoding>
+@interface SFIAlmondPlus : NSObject <NSCoding, NSCopying>
+
 @property(nonatomic) NSString *almondplusMAC;
 @property(nonatomic) NSString *almondplusName;
-@property int index;
-@property int colorCodeIndex;
+@property(nonatomic) int index;
+@property(nonatomic) int colorCodeIndex;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
 
 - (NSString *)description;
+
+- (id)copyWithZone:(NSZone *)zone;
 
 @end
