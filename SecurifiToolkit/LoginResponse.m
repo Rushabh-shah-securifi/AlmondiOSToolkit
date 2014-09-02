@@ -9,7 +9,5 @@
 #import "LoginResponse.h"
 
 @implementation LoginResponse
-@synthesize isSuccessful, userID, tempPass,reason;
-@synthesize reasonCode;
 
 @end

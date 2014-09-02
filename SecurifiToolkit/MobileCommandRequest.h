@@ -12,10 +12,10 @@
 //todo encapsulate this (a designated initializer)
 
 @interface MobileCommandRequest : NSObject
-@property NSString *almondMAC;
-@property NSString *deviceID;
-@property SFIDeviceType deviceType;
-@property NSString *indexID;
-@property NSString *changedValue;
-@property NSString *internalIndex;
+@property(nonatomic) NSString *almondMAC;
+@property(nonatomic) NSString *deviceID;
+@property(nonatomic) SFIDeviceType deviceType;
+@property(nonatomic) NSString *indexID;
+@property(nonatomic) NSString *changedValue;
+@property(nonatomic) NSString *internalIndex;
 @end

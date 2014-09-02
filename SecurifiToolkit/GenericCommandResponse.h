@@ -10,11 +10,11 @@
 
 
 @interface GenericCommandResponse : NSObject
-@property BOOL isSuccessful;
-@property unsigned int mobileInternalIndex;
-@property NSString *reason;
-@property NSString *almondMAC;
-@property NSString *applicationID;
-@property NSString *genericData;
-@property NSData *decodedData;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) unsigned int mobileInternalIndex;
+@property(nonatomic) NSString *reason;
+@property(nonatomic) NSString *almondMAC;
+@property(nonatomic) NSString *applicationID;
+@property(nonatomic) NSString *genericData;
+@property(nonatomic) NSData *decodedData;
 @end

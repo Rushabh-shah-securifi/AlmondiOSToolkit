@@ -9,5 +9,4 @@
 #import "GenericCommandResponse.h"
 
 @implementation GenericCommandResponse
-@synthesize isSuccessful, reason, almondMAC, applicationID, mobileInternalIndex, genericData, decodedData;
 @end

@@ -10,9 +10,9 @@
 
 @interface LoginResponse : NSObject
 
-@property BOOL isSuccessful;
-@property NSString *userID;
-@property NSString *tempPass;
-@property NSString *reason;
-@property int reasonCode;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) NSString *userID;
+@property(nonatomic) NSString *tempPass;
+@property(nonatomic) NSString *reason;
+@property(nonatomic) int reasonCode;
 @end
