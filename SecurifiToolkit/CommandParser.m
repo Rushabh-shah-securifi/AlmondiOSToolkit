@@ -739,7 +739,9 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         }
         //Save Name
         if([nameKey isEqualToString:@"Name"]){
+            SFIDevicePropertyType propertyType = [SFIDeviceKnownValues nameToPropertyType:nameVal];
             [parser.tmpDeviceKnownValue setValueName:nameVal];
+            [parser.tmpDeviceKnownValue setPropertyType:propertyType];
         }
         //Save Type
         if([typeKey isEqualToString:@"Type"]){
@@ -867,6 +869,8 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         }
         //Save Name
         if([nameKey isEqualToString:@"Name"]){
+            SFIDevicePropertyType propertyType = [SFIDeviceKnownValues nameToPropertyType:nameVal];
+            [parser.tmpDeviceKnownValue setPropertyType:propertyType];
             [parser.tmpDeviceKnownValue setValueName:nameVal];
         }
         //Save Type

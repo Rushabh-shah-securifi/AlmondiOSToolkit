@@ -205,7 +205,7 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"SWITCH MULTILEVEL"]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_MULTILEVEL) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
@@ -220,7 +220,7 @@
                 curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"SENSOR BINARY"]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_BINARY) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
@@ -236,10 +236,10 @@
                 curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"SWITCH BINARY"]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_BINARY) {
                     self.stateIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:@"SWITCH MULTILEVEL"]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_MULTILEVEL) {
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
@@ -251,7 +251,7 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"DOOR LOCK "]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_LOCK_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
@@ -262,12 +262,11 @@
         }
 
         case SFIDeviceType_Alarm_6: {
-            //Alarm : TODO Later
             for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"LOCK_STATE"]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_BASIC) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
@@ -282,16 +281,16 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:STATE]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
-                else if ([deviceValueTypeName isEqualToString:TAMPER]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_TAMPER) {
                     self.isTampered = [curDeviceValues.value boolValue];
                     self.tamperValueIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:LOW_BATTERY]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_LOW_BATTERY) {
                     self.isBatteryLow = [curDeviceValues.value boolValue];
                 }
             }
@@ -304,16 +303,16 @@
 
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:STATE]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
-                else if ([deviceValueTypeName isEqualToString:TAMPER]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_TAMPER) {
                     self.isTampered = [curDeviceValues.value boolValue];
                     self.tamperValueIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:LOW_BATTERY]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_LOW_BATTERY) {
                     self.isBatteryLow = [curDeviceValues.value boolValue];
                 }
             }
@@ -325,16 +324,16 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:STATE]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
-                else if ([deviceValueTypeName isEqualToString:TAMPER]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_TAMPER) {
                     self.isTampered = [curDeviceValues.value boolValue];
                     self.tamperValueIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:LOW_BATTERY]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_LOW_BATTERY) {
                     self.isBatteryLow = [curDeviceValues.value boolValue];
                 }
             }
@@ -346,16 +345,16 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:STATE]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
-                else if ([deviceValueTypeName isEqualToString:TAMPER]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_TAMPER) {
                     self.isTampered = [curDeviceValues.value boolValue];
                     self.tamperValueIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:LOW_BATTERY]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_LOW_BATTERY) {
                     self.isBatteryLow = [curDeviceValues.value boolValue];
                 }
             }
@@ -368,16 +367,16 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:STATE]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
-                else if ([deviceValueTypeName isEqualToString:TAMPER]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_TAMPER) {
                     self.isTampered = [curDeviceValues.value boolValue];
                     self.tamperValueIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:LOW_BATTERY]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_LOW_BATTERY) {
                     self.isBatteryLow = [curDeviceValues.value boolValue];
                 }
             }
@@ -390,16 +389,16 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:STATE]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
-                else if ([deviceValueTypeName isEqualToString:TAMPER]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_TAMPER) {
                     self.isTampered = [curDeviceValues.value boolValue];
                     self.tamperValueIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:LOW_BATTERY]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_LOW_BATTERY) {
                     self.isBatteryLow = [curDeviceValues.value boolValue];
                 }
             }
@@ -412,20 +411,19 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:STATE]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_STATE) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
                 }
-                else if ([deviceValueTypeName isEqualToString:TAMPER]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_TAMPER) {
                     self.isTampered = [curDeviceValues.value boolValue];
                     self.tamperValueIndex = index;
                 }
-                else if ([deviceValueTypeName isEqualToString:LOW_BATTERY]) {
+                else if (curDeviceValues.propertyType == SFIDevicePropertyType_LOW_BATTERY) {
                     self.isBatteryLow = [curDeviceValues.value boolValue];
                 }
             }
-
             break;
         }
 
@@ -434,7 +432,7 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"SWITCH BINARY"]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_BINARY) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
@@ -449,7 +447,7 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"SWITCH BINARY"]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_BINARY) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
@@ -464,7 +462,7 @@
                 SFIDeviceKnownValues *curDeviceValues = currentKnownValues[index];
                 deviceValueTypeName = curDeviceValues.valueName;
 
-                if ([deviceValueTypeName isEqualToString:@"SWITCH BINARY"]) {
+                if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_BINARY) {
                     self.stateIndex = index;
                     self.mostImpValueIndex = index;
                     self.mostImpValueName = deviceValueTypeName;
