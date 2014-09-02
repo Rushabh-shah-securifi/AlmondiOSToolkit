@@ -31,7 +31,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
 
 @interface SecurifiToolkit () <SingleTonDelegate>
-@property(nonatomic, readonly) Scoreboard *stats;
+@property(nonatomic, readonly) Scoreboard *scoreboard;
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
@@ -60,7 +60,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     if (self) {
         [SFIReachabilityManager sharedManager];
 
-        _stats = [Scoreboard new];
+        _scoreboard = [Scoreboard new];
 
         // default; do not change
         self.useProductionCloud = YES;
@@ -176,7 +176,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 - (void)onReachabilityChanged:(id)notice {
-    self.stats.reachabilityChangedCount++;
+    self.scoreboard.reachabilityChangedCount++;
 }
 
 #pragma mark - SDK Initialization
@@ -302,7 +302,6 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
         GenericCommand *cmd = [block_self makeAlmondListCommand];
         [block_self internalInitializeCloud:socket command:cmd];
-        block_self.stats.connectionCount++;
     });
 }
 
@@ -402,7 +401,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         return;
     }
 
-    self.stats.loginCount++;
+    self.scoreboard.loginCount++;
 
     [self tearDownLoginSession];
     [self setSecEmail:email];
@@ -598,7 +597,6 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     return [SFIOfflineDataManager readDeviceValueList:almondMac];
 }
 
-
 #pragma mark - Device and Device Value Management
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
@@ -639,8 +637,8 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     return YES;
 }
 
-- (Scoreboard *)scoreboard {
-    return [self.stats copy];
+- (Scoreboard *)scoreboardSnapshot {
+    return [self.scoreboard copy];
 }
 
 #pragma mark - Device value updates
@@ -775,15 +773,15 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 #pragma mark - SingleTonDelegate methods
 
 - (void)singletTonDidReceiveDynamicUpdate:(SingleTon *)singleTon {
-    self.stats.dynamicUpdateCount++;
+    self.scoreboard.dynamicUpdateCount++;
 }
 
 - (void)singletTonDidSendCommand:(SingleTon *)singleTon {
-    self.stats.commandRequestCount++;
+    self.scoreboard.commandRequestCount++;
 }
 
 - (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime {
-    self.stats.commandResponseCount++;
+    self.scoreboard.commandResponseCount++;
 
     id p_cmd = cmd.command;
     if ([p_cmd isKindOfClass:[MobileCommandRequest class]]) {
@@ -795,6 +793,10 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     }
 
     NSLog(@"Command completion: cmd:%@, %0.2f secs", cmd, roundTripTime);
+}
+
+- (void)singletTonCloudConnectionDidEstablish:(SingleTon *)singleTon {
+    self.scoreboard.connectionCount++;
 }
 
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon {

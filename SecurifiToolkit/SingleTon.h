@@ -24,11 +24,12 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 
 @protocol SingleTonDelegate
 
+- (void)singletTonCloudConnectionDidEstablish:(SingleTon *)singleTon;
+- (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon;
+
 - (void)singletTonDidReceiveDynamicUpdate:(SingleTon *)singleTon;
 - (void)singletTonDidSendCommand:(SingleTon *)singleTon;
 - (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime;
-
-- (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon;
 
 @end
 

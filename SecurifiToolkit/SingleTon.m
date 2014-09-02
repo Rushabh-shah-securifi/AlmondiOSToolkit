@@ -155,6 +155,8 @@
             block_self.isStreamConnected = YES;
             dispatch_semaphore_signal(block_self.network_established_latch);
             //
+            [block_self.delegate singletTonCloudConnectionDidEstablish:block_self];
+            //
             while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && !block_self.networkShutdown) {
 //                DLog(@"Streams entered run loop");
             }

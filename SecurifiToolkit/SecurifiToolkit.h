@@ -148,7 +148,7 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac;
 
 // Returns running stats on internals of this toolkit; useful for debugging and development
-- (Scoreboard*)scoreboard;
+- (Scoreboard*)scoreboardSnapshot;
 
 @end
  
