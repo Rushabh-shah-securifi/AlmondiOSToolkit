@@ -20,25 +20,13 @@ NSString *const kSFIReachabilityChangedNotification = @"kReachabilityChangedNoti
 @implementation SFIReachabilityManager
 
 #pragma mark -
-#pragma mark Default Manager
-
-+ (SFIReachabilityManager *)sharedManager {
-    static SFIReachabilityManager *_sharedManager = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _sharedManager = [[self alloc] init];
-    });
-    return _sharedManager;
-}
-
-#pragma mark -
 #pragma mark Initialization
 
-- (id)init {
+- (instancetype)initWithHost:(NSString*)host {
     self = [super init];
     if (self) {
-        // Initialize Reachability
-        _reachability = [Reachability reachabilityWithHostname:CLOUD_PROD_SERVER];
+        _reachability = [Reachability reachabilityWithHostname:host];
+
         // Start Monitoring
         [self.reachability startNotifier];
     }
@@ -46,14 +34,19 @@ NSString *const kSFIReachabilityChangedNotification = @"kReachabilityChangedNoti
 }
 
 - (void)dealloc {
-    // Stop Notifier
-    if (_reachability) {
-        [_reachability stopNotifier];
-    }
+    [self shutdown];
 }
 
 #pragma mark -
 #pragma mark Public methods
+
+- (void)shutdown {
+    // Stop Notifier
+    if (_reachability) {
+        [_reachability stopNotifier];
+        _reachability = nil;
+    }
+}
 
 - (BOOL)isReachable {
     return self.reachability.isReachable;

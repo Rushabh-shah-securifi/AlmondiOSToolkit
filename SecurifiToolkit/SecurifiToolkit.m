@@ -31,6 +31,7 @@ NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
 
 @interface SecurifiToolkit () <SingleTonDelegate>
+@property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
@@ -58,9 +59,9 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 - (id)init {
     self = [super init];
     if (self) {
-        [SFIReachabilityManager sharedManager];
-
         _scoreboard = [Scoreboard new];
+
+        [self setupReachability:CLOUD_DEV_SERVER];
 
         // default; do not change
         self.useProductionCloud = YES;
@@ -157,7 +158,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 - (BOOL)isReachable {
-    return [[SFIReachabilityManager sharedManager] isReachable];
+    return [self.cloudReachability isReachable];
 }
 
 - (BOOL)isLoggedIn {
@@ -173,6 +174,11 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     else {
         return SDKCloudStatusUninitialized;
     }
+}
+
+- (void)setupReachability:(NSString*)hostname {
+    [_cloudReachability shutdown];
+    _cloudReachability = [[SFIReachabilityManager alloc] initWithHost:hostname];
 }
 
 - (void)onReachabilityChanged:(id)notice {

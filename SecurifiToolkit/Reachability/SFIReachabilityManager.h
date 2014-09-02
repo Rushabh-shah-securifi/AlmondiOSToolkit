@@ -8,12 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-
+//todo move to the securifi toolkit; move to a delegate model
 extern NSString *const kSFIReachabilityChangedNotification;
 
 @interface SFIReachabilityManager : NSObject
 
-+ (SFIReachabilityManager *)sharedManager;
+- (instancetype)initWithHost:(NSString *)host;
+
+- (void)shutdown;
 
 - (BOOL)isReachable;
 
