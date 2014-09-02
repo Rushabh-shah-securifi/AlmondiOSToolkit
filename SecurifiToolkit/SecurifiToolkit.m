@@ -32,6 +32,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
 @interface SecurifiToolkit () <SingleTonDelegate>
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
+@property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
@@ -60,6 +61,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     self = [super init];
     if (self) {
         _scoreboard = [Scoreboard new];
+        _dataManager = [SFIOfflineDataManager new];
 
         [self setupReachability:CLOUD_DEV_SERVER];
 
@@ -472,7 +474,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 - (void)tearDownLoginSession {
     [self removeCurrentAlmond];
     [self clearSecCredentials];
-    [SFIOfflineDataManager purgeAll];
+    [self.dataManager purgeAll];
 }
 
 - (void)onLoginResponse:(NSNotification *)notification {
@@ -592,15 +594,15 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 - (NSArray *)almondList {
-    return [SFIOfflineDataManager readAlmondList];
+    return [self.dataManager readAlmondList];
 }
 
 - (NSArray *)deviceList:(NSString *)almondMac {
-    return [SFIOfflineDataManager readDeviceList:almondMac];
+    return [self.dataManager readDeviceList:almondMac];
 }
 
 - (NSArray *)deviceValuesList:(NSString *)almondMac {
-    return [SFIOfflineDataManager readDeviceValueList:almondMac];
+    return [self.dataManager readDeviceValueList:almondMac];
 }
 
 #pragma mark - Device and Device Value Management
@@ -650,7 +652,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 #pragma mark - Device value updates
 
 - (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac {
-    [SFIOfflineDataManager writeDeviceValueList:deviceList currentMAC:almondMac];
+    [self.dataManager writeDeviceValueList:deviceList currentMAC:almondMac];
 }
 
 #pragma mark - Command constructors
@@ -860,7 +862,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     NSArray *almondList = obj.almondPlusMACList;
 
     // Store the new list
-    [SFIOfflineDataManager writeAlmondList:almondList];
+    [self.dataManager writeAlmondList:almondList];
 
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
@@ -887,7 +889,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     NSArray *almondList = obj.almondPlusMACList;
 
     // Store the new list
-    [SFIOfflineDataManager writeAlmondList:almondList];
+    [self.dataManager writeAlmondList:almondList];
 
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:YES];
@@ -910,7 +912,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
     NSArray *newAlmondList = @[];
     for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
-        newAlmondList = [SFIOfflineDataManager deleteAlmond:deleted];
+        newAlmondList = [self.dataManager deleteAlmond:deleted];
     }
 
     // Ensure Current Almond is consistent with new list
@@ -938,7 +940,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
             almond.almondplusName = obj.almondplusName;
 
             // Save the change
-            [SFIOfflineDataManager writeAlmondList:currentList];
+            [self.dataManager writeAlmondList:currentList];
 
             // Update the Current Almond
             SFIAlmondPlus *plus = [self currentAlmond];
@@ -962,7 +964,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     // Manage the "Current selected Almond" value
     if (almondList.count == 0) {
         [self removeCurrentAlmond];
-        [SFIOfflineDataManager purgeAll];
+        [self.dataManager purgeAll];
         return nil;
     }
     else if (almondList.count == 1) {
@@ -1033,7 +1035,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     }
 
     NSString *currentMac = plus.almondplusMAC;
-    NSString *storedHash = [SFIOfflineDataManager readHashList:currentMac];
+    NSString *storedHash = [self.dataManager readHashList:currentMac];
 
     if (currentHash == nil || [currentHash isEqualToString:@"null"]) {
         //Hash sent by cloud as null - No Device
@@ -1048,7 +1050,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     else {
         //Save hash in file for each almond
         NSLog(@"Device Hash Response: mismatch; requesting devices; mac:%@, current:%@, stored:%@", currentMac, currentHash, storedHash);
-        [SFIOfflineDataManager writeHashList:currentHash currentMAC:currentMac];
+        [self.dataManager writeHashList:currentHash currentMAC:currentMac];
         // and update the device list -- on receipt of the device list, then the values will be updated
         [self asyncRequestDeviceList:currentMac];
     }
@@ -1102,7 +1104,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 // Processes device lists received in dynamic and on-demand updates.
 // After storing the new list, a notification is posted and an updated values list is requested
 - (void)processDeviceListChange:(NSString *)mac newDevices:(NSArray *)newDevices {
-    [SFIOfflineDataManager writeDeviceList:newDevices currentMAC:mac];
+    [self.dataManager writeDeviceList:newDevices currentMAC:mac];
 
     // Request values for devices
     [self asyncRequestDeviceValueList:mac];
@@ -1141,7 +1143,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     }
 
     // Update offline storage
-    [SFIOfflineDataManager writeDeviceValueList:obj.deviceValueList currentMAC:currentMAC];
+    [self.dataManager writeDeviceValueList:obj.deviceValueList currentMAC:currentMAC];
 
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
@@ -1153,7 +1155,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     }
 
     NSMutableArray *cloudDeviceValueList = obj.deviceValueList;
-    NSArray *currentDeviceValueList = [SFIOfflineDataManager readDeviceValueList:currentMAC];
+    NSArray *currentDeviceValueList = [self.dataManager readDeviceValueList:currentMAC];
 
     NSMutableArray *newDeviceValueList;
     if (currentDeviceValueList != nil) {
@@ -1207,7 +1209,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     }
 
     // Update offline storage
-    [SFIOfflineDataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
+    [self.dataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
 
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
