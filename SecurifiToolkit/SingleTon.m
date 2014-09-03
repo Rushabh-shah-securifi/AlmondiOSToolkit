@@ -316,9 +316,9 @@
     SUnit *unit = self.currentUnit;
 
     if (unit) {
-        DLog(@"Marking response %i for unit: %@", responseType, unit.description);
         [unit markResponse:success];
         [self.delegate singletTonDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess];
+        DLog(@"Marking response %i for unit: %@", responseType, unit.description);
     }
     else {
         [self.delegate singletTonDidReceiveCommandResponse:self command:nil timeToCompletion:0];

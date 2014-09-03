@@ -800,7 +800,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         [self postNotification:kSFIDidCompleteMobileCommandRequest data:payload];
     }
 
-    NSLog(@"Command completion: cmd:%@, %0.2f secs", cmd, roundTripTime);
+    DLog(@"Command completion: cmd:%@, %0.3f secs", cmd, roundTripTime);
 }
 
 - (void)singletTonCloudConnectionDidEstablish:(SingleTon *)singleTon {
