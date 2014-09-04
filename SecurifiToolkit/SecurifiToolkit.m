@@ -9,7 +9,6 @@
 #import <SecurifiToolkit/SecurifiToolkit.h>
 #import "SingleTon.h"
 #import "LoginTempPass.h"
-#import "PrivateCommandTypes.h"
 #import "KeyChainWrapper.h"
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -394,7 +393,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     mobileCommand.internalIndex = [NSString stringWithFormat:@"%d", internalIndex];
 
     GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = MOBILE_COMMAND;
+    command.commandType = CommandType_MOBILE_COMMAND;
     command.command = mobileCommand;
 
     [self asyncSendToCloud:command];
@@ -422,7 +421,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     loginCommand.Password = password;
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = LOGIN_COMMAND;
+    cloudCommand.commandType = CommandType_LOGIN_COMMAND;
     cloudCommand.command = loginCommand;
 
     [self asyncSendToCloud:cloudCommand];
@@ -440,7 +439,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
     if (self.isCloudOnline) {
         GenericCommand *cmd = [[GenericCommand alloc] init];
-        cmd.commandType = LOGOUT_COMMAND;
+        cmd.commandType = CommandType_LOGOUT_COMMAND;
         cmd.command = nil;
 
         [self asyncSendToCloud:cmd];
@@ -457,7 +456,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     cmd.Password = [NSString stringWithString:password];
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = LOGOUT_ALL_COMMAND;
+    cloudCommand.commandType = CommandType_LOGOUT_ALL_COMMAND;
     cloudCommand.command = cmd;
 
     [self asyncSendToCloud:cloudCommand];
@@ -617,7 +616,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     deviceListCommand.almondMAC = almondMac;
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = DEVICEDATA;
+    cloudCommand.commandType = CommandType_DEVICE_DATA;
     cloudCommand.command = deviceListCommand;
 
     [self asyncSendToCloud:cloudCommand];
@@ -628,7 +627,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     command.almondMAC = almondMac;
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = DEVICE_VALUE;
+    cloudCommand.commandType = CommandType_DEVICE_VALUE;
     cloudCommand.command = command;
 
     [self.networkSingleton markDeviceValuesFetchedForAlmond:almondMac];
@@ -659,7 +658,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
 - (GenericCommand *)makeCloudSanityCommand {
     GenericCommand *sanityCommand = [[GenericCommand alloc] init];
-    sanityCommand.commandType = CLOUD_SANITY;
+    sanityCommand.commandType = CommandType_CLOUD_SANITY;
     sanityCommand.command = nil;
     return sanityCommand;
 }
@@ -670,7 +669,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     cmd.TempPass = [self secPassword];
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = LOGIN_TEMPPASS_COMMAND;
+    cloudCommand.commandType = CommandType_LOGIN_TEMPPASS_COMMAND;
     cloudCommand.command = cmd;
 
     return cloudCommand;
@@ -678,7 +677,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
 - (GenericCommand *)makeAlmondListCommand {
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = ALMOND_LIST;
+    cloudCommand.commandType = CommandType_ALMOND_LIST;
     cloudCommand.command = [AlmondListRequest new];
     return cloudCommand;
 }
@@ -688,7 +687,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     deviceHashCommand.almondMAC = almondMac;
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = DEVICEDATA_HASH;
+    cloudCommand.commandType = CommandType_DEVICE_DATA_HASH;
     cloudCommand.command = deviceHashCommand;
 
     return cloudCommand;
@@ -800,7 +799,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         [self postNotification:kSFIDidCompleteMobileCommandRequest data:payload];
     }
 
-    DLog(@"Command completion: cmd:%@, %0.3f secs", cmd, roundTripTime);
+    NSLog(@"Command completion: cmd:%@, %0.3f secs", cmd, roundTripTime);
 }
 
 - (void)singletTonCloudConnectionDidEstablish:(SingleTon *)singleTon {

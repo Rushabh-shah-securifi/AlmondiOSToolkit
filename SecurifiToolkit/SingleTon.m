@@ -9,7 +9,6 @@
 #import "SingleTon.h"
 #import <SecurifiToolkit/SecurifiToolkit.h>
 #import "Commandparser.h"
-#import "PrivateCommandTypes.h"
 #import "LoginTempPass.h"
 #import "SUnit.h"
 
@@ -310,9 +309,16 @@
     return timedOut;
 }
 
+#pragma mark - Logged In state
+
+- (void)markLoggedInState:(BOOL)loggedIn {
+    self.isLoggedIn = loggedIn;
+    self.connectionState = loggedIn ? SDKCloudStatusLoggedIn : SDKCloudStatusNotLoggedIn;
+}
+
 #pragma mark - NSStreamDelegate methods
 
-- (void)tryMarkUnitCompletion:(BOOL)success responseType:(unsigned int)responseType {
+- (void)tryMarkUnitCompletion:(BOOL)success responseType:(CommandType)responseType {
     SUnit *unit = self.currentUnit;
 
     if (unit) {
@@ -420,53 +426,43 @@
                                     [self tryPostNetworkUpNotification];
 
                                     switch (temp.commandType) {
-                                        case LOGIN_RESPONSE: {
+                                        case CommandType_LOGIN_RESPONSE: {
                                             LoginResponse *obj = (LoginResponse *) temp.command;
-                                            if (obj.isSuccessful == YES) {
-                                                //Set the indicator that we are logged in to prevent next login from User
-                                                self.isLoggedIn = YES;
-                                                self.connectionState = SDKCloudStatusLoggedIn;
-                                            }
-                                            else {
-                                                self.isLoggedIn = NO;
-                                                self.connectionState = SDKCloudStatusNotLoggedIn;
-                                            }
-
-                                            [self tryMarkUnitCompletion:obj.isSuccessful responseType:LOGIN_RESPONSE];
+                                            [self markLoggedInState:obj.isSuccessful];
+                                            [self tryMarkUnitCompletion:obj.isSuccessful responseType:CommandType_LOGIN_RESPONSE];
                                             [self postData:LOGIN_NOTIFIER data:obj];
-
                                             break;
                                         }
 
-                                        case SIGNUP_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:SIGNUP_RESPONSE];
+                                        case CommandType_SIGNUP_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_SIGNUP_RESPONSE];
                                             [self postData:SIGN_UP_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case KEEP_ALIVE: {
+                                        case CommandType_KEEP_ALIVE: {
                                             break;
                                         }
 
-                                        case CLOUD_SANITY_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:CLOUD_SANITY_RESPONSE];
+                                        case CommandType_CLOUD_SANITY_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_CLOUD_SANITY_RESPONSE];
                                             break;
                                         }
 
-                                        case LOGOUT_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:LOGOUT_RESPONSE];
+                                        case CommandType_LOGOUT_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_LOGOUT_RESPONSE];
                                             [self postData:LOGOUT_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case LOGOUT_ALL_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:LOGOUT_ALL_RESPONSE];
+                                        case CommandType_LOGOUT_ALL_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_LOGOUT_ALL_RESPONSE];
                                             [self postData:LOGOUT_ALL_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case AFFILIATION_USER_COMPLETE: {
-                                            [self tryMarkUnitCompletion:YES responseType:AFFILIATION_USER_COMPLETE];
+                                        case CommandType_AFFILIATION_USER_COMPLETE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_AFFILIATION_USER_COMPLETE];
                                             [self postData:AFFILIATION_COMPLETE_NOTIFIER data:temp.command];
                                             break;
                                         }
@@ -482,52 +478,52 @@
                                             //                                            temp=nil;
                                             //                                        }
                                             //                                            break;
-                                        case ALMOND_LIST_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:ALMOND_LIST_RESPONSE];
+                                        case CommandType_ALMOND_LIST_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_ALMOND_LIST_RESPONSE];
                                             [self postData:ALMOND_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case DEVICEDATA_HASH_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:DEVICEDATA_HASH_RESPONSE];
+                                        case CommandType_DEVICE_DATA_HASH_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_DEVICE_DATA_HASH_RESPONSE];
                                             [self postData:DEVICEDATA_HASH_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case DEVICEDATA_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:DEVICEDATA_RESPONSE];
+                                        case CommandType_DEVICE_DATA_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_DEVICE_DATA_RESPONSE];
                                             [self postData:DEVICE_DATA_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case DEVICE_VALUE_LIST_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:DEVICE_VALUE_LIST_RESPONSE];
+                                        case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_DEVICE_VALUE_LIST_RESPONSE];
                                             [self postData:DEVICE_VALUE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case MOBILE_COMMAND_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:MOBILE_COMMAND_RESPONSE];
+                                        case CommandType_MOBILE_COMMAND_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_MOBILE_COMMAND_RESPONSE];
                                             [self postData:MOBILE_COMMAND_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case DYNAMIC_DEVICE_DATA: {
+                                        case CommandType_DYNAMIC_DEVICE_DATA: {
                                             [self postDataDynamic:DYNAMIC_DEVICE_DATA_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case DYNAMIC_DEVICE_VALUE_LIST: {
+                                        case CommandType_DYNAMIC_DEVICE_VALUE_LIST: {
                                             [self postDataDynamic:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case GENERIC_COMMAND_RESPONSE: {
+                                        case CommandType_GENERIC_COMMAND_RESPONSE: {
                                             GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
                                             NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
                                             obj.decodedData = decodedData;
 
-                                            [self tryMarkUnitCompletion:YES responseType:GENERIC_COMMAND_RESPONSE];
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_GENERIC_COMMAND_RESPONSE];
                                             [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
                                             break;
                                         }
-                                        case GENERIC_COMMAND_NOTIFICATION: {
+                                        case CommandType_GENERIC_COMMAND_NOTIFICATION: {
                                             GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
 
                                             //Decode using Base64
@@ -539,30 +535,30 @@
 
                                             break;
                                         }
-                                        case VALIDATE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:VALIDATE_RESPONSE];
+                                        case CommandType_VALIDATE_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_VALIDATE_RESPONSE];
                                             [self postData:VALIDATE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case RESET_PASSWORD_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:RESET_PASSWORD_RESPONSE];
+                                        case CommandType_RESET_PASSWORD_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_RESET_PASSWORD_RESPONSE];
                                             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case DYNAMIC_ALMOND_ADD: {
+                                        case CommandType_DYNAMIC_ALMOND_ADD: {
                                             [self postDataDynamic:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case DYNAMIC_ALMOND_DELETE: {
+                                        case CommandType_DYNAMIC_ALMOND_DELETE: {
                                             [self postDataDynamic:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case SENSOR_CHANGE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:SENSOR_CHANGE_RESPONSE];
+                                        case CommandType_SENSOR_CHANGE_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_SENSOR_CHANGE_RESPONSE];
                                             [self postData:SENSOR_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        case DYNAMIC_ALMOND_NAME_CHANGE: {
+                                        case CommandType_DYNAMIC_ALMOND_NAME_CHANGE: {
                                             [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
@@ -944,7 +940,7 @@
 
         @try {
             switch (obj.commandType) {
-                case LOGIN_COMMAND: {
+                case CommandType_LOGIN_COMMAND: {
                     /* Check if User is already logged in [ if he has received loginResponse command */
                     if (socket.isLoggedIn == YES) {
                         //Post Callback that you are logged in
@@ -964,7 +960,7 @@
                         commandPayload = [NSString stringWithFormat:FRESH_LOGIN_REQUEST_XML, ob1.UserID, ob1.Password];
 
 
-                        commandType = (uint32_t) htonl(LOGIN_COMMAND);
+                        commandType = (uint32_t) htonl(CommandType_LOGIN_COMMAND);
 
                         sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                         commandLength = (uint32_t) htonl([sendCommandPayload length]);
@@ -972,27 +968,27 @@
 
                     break;
                 }
-                case LOGIN_TEMPPASS_COMMAND: {
+                case CommandType_LOGIN_TEMPPASS_COMMAND: {
                     // [SNLog Log:@"%s: Sending LOGIN_TEMPPASS_COMMAND",__PRETTY_FUNCTION__];
                     LoginTempPass *ob1 = (LoginTempPass *) obj.command;
                     commandPayload = [NSString stringWithFormat:LOGIN_REQUEST_XML, ob1.UserID, ob1.TempPass];
 
                     //Cloud has switch for both command as LOGIN_COMMAND
-                    commandType = (uint32_t) htonl(LOGIN_COMMAND);
+                    commandType = (uint32_t) htonl(CommandType_LOGIN_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case LOGOUT_COMMAND: {
+                case CommandType_LOGOUT_COMMAND: {
                     // [SNLog Log:@"%s: Sending LOGOUT COMMAND",__PRETTY_FUNCTION__];
 //                    Logout *ob1 = (Logout *)obj.command;
                     commandPayload = LOGOUT_REQUEST_XML;
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
                     //Cloud has switch for both command as LOGIN_COMMAND
-                    commandType = (uint32_t) htonl(LOGOUT_COMMAND);
+                    commandType = (uint32_t) htonl(CommandType_LOGOUT_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
@@ -1020,45 +1016,45 @@
 
                     break;
                 }
-                case SIGNUP_COMMAND: {
+                case CommandType_SIGNUP_COMMAND: {
                     // [SNLog Log:@"%s: Sending SIGNUP Command",__PRETTY_FUNCTION__];
                     Signup *ob1 = (Signup *) obj.command;
                     commandPayload = [NSString stringWithFormat:SIGNUP_REQUEST_XML, ob1.UserID, ob1.Password];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(SIGNUP_COMMAND);
+                    commandType = (uint32_t) htonl(CommandType_SIGNUP_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case CLOUD_SANITY: {
+                case CommandType_CLOUD_SANITY: {
                     // [SNLog Log:@"%s: Sending CLOUD_SANITY Command",__PRETTY_FUNCTION__];
                     commandPayload = CLOUDSANITY_REQUEST_XML;//[NSString stringWithFormat:CLOUDSANITY_REQUEST_XML];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(CLOUD_SANITY);
+                    commandType = (uint32_t) htonl(CommandType_CLOUD_SANITY);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case AFFILIATION_CODE_REQUEST: {
+                case CommandType_AFFILIATION_CODE_REQUEST: {
                     // [SNLog Log:@"%s: Sending Affiliation Code request",__PRETTY_FUNCTION__];
                     AffiliationUserRequest *affiliationObj = (AffiliationUserRequest *) obj.command;
                     commandPayload = [NSString stringWithFormat:AFFILIATION_CODE_REQUEST_XML, affiliationObj.Code];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(AFFILIATION_CODE_REQUEST);
+                    commandType = (uint32_t) htonl(CommandType_AFFILIATION_CODE_REQUEST);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case LOGOUT_ALL_COMMAND: {
+                case CommandType_LOGOUT_ALL_COMMAND: {
                     //PY 160913 - Logout all command
                     // [SNLog Log:@"%s: Sending Logout request",__PRETTY_FUNCTION__];
                     //            <root>
@@ -1072,14 +1068,14 @@
                     commandPayload = [NSString stringWithFormat:LOGOUT_ALL_REQUEST_XML, logoutAllObj.UserID, logoutAllObj.Password];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(LOGOUT_ALL_COMMAND);
+                    commandType = (uint32_t) htonl(CommandType_LOGOUT_ALL_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case ALMOND_LIST: {
+                case CommandType_ALMOND_LIST: {
                     //PY 160913 - almond list command
                     // [SNLog Log:@"%s: Sending almond list request",__PRETTY_FUNCTION__];
                     // <root></root>
@@ -1088,7 +1084,7 @@
                     commandPayload = ALMOND_LIST_REQUEST_XML; //[NSString stringWithFormat:];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(ALMOND_LIST);
+                    commandType = (uint32_t) htonl(CommandType_ALMOND_LIST);
 
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
@@ -1096,7 +1092,7 @@
 
                     break;
                 }
-                case DEVICEDATA_HASH: {
+                case CommandType_DEVICE_DATA_HASH: {
                     //PY 170913 - Device Hash command
                     // [SNLog Log:@"%s: Sending Device Hash request",__PRETTY_FUNCTION__];
                     //            <root><DeviceDataHash>
@@ -1107,14 +1103,14 @@
                     commandPayload = [NSString stringWithFormat:DEVICE_DATA_HASH_REQUEST_XML, deviceDataHashObj.almondMAC];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(DEVICEDATA_HASH);
+                    commandType = (uint32_t) htonl(CommandType_DEVICE_DATA_HASH);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case DEVICEDATA: {
+                case CommandType_DEVICE_DATA: {
                     //PY 170913 - Device Data command
                     // [SNLog Log:@"%s: Sending Device Data request",__PRETTY_FUNCTION__];
                     //            <root><DeviceData>
@@ -1125,14 +1121,14 @@
                     commandPayload = [NSString stringWithFormat:DEVICE_DATA_REQUEST_XML, deviceDataObj.almondMAC];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(DEVICEDATA);
+                    commandType = (uint32_t) htonl(CommandType_DEVICE_DATA);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case DEVICE_VALUE: {
+                case CommandType_DEVICE_VALUE: {
                     //PY 190913 - Device Value command
                     // [SNLog Log:@"%s: Sending DeviceValue request",__PRETTY_FUNCTION__];
                     //            <root><DeviceValue>
@@ -1143,14 +1139,14 @@
                     commandPayload = [NSString stringWithFormat:DEVICE_VALUE_REQUEST_XML, deviceValueObj.almondMAC];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(DEVICE_VALUE);
+                    commandType = (uint32_t) htonl(CommandType_DEVICE_VALUE);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case MOBILE_COMMAND: {
+                case CommandType_MOBILE_COMMAND: {
                     //PY 200913 - Mobile command
                     // [SNLog Log:@"%s: Sending MobileCommand request",__PRETTY_FUNCTION__];
                     /* <root><MobileCommand>
@@ -1173,7 +1169,7 @@
                     //Add this line to any XML  string with has \" in it. For example: <Device ID=\"%@\">
                     commandPayload = [self stringByRemovingEscapeCharacters:commandPayload];
 
-                    commandType = (uint32_t) htonl(MOBILE_COMMAND);
+                    commandType = (uint32_t) htonl(CommandType_MOBILE_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     DLog(@"Payload Command length %lu", (unsigned long) [sendCommandPayload length]);
@@ -1181,7 +1177,7 @@
 
                     break;
                 }
-                case GENERIC_COMMAND_REQUEST: {
+                case CommandType_GENERIC_COMMAND_REQUEST: {
                     //PY 291013 - Generic command
 //                    <root>
 //                    <GenericCommandRequest>
@@ -1206,7 +1202,7 @@
                     commandPayload = [NSString stringWithFormat:GENERIC_COMMAND_REQUEST_XML, genericCommandObj.almondMAC, genericCommandObj.applicationID, genericCommandObj.mobileInternalIndex, encodedString];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(GENERIC_COMMAND_REQUEST);
+                    commandType = (uint32_t) htonl(CommandType_GENERIC_COMMAND_REQUEST);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
@@ -1214,7 +1210,7 @@
                     break;
                 }
                     //PY 011113 - Reactivation email command
-                case VALIDATE_REQUEST: {
+                case CommandType_VALIDATE_REQUEST: {
                     // [SNLog Log:@"%s: Sending VALIDATE request",__PRETTY_FUNCTION__];
                     /*
                      <root>
@@ -1228,14 +1224,14 @@
                     commandPayload = [NSString stringWithFormat:VALIDATE_REQUEST_XML, validateObj.email];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(VALIDATE_REQUEST);
+                    commandType = (uint32_t) htonl(CommandType_VALIDATE_REQUEST);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case RESET_PASSWORD_REQUEST: {
+                case CommandType_RESET_PASSWORD_REQUEST: {
                     // [SNLog Log:@"%s: Sending RESET_PASSWORD request",__PRETTY_FUNCTION__];
                     /*
                      <root>
@@ -1249,7 +1245,7 @@
                     commandPayload = [NSString stringWithFormat:RESET_PWD_REQUEST_XML, resetPwdObj.email];
                     //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(RESET_PASSWORD_REQUEST);
+                    commandType = (uint32_t) htonl(CommandType_RESET_PASSWORD_REQUEST);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
@@ -1257,7 +1253,7 @@
                     break;
                 }
                     //PY 150114 - Forced Data Update
-                case DEVICE_DATA_FORCED_UPDATE_REQUEST: {
+                case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
                     // [SNLog Log:@"%s: Sending DEVICE_DATA_FORCED_UPDATE_REQUEST request",__PRETTY_FUNCTION__];
                     /*
                     <root><DeviceDataForcedUpdate>
@@ -1272,14 +1268,14 @@
 
 
                     //Send as Command 61
-                    commandType = (uint32_t) htonl(MOBILE_COMMAND);
+                    commandType = (uint32_t) htonl(CommandType_MOBILE_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;
                 }
-                case SENSOR_CHANGE_REQUEST: {
+                case CommandType_SENSOR_CHANGE_REQUEST: {
                     //PY 200114 - Sensor name and location change
                     //[SNLog Log:@"%s: Sending SENSOR_CHANGE_REQUEST request",__PRETTY_FUNCTION__];
 
@@ -1316,7 +1312,7 @@
                     DLog(@"Command Payload %@: ", commandPayload);
 
                     //Send as Command 61
-                    commandType = (uint32_t) htonl(MOBILE_COMMAND);
+                    commandType = (uint32_t) htonl(CommandType_MOBILE_COMMAND);
 
                     sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);

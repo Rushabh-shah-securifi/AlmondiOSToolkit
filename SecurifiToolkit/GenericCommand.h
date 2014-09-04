@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CommandTypes.h"
 
 @interface GenericCommand : NSObject
 
 @property(nonatomic) id command;
-@property(nonatomic) unsigned int commandType;
+@property(nonatomic) CommandType commandType;
 
 - (NSString *)description;
 

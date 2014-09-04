@@ -6,44 +6,48 @@
 //  Copyright (c) 2013 Nirav Uchat. All rights reserved.
 //
 
-#ifndef SecurifiToolkit_CommandTypes_h
-#define SecurifiToolkit_CommandTypes_h
+typedef NS_ENUM(unsigned int, CommandType) {
+    CommandType_LOGIN_COMMAND                       = 1,
+    CommandType_LOGIN_RESPONSE                      = 2,
+    CommandType_LOGOUT_COMMAND                      = 3,
+    CommandType_LOGOUT_ALL_COMMAND                  = 4,
+    CommandType_LOGOUT_ALL_RESPONSE                 = 5,
+    CommandType_SIGNUP_COMMAND                      = 6,
+    CommandType_SIGNUP_RESPONSE                     = 7,
+    CommandType_VALIDATE_REQUEST                    = 10,
+    CommandType_VALIDATE_RESPONSE                   = 11,
+    CommandType_RESET_PASSWORD_REQUEST              = 14,
+    CommandType_RESET_PASSWORD_RESPONSE             = 15,
+    CommandType_LOGOUT_RESPONSE                     = 18,
+    CommandType_AFFILIATION_CODE_REQUEST            = 23,
+    //CommandType_AFFILIATION_CODE_RESPONSE           = 22,
+    CommandType_AFFILIATION_USER_COMPLETE           = 26,
+    CommandType_ALMOND_LIST                         = 71,
+    CommandType_ALMOND_LIST_RESPONSE                = 72,
+    CommandType_DEVICE_DATA_HASH                    = 73,
+    CommandType_DEVICE_DATA_HASH_RESPONSE           = 74,
+    CommandType_DEVICE_DATA                         = 75,
+    CommandType_DEVICE_DATA_RESPONSE                = 76,
+    CommandType_DEVICE_VALUE					    = 77,
+    CommandType_DEVICE_VALUE_LIST_RESPONSE          = 78,
+    CommandType_MOBILE_COMMAND                      = 61,
+    CommandType_MOBILE_COMMAND_RESPONSE             = 64,
+    CommandType_DYNAMIC_DEVICE_DATA                 = 81,
+    CommandType_DYNAMIC_DEVICE_VALUE_LIST		    = 82,
+    CommandType_DYNAMIC_ALMOND_ADD                  = 83,
+    CommandType_DYNAMIC_ALMOND_DELETE               = 84,
+    CommandType_DYNAMIC_ALMOND_NAME_CHANGE          = 85,
 
-#define LOGIN_COMMAND                       1
-#define LOGIN_RESPONSE                      2
-#define LOGOUT_COMMAND                      3
-#define LOGOUT_ALL_COMMAND                  4
-#define LOGOUT_ALL_RESPONSE                 5
-#define SIGNUP_COMMAND                      6
-#define SIGNUP_RESPONSE                     7
-#define VALIDATE_REQUEST                    10
-#define VALIDATE_RESPONSE                   11
-#define RESET_PASSWORD_REQUEST              14
-#define RESET_PASSWORD_RESPONSE             15
-#define LOGOUT_RESPONSE                     18
-#define AFFILIATION_CODE_REQUEST            23
-//#define AFFILIATION_CODE_RESPONSE           22
-#define AFFILIATION_USER_COMPLETE           26
-#define ALMOND_LIST                         71
-#define ALMOND_LIST_RESPONSE                72
-#define DEVICEDATA_HASH                     73
-#define DEVICEDATA_HASH_RESPONSE            74
-#define DEVICEDATA                          75
-#define DEVICEDATA_RESPONSE                 76
-#define DEVICE_VALUE						77
-#define DEVICE_VALUE_LIST_RESPONSE          78
-#define MOBILE_COMMAND                      61
-#define MOBILE_COMMAND_RESPONSE             64
-#define DYNAMIC_DEVICE_DATA                 81
-#define DYNAMIC_DEVICE_VALUE_LIST			82
-#define DYNAMIC_ALMOND_ADD                  83
-#define DYNAMIC_ALMOND_DELETE               84
-#define DYNAMIC_ALMOND_NAME_CHANGE          85
-#define GENERIC_COMMAND_REQUEST             201
-#define GENERIC_COMMAND_RESPONSE            204
-#define GENERIC_COMMAND_NOTIFICATION        205
-#define SENSOR_CHANGE_REQUEST               301
-#define SENSOR_CHANGE_RESPONSE              304
-#define DEVICE_DATA_FORCED_UPDATE_REQUEST   321
+    CommandType_LOGIN_TEMPPASS_COMMAND  = 101,
+    CommandType_CLOUD_SANITY            = 102,
+    CommandType_CLOUD_SANITY_RESPONSE   = 103,
+    CommandType_KEEP_ALIVE              = 104,
 
-#endif
+    CommandType_GENERIC_COMMAND_REQUEST             = 201,
+    CommandType_GENERIC_COMMAND_RESPONSE            = 204,
+    CommandType_GENERIC_COMMAND_NOTIFICATION        = 205,
+    CommandType_SENSOR_CHANGE_REQUEST               = 301,
+    CommandType_SENSOR_CHANGE_RESPONSE              = 304,
+    CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST   = 321,
+
+};

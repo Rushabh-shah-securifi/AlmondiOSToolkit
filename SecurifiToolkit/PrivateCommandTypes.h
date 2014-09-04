@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Nirav Uchat. All rights reserved.
 //
 
+//todo remove me; no longer needed
+
 #ifndef SecurifiToolkit_PrivateCommandTypes_h
 #define SecurifiToolkit_PrivateCommandTypes_h
 
