@@ -969,14 +969,10 @@
                         return YES;
                     }
                     else {
-                        // [SNLog Log:@"%s: Sending LOGIN COMMAND",__PRETTY_FUNCTION__];
-                        Login *ob1 = (Login *) obj.command;
-                        commandPayload = [NSString stringWithFormat:FRESH_LOGIN_REQUEST_XML, ob1.UserID, ob1.Password];
-
-
+                        Login *cmd = (Login *) obj.command;
                         commandType = (uint32_t) htonl(LOGIN_COMMAND);
-
-                        sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                        commandPayload = [cmd toXml];
+                        sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
                         commandLength = (uint32_t) htonl([sendCommandPayload length]);
                     }
 
@@ -1290,45 +1286,11 @@
                     break;
                 }
                 case SENSOR_CHANGE_REQUEST: {
-                    //PY 200114 - Sensor name and location change
-                    //[SNLog Log:@"%s: Sending SENSOR_CHANGE_REQUEST request",__PRETTY_FUNCTION__];
+                    SensorChangeRequest *cmd = (SensorChangeRequest *) obj.command;
 
-                    /*
-                     <root><SensorChange>
-                     <AlmondplusMAC>251176214925585</AlmondplusMAC>
-                     <Device ID=”6”>
-                     <NewName optional>MyGreatSensor</NewName>
-                     <NewLocation optional>Buckingham Palace</NewLocation>
-                     </Device>
-                     <MobileInternalIndex>324</MobileInternalIndex>
-                     </SensorChange></root>
-                     */
-
-                    SensorChangeRequest *sensorChangeObj = (SensorChangeRequest *) obj.command;
-
-                    if (sensorChangeObj.changedName != nil && sensorChangeObj.changedLocation == nil) {
-                        commandPayload = [NSString stringWithFormat:SENSOR_CHANGE_NAME_REQUEST_XML, sensorChangeObj.almondMAC, sensorChangeObj.deviceID, sensorChangeObj.changedName, sensorChangeObj.mobileInternalIndex];
-                    }
-                    else if (sensorChangeObj.changedLocation != nil && sensorChangeObj.changedName == nil) {
-                        commandPayload = [NSString stringWithFormat:SENSOR_CHANGE_LOCATION_REQUEST_XML, sensorChangeObj.almondMAC, sensorChangeObj.deviceID, sensorChangeObj.changedLocation, sensorChangeObj.mobileInternalIndex];
-                    }
-                    else {
-                        commandPayload = [NSString stringWithFormat:SENSOR_CHANGE_REQUEST_XML, sensorChangeObj.almondMAC, sensorChangeObj.deviceID, sensorChangeObj.changedName, sensorChangeObj.changedLocation, sensorChangeObj.mobileInternalIndex];
-                    }
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    //PY 290114: Replacing the \" (backslash quotes) in the string to just " (quotes).
-                    //When we are using string obfuscation the decoded string has the \ escape character with it.
-                    //The cloud is unable to handle it and rejects the command.
-                    //Add this line to any XML  string with has \" in it. For example: <Device ID=\"%@\">
-                    commandPayload = [self stringByRemovingEscapeCharacters:commandPayload];
-
-                    DLog(@"Command Payload %@: ", commandPayload);
-
-                    //Send as Command 61
+                    commandPayload = [cmd toXml];
                     commandType = (uint32_t) htonl(MOBILE_COMMAND);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
+                    sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
                     commandLength = (uint32_t) htonl([sendCommandPayload length]);
 
                     break;

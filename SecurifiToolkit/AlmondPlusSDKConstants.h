@@ -68,7 +68,6 @@
 #define SETTINGS_LIST @"Settings"
 
 //XMLS
-#define FRESH_LOGIN_REQUEST_XML             @"<root><Login><EmailID>%@</EmailID><Password>%@</Password></Login></root>"
 #define LOGIN_REQUEST_XML                   @"<root><Login><UserID>%@</UserID><TempPass>%@</TempPass></Login></root>"
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
 #define SIGNUP_REQUEST_XML                  @"<root><Signup><EmailID>%@</EmailID><Password>%@</Password></Signup></root>"
@@ -82,18 +81,10 @@
 #define MOBILE_COMMAND_REQUEST_XML          @"<root><MobileCommand><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewValue Index=\"%@\">%@</NewValue></Device><MobileInternalIndex>%@</MobileInternalIndex></MobileCommand></root>"
 
 #define GENERIC_COMMAND_REQUEST_XML         @"<root><GenericCommandRequest><AlmondplusMAC>%@</AlmondplusMAC><ApplicationID>%@</ApplicationID><MobileInternalIndex>%@</MobileInternalIndex><Data>%@</Data></GenericCommandRequest></root>"
-
 #define VALIDATE_REQUEST_XML                @"<root><ValidateAccountRequest><EmailID>%@</EmailID></ValidateAccountRequest></root>"
 
 #define RESET_PWD_REQUEST_XML               @"<root><ResetPasswordRequest><EmailID>%@</EmailID></ResetPasswordRequest></root>"
 #define SENSOR_FORCED_UPDATE_REQUEST_XML    @"<root><DeviceDataForcedUpdate><AlmondplusMAC>%@</AlmondplusMAC><MobileInternalIndex>%@</MobileInternalIndex></DeviceDataForcedUpdate></root>"
-
-#define SENSOR_CHANGE_REQUEST_XML           @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
-
-#define SENSOR_CHANGE_NAME_REQUEST_XML      @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
-
-#define SENSOR_CHANGE_LOCATION_REQUEST_XML  @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
-
 
 #define AFFILIATION_CODE_CHAR_COUNT 6
 #define SSID_CHAR_COUNT 32

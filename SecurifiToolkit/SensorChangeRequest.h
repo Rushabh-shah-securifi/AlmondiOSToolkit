@@ -14,4 +14,7 @@
 @property NSString *deviceID;
 @property NSString *changedName;
 @property NSString *changedLocation;
+
+- (NSString*)toXml;
+
 @end
