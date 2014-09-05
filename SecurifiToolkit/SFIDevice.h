@@ -75,7 +75,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 @property(nonatomic) NSString *location;
 
 @property(nonatomic) BOOL isExpanded;
-@property(nonatomic) NSString *imageName;
+@property(nonatomic) NSString *imageName; //todo remove me; this is strictly UI
 @property(nonatomic) NSString *mostImpValueName;
 @property(nonatomic) int mostImpValueIndex;
 @property(nonatomic) int stateIndex;
