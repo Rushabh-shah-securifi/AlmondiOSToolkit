@@ -12,4 +12,7 @@
 @property BOOL isSuccessful;
 @property (copy) NSString *UserID;
 @property (copy) NSString *Password;
+
+- (NSString *)toXml;
+
 @end
