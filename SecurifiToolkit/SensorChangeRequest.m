@@ -13,6 +13,8 @@
 
 - (NSString *)toXml {
     XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
 
     [writer writeStartElement:@"root"];
     [writer writeStartElement:@"SensorChange"];
