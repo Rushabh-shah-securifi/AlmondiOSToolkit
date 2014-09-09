@@ -70,32 +70,9 @@
 #define SETTINGS_LIST @"Settings"
 
 //XMLS
-#define FRESH_LOGIN_REQUEST_XML             @"<root><Login><EmailID>%@</EmailID><Password>%@</Password></Login></root>"
-#define LOGIN_REQUEST_XML                   @"<root><Login><UserID>%@</UserID><TempPass>%@</TempPass></Login></root>"
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
-#define SIGNUP_REQUEST_XML                  @"<root><Signup><EmailID>%@</EmailID><Password>%@</Password></Signup></root>"
-#define CLOUDSANITY_REQUEST_XML             @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"
-#define AFFILIATION_CODE_REQUEST_XML        @"<root><AffiliationCodeRequest><Code>%@</Code></AffiliationCodeRequest></root>"
-#define LOGOUT_ALL_REQUEST_XML              @"<root><LogoutAll><EmailID>%@</EmailID><Password>%@</Password></LogoutAll></root>"
+#define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"
 #define ALMOND_LIST_REQUEST_XML             @"<root></root>"
-#define DEVICE_DATA_HASH_REQUEST_XML        @"<root><DeviceDataHash><AlmondplusMAC>%@</AlmondplusMAC></DeviceDataHash></root>"
-#define DEVICE_DATA_REQUEST_XML             @"<root><DeviceData><AlmondplusMAC>%@</AlmondplusMAC></DeviceData></root>"
-#define DEVICE_VALUE_REQUEST_XML            @"<root><DeviceValue><AlmondplusMAC>%@</AlmondplusMAC></DeviceValue></root>"
-#define MOBILE_COMMAND_REQUEST_XML          @"<root><MobileCommand><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewValue Index=\"%@\">%@</NewValue></Device><MobileInternalIndex>%@</MobileInternalIndex></MobileCommand></root>"
-
-#define GENERIC_COMMAND_REQUEST_XML         @"<root><GenericCommandRequest><AlmondplusMAC>%@</AlmondplusMAC><ApplicationID>%@</ApplicationID><MobileInternalIndex>%@</MobileInternalIndex><Data>%@</Data></GenericCommandRequest></root>"
-
-#define VALIDATE_REQUEST_XML                @"<root><ValidateAccountRequest><EmailID>%@</EmailID></ValidateAccountRequest></root>"
-
-#define RESET_PWD_REQUEST_XML               @"<root><ResetPasswordRequest><EmailID>%@</EmailID></ResetPasswordRequest></root>"
-#define SENSOR_FORCED_UPDATE_REQUEST_XML    @"<root><DeviceDataForcedUpdate><AlmondplusMAC>%@</AlmondplusMAC><MobileInternalIndex>%@</MobileInternalIndex></DeviceDataForcedUpdate></root>"
-
-#define SENSOR_CHANGE_REQUEST_XML           @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
-
-#define SENSOR_CHANGE_NAME_REQUEST_XML      @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewName>%@</NewName></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
-
-#define SENSOR_CHANGE_LOCATION_REQUEST_XML  @"<root><SensorChange><AlmondplusMAC>%@</AlmondplusMAC><Device ID=\"%@\"><NewLocation>%@</NewLocation></Device><MobileInternalIndex>%@</MobileInternalIndex></SensorChange></root>"
-
 
 #define AFFILIATION_CODE_CHAR_COUNT 6
 #define SSID_CHAR_COUNT 32

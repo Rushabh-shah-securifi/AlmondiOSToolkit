@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface ResetPasswordRequest : NSObject
+@interface ResetPasswordRequest : NSObject <SecurifiCommand>
 @property NSString *email;
 @end

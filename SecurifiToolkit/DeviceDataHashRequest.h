@@ -7,7 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface DeviceDataHashRequest : NSObject
+@interface DeviceDataHashRequest : NSObject <SecurifiCommand>
 @property NSString *almondMAC;
+
+- (NSString *)toXml;
+
 @end

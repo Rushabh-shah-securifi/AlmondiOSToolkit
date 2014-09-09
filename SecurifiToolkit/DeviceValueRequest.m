@@ -7,6 +7,7 @@
 //
 
 #import "DeviceValueRequest.h"
+#import "XMLWriter.h"
 
 @implementation DeviceValueRequest
 
@@ -16,5 +17,26 @@
     [description appendString:@">"];
     return description;
 }
+
+- (NSString *)toXml {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+    [writer writeStartElement:@"DeviceValue"];
+
+    [writer writeStartElement:@"AlmondplusMAC"];
+    [writer writeCharacters:self.almondMAC];
+    [writer writeEndElement];
+
+    // close DeviceValue
+    [writer writeEndElement];
+    // close root
+    [writer writeEndElement];
+
+    return writer.toString;
+}
+
 
 @end

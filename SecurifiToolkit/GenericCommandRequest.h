@@ -16,8 +16,9 @@
 //</Data>
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface GenericCommandRequest : NSObject
+@interface GenericCommandRequest : NSObject <SecurifiCommand>
 @property NSString *almondMAC;
 @property NSString *applicationID;
 @property NSString *mobileInternalIndex;

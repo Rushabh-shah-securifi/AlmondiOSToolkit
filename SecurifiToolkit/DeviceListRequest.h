@@ -7,8 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface DeviceListRequest : NSObject
+@interface DeviceListRequest : NSObject <SecurifiCommand>
 @property NSString *almondMAC;
 
 - (NSString *)description;

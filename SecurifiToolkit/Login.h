@@ -7,8 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface Login : NSObject
+@interface Login : NSObject <SecurifiCommand>
 @property BOOL isSuccessful;
 @property (copy) NSString *UserID;
 @property (copy) NSString *Password;

@@ -7,7 +7,29 @@
 //
 
 #import "ValidateAccountRequest.h"
+#import "XMLWriter.h"
 
 @implementation ValidateAccountRequest
-@synthesize email;
+
+- (NSString *)toXml {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+    [writer writeStartElement:@"ValidateAccountRequest"];
+
+    [writer writeStartElement:@"EmailID"];
+    [writer writeCharacters:self.email];
+    [writer writeEndElement];
+
+    // close ValidateAccountRequest
+    [writer writeEndElement];
+    // close root element
+    [writer writeEndElement];
+
+    return writer.toString;
+}
+
+
 @end

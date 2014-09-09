@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface ValidateAccountRequest : NSObject
+@interface ValidateAccountRequest : NSObject <SecurifiCommand>
 @property NSString *email;
 @end

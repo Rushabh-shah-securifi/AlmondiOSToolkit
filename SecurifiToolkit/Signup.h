@@ -7,10 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface Signup : NSObject
+@interface Signup : NSObject <SecurifiCommand>
 @property BOOL isSuccessful;
 @property NSString *UserID;
 @property NSString *Password;
 @property NSString *Reason;
+
+- (NSString*)toXml;
+
 @end

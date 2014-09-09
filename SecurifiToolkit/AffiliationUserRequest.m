@@ -7,7 +7,29 @@
 //
 
 #import "AffiliationUserRequest.h"
+#import "XMLWriter.h"
 
 @implementation AffiliationUserRequest
-@synthesize Code;
+
+- (NSString *)toXml {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+    [writer writeStartElement:@"AffiliationCodeRequest"];
+
+    [writer writeStartElement:@"Code"];
+    [writer writeCharacters:self.Code];
+    [writer writeEndElement];
+
+    // close AffiliationCodeRequest
+    [writer writeEndElement];
+    // close root
+    [writer writeEndElement];
+
+    return writer.toString;
+}
+
+
 @end

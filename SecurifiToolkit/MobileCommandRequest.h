@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "SFIDevice.h"
+#import "SecurifiCommand.h"
 
 //todo encapsulate this (a designated initializer)
 
-@interface MobileCommandRequest : NSObject
+@interface MobileCommandRequest : NSObject <SecurifiCommand>
 @property(nonatomic) NSString *almondMAC;
 @property(nonatomic) NSString *deviceID;
 @property(nonatomic) SFIDeviceType deviceType;

@@ -7,6 +7,7 @@
 //
 
 #import "DeviceListRequest.h"
+#import "XMLWriter.h"
 
 @implementation DeviceListRequest
 
@@ -15,6 +16,26 @@
     [description appendFormat:@"self.almondMAC=%@", self.almondMAC];
     [description appendString:@">"];
     return description;
+}
+
+- (NSString *)toXml {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+    [writer writeStartElement:@"DeviceData"];
+
+    [writer writeStartElement:@"AlmondplusMAC"];
+    [writer writeCharacters:self.almondMAC];
+    [writer writeEndElement];
+
+    // close DeviceData
+    [writer writeEndElement];
+    // close root
+    [writer writeEndElement];
+
+    return writer.toString;
 }
 
 

@@ -7,7 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface AffiliationUserRequest : NSObject
+@interface AffiliationUserRequest : NSObject <SecurifiCommand>
+
 @property NSString *Code;
+
+- (NSString *)toXml;
+
 @end

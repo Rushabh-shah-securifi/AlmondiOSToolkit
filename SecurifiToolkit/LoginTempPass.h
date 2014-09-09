@@ -7,8 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface LoginTempPass : NSObject
+@interface LoginTempPass : NSObject <SecurifiCommand>
 @property NSString *UserID;
 @property NSString *TempPass;
+
+- (NSString *)toXml;
+
 @end

@@ -7,7 +7,33 @@
 //
 
 #import "Signup.h"
+#import "XMLWriter.h"
 
 @implementation Signup
-@synthesize UserID,Password,Reason;
+
+- (NSString *)toXml {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+    [writer writeStartElement:@"Signup"];
+
+    [writer writeStartElement:@"EmailID"];
+    [writer writeCharacters:self.UserID];
+    [writer writeEndElement];
+
+    [writer writeStartElement:@"Password"];
+    [writer writeCharacters:self.Password];
+    [writer writeEndElement];
+
+    // close Signup
+    [writer writeEndElement];
+    // close root
+    [writer writeEndElement];
+
+    return writer.toString;
+}
+
+
 @end

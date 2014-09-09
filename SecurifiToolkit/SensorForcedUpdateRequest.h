@@ -7,8 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface SensorForcedUpdateRequest : NSObject
+@interface SensorForcedUpdateRequest : NSObject <SecurifiCommand>
 @property NSString *almondMAC;
 @property NSString *mobileInternalIndex;
 @end

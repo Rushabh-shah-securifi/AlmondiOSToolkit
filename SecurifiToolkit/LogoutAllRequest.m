@@ -7,7 +7,32 @@
 //
 
 #import "LogoutAllRequest.h"
+#import "XMLWriter.h"
 
 @implementation LogoutAllRequest
-@synthesize UserID,Password,Reason;
+
+- (NSString *)toXml {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+    [writer writeStartElement:@"LogoutAll"];
+
+    [writer writeStartElement:@"EmailID"];
+    [writer writeCharacters:self.UserID];
+    [writer writeEndElement];
+
+    [writer writeStartElement:@"Password"];
+    [writer writeCharacters:self.Password];
+    [writer writeEndElement];
+
+    // close LogoutAll
+    [writer writeEndElement];
+    // close root
+    [writer writeEndElement];
+
+    return writer.toString;
+}
+
 @end
