@@ -34,6 +34,8 @@
 		1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */; };
 		1DF0303A77013C449B86C26B /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF033FE398C1B48B1CA5CCC /* SUnit.h */; };
 		1DF0352850B972F9D28F2BD0 /* SUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03CBFC72431ED1B6B81A3 /* SUnit.m */; };
+		1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF034243877C8131B0AE8FE /* XMLWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */; };
 		22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D42179132A40099CD8F /* CommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011C9E179543E80019D5A4 /* Login.h in Headers */ = {isa = PBXBuildFile; fileRef = 22011C9C179543E80019D5A4 /* Login.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011C9F179543E80019D5A4 /* Login.m in Sources */ = {isa = PBXBuildFile; fileRef = 22011C9D179543E80019D5A4 /* Login.m */; };
@@ -186,7 +188,9 @@
 		1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIOfflineDataManager.h; sourceTree = "<group>"; };
 		1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIOfflineDataManager.m; sourceTree = "<group>"; };
 		1DF033FE398C1B48B1CA5CCC /* SUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUnit.h; path = Network/SUnit.h; sourceTree = "<group>"; };
+		1DF034243877C8131B0AE8FE /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLWriter.m; sourceTree = "<group>"; };
 		1DF03CBFC72431ED1B6B81A3 /* SUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUnit.m; path = Network/SUnit.m; sourceTree = "<group>"; };
+		1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLWriter.h; sourceTree = "<group>"; };
 		22011C9C179543E80019D5A4 /* Login.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Login.h; sourceTree = "<group>"; };
 		22011C9D179543E80019D5A4 /* Login.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Login.m; sourceTree = "<group>"; };
 		22011CA1179549C70019D5A4 /* LoginTempPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginTempPass.h; sourceTree = "<group>"; };
@@ -357,6 +361,15 @@
 			path = OfflineStorage;
 			sourceTree = "<group>";
 		};
+		1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */ = {
+			isa = PBXGroup;
+			children = (
+				1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */,
+				1DF034243877C8131B0AE8FE /* XMLWriter.m */,
+			);
+			path = "XMLWriter-1.0.4-MIT";
+			sourceTree = "<group>";
+		};
 		1DF03F912D2886681925010C /* keychain */ = {
 			isa = PBXGroup;
 			children = (
@@ -420,6 +433,7 @@
 				22A76D2317912A110099CD8F /* private */,
 				221185C0178D371200EE23ED /* Supporting Files */,
 				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
+				1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */,
 			);
 			path = SecurifiToolkit;
 			sourceTree = "<group>";
@@ -662,6 +676,7 @@
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
 				1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */,
 				1DF0303A77013C449B86C26B /* SUnit.h in Headers */,
+				1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -896,6 +911,7 @@
 				22FE9B8017AA331300B53869 /* Logout.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
 				1DF0352850B972F9D28F2BD0 /* SUnit.m in Sources */,
+				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
