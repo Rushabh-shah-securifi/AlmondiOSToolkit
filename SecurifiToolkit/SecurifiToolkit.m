@@ -669,7 +669,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     cmd.TempPass = [self secPassword];
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_LOGIN_TEMPPASS_COMMAND;
+    cloudCommand.commandType = CommandType_LOGIN_COMMAND; // use Login command type
     cloudCommand.command = cmd;
 
     return cloudCommand;

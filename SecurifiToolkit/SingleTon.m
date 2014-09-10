@@ -9,7 +9,6 @@
 #import "SingleTon.h"
 #import <SecurifiToolkit/SecurifiToolkit.h>
 #import "Commandparser.h"
-#import "LoginTempPass.h"
 #import "SUnit.h"
 
 @interface SingleTon ()
@@ -933,373 +932,67 @@
         GenericCommand *obj = (GenericCommand *) sender;
         DLog(@"Sending command, cmd:%@", obj.debugDescription);
 
+        unsigned int commandType = htonl(obj.commandType);;
         NSString *commandPayload;
-        unsigned int commandLength = 0;
-        unsigned int commandType = 0;
-        NSData *sendCommandPayload;
 
         @try {
             switch (obj.commandType) {
-                case CommandType_LOGIN_COMMAND: {
-                    /* Check if User is already logged in [ if he has received loginResponse command */
-                    if (socket.isLoggedIn == YES) {
-                        //Post Callback that you are logged in
-                        LoginResponse *object = [[LoginResponse alloc] init];
-                        object.isSuccessful = NO;
-                        object.userID = nil;
-                        object.tempPass = nil;
-                        [object setReason:@"Already Loggedin"];
-
-                        [self postData:LOGIN_NOTIFIER data:object];
-
-                        return YES;
-                    }
-                    else {
-                        Login *cmd = (Login *) obj.command;
-                        commandPayload = cmd.toXml;
-                        commandType = (uint32_t) htonl(CommandType_LOGIN_COMMAND);
-                        sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
-                        commandLength = (uint32_t) htonl([sendCommandPayload length]);
-                    }
-
+                case CommandType_LOGIN_COMMAND:
+                case CommandType_LOGIN_TEMPPASS_COMMAND:
+                case CommandType_LOGOUT_ALL_COMMAND:
+                case CommandType_SIGNUP_COMMAND:
+                case CommandType_AFFILIATION_CODE_REQUEST:
+                case CommandType_DEVICE_DATA_HASH:
+                case CommandType_DEVICE_DATA:
+                case CommandType_DEVICE_VALUE:
+                case CommandType_MOBILE_COMMAND:
+                case CommandType_VALIDATE_REQUEST:
+                case CommandType_RESET_PASSWORD_REQUEST:
+                case CommandType_SENSOR_CHANGE_REQUEST:
+                case CommandType_GENERIC_COMMAND_REQUEST:
+                {
+                    id<SecurifiCommand> cmd = obj.command;
+                    commandPayload = [cmd toXml];
                     break;
                 }
-                case CommandType_LOGIN_TEMPPASS_COMMAND: {
-                    // [SNLog Log:@"%s: Sending LOGIN_TEMPPASS_COMMAND",__PRETTY_FUNCTION__];
-                    LoginTempPass *ob1 = (LoginTempPass *) obj.command;
-                    commandPayload = [NSString stringWithFormat:LOGIN_REQUEST_XML, ob1.UserID, ob1.TempPass];
-
-                    //Cloud has switch for both command as LOGIN_COMMAND
-                    commandType = (uint32_t) htonl(CommandType_LOGIN_COMMAND);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
+                case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
+                    id<SecurifiCommand> cmd = obj.command;
+                    //Send as Command 61
+                    commandType = (unsigned int) htonl(CommandType_MOBILE_COMMAND);
+                    commandPayload = [cmd toXml];
                     break;
                 }
                 case CommandType_LOGOUT_COMMAND: {
-                    // [SNLog Log:@"%s: Sending LOGOUT COMMAND",__PRETTY_FUNCTION__];
-//                    Logout *ob1 = (Logout *)obj.command;
                     commandPayload = LOGOUT_REQUEST_XML;
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    //Cloud has switch for both command as LOGIN_COMMAND
-                    commandType = (uint32_t) htonl(CommandType_LOGOUT_COMMAND);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    //PY 250214 - Logout Response will be received now
-                    //Remove preferences
-//                    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-//
-//                    // [SNLog Log:@"%s: TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
-//                    [prefs removeObjectForKey:tmpPwdKey];
-//                    [prefs removeObjectForKey:usrIDKey];
-//                    [prefs synchronize];
-//                    // [SNLog Log:@"%s: After delete\n",__PRETTY_FUNCTION__];
-//                    // [SNLog Log:@"%s: TempPass - %@ \n UserID - %@",__PRETTY_FUNCTION__,[prefs objectForKey:tmpPwdKey], [prefs objectForKey:usrIDKey]];
-//
-//                    [socket setConnectionState:NOT_LOGGED_IN];
-//
-//                    //PY 160913 - Reconnect to cloud
-//                    id ret = [[SecurifiToolkit sharedInstance] initSDKCloud];
-//                    if (ret == nil)
-//                    {
-//                        // [SNLog Log:@"%s: APP Delegate : SDKInit Error",__PRETTY_FUNCTION__];
-//                    }
-//
-
                     break;
                 }
-                case CommandType_SIGNUP_COMMAND: {
-                    // [SNLog Log:@"%s: Sending SIGNUP Command",__PRETTY_FUNCTION__];
-                    Signup *ob1 = (Signup *) obj.command;
-                    commandPayload = [NSString stringWithFormat:SIGNUP_REQUEST_XML, ob1.UserID, ob1.Password];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
 
-                    commandType = (uint32_t) htonl(CommandType_SIGNUP_COMMAND);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
                 case CommandType_CLOUD_SANITY: {
-                    // [SNLog Log:@"%s: Sending CLOUD_SANITY Command",__PRETTY_FUNCTION__];
-                    commandPayload = CLOUDSANITY_REQUEST_XML;//[NSString stringWithFormat:CLOUDSANITY_REQUEST_XML];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_CLOUD_SANITY);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_AFFILIATION_CODE_REQUEST: {
-                    // [SNLog Log:@"%s: Sending Affiliation Code request",__PRETTY_FUNCTION__];
-                    AffiliationUserRequest *affiliationObj = (AffiliationUserRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:AFFILIATION_CODE_REQUEST_XML, affiliationObj.Code];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_AFFILIATION_CODE_REQUEST);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_LOGOUT_ALL_COMMAND: {
-                    //PY 160913 - Logout all command
-                    // [SNLog Log:@"%s: Sending Logout request",__PRETTY_FUNCTION__];
-                    //            <root>
-                    //            <LogoutAll>
-                    //            <EmailID>validemail@mycompany.com</EmailID>
-                    //            <Password>originalpassword</Password>
-                    //            </LogoutAll>
-                    //            </root>
-
-                    LogoutAllRequest *logoutAllObj = (LogoutAllRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:LOGOUT_ALL_REQUEST_XML, logoutAllObj.UserID, logoutAllObj.Password];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_LOGOUT_ALL_COMMAND);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
+                    commandPayload = CLOUD_SANITY_REQUEST_XML;
                     break;
                 }
                 case CommandType_ALMOND_LIST: {
-                    //PY 160913 - almond list command
-                    // [SNLog Log:@"%s: Sending almond list request",__PRETTY_FUNCTION__];
-                    // <root></root>
-
-                    //AlmondListRequest *logoutAllObj = (AlmondListRequest *)obj.command;
-                    commandPayload = ALMOND_LIST_REQUEST_XML; //[NSString stringWithFormat:];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_ALMOND_LIST);
-
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
+                    commandPayload = ALMOND_LIST_REQUEST_XML;
                     break;
                 }
-                case CommandType_DEVICE_DATA_HASH: {
-                    //PY 170913 - Device Hash command
-                    // [SNLog Log:@"%s: Sending Device Hash request",__PRETTY_FUNCTION__];
-                    //            <root><DeviceDataHash>
-                    //            <AlmondplusMAC>251176214925585</AlmondplusMAC>
-                    //            </DeviceDataHash></root>
-
-                    DeviceDataHashRequest *deviceDataHashObj = (DeviceDataHashRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:DEVICE_DATA_HASH_REQUEST_XML, deviceDataHashObj.almondMAC];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_DEVICE_DATA_HASH);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_DEVICE_DATA: {
-                    //PY 170913 - Device Data command
-                    // [SNLog Log:@"%s: Sending Device Data request",__PRETTY_FUNCTION__];
-                    //            <root><DeviceData>
-                    //            <AlmondplusMAC>251176214925585</AlmondplusMAC>
-                    //            </DeviceData></root>
-
-                    DeviceListRequest *deviceDataObj = (DeviceListRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:DEVICE_DATA_REQUEST_XML, deviceDataObj.almondMAC];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_DEVICE_DATA);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_DEVICE_VALUE: {
-                    //PY 190913 - Device Value command
-                    // [SNLog Log:@"%s: Sending DeviceValue request",__PRETTY_FUNCTION__];
-                    //            <root><DeviceValue>
-                    //            <AlmondplusMAC>251176214925585</AlmondplusMAC>
-                    //            </DeviceValue></root>
-
-                    DeviceValueRequest *deviceValueObj = (DeviceValueRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:DEVICE_VALUE_REQUEST_XML, deviceValueObj.almondMAC];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_DEVICE_VALUE);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_MOBILE_COMMAND: {
-                    //PY 200913 - Mobile command
-                    // [SNLog Log:@"%s: Sending MobileCommand request",__PRETTY_FUNCTION__];
-                    /* <root><MobileCommand>
-                     * <AlmondplusMAC>251176214925585</AlmondplusMAC>
-                     * <Device ID=”6”>
-                     * <NewValue Index=”1”>NewTextValue</NewValue>
-                     * </Device>
-                     * <MobileInternalIndex>324</MobileInternalIndex>
-                     * </MobileCommand></root>
-                     */
-
-                    MobileCommandRequest *mobileCommandObj = (MobileCommandRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:MOBILE_COMMAND_REQUEST_XML, mobileCommandObj.almondMAC, mobileCommandObj.deviceID, mobileCommandObj.indexID, mobileCommandObj.changedValue, mobileCommandObj.internalIndex];
-                    DLog(@"Command length %lu", (unsigned long) [commandPayload length]);
-
-
-                    //PY 290114: Replacing the \" (backslash quotes) in the string to just " (quotes).
-                    //When we are using string obfuscation the decoded string has the \ escape character with it.
-                    //The cloud is unable to handle it and rejects the command.
-                    //Add this line to any XML  string with has \" in it. For example: <Device ID=\"%@\">
-                    commandPayload = [self stringByRemovingEscapeCharacters:commandPayload];
-
-                    commandType = (uint32_t) htonl(CommandType_MOBILE_COMMAND);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    DLog(@"Payload Command length %lu", (unsigned long) [sendCommandPayload length]);
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_GENERIC_COMMAND_REQUEST: {
-                    //PY 291013 - Generic command
-//                    <root>
-//                    <GenericCommandRequest>
-//                    <AlmondplusMAC>251176214925585</AlmondplusMAC>
-//                    <ApplicationID></ApplicationID>
-//                    <MobileInternalIndex>1</MobileInternalIndex>
-//                    <Data>
-//                    [Base64Encoded]
-//                    <root><Reboot>1</Reboot></root>[Base64Encoded]
-//                    </Data>
-//                    </GenericCommandRequest>
-//                    </root>
-                    // [SNLog Log:@"%s: Sending GenricCommand request",__PRETTY_FUNCTION__];
-
-                    GenericCommandRequest *genericCommandObj = (GenericCommandRequest *) obj.command;
-
-                    //Encode data to Base64
-                    NSData *dataToEncode = [genericCommandObj.data dataUsingEncoding:NSUTF8StringEncoding];
-                    NSData *encodedData = [dataToEncode base64EncodedDataWithOptions:0];
-                    NSString *encodedString = [[NSString alloc] initWithData:encodedData encoding:NSUTF8StringEncoding];
-
-                    commandPayload = [NSString stringWithFormat:GENERIC_COMMAND_REQUEST_XML, genericCommandObj.almondMAC, genericCommandObj.applicationID, genericCommandObj.mobileInternalIndex, encodedString];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_GENERIC_COMMAND_REQUEST);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                    //PY 011113 - Reactivation email command
-                case CommandType_VALIDATE_REQUEST: {
-                    // [SNLog Log:@"%s: Sending VALIDATE request",__PRETTY_FUNCTION__];
-                    /*
-                     <root>
-                     <ValidateAccountRequest>
-                     <EmailID>xyz@abc.com</EmailID>
-                     </ValidateAccountRequest>
-                     </root>
-                     */
-
-                    ValidateAccountRequest *validateObj = (ValidateAccountRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:VALIDATE_REQUEST_XML, validateObj.email];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_VALIDATE_REQUEST);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_RESET_PASSWORD_REQUEST: {
-                    // [SNLog Log:@"%s: Sending RESET_PASSWORD request",__PRETTY_FUNCTION__];
-                    /*
-                     <root>
-                     <ResetPasswordRequest>
-                     <EmailID>xyz@abc.com</EmailID>
-                     </ResetPasswordRequest>
-                     </root>
-                     */
-
-                    ResetPasswordRequest *resetPwdObj = (ResetPasswordRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:RESET_PWD_REQUEST_XML, resetPwdObj.email];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-                    commandType = (uint32_t) htonl(CommandType_RESET_PASSWORD_REQUEST);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                    //PY 150114 - Forced Data Update
-                case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
-                    // [SNLog Log:@"%s: Sending DEVICE_DATA_FORCED_UPDATE_REQUEST request",__PRETTY_FUNCTION__];
-                    /*
-                    <root><DeviceDataForcedUpdate>
-                    <AlmondplusMAC>251176214925585</AlmondplusMAC>
-                    <MobileInternalIndex>1234</MobileInternalIndex>
-                    </DeviceDataForcedUpdate></root>
-                     */
-
-                    SensorForcedUpdateRequest *forcedUpdateObj = (SensorForcedUpdateRequest *) obj.command;
-                    commandPayload = [NSString stringWithFormat:SENSOR_FORCED_UPDATE_REQUEST_XML, forcedUpdateObj.almondMAC, forcedUpdateObj.mobileInternalIndex];
-                    //commandLength = (uint32_t)htonl([commandPayload length]);
-
-
-                    //Send as Command 61
-                    commandType = (uint32_t) htonl(CommandType_MOBILE_COMMAND);
-
-                    sendCommandPayload = [[NSData alloc] initWithData:[commandPayload dataUsingEncoding:NSASCIIStringEncoding]];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-                case CommandType_SENSOR_CHANGE_REQUEST: {
-                    SensorChangeRequest *cmd = (SensorChangeRequest *) obj.command;
-                    commandType = (uint32_t) htonl(CommandType_MOBILE_COMMAND);
-                    commandPayload = cmd.toXml;
-                    sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
-                    commandLength = (uint32_t) htonl([sendCommandPayload length]);
-
-                    break;
-                }
-
                 default:
                     break;
             }
-            //isLoggedin might be set to 1 if we miss the TCP termination callback
-            //Check on each write if it fails set isLoggedin to
+
+            NSData *sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
+            unsigned int commandLength = (unsigned int) htonl([sendCommandPayload length]);
 
             DLog(@"@Payload being sent: %@", commandPayload);
 
-            NSStreamStatus type;
-            do {
-                type = [socket.outputStream streamStatus];
-                // [SNLog Log:@"%s: Socket in opening state.. wait..",__PRETTY_FUNCTION__];
-            } while (type == NSStreamStatusOpening);
-
-            if (socket.isStreamConnected) {
-                [socket.outputStream streamStatus];
-            }
-
-            // [SNLog Log:@"%s: Out of stream type check loop : %d",__PRETTY_FUNCTION__,type];
+//            // Wait until socket is open
+//            NSStreamStatus type;
+//            do {
+//                type = [socket.outputStream streamStatus];
+//            } while (type == NSStreamStatusOpening);
+//
+//            if (socket.isStreamConnected) {
+//                [socket.outputStream streamStatus];
+//            }
 
             if (socket.isStreamConnected && socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [socket.outputStream write:(uint8_t *) &commandLength maxLength:4]) {
@@ -1363,18 +1056,6 @@
         }
     }//synchronized
 
-}
-
-- (NSString *)stringByRemovingEscapeCharacters:(NSString *)inputString {
-    NSMutableString *s = [NSMutableString stringWithString:inputString];
-    [s replaceOccurrencesOfString:@"\\\"" withString:@"\"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-//    //[s replaceOccurrencesOfString:@"/" withString:@"\\/" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-//    [s replaceOccurrencesOfString:@"\n" withString:@"\\n" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-//    [s replaceOccurrencesOfString:@"\b" withString:@"\\b" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-//    [s replaceOccurrencesOfString:@"\f" withString:@"\\f" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-//    [s replaceOccurrencesOfString:@"\r" withString:@"\\r" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-//    [s replaceOccurrencesOfString:@"\t" withString:@"\\t" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [s length])];
-    return [NSString stringWithString:s];
 }
 
 - (NSError*)makeError:(NSString*)description {
