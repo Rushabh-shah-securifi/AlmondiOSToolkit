@@ -681,13 +681,13 @@
 }
 
 - (BOOL)isTrustedCertificate:(NSStream *)aStream {
-    SecPolicyRef policy = SecPolicyCreateSSL(NO, CFSTR("*.securifi.com"));
-
     CFArrayRef streamCertificates = (__bridge CFArrayRef) [aStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerCertificates];
     if (streamCertificates == nil) {
         NSLog(@"%s: Unable to evaluate trust; stream did not return certificates", __PRETTY_FUNCTION__);
         return NO;
     }
+
+    SecPolicyRef policy = SecPolicyCreateSSL(NO, CFSTR("*.securifi.com"));
 
     SecTrustRef trust = NULL;
     SecTrustCreateWithCertificates(streamCertificates, policy, &trust);
