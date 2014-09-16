@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SFIDeviceKnownValues.h"
 
 @interface SFIDeviceValue : NSObject <NSCoding, NSCopying>
 @property(nonatomic) unsigned int deviceID;
@@ -22,6 +23,11 @@
 - (void)encodeWithCoder:(NSCoder *)coder;
 
 - (NSString *)description;
+
+- (SFIDeviceKnownValues*)knownValuesForProperty:(SFIDevicePropertyType)propertyType;
+
+// returns the value for the specified property, or nil if none found
+- (NSString*)valueForProperty:(SFIDevicePropertyType)propertyType;
 
 - (id)copyWithZone:(NSZone *)zone;
 

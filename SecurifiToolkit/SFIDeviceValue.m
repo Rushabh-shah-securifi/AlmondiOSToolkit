@@ -38,9 +38,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    NSLog(@"NSCopying SFIDeviceValue");
-
-    SFIDeviceValue *copy = [[[self class] allocWithZone:zone] init];
+    SFIDeviceValue *copy = (SFIDeviceValue *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy.deviceID = self.deviceID;
@@ -51,5 +49,20 @@
 
     return copy;
 }
+
+- (SFIDeviceKnownValues*)knownValuesForProperty:(SFIDevicePropertyType)propertyType {
+    for (SFIDeviceKnownValues *currentDeviceValue in self.knownValues) {
+        if (currentDeviceValue.propertyType == propertyType) {
+            return currentDeviceValue;
+        }
+    }
+    return nil;
+}
+
+- (NSString *)valueForProperty:(SFIDevicePropertyType)propertyType {
+    SFIDeviceKnownValues *values = [self knownValuesForProperty:propertyType];
+    return values.value;
+}
+
 
 @end
