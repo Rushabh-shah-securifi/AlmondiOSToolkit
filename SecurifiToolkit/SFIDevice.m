@@ -150,7 +150,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    SFIDevice *copy = [[[self class] allocWithZone:zone] init];
+    SFIDevice *copy = (SFIDevice *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy.deviceID = self.deviceID;
@@ -186,27 +186,21 @@
 }
 
 - (void)initializeFromValues:(SFIDeviceValue *)values {
-//    self.imageName = @"Reload_icon.png";
-//
-//    if (values == nil) {
-//        return;
-//    }
-
-    NSArray *currentKnownValues = values.knownValues;
+    NSArray *currentKnownValues = values.knownDevicesValues;
 
     switch (self.deviceType) {
         case SFIDeviceType_BinarySwitch_1: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_MultiLevelSwitch_2: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_MULTILEVEL values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_MULTILEVEL values:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_BinarySensor_3: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownDevicesValues];
             break;
         }
 
@@ -226,42 +220,42 @@
             break;
         }
         case SFIDeviceType_DoorLock_5: {
-            [self configureDeviceForState:SFIDevicePropertyType_LOCK_STATE values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_LOCK_STATE values:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_Alarm_6: {
-            [self configureDeviceForState:SFIDevicePropertyType_BASIC values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_BASIC values:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_MotionSensor_11: {
-            [self configureStandardStateDevice:values.knownValues];
+            [self configureStandardStateDevice:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_ContactSwitch_12: {
-            [self configureStandardStateDevice:values.knownValues];
+            [self configureStandardStateDevice:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_FireSensor_13: {
-            [self configureStandardStateDevice:values.knownValues];
+            [self configureStandardStateDevice:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_WaterSensor_14: {
-            [self configureStandardStateDevice:values.knownValues];
+            [self configureStandardStateDevice:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_GasSensor_15: {
-            [self configureStandardStateDevice:values.knownValues];
+            [self configureStandardStateDevice:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_VibrationOrMovementSensor_17: {
-            [self configureStandardStateDevice:values.knownValues];
+            [self configureStandardStateDevice:values.knownDevicesValues];
             break;
         }
 
@@ -270,22 +264,22 @@
         }
 
         case SFIDeviceType_Keypad_20: {
-            [self configureStandardStateDevice:values.knownValues];
+            [self configureStandardStateDevice:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_SmartACSwitch_22: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_SmartDCSwitch_23: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownDevicesValues];
             break;
         }
 
         case SFIDeviceType_Shade_34: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownValues];
+            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values.knownDevicesValues];
             break;
         }
         case SFIDeviceType_FloodSensor_37: {

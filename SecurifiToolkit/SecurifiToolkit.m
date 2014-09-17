@@ -1163,8 +1163,8 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
                 if (currentValue.deviceID == cloudValue.deviceID) {
                     cloudValue.isPresent = YES;
 
-                    NSMutableArray *currentValues = currentValue.knownValues;
-                    NSMutableArray *cloudValues = cloudValue.knownValues;
+                    NSArray *currentValues = [currentValue knownDevicesValues];
+                    NSArray *cloudValues = [cloudValue knownDevicesValues];
 
                     for (SFIDeviceKnownValues *currentMobileKnownValue in currentValues) {
                         for (SFIDeviceKnownValues *currentCloudKnownValue in cloudValues) {
@@ -1175,7 +1175,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
                         }
                     }
 
-                    currentValue.knownValues = currentValues;
+                    [currentValue replaceKnownDeviceValues:currentValues];
                 }
             }
         }

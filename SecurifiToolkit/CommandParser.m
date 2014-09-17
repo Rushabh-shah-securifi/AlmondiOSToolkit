@@ -1370,7 +1370,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_ValueVariables, kLength_MaxTag)
                   && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
         {
-            [parser.tmpDeviceValue setKnownValues:parser.knownDeviceValues];
+            [parser.tmpDeviceValue replaceKnownDeviceValues:parser.knownDeviceValues];
             
         }
         else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
@@ -1439,7 +1439,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }else if (!strncmp((const char *)localname, kName_ValueVariables, kLength_MaxTag)
                   && (parser.storingCommandType == CommandType_DYNAMIC_DEVICE_VALUE_LIST))
         {
-            [parser.tmpDeviceValue setKnownValues:parser.knownDeviceValues];
+            [parser.tmpDeviceValue replaceKnownDeviceValues:parser.knownDeviceValues];
             
         }
         else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
