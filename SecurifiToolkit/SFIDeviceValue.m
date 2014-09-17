@@ -85,5 +85,25 @@
     return values.value;
 }
 
+- (NSString *)valueForProperty:(SFIDevicePropertyType)propertyType default:(NSString *)ifNil {
+    SFIDeviceKnownValues *values = [self internalKnownValuesForProperty:propertyType];
+    NSString *str = values.value;
+    return (str == nil) ? ifNil : str;
+}
+
+- (id)choiceForPropertyValue:(SFIDevicePropertyType)propertyType choices:(NSDictionary *)choices default:(id)ifNil {
+    SFIDeviceKnownValues *values = [self internalKnownValuesForProperty:propertyType];
+    if (!values) {
+        return ifNil;
+    }
+
+    NSString *str = values.value;
+    if (!str) {
+        return ifNil;
+    }
+
+    return choices[str];
+}
+
 
 @end
