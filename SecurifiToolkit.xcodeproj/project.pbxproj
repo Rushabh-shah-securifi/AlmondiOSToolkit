@@ -124,6 +124,12 @@
 		CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6DC94817EC60D1006F48C4 /* MobileCommandResponse.m */; };
 		CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7EA7DC18978910005DCBA3 /* Base64.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7EA7DD18978910005DCBA3 /* Base64.m */; };
+		CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91315019C6B83B00D94876 /* UserProfileRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91315119C6B83B00D94876 /* UserProfileRequest.m */; };
+		CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91315419C6B94500D94876 /* UserProfileResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; };
+		CE91315819C6C02100D94876 /* UserProfileRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = CE91315019C6B83B00D94876 /* UserProfileRequest.h */; };
+		CE91315919C6C02600D94876 /* UserProfileResponse.h in Sources */ = {isa = PBXBuildFile; fileRef = CE91315419C6B94500D94876 /* UserProfileResponse.h */; };
 		CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */; };
 		CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185F6178D453A00EE23ED /* CoreFoundation.framework */; };
@@ -288,6 +294,10 @@
 		CE6DC94817EC60D1006F48C4 /* MobileCommandResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MobileCommandResponse.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE7EA7DC18978910005DCBA3 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
 		CE7EA7DD18978910005DCBA3 /* Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Base64.m; sourceTree = "<group>"; };
+		CE91315019C6B83B00D94876 /* UserProfileRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileRequest.h; sourceTree = "<group>"; };
+		CE91315119C6B83B00D94876 /* UserProfileRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileRequest.m; sourceTree = "<group>"; };
+		CE91315419C6B94500D94876 /* UserProfileResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileResponse.h; sourceTree = "<group>"; };
+		CE91315519C6B94500D94876 /* UserProfileResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileResponse.m; sourceTree = "<group>"; };
 		CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicAlmondNameChangeResponse.h; sourceTree = "<group>"; };
 		CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicAlmondNameChangeResponse.m; sourceTree = "<group>"; };
 		CE9A2910188D2B240063D562 /* SensorChangeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorChangeRequest.h; sourceTree = "<group>"; };
@@ -540,6 +550,8 @@
 				CE9A2914188D30270063D562 /* SensorChangeResponse.h */,
 				CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */,
 				1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */,
+				CE91315019C6B83B00D94876 /* UserProfileRequest.h */,
+				CE91315419C6B94500D94876 /* UserProfileResponse.h */,
 			);
 			name = public;
 			sourceTree = "<group>";
@@ -547,6 +559,8 @@
 		22A76D2517912B830099CD8F /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				CE91315119C6B83B00D94876 /* UserProfileRequest.m */,
+				CE91315519C6B94500D94876 /* UserProfileResponse.m */,
 				CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */,
 				CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */,
 				22B326CD1796D447004B3642 /* SanityResponse.h */,
@@ -673,6 +687,8 @@
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
+				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
+				CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */,
 				1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
@@ -867,6 +883,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE91315919C6C02600D94876 /* UserProfileResponse.h in Sources */,
+				CE91315819C6C02100D94876 /* UserProfileRequest.h in Sources */,
 				CE5EB5BB17E703BA00985636 /* LogoutAllRequest.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
 				CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */,
@@ -895,7 +913,9 @@
 				2204C20B179428B200B05F17 /* SingleTon.m in Sources */,
 				2204C20F1794349400B05F17 /* GenericCommand.m in Sources */,
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
+				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
 				22011C9F179543E80019D5A4 /* Login.m in Sources */,
+				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
 				CE9A2913188D2B240063D562 /* SensorChangeRequest.m in Sources */,
 				22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,

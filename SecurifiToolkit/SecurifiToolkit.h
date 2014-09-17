@@ -47,6 +47,8 @@
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>
 #import <SecurifiToolkit/DynamicAlmondNameChangeResponse.h>
 #import <SecurifiToolkit/SFIOfflineDataManager.h>
+#import <SecurifiToolkit/UserProfileRequest.h>
+#import <SecurifiToolkit/UserProfileResponse.h>
 
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
@@ -149,6 +151,9 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 // Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard*)scoreboardSnapshot;
+
+//PY 150914 - Accounts
+
 
 @end
  

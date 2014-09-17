@@ -57,6 +57,9 @@
 #define LOGOUT_ALL_NOTIFIER                 @"LOGOUT_ALL_NOTIFIER"
 #define DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER @"DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER"
 
+//PY 150914 - Accounts Settings
+#define USER_PROFILE_NOTIFIER                 @"USER_PROFILE_NOTIFIER"
+
 #define ALMONDLIST_FILENAME @"almondlist"
 #define HASH_FILENAME @"hashlist"
 #define DEVICELIST_FILENAME  @"devicelist"

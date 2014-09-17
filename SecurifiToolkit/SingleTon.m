@@ -561,6 +561,13 @@
                                             [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
+                                            
+                                            //PY 150914 - Account Settings
+                                        case CommandType_USER_PROFILE_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_USER_PROFILE_RESPONSE];
+                                            [self postData:USER_PROFILE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
 
                                         default:
                                             break;
@@ -976,8 +983,9 @@
                     commandPayload = CLOUD_SANITY_REQUEST_XML;
                     break;
                 }
+                case CommandType_USER_PROFILE_REQUEST: //PY 150914 Accounts
                 case CommandType_ALMOND_LIST: {
-                    commandPayload = ALMOND_LIST_REQUEST_XML;
+                    commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
                     break;
                 }
                 default:

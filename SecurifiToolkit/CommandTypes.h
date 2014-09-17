@@ -49,5 +49,8 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_SENSOR_CHANGE_REQUEST               = 301,
     CommandType_SENSOR_CHANGE_RESPONSE              = 304,
     CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST   = 321,
+    
+    CommandType_USER_PROFILE_REQUEST        = 259,
+    CommandType_USER_PROFILE_RESPONSE       = 260,
 
 };

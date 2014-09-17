@@ -33,6 +33,7 @@
 #import "ResetPasswordResponse.h"
 #import "SensorChangeResponse.h"
 #import "DynamicAlmondNameChangeResponse.h"
+#import "UserProfileResponse.h"
 
 #pragma mark Constants
 
@@ -124,6 +125,16 @@ static const char *kName_LogoutResponse =                   "LogoutResponse";
 
 //PY 280214 - DynamicAlmondNameChange
 static const char *kName_DynamicAlmondNameChange =          "DynamicAlmondNameChange";
+
+//PY 150914 - Account Settings
+static const char *kName_UserProfileResponse =  "UserProfileResponse";
+static const char *kName_FirstName =            "FirstName";
+static const char *kName_LastName =             "LastName";
+static const char *kName_AddressLine1 =         "AddressLine1";
+static const char *kName_AddressLine2 =         "AddressLine2";
+static const char *kName_AddressLine3 =         "AddressLine3";
+static const char *kName_Country =              "Country";
+static const char *kName_ZipCode =              "ZipCode";
 
 //static const char *kName_Index =                            "Index";
 //static const char *kName_Name =                             "Name";
@@ -244,6 +255,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
+        case CommandType_USER_PROFILE_RESPONSE:
             obj.command = self.command;
             obj.commandType = self.commandType;
             break;
@@ -1062,6 +1074,28 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_DYNAMIC_ALMOND_NAME_CHANGE;
     }
+    //PY150914 - User Profile Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_UserProfileResponse, kLength_MaxTag)){
+        UserProfileResponse *userProfileResponse = [[UserProfileResponse alloc]init];
+        parser.command = userProfileResponse;
+ 
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_USER_PROFILE_RESPONSE;
+    }
     else if (parser.parsingCommand && (prefix == NULL && (
                                                           (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_UserID, kLength_MaxTag))
@@ -1090,6 +1124,13 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
                                                           || (!strncmp((const char *)localname, kName_Location,kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_WifiPassword,kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_WifiSSID,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_FirstName,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_LastName,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_AddressLine1,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_AddressLine2,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_AddressLine3,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_Country,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_ZipCode,kLength_MaxTag))
                                                           )  ))
     {
         //// NSLog(@"Storing Character for : %s",localname);
@@ -1716,7 +1757,58 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.commandType = CommandType_DYNAMIC_ALMOND_NAME_CHANGE;
             parser.parsingCommand = NO;
         }
-
+        
+        //PY 150914 - Account Settings - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_FirstName, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+             [parser.command setFirstName:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_LastName, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+             [parser.command setLastName:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_AddressLine1, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+             [parser.command setAddressLine1:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_AddressLine2, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+             [parser.command setAddressLine2:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_AddressLine3, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+             [parser.command setAddressLine3:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_Country, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+             [parser.command setCountry:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ZipCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
+        {
+             [parser.command setZipCode:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_UserProfileResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_USER_PROFILE_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 150914 - Account Settings - END
     }
     
     parser.storingCharacters = NO;
