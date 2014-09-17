@@ -10,6 +10,7 @@
 
 @interface SFIDeviceValue ()
 @property(nonatomic, readonly) NSArray *knownValues;
+@property(nonatomic, readonly) NSDictionary *lookupTable; // property type :: SFIDeviceKnownValues
 @end
 
 @implementation SFIDeviceValue
@@ -20,6 +21,7 @@
         self.deviceID = (unsigned int) [coder decodeIntForKey:@"self.deviceID"];
         self.valueCount = (unsigned int) [coder decodeIntForKey:@"self.valueCount"];
         _knownValues = [coder decodeObjectForKey:@"self.knownValues"];
+        _lookupTable = [self buildLookupTable:_knownValues];
     }
 
     return self;
@@ -47,7 +49,7 @@
     if (copy != nil) {
         copy.deviceID = self.deviceID;
         copy.valueCount = self.valueCount;
-        copy->_knownValues = self.knownDevicesValues;
+        [copy replaceKnownDeviceValues:self.knownDevicesValues];
         copy.isPresent = self.isPresent;
     }
 
@@ -63,7 +65,10 @@
 
 
 - (void)replaceKnownDeviceValues:(NSArray *)values {
-    _knownValues = [[NSArray alloc] initWithArray:values copyItems:YES];
+    NSArray *copy = [[NSArray alloc] initWithArray:values copyItems:YES];
+    NSDictionary *lookupTable = [self buildLookupTable:copy];
+    _knownValues = copy;
+    _lookupTable = lookupTable;
 }
 
 - (SFIDeviceKnownValues*)knownValuesForProperty:(SFIDevicePropertyType)propertyType {
@@ -72,12 +77,8 @@
 }
 
 - (SFIDeviceKnownValues *)internalKnownValuesForProperty:(SFIDevicePropertyType)propertyType {
-    for (SFIDeviceKnownValues *currentDeviceValue in self.knownDevicesValues) {
-        if (currentDeviceValue.propertyType == propertyType) {
-            return currentDeviceValue;
-        }
-    }
-    return nil;
+    NSNumber *key = @(propertyType);
+    return (self.lookupTable)[key];
 }
 
 - (NSString *)valueForProperty:(SFIDevicePropertyType)propertyType {
@@ -102,8 +103,23 @@
         return ifNil;
     }
 
-    return choices[str];
+    id o = choices[str];
+    if (!o) {
+        return ifNil;
+    }
+
+    return o;
 }
 
+- (NSDictionary*)buildLookupTable:(NSArray*)knownValues {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+    for (SFIDeviceKnownValues *values in knownValues) {
+        NSNumber *key = @(values.propertyType);
+        dict[key] = values;
+    }
+    
+    return dict;
+}
 
 @end
