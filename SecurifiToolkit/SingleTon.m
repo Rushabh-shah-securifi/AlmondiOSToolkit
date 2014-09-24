@@ -701,6 +701,7 @@
         case kSecTrustResultOtherError:
             return NO;
 
+        case kSecTrustResultInvalid:
         case kSecTrustResultProceed:
         case kSecTrustResultUnspecified:
         default:break;
