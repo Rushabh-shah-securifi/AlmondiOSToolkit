@@ -748,56 +748,56 @@
     SecTrustRef secTrust = (__bridge SecTrustRef) [aStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerTrust];
     if (secTrust == nil) {
         NSLog(@"%s: Unable to evaluate trust; stream did not return security trust ref", __PRETTY_FUNCTION__);
-<<<<<<< HEAD
         return NO;
     }
-
+    
     SecTrustResultType resultType;
     SecTrustGetTrustResult(secTrust, &resultType);
-
+    
     switch (resultType) {
         case kSecTrustResultDeny:
         case kSecTrustResultRecoverableTrustFailure:
         case kSecTrustResultFatalTrustFailure:
         case kSecTrustResultOtherError:
             return NO;
-
+            
         case kSecTrustResultInvalid:
         case kSecTrustResultProceed:
         case kSecTrustResultUnspecified:
         default:break;
     }
-
+    
     if (resultType == kSecTrustResultInvalid) {
         NSLog(@"Cert test: kSecTrustResultInvalid");
-
+        
         SecTrustResultType result;
         OSStatus status = SecTrustEvaluate(secTrust, &result);
         if (status != errSecSuccess) {
             NSLog(@"Cert test fail: kSecTrustResultInvalid !errSecSuccess");
             return NO;
         }
-
+        
         switch (result) {
             case kSecTrustResultDeny:
             case kSecTrustResultRecoverableTrustFailure:
             case kSecTrustResultFatalTrustFailure:
             case kSecTrustResultOtherError:
                 return NO;
-
+                
             case kSecTrustResultInvalid: {
                 NSLog(@"Cert test fail: kSecTrustResultInvalid again");
                 return NO;
             }
-
+                
             case kSecTrustResultProceed:
             case kSecTrustResultUnspecified:
             default:break;
         }
     }
-
+    
     return [self evaluateCertificate:secTrust];
 }
+
 
 - (BOOL)evaluateCertificate:(SecTrustRef)secTrust {
     CFIndex count = SecTrustGetCertificateCount(secTrust);
@@ -805,98 +805,30 @@
         NSLog(@"Cert test fail: zero certificate count");
         return NO;
     }
-
+    
     NSMutableArray *streamCertificates = [NSMutableArray array];
     for (CFIndex index = 0; index < count; index++) {
         SecCertificateRef certificate = SecTrustGetCertificateAtIndex(secTrust, index);
         id cert = (__bridge id) certificate;
         [streamCertificates addObject:cert];
     }
-
+    
     SecPolicyRef policy = SecPolicyCreateSSL(YES, CFSTR("*.securifi.com")); // must be released
-
-=======
-        return NO;
-    }
-
-    SecTrustResultType resultType;
-    SecTrustGetTrustResult(secTrust, &resultType);
-
-    switch (resultType) {
-        case kSecTrustResultDeny:
-        case kSecTrustResultRecoverableTrustFailure:
-        case kSecTrustResultFatalTrustFailure:
-        case kSecTrustResultOtherError:
-            return NO;
-
-        case kSecTrustResultInvalid:
-        case kSecTrustResultProceed:
-        case kSecTrustResultUnspecified:
-        default:break;
-    }
-
-    if (resultType == kSecTrustResultInvalid) {
-        NSLog(@"Cert test: kSecTrustResultInvalid");
-
-        SecTrustResultType result;
-        OSStatus status = SecTrustEvaluate(secTrust, &result);
-        if (status != errSecSuccess) {
-            NSLog(@"Cert test fail: kSecTrustResultInvalid !errSecSuccess");
-            return NO;
-        }
-
-        switch (result) {
-            case kSecTrustResultDeny:
-            case kSecTrustResultRecoverableTrustFailure:
-            case kSecTrustResultFatalTrustFailure:
-            case kSecTrustResultOtherError:
-                return NO;
-
-            case kSecTrustResultInvalid: {
-                NSLog(@"Cert test fail: kSecTrustResultInvalid again");
-                return NO;
-            }
-
-            case kSecTrustResultProceed:
-            case kSecTrustResultUnspecified:
-            default:break;
-        }
-    }
-
-    return [self evaluateCertificate:secTrust];
-}
-
-- (BOOL)evaluateCertificate:(SecTrustRef)secTrust {
-    CFIndex count = SecTrustGetCertificateCount(secTrust);
-    if (count == 0) {
-        NSLog(@"Cert test fail: zero certificate count");
-        return NO;
-    }
-
-    NSMutableArray *streamCertificates = [NSMutableArray array];
-    for (CFIndex index = 0; index < count; index++) {
-        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(secTrust, index);
-        id cert = (__bridge id) certificate;
-        [streamCertificates addObject:cert];
-    }
-
-    SecPolicyRef policy = SecPolicyCreateSSL(YES, CFSTR("*.securifi.com")); // must be released
-
->>>>>>> FETCH_HEAD
+    
     SecTrustRef trust = NULL; // must be released
     OSStatus status;
-
+    
     status = SecTrustCreateWithCertificates((__bridge CFArrayRef) streamCertificates, policy, &trust);
     if (status != errSecSuccess) {
         NSLog(@"%s: Failed to create trust with certs copy", __PRETTY_FUNCTION__);
         return NO;
     }
-
+    
     SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) @[(id) self.certificate]);
-
+    
     SecTrustResultType trustResultType = kSecTrustResultInvalid;
     status = SecTrustEvaluate(trust, &trustResultType);
-
+    
     BOOL trusted;
     if (status == errSecSuccess) {
         if (trustResultType == kSecTrustResultUnspecified) {
@@ -911,16 +843,17 @@
         NSLog(@"%s: Unable to evaluate trust: %d", __PRETTY_FUNCTION__, (int) status);
         trusted = NO;
     }
-
+    
     if (trust) {
         CFRelease(trust);
     }
     if (policy) {
         CFRelease(policy);
     }
-
+    
     return trusted;
 }
+
 
 #pragma mark - Hash value management
 
