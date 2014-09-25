@@ -741,7 +741,7 @@
 			name = SecurifiToolkitTests;
 			productName = SecurifiToolkitTests;
 			productReference = 221185CB178D371200EE23ED /* SecurifiToolkitTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		221185F4178D453A00EE23ED /* SecurifiCloudResources */ = {
 			isa = PBXNativeTarget;
@@ -766,6 +766,7 @@
 		221185B2178D371100EE23ED /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0600;
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Nirav Uchat";
 			};
