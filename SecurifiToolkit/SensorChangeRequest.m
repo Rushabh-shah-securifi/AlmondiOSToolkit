@@ -26,15 +26,17 @@
     [writer writeStartElement:@"Device"];
     [writer writeAttribute:@"ID" value:self.deviceID];
     //
-    if (self.changedName.length > 0) {
+    NSString *name = [self.changedName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (name.length > 0) {
         [writer writeStartElement:@"NewName"];
-        [writer writeCharacters:self.changedName];
+        [writer writeCharacters:name];
         [writer writeEndElement];
     }
     //
-    if (self.changedLocation.length > 0) {
+    NSString *location = [self.changedLocation stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (location.length > 0) {
         [writer writeStartElement:@"NewLocation"];
-        [writer writeCharacters:self.changedLocation];
+        [writer writeCharacters:location];
         [writer writeEndElement];
     }
     //

@@ -34,6 +34,16 @@
 #import "SensorChangeResponse.h"
 #import "DynamicAlmondNameChangeResponse.h"
 #import "UserProfileResponse.h"
+#import "ChangePasswordResponse.h"
+#import "DeleteAccountResponse.h"
+#import "UpdateUserProfileResponse.h"
+#import "AlmondAffiliationDataResponse.h"
+#import "UnlinkAlmondResponse.h"
+#import "UserInviteResponse.h"
+#import "DeleteSecondaryUserResponse.h"
+#import "AlmondNameChangeResponse.h"
+#import "MeAsSecondaryUserResponse.h"
+#import "DeleteMeAsSecondaryUserResponse.h"
 
 #pragma mark Constants
 
@@ -127,20 +137,30 @@ static const char *kName_LogoutResponse =                   "LogoutResponse";
 static const char *kName_DynamicAlmondNameChange =          "DynamicAlmondNameChange";
 
 //PY 150914 - Account Settings
-static const char *kName_UserProfileResponse =  "UserProfileResponse";
-static const char *kName_FirstName =            "FirstName";
-static const char *kName_LastName =             "LastName";
-static const char *kName_AddressLine1 =         "AddressLine1";
-static const char *kName_AddressLine2 =         "AddressLine2";
-static const char *kName_AddressLine3 =         "AddressLine3";
-static const char *kName_Country =              "Country";
-static const char *kName_ZipCode =              "ZipCode";
-
-//static const char *kName_Index =                            "Index";
-//static const char *kName_Name =                             "Name";
-//static const char *kName_Type =                             "Type";
-
-
+static const char *kName_UserProfileResponse =              "UserProfileResponse";
+static const char *kName_FirstName =                        "FirstName";
+static const char *kName_LastName =                         "LastName";
+static const char *kName_AddressLine1 =                     "AddressLine1";
+static const char *kName_AddressLine2 =                     "AddressLine2";
+static const char *kName_AddressLine3 =                     "AddressLine3";
+static const char *kName_Country =                          "Country";
+static const char *kName_ZipCode =                          "ZipCode";
+static const char *kName_ChangePasswordResponse =           "ChangePasswordResponse";
+static const char *kName_DeleteAccountResponse =            "DeleteAccountResponse";
+static const char *kName_UpdateUserProfileResponse =        "UpdateUserProfileResponse";
+static const char *kName_AlmondAffiliationDataResponse =    "AlmondAffiliationDataResponse";
+static const char *kName_Almond =                           "Almond";
+static const char *kName_Name =                             "Name";
+static const char *kName_MAC =                              "MAC";
+static const char *kName_EmailID =                          "EmailID";
+static const char *kName_UnlinkAlmondResponse =             "UnlinkAlmondResponse";
+static const char *kName_UserInviteResponse =               "UserInviteResponse";
+static const char *kName_DeleteSecondaryUserResponse =      "DeleteSecondaryUserResponse";
+static const char *kName_AlmondNameChangeResponse =         "AlmondNameChangeResponse";
+static const char *kName_MeAsSecondaryUserResponse =        "MeAsSecondaryUserResponse";
+static const char *kName_OwnerEmailID =                     "OwnerEmailID";
+static const char *kName_AName =                            "AlmondName";
+static const char *kName_DeleteMeAsSecondaryUserResponse =  "DeleteMeAsSecondaryUserResponse";
 
 static const NSUInteger kLength_MaxTag  =                   35;
 //static const NSUInteger kLength_LoginResponse =             14;
@@ -206,6 +226,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
 @property(nonatomic) CommandType commandType;
 @property(nonatomic) CommandType storingCommandType;
 @property(nonatomic) id command;
+@property(nonatomic) NSMutableArray *tmpEmailList;
 @end
 
 @implementation CommandParser
@@ -256,6 +277,16 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
         case CommandType_USER_PROFILE_RESPONSE:
+        case CommandType_CHANGE_PASSWORD_RESPONSE:
+        case CommandType_DELETE_ACCOUNT_RESPONSE:
+        case CommandType_UPDATE_USER_PROFILE_RESPONSE:
+        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE:
+        case CommandType_UNLINK_ALMOND_RESPONSE:
+        case CommandType_USER_INVITE_RESPONSE:
+        case CommandType_DELETE_SECONDARY_USER_RESPONSE:
+        case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
+        case CommandType_ME_AS_SECONDARY_USER_RESPONSE:
+        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:
             obj.command = self.command;
             obj.commandType = self.commandType;
             break;
@@ -1096,6 +1127,285 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_USER_PROFILE_RESPONSE;
     }
+    //PY170914 - Change Password Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_ChangePasswordResponse, kLength_MaxTag)){
+        ChangePasswordResponse *changePwdResponse = [[ChangePasswordResponse alloc]init];
+        parser.command = changePwdResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_CHANGE_PASSWORD_RESPONSE;
+    }
+    //PY180914 - Delete Account Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeleteAccountResponse, kLength_MaxTag)){
+        DeleteAccountResponse *delAccountResponse = [[DeleteAccountResponse alloc]init];
+        parser.command = delAccountResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_DELETE_ACCOUNT_RESPONSE;
+    }
+    //PY190914 - Update User Profile Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_UpdateUserProfileResponse, kLength_MaxTag)){
+        UpdateUserProfileResponse *updateProfileResponse = [[UpdateUserProfileResponse alloc]init];
+        parser.command = updateProfileResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_UPDATE_USER_PROFILE_RESPONSE;
+    }
+    
+    //PY190914 - Almond Affiliation Data Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_AlmondAffiliationDataResponse, kLength_MaxTag)){
+        AlmondAffiliationDataResponse *ownedAlmondListResponse = [[AlmondAffiliationDataResponse alloc]init];
+        parser.command = ownedAlmondListResponse;
+        
+        //To get Almond Count attribute
+        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        //To get Success attribute
+        attributes += 5;
+        NSString *successKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* successVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        
+        if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
+            [parser.command setIsSuccessful:1];
+            //Set count
+            [parser.command setAlmondCount:(unsigned int) [countVal intValue]];
+            parser.tmpAlmondList = [[NSMutableArray alloc]init]; //Create Owned AlmondPlus List
+        }else{
+            [parser.command setIsSuccessful:0];
+            [parser.command setAlmondCount:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_ALMOND_AFFILIATION_DATA_RESPONSE;
+    }
+    else if (!strncmp((const char *)localname, kName_Almond,kLength_MaxTag)  && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get Index from attribute
+        NSString *almondIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* almondIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        attributes += 5;
+        //Get UserCount from attribute
+        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        parser.tmpAlmond = [[SFIAlmondPlus alloc]init];
+        
+        if([almondIDKey isEqualToString:@"Index"]){
+            [parser.tmpAlmond setIndex:[almondIDVal intValue]];
+        }else{
+            //Not possible: (no device id comes from cloud)
+            [parser.tmpAlmond setIndex:0];
+        }
+        
+        if([countVal intValue] > 0){
+            parser.tmpEmailList = [[NSMutableArray alloc]init];
+        }
+        
+         [parser.tmpAlmond setUserCount:[countVal intValue]];
+    }
+    
+    //PY220914 - Unlink Almond Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_UnlinkAlmondResponse, kLength_MaxTag)){
+        UnlinkAlmondResponse *unlinkAlmondResponse = [[UnlinkAlmondResponse alloc]init];
+        parser.command = unlinkAlmondResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_UNLINK_ALMOND_RESPONSE;
+    }
+    //PY220914 - User invite for sharing Almond Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_UserInviteResponse, kLength_MaxTag)){
+        UserInviteResponse *userInviteResponse = [[UserInviteResponse alloc]init];
+        parser.command = userInviteResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_USER_INVITE_RESPONSE;
+    }
+    //PY220914 - Delete secondary user Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeleteSecondaryUserResponse, kLength_MaxTag)){
+        DeleteSecondaryUserResponse *delUserResponse = [[DeleteSecondaryUserResponse alloc]init];
+        parser.command = delUserResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_DELETE_SECONDARY_USER_RESPONSE;
+    }
+    //PY220914 - Almond Name Change Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_AlmondNameChangeResponse, kLength_MaxTag)){
+        AlmondNameChangeResponse *almondNameChangeResponse = [[AlmondNameChangeResponse alloc]init];
+        parser.command = almondNameChangeResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_ALMOND_NAME_CHANGE_RESPONSE;
+    }
+    
+    //PY230914 - Me As Secondary Almond User Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_MeAsSecondaryUserResponse, kLength_MaxTag)){
+        MeAsSecondaryUserResponse *meAsSecodaryResponse = [[MeAsSecondaryUserResponse alloc]init];
+        parser.command = meAsSecodaryResponse;
+        
+        //To get Almond Count attribute
+        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        //To get Success attribute
+        attributes += 5;
+        NSString *successKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* successVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        
+        if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
+            [parser.command setIsSuccessful:1];
+            //Set count
+            [parser.command setAlmondCount:(unsigned int) [countVal intValue]];
+            parser.tmpAlmondList = [[NSMutableArray alloc]init]; //Create Owned AlmondPlus List
+        }else{
+            [parser.command setIsSuccessful:0];
+            [parser.command setAlmondCount:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_ME_AS_SECONDARY_USER_RESPONSE;
+    }
+    else if (!strncmp((const char *)localname, kName_Almond,kLength_MaxTag)  && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get Index from attribute
+        NSString *almondIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* almondIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        parser.tmpAlmond = [[SFIAlmondPlus alloc]init];
+        
+        if([almondIDKey isEqualToString:@"Index"]){
+            [parser.tmpAlmond setIndex:[almondIDVal intValue]];
+        }else{
+            //Not possible: (no device id comes from cloud)
+            [parser.tmpAlmond setIndex:0];
+        }
+    }
+    //PY240914 - Delete me as secondary user Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeleteMeAsSecondaryUserResponse, kLength_MaxTag)){
+        DeleteMeAsSecondaryUserResponse *delUserResponse = [[DeleteMeAsSecondaryUserResponse alloc]init];
+        parser.command = delUserResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE;
+    }
+
+
     else if (parser.parsingCommand && (prefix == NULL && (
                                                           (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_UserID, kLength_MaxTag))
@@ -1131,6 +1441,12 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
                                                           || (!strncmp((const char *)localname, kName_AddressLine3,kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_Country,kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_ZipCode,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_Almond,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_Name,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_MAC,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_EmailID,kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_OwnerEmailID,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_AName,kLength_MaxTag))
                                                           )  ))
     {
         //// NSLog(@"Storing Character for : %s",localname);
@@ -1809,6 +2125,248 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.parsingCommand = NO;
         }
         //PY 150914 - Account Settings - END
+        
+        //PY 170914 - Change Account Password - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_CHANGE_PASSWORD_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_CHANGE_PASSWORD_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_ChangePasswordResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_CHANGE_PASSWORD_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 180914 - Change Account Password - END
+        
+        //PY 180914 - Delete Account - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_ACCOUNT_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_ACCOUNT_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_DeleteAccountResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_DELETE_ACCOUNT_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 180914 - Delete Account - END
+        
+        //PY 180914 - Update User Profile  - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_UPDATE_USER_PROFILE_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_UPDATE_USER_PROFILE_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_UPDATE_USER_PROFILE_RESPONSE))
+        {
+            [parser.command setInternalIndex:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_UpdateUserProfileResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_UPDATE_USER_PROFILE_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 180914 - Update User Profile - END
+        
+        //PY 190914 - Almond Affiliation Data Response  - BEGIN
+//        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
+//        {
+//            [parser.command setReason:[parser currentString]];
+//        }
+//        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
+//        {
+//            [parser.command setReasonCode:[[parser currentString] intValue]];
+//        }
+        else if (!strncmp((const char *)localname, kName_MAC, kLength_MaxTag)
+            && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
+        {
+            
+            [parser.tmpAlmond setAlmondplusMAC:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_Name, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
+        {
+            [parser.tmpAlmond setAlmondplusName:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_EmailID, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
+        {
+            //Add to array
+            [parser.tmpEmailList addObject:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_Almond, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
+        {
+            if(parser.tmpAlmond.userCount > 0){
+                [parser.tmpAlmond setAccessEmailIDs:parser.tmpEmailList];
+            }
+            //Add to array
+            [parser.tmpAlmondList addObject:parser.tmpAlmond];
+            
+        }
+        else if (!strncmp((const char *)localname, kName_AlmondAffiliationDataResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_ALMOND_AFFILIATION_DATA_RESPONSE;
+            [parser.command setAlmondList:parser.tmpAlmondList];
+            parser.parsingCommand = NO;
+        }
+        //PY 190914 - Almond Affiliation Data Response - END
+        
+        //PY 220914 - Unlink Almond - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_UNLINK_ALMOND_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_UNLINK_ALMOND_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_UNLINK_ALMOND_RESPONSE))
+        {
+            [parser.command setInternalIndex:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_UnlinkAlmondResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_UNLINK_ALMOND_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 220914 - Unlink Almond - END
+        
+        //PY 220914 - User invite for sharing Almond - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_INVITE_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_INVITE_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_USER_INVITE_RESPONSE))
+        {
+            [parser.command setInternalIndex:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_UserInviteResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_USER_INVITE_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 220914 - User invite for sharing Almond - END
+        
+        //PY 220914 - Delete Secondary User Response - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setInternalIndex:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_DeleteSecondaryUserResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_DELETE_SECONDARY_USER_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 220914 - Delete Secondary User Response - END
+        
+        //PY 220914 - Almond Name Change Response - BEGIN
+        else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ALMOND_NAME_CHANGE_RESPONSE))
+        {
+            [parser.command setInternalIndex:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_AlmondNameChangeResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_ALMOND_NAME_CHANGE_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 220914 - Almond Name Change Response - END
+        
+        //PY 230914 - Me As Secondary Almond User Response  - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_MAC, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            
+            [parser.tmpAlmond setAlmondplusMAC:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_AName, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            [parser.tmpAlmond setAlmondplusName:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_OwnerEmailID, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+             [parser.tmpAlmond setOwnerEmailID:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_Almond, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            //Add to array
+            [parser.tmpAlmondList addObject:parser.tmpAlmond];
+            
+        }
+        else if (!strncmp((const char *)localname, kName_MeAsSecondaryUserResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_ME_AS_SECONDARY_USER_RESPONSE;
+            [parser.command setAlmondList:parser.tmpAlmondList];
+            parser.parsingCommand = NO;
+        }
+        //PY 230914 - Me As Secondary Almond User Response - END
+        
+        //PY 240914 - Delete Me As Secondary User Response - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            [parser.command setInternalIndex:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_DeleteMeAsSecondaryUserResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 240914 - Delete Me As Secondary User Response - END
     }
     
     parser.storingCharacters = NO;

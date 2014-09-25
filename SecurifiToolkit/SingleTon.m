@@ -126,9 +126,6 @@
             //[SSLOptions setObject:[NSNumber numberWithBool:NO] forKey:(NSString *)kCFStreamSSLIsServer];
 
             NSDictionary *settings = @{
-                    (__bridge id) kCFStreamSSLAllowsExpiredRoots : @NO,
-                    (__bridge id) kCFStreamSSLAllowsExpiredCertificates : @NO,
-                    (__bridge id) kCFStreamSSLAllowsAnyRoot : @NO,
                     (__bridge id) kCFStreamSSLValidatesCertificateChain : @YES
             };
 
@@ -568,7 +565,67 @@
                                             [self postData:USER_PROFILE_NOTIFIER data:temp.command];
                                             break;
                                         }
+                                            
+                                        case CommandType_CHANGE_PASSWORD_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_CHANGE_PASSWORD_RESPONSE];
+                                            [self postData:CHANGE_PWD_RESPONSE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
 
+                                        case CommandType_DELETE_ACCOUNT_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_DELETE_ACCOUNT_RESPONSE];
+                                            [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_UPDATE_USER_PROFILE_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_UPDATE_USER_PROFILE_RESPONSE];
+                                            [self postData:UPDATE_USER_PROFILE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_ALMOND_AFFILIATION_DATA_RESPONSE];
+                                            [self postData:ALMOND_AFFILIATION_DATA_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_UNLINK_ALMOND_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_UNLINK_ALMOND_RESPONSE];
+                                            [self postData:UNLINK_ALMOND_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_USER_INVITE_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_USER_INVITE_RESPONSE];
+                                            [self postData:USER_INVITE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_DELETE_SECONDARY_USER_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_DELETE_SECONDARY_USER_RESPONSE];
+                                            [self postData:DELETE_SECONDARY_USER_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_ALMOND_NAME_CHANGE_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_ALMOND_NAME_CHANGE_RESPONSE];
+                                            [self postData:ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_ME_AS_SECONDARY_USER_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_ME_AS_SECONDARY_USER_RESPONSE];
+                                            [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE];
+                                            [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
                                         default:
                                             break;
                                     }
@@ -688,25 +745,91 @@
 }
 
 - (BOOL)isTrustedCertificate:(NSStream *)aStream {
-    CFArrayRef streamCertificates = (__bridge CFArrayRef) [aStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerCertificates];
-    if (streamCertificates == nil) {
-        NSLog(@"%s: Unable to evaluate trust; stream did not return certificates", __PRETTY_FUNCTION__);
+    SecTrustRef secTrust = (__bridge SecTrustRef) [aStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerTrust];
+    if (secTrust == nil) {
+        NSLog(@"%s: Unable to evaluate trust; stream did not return security trust ref", __PRETTY_FUNCTION__);
         return NO;
     }
 
-    SecPolicyRef policy = SecPolicyCreateSSL(NO, CFSTR("*.securifi.com"));
+    SecTrustResultType resultType;
+    SecTrustGetTrustResult(secTrust, &resultType);
 
-    SecTrustRef trust = NULL;
-    SecTrustCreateWithCertificates(streamCertificates, policy, &trust);
+    switch (resultType) {
+        case kSecTrustResultDeny:
+        case kSecTrustResultRecoverableTrustFailure:
+        case kSecTrustResultFatalTrustFailure:
+        case kSecTrustResultOtherError:
+            return NO;
+
+        case kSecTrustResultInvalid:
+        case kSecTrustResultProceed:
+        case kSecTrustResultUnspecified:
+        default:break;
+    }
+
+    if (resultType == kSecTrustResultInvalid) {
+        NSLog(@"Cert test: kSecTrustResultInvalid");
+
+        SecTrustResultType result;
+        OSStatus status = SecTrustEvaluate(secTrust, &result);
+        if (status != errSecSuccess) {
+            NSLog(@"Cert test fail: kSecTrustResultInvalid !errSecSuccess");
+            return NO;
+        }
+
+        switch (result) {
+            case kSecTrustResultDeny:
+            case kSecTrustResultRecoverableTrustFailure:
+            case kSecTrustResultFatalTrustFailure:
+            case kSecTrustResultOtherError:
+                return NO;
+
+            case kSecTrustResultInvalid: {
+                NSLog(@"Cert test fail: kSecTrustResultInvalid again");
+                return NO;
+            }
+
+            case kSecTrustResultProceed:
+            case kSecTrustResultUnspecified:
+            default:break;
+        }
+    }
+
+    return [self evaluateCertificate:secTrust];
+}
+
+- (BOOL)evaluateCertificate:(SecTrustRef)secTrust {
+    CFIndex count = SecTrustGetCertificateCount(secTrust);
+    if (count == 0) {
+        NSLog(@"Cert test fail: zero certificate count");
+        return NO;
+    }
+
+    NSMutableArray *streamCertificates = [NSMutableArray array];
+    for (CFIndex index = 0; index < count; index++) {
+        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(secTrust, index);
+        id cert = (__bridge id) certificate;
+        [streamCertificates addObject:cert];
+    }
+
+    SecPolicyRef policy = SecPolicyCreateSSL(YES, CFSTR("*.securifi.com")); // must be released
+
+    SecTrustRef trust = NULL; // must be released
+    OSStatus status;
+
+    status = SecTrustCreateWithCertificates((__bridge CFArrayRef) streamCertificates, policy, &trust);
+    if (status != errSecSuccess) {
+        NSLog(@"%s: Failed to create trust with certs copy", __PRETTY_FUNCTION__);
+        return NO;
+    }
 
     SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) @[(id) self.certificate]);
 
     SecTrustResultType trustResultType = kSecTrustResultInvalid;
-    OSStatus status = SecTrustEvaluate(trust, &trustResultType);
+    status = SecTrustEvaluate(trust, &trustResultType);
 
     BOOL trusted;
     if (status == errSecSuccess) {
-        // expect trustResultType == kSecTrustResultUnspecified until the cert exists in the keychain
         if (trustResultType == kSecTrustResultUnspecified) {
             trusted = YES;
         }
@@ -962,11 +1085,19 @@
                 case CommandType_RESET_PASSWORD_REQUEST:
                 case CommandType_SENSOR_CHANGE_REQUEST:
                 case CommandType_GENERIC_COMMAND_REQUEST:
+                case CommandType_CHANGE_PASSWORD_REQUEST:
+                case CommandType_DELETE_ACCOUNT_REQUEST:
+                case CommandType_UPDATE_USER_PROFILE_REQUEST:
+                case CommandType_UNLINK_ALMOND_REQUEST:
+                case CommandType_USER_INVITE_REQUEST:
+                case CommandType_DELETE_SECONDARY_USER_REQUEST:
+                case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
                 {
                     id<SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
                     break;
                 }
+                case CommandType_ALMOND_NAME_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
                     id<SecurifiCommand> cmd = obj.command;
                     //Send as Command 61
@@ -984,6 +1115,8 @@
                     break;
                 }
                 case CommandType_USER_PROFILE_REQUEST: //PY 150914 Accounts
+                case CommandType_ME_AS_SECONDARY_USER_REQUEST:
+                case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:
                 case CommandType_ALMOND_LIST: {
                     commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
                     break;

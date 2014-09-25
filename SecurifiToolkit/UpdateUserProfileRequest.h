@@ -1,15 +1,15 @@
 //
-//  UserProfileResponse.h
+//  UpdateUserProfileRequest.h
 //  SecurifiToolkit
 //
-//  Created by Priya Yerunkar on 15/09/14.
+//  Created by Priya Yerunkar on 18/09/14.
 //  Copyright (c) 2014 Nirav Uchat. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiCommand.h"
 
-@interface UserProfileResponse : NSObject
-@property BOOL isSuccessful;
+@interface UpdateUserProfileRequest : NSObject  <SecurifiCommand>
 @property NSString *firstName;
 @property NSString *lastName;
 @property NSString *addressLine1;
@@ -17,6 +17,7 @@
 @property NSString *addressLine3;
 @property NSString *country;
 @property NSString *zipCode;
-@property int reasonCode;
-@property NSString *reason;
+@property(nonatomic) NSString *internalIndex;
+- (NSString*)toXml;
+
 @end

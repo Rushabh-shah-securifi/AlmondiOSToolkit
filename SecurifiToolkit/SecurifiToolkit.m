@@ -648,6 +648,115 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     return [self.scoreboard copy];
 }
 
+#pragma mark - Account related commands
+- (void)asyncRequestChangeCloudPassword:(NSString*)currentPwd changedPwd:(NSString*)changedPwd{
+    ChangePasswordRequest *changePwdCommand = [[ChangePasswordRequest alloc] init];
+    changePwdCommand.emailID = [self loginEmail];
+    changePwdCommand.currentPassword = currentPwd;
+    changePwdCommand.changedPassword = changedPwd;
+    
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = CommandType_CHANGE_PASSWORD_REQUEST;
+    command.command = changePwdCommand;
+    
+    [self asyncSendToCloud:command];
+}
+
+- (void)asyncRequestDeleteCloudAccount:(NSString*)password{
+    DeleteAccountRequest *delAccountCommand = [[DeleteAccountRequest alloc] init];
+    delAccountCommand.emailID = [self loginEmail];
+    delAccountCommand.password = password;
+    
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = CommandType_DELETE_ACCOUNT_REQUEST;
+    command.command = delAccountCommand;
+    
+    [self asyncSendToCloud:command];
+}
+
+-(void)asyncRequestUnlinkAlmond:(NSString*)almondMAC password:(NSString*)password{
+    // Generate internal index between 1 to 100
+    unsigned int internalIndex = (arc4random() % 100) + 1;
+    
+    UnlinkAlmondRequest *unlinkAlmondCommand = [[UnlinkAlmondRequest alloc]init];
+    unlinkAlmondCommand.almondMAC = almondMAC;
+    unlinkAlmondCommand.password = password;
+    unlinkAlmondCommand.emailID = [self loginEmail];
+    unlinkAlmondCommand.internalIndex = [NSString stringWithFormat:@"%d", internalIndex];
+    
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = CommandType_UNLINK_ALMOND_REQUEST;
+    command.command = unlinkAlmondCommand;
+    
+    [self asyncSendToCloud:command];
+}
+
+- (void)asyncRequestInviteForSharingAlmond:(NSString*)almondMAC inviteEmail:(NSString*)inviteEmailID{
+    // Generate internal index between 1 to 100
+    unsigned int internalIndex = (arc4random() % 100) + 1;
+    
+    UserInviteRequest *userInviteCommand = [[UserInviteRequest alloc]init];
+    userInviteCommand.almondMAC = almondMAC;
+    userInviteCommand.emailID = inviteEmailID;
+    userInviteCommand.internalIndex  = [NSString stringWithFormat:@"%d", internalIndex];
+    
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = CommandType_USER_INVITE_REQUEST;
+    command.command = userInviteCommand;
+    
+    [self asyncSendToCloud:command];
+}
+
+- (void)asyncRequestDelSecondaryUser:(NSString*)almondMAC email:(NSString*)emailID{
+    // Generate internal index between 1 to 100
+    unsigned int internalIndex = (arc4random() % 100) + 1;
+    
+    DeleteSecondaryUserRequest *delUserCommand = [[DeleteSecondaryUserRequest alloc]init];
+    delUserCommand.almondMAC = almondMAC;
+    delUserCommand.emailID = emailID;
+    delUserCommand.internalIndex  = [NSString stringWithFormat:@"%d", internalIndex];
+    
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = CommandType_DELETE_SECONDARY_USER_REQUEST;
+    command.command = delUserCommand;
+    
+    [self asyncSendToCloud:command];
+}
+
+- (void)asyncRequestDelMeAsSecondaryUser:(NSString*)almondMAC{
+    // Generate internal index between 1 to 100
+    unsigned int internalIndex = (arc4random() % 100) + 1;
+    
+    DeleteMeAsSecondaryUserRequest *delUserCommand = [[DeleteMeAsSecondaryUserRequest alloc]init];
+    delUserCommand.almondMAC = almondMAC;
+    delUserCommand.internalIndex  = [NSString stringWithFormat:@"%d", internalIndex];
+    
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST;
+    command.command = delUserCommand;
+    
+    [self asyncSendToCloud:command];
+}
+
+- (void)asyncRequestChangeAlmondName:(NSString*)changedAlmondName almondMAC:(NSString*)almondMAC{
+    // Generate internal index between 1 to 100
+    unsigned int internalIndex = (arc4random() % 100) + 1;
+    
+    
+    AlmondNameChange *almondNameChangeCommand = [[AlmondNameChange alloc]init];
+    almondNameChangeCommand.almondMAC = almondMAC;
+    almondNameChangeCommand.changedAlmondName = changedAlmondName;
+    almondNameChangeCommand.mobileInternalIndex  = [NSString stringWithFormat:@"%d", internalIndex];
+    
+    GenericCommand *command = [[GenericCommand alloc] init];
+    command.commandType = CommandType_ALMOND_NAME_CHANGE_REQUEST;
+    command.command = almondNameChangeCommand;
+    
+    [self asyncSendToCloud:command];
+
+
+}
+
 #pragma mark - Device value updates
 
 - (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac {

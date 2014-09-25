@@ -49,6 +49,27 @@
 #import <SecurifiToolkit/SFIOfflineDataManager.h>
 #import <SecurifiToolkit/UserProfileRequest.h>
 #import <SecurifiToolkit/UserProfileResponse.h>
+#import <SecurifiToolkit/ChangePasswordRequest.h>
+#import <SecurifiToolkit/ChangePasswordResponse.h>
+#import <SecurifiToolkit/DeleteAccountRequest.h>
+#import <SecurifiToolkit/DeleteAccountResponse.h>
+#import <SecurifiToolkit/UpdateUserProfileRequest.h>
+#import <SecurifiToolkit/UpdateUserProfileResponse.h>
+#import <SecurifiToolkit/AlmondAffiliationData.h>
+#import <SecurifiToolkit/AlmondAffiliationDataResponse.h>
+#import <SecurifiToolkit/UnlinkAlmondRequest.h>
+#import <SecurifiToolkit/UnlinkAlmondResponse.h>
+#import <SecurifiToolkit/UserInviteRequest.h>
+#import <SecurifiToolkit/UserInviteResponse.h>
+#import <SecurifiToolkit/DeleteSecondaryUserRequest.h>
+#import <SecurifiToolkit/DeleteSecondaryUserResponse.h>
+#import <SecurifiToolkit/AlmondNameChange.h>
+#import <SecurifiToolkit/AlmondNameChangeResponse.h>
+#import <SecurifiToolkit/MeAsSecondaryUserRequest.h>
+#import <SecurifiToolkit/MeAsSecondaryUserResponse.h>
+#import <SecurifiToolkit/DeleteMeAsSecondaryUserRequest.h>
+#import <SecurifiToolkit/DeleteMeAsSecondaryUserResponse.h>
+
 
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
@@ -153,7 +174,25 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 - (Scoreboard*)scoreboardSnapshot;
 
 //PY 150914 - Accounts
+// Send a command to the cloud requesting to change the password for cloud account
+- (void)asyncRequestChangeCloudPassword:(NSString*)currentPwd changedPwd:(NSString*)changedPwd;
 
+// Send a command to the cloud requesting to delete cloud account
+- (void)asyncRequestDeleteCloudAccount:(NSString*)password;
 
+// Send a command to the cloud requesting to unlink the current Almond from cloud account
+- (void)asyncRequestUnlinkAlmond:(NSString*)almondMAC password:(NSString*)password;
+
+// Send a command to the cloud requesting to invite secondary user to the current Almond from cloud account
+- (void)asyncRequestInviteForSharingAlmond:(NSString*)almondMAC inviteEmail:(NSString*)inviteEmailID;
+
+// Send a command to the cloud requesting to remove another secondary user from the current Almond from cloud account
+- (void)asyncRequestDelSecondaryUser:(NSString*)almondMAC email:(NSString*)emailID;
+
+// Send a command to the cloud requesting to change the name of current Almond
+- (void)asyncRequestChangeAlmondName:(NSString*)changedAlmondName almondMAC:(NSString*)almondMAC;
+
+// Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
+- (void)asyncRequestDelMeAsSecondaryUser:(NSString*)almondMAC;
 @end
  

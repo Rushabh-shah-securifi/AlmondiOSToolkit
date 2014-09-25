@@ -20,7 +20,9 @@
     [writer writeStartElement:@"ValidateAccountRequest"];
 
     [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.email];
+    if (self.email) {
+        [writer writeCharacters:self.email];
+    }
     [writer writeEndElement];
 
     // close ValidateAccountRequest

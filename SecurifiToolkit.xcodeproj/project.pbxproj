@@ -81,6 +81,30 @@
 		22FE9B7F17AA331300B53869 /* Logout.h in Headers */ = {isa = PBXBuildFile; fileRef = 22FE9B7D17AA331300B53869 /* Logout.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22FE9B8017AA331300B53869 /* Logout.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FE9B7E17AA331300B53869 /* Logout.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
+		CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */; };
+		CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */; };
+		CE2EA24D19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24B19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h */; };
+		CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24C19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m */; };
+		CE2EA25119D00B3E00C6D6A8 /* UserInviteRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24F19D00B3E00C6D6A8 /* UserInviteRequest.h */; };
+		CE2EA25219D00B3E00C6D6A8 /* UserInviteRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA25019D00B3E00C6D6A8 /* UserInviteRequest.m */; };
+		CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA25319D00B5200C6D6A8 /* UserInviteResponse.h */; };
+		CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA25419D00B5200C6D6A8 /* UserInviteResponse.m */; };
+		CE2EA25919D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA25719D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h */; };
+		CE2EA25A19D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA25819D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m */; };
+		CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA25B19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h */; };
+		CE2EA25E19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA25C19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m */; };
+		CE2EA26119D04BDD00C6D6A8 /* AlmondNameChange.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA25F19D04BDD00C6D6A8 /* AlmondNameChange.h */; };
+		CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA26019D04BDD00C6D6A8 /* AlmondNameChange.m */; };
+		CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA26319D04BEA00C6D6A8 /* AlmondNameChangeResponse.h */; };
+		CE2EA26619D04BEA00C6D6A8 /* AlmondNameChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA26419D04BEA00C6D6A8 /* AlmondNameChangeResponse.m */; };
+		CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA26719D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h */; };
+		CE2EA26A19D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA26819D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m */; };
+		CE2EA26D19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA26B19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h */; };
+		CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA26C19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m */; };
+		CE2EA27119D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA26F19D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h */; };
+		CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */; };
+		CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */; };
+		CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */; };
 		CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE466A581823C2E800E55DF9 /* ValidateAccountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A561823C2E800E55DF9 /* ValidateAccountRequest.m */; };
 		CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A591823C50700E55DF9 /* ValidateAccountResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -124,12 +148,20 @@
 		CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6DC94817EC60D1006F48C4 /* MobileCommandResponse.m */; };
 		CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7EA7DC18978910005DCBA3 /* Base64.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7EA7DD18978910005DCBA3 /* Base64.m */; };
+		CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7F218219CC012C008AD4FB /* AlmondAffiliationData.h */; };
+		CE7F218519CC012C008AD4FB /* AlmondAffiliationData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7F218319CC012C008AD4FB /* AlmondAffiliationData.m */; };
+		CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7F218619CC0165008AD4FB /* AlmondAffiliationDataResponse.h */; };
+		CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7F218719CC0165008AD4FB /* AlmondAffiliationDataResponse.m */; };
 		CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91315019C6B83B00D94876 /* UserProfileRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91315119C6B83B00D94876 /* UserProfileRequest.m */; };
 		CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91315419C6B94500D94876 /* UserProfileResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; };
 		CE91315819C6C02100D94876 /* UserProfileRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = CE91315019C6B83B00D94876 /* UserProfileRequest.h */; };
 		CE91315919C6C02600D94876 /* UserProfileResponse.h in Sources */ = {isa = PBXBuildFile; fileRef = CE91315419C6B94500D94876 /* UserProfileResponse.h */; };
+		CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91316B19C9A2DD00D94876 /* ChangePasswordRequest.h */; };
+		CE91316E19C9A2DD00D94876 /* ChangePasswordRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91316C19C9A2DD00D94876 /* ChangePasswordRequest.m */; };
+		CE91317119C9A2F900D94876 /* ChangePasswordResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91316F19C9A2F900D94876 /* ChangePasswordResponse.h */; };
+		CE91317219C9A2F900D94876 /* ChangePasswordResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91317019C9A2F900D94876 /* ChangePasswordResponse.m */; };
 		CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */; };
 		CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185F6178D453A00EE23ED /* CoreFoundation.framework */; };
@@ -139,6 +171,14 @@
 		CE9A2917188D30270063D562 /* SensorChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9A2915188D30270063D562 /* SensorChangeResponse.m */; };
 		CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9C5B48188669B6006F2306 /* SensorForcedUpdateRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */; };
+		CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAD85A319CAB7D8006D1048 /* DeleteAccountRequest.h */; };
+		CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAD85A419CAB7D8006D1048 /* DeleteAccountRequest.m */; };
+		CEAD85A919CABCBE006D1048 /* DeleteAccountResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAD85A719CABCBE006D1048 /* DeleteAccountResponse.h */; };
+		CEAD85AA19CABCBE006D1048 /* DeleteAccountResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAD85A819CABCBE006D1048 /* DeleteAccountResponse.m */; };
+		CEAD85AD19CACE43006D1048 /* UpdateUserProfileRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAD85AB19CACE42006D1048 /* UpdateUserProfileRequest.h */; };
+		CEAD85AE19CACE43006D1048 /* UpdateUserProfileRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAD85AC19CACE42006D1048 /* UpdateUserProfileRequest.m */; };
+		CEAD85B119CAEED1006D1048 /* UpdateUserProfileResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAD85AF19CAEED1006D1048 /* UpdateUserProfileResponse.h */; };
+		CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAD85B019CAEED1006D1048 /* UpdateUserProfileResponse.m */; };
 		CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE19EE8181F9D9500F91AAD /* GenericCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EE9181F9D9500F91AAD /* GenericCommandRequest.m */; };
 		CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE19EF2181FB01300F91AAD /* GenericCommandResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -251,6 +291,30 @@
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
 		CE15FFAE186844AA00371183 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		CE15FFB418684D7500371183 /* certificate.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = certificate.cer; sourceTree = "<group>"; };
+		CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnlinkAlmondRequest.h; sourceTree = "<group>"; };
+		CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnlinkAlmondRequest.m; sourceTree = "<group>"; };
+		CE2EA24B19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnlinkAlmondResponse.h; sourceTree = "<group>"; };
+		CE2EA24C19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnlinkAlmondResponse.m; sourceTree = "<group>"; };
+		CE2EA24F19D00B3E00C6D6A8 /* UserInviteRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserInviteRequest.h; sourceTree = "<group>"; };
+		CE2EA25019D00B3E00C6D6A8 /* UserInviteRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserInviteRequest.m; sourceTree = "<group>"; };
+		CE2EA25319D00B5200C6D6A8 /* UserInviteResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserInviteResponse.h; sourceTree = "<group>"; };
+		CE2EA25419D00B5200C6D6A8 /* UserInviteResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserInviteResponse.m; sourceTree = "<group>"; };
+		CE2EA25719D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteSecondaryUserRequest.h; sourceTree = "<group>"; };
+		CE2EA25819D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteSecondaryUserRequest.m; sourceTree = "<group>"; };
+		CE2EA25B19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteSecondaryUserResponse.h; sourceTree = "<group>"; };
+		CE2EA25C19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteSecondaryUserResponse.m; sourceTree = "<group>"; };
+		CE2EA25F19D04BDD00C6D6A8 /* AlmondNameChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondNameChange.h; sourceTree = "<group>"; };
+		CE2EA26019D04BDD00C6D6A8 /* AlmondNameChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondNameChange.m; sourceTree = "<group>"; };
+		CE2EA26319D04BEA00C6D6A8 /* AlmondNameChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondNameChangeResponse.h; sourceTree = "<group>"; };
+		CE2EA26419D04BEA00C6D6A8 /* AlmondNameChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondNameChangeResponse.m; sourceTree = "<group>"; };
+		CE2EA26719D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeAsSecondaryUserRequest.h; sourceTree = "<group>"; };
+		CE2EA26819D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MeAsSecondaryUserRequest.m; sourceTree = "<group>"; };
+		CE2EA26B19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeAsSecondaryUserResponse.h; sourceTree = "<group>"; };
+		CE2EA26C19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MeAsSecondaryUserResponse.m; sourceTree = "<group>"; };
+		CE2EA26F19D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMeAsSecondaryUserRequest.h; sourceTree = "<group>"; };
+		CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserRequest.m; sourceTree = "<group>"; };
+		CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMeAsSecondaryUserResponse.h; sourceTree = "<group>"; };
+		CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserResponse.m; sourceTree = "<group>"; };
 		CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValidateAccountRequest.h; sourceTree = "<group>"; };
 		CE466A561823C2E800E55DF9 /* ValidateAccountRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ValidateAccountRequest.m; sourceTree = "<group>"; };
 		CE466A591823C50700E55DF9 /* ValidateAccountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValidateAccountResponse.h; sourceTree = "<group>"; };
@@ -294,10 +358,18 @@
 		CE6DC94817EC60D1006F48C4 /* MobileCommandResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MobileCommandResponse.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE7EA7DC18978910005DCBA3 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
 		CE7EA7DD18978910005DCBA3 /* Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Base64.m; sourceTree = "<group>"; };
+		CE7F218219CC012C008AD4FB /* AlmondAffiliationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondAffiliationData.h; sourceTree = "<group>"; };
+		CE7F218319CC012C008AD4FB /* AlmondAffiliationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondAffiliationData.m; sourceTree = "<group>"; };
+		CE7F218619CC0165008AD4FB /* AlmondAffiliationDataResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondAffiliationDataResponse.h; sourceTree = "<group>"; };
+		CE7F218719CC0165008AD4FB /* AlmondAffiliationDataResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondAffiliationDataResponse.m; sourceTree = "<group>"; };
 		CE91315019C6B83B00D94876 /* UserProfileRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileRequest.h; sourceTree = "<group>"; };
 		CE91315119C6B83B00D94876 /* UserProfileRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileRequest.m; sourceTree = "<group>"; };
 		CE91315419C6B94500D94876 /* UserProfileResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfileResponse.h; sourceTree = "<group>"; };
 		CE91315519C6B94500D94876 /* UserProfileResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileResponse.m; sourceTree = "<group>"; };
+		CE91316B19C9A2DD00D94876 /* ChangePasswordRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangePasswordRequest.h; sourceTree = "<group>"; };
+		CE91316C19C9A2DD00D94876 /* ChangePasswordRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangePasswordRequest.m; sourceTree = "<group>"; };
+		CE91316F19C9A2F900D94876 /* ChangePasswordResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangePasswordResponse.h; sourceTree = "<group>"; };
+		CE91317019C9A2F900D94876 /* ChangePasswordResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangePasswordResponse.m; sourceTree = "<group>"; };
 		CE98307518C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicAlmondNameChangeResponse.h; sourceTree = "<group>"; };
 		CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicAlmondNameChangeResponse.m; sourceTree = "<group>"; };
 		CE9A2910188D2B240063D562 /* SensorChangeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorChangeRequest.h; sourceTree = "<group>"; };
@@ -306,6 +378,14 @@
 		CE9A2915188D30270063D562 /* SensorChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorChangeResponse.m; sourceTree = "<group>"; };
 		CE9C5B48188669B6006F2306 /* SensorForcedUpdateRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorForcedUpdateRequest.h; sourceTree = "<group>"; };
 		CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorForcedUpdateRequest.m; sourceTree = "<group>"; };
+		CEAD85A319CAB7D8006D1048 /* DeleteAccountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteAccountRequest.h; sourceTree = "<group>"; };
+		CEAD85A419CAB7D8006D1048 /* DeleteAccountRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteAccountRequest.m; sourceTree = "<group>"; };
+		CEAD85A719CABCBE006D1048 /* DeleteAccountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteAccountResponse.h; sourceTree = "<group>"; };
+		CEAD85A819CABCBE006D1048 /* DeleteAccountResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteAccountResponse.m; sourceTree = "<group>"; };
+		CEAD85AB19CACE42006D1048 /* UpdateUserProfileRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpdateUserProfileRequest.h; sourceTree = "<group>"; };
+		CEAD85AC19CACE42006D1048 /* UpdateUserProfileRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateUserProfileRequest.m; sourceTree = "<group>"; };
+		CEAD85AF19CAEED1006D1048 /* UpdateUserProfileResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpdateUserProfileResponse.h; sourceTree = "<group>"; };
+		CEAD85B019CAEED1006D1048 /* UpdateUserProfileResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateUserProfileResponse.m; sourceTree = "<group>"; };
 		CEE19EE8181F9D9500F91AAD /* GenericCommandRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericCommandRequest.h; sourceTree = "<group>"; };
 		CEE19EE9181F9D9500F91AAD /* GenericCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericCommandRequest.m; sourceTree = "<group>"; };
 		CEE19EF2181FB01300F91AAD /* GenericCommandResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericCommandResponse.h; sourceTree = "<group>"; };
@@ -552,6 +632,26 @@
 				1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */,
 				CE91315019C6B83B00D94876 /* UserProfileRequest.h */,
 				CE91315419C6B94500D94876 /* UserProfileResponse.h */,
+				CE91316B19C9A2DD00D94876 /* ChangePasswordRequest.h */,
+				CE91316F19C9A2F900D94876 /* ChangePasswordResponse.h */,
+				CEAD85A319CAB7D8006D1048 /* DeleteAccountRequest.h */,
+				CEAD85A719CABCBE006D1048 /* DeleteAccountResponse.h */,
+				CEAD85AB19CACE42006D1048 /* UpdateUserProfileRequest.h */,
+				CEAD85AF19CAEED1006D1048 /* UpdateUserProfileResponse.h */,
+				CE7F218219CC012C008AD4FB /* AlmondAffiliationData.h */,
+				CE7F218619CC0165008AD4FB /* AlmondAffiliationDataResponse.h */,
+				CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */,
+				CE2EA24B19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h */,
+				CE2EA24F19D00B3E00C6D6A8 /* UserInviteRequest.h */,
+				CE2EA25319D00B5200C6D6A8 /* UserInviteResponse.h */,
+				CE2EA25719D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h */,
+				CE2EA25B19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h */,
+				CE2EA25F19D04BDD00C6D6A8 /* AlmondNameChange.h */,
+				CE2EA26319D04BEA00C6D6A8 /* AlmondNameChangeResponse.h */,
+				CE2EA26719D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h */,
+				CE2EA26B19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h */,
+				CE2EA26F19D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h */,
+				CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */,
 			);
 			name = public;
 			sourceTree = "<group>";
@@ -559,7 +659,27 @@
 		22A76D2517912B830099CD8F /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				CE7F218319CC012C008AD4FB /* AlmondAffiliationData.m */,
+				CE7F218719CC0165008AD4FB /* AlmondAffiliationDataResponse.m */,
+				CE91316C19C9A2DD00D94876 /* ChangePasswordRequest.m */,
+				CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */,
+				CE2EA24C19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m */,
+				CE2EA25019D00B3E00C6D6A8 /* UserInviteRequest.m */,
+				CE2EA25419D00B5200C6D6A8 /* UserInviteResponse.m */,
+				CE2EA26819D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m */,
+				CE2EA26C19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m */,
+				CE2EA25819D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m */,
+				CE2EA25C19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m */,
+				CEAD85A419CAB7D8006D1048 /* DeleteAccountRequest.m */,
+				CE2EA26019D04BDD00C6D6A8 /* AlmondNameChange.m */,
+				CE2EA26419D04BEA00C6D6A8 /* AlmondNameChangeResponse.m */,
+				CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */,
+				CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */,
+				CEAD85B019CAEED1006D1048 /* UpdateUserProfileResponse.m */,
+				CEAD85A819CABCBE006D1048 /* DeleteAccountResponse.m */,
+				CE91317019C9A2F900D94876 /* ChangePasswordResponse.m */,
 				CE91315119C6B83B00D94876 /* UserProfileRequest.m */,
+				CEAD85AC19CACE42006D1048 /* UpdateUserProfileRequest.m */,
 				CE91315519C6B94500D94876 /* UserProfileResponse.m */,
 				CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */,
 				CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */,
@@ -643,23 +763,31 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEAD85A919CABCBE006D1048 /* DeleteAccountResponse.h in Headers */,
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
 				22A76D3817912EAC0099CD8F /* LoginResponse.h in Headers */,
 				CE5EB65617EAD44E00985636 /* SFIDeviceValue.h in Headers */,
 				22A76D3C17912F980099CD8F /* SignupResponse.h in Headers */,
 				CE6DC94517EC60C2006F48C4 /* MobileCommandRequest.h in Headers */,
 				22A76D491791347D0099CD8F /* AffiliationUserComplete.h in Headers */,
+				CE2EA24D19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h in Headers */,
 				2204C20E1794349400B05F17 /* GenericCommand.h in Headers */,
 				22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */,
 				22011C9E179543E80019D5A4 /* Login.h in Headers */,
 				CE5EB63417E82CB400985636 /* DeviceListRequest.h in Headers */,
 				CE5EB64917E86D2200985636 /* DeviceListResponse.h in Headers */,
 				CE539F8E17FAD40B00640820 /* SNLog.h in Headers */,
+				CE2EA25119D00B3E00C6D6A8 /* UserInviteRequest.h in Headers */,
+				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
+				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
 				CE5EB64E17EAD41F00985636 /* DeviceValueRequest.h in Headers */,
 				CE5EB63917E852E500985636 /* SFIDevice.h in Headers */,
+				CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */,
+				CEAD85AD19CACE43006D1048 /* UpdateUserProfileRequest.h in Headers */,
 				22A76D4017912FF10099CD8F /* LogoutAllResponse.h in Headers */,
 				CE5EB5B917E703AB00985636 /* LogoutAllRequest.h in Headers */,
 				22B326CF1796D447004B3642 /* SanityResponse.h in Headers */,
+				CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */,
 				22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */,
 				22A76D4D179136B80099CD8F /* CommandParser.h in Headers */,
 				CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */,
@@ -671,31 +799,43 @@
 				CE6DC94917EC60D1006F48C4 /* MobileCommandResponse.h in Headers */,
 				CE5EB5CA17E722BD00985636 /* AlmondListResponse.h in Headers */,
 				CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */,
+				CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */,
+				CE2EA27119D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h in Headers */,
 				CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */,
 				22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */,
 				CE5EB63D17E8548500985636 /* DeviceDataHashRequest.h in Headers */,
 				CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */,
 				CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */,
+				CE2EA26119D04BDD00C6D6A8 /* AlmondNameChange.h in Headers */,
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
+				CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */,
 				CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */,
 				CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */,
+				CEAD85B119CAEED1006D1048 /* UpdateUserProfileResponse.h in Headers */,
 				CE5EB65217EAD43000985636 /* DeviceValueResponse.h in Headers */,
 				CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
+				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				22FAE88817A8E528002FFEE8 /* Signup.h in Headers */,
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
+				CE2EA25919D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h in Headers */,
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
 				CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */,
+				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
+				CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */,
 				1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
+				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
 				1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */,
 				1DF0303A77013C449B86C26B /* SUnit.h in Headers */,
 				1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */,
+				CE2EA26D19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h in Headers */,
+				CE91317119C9A2F900D94876 /* ChangePasswordResponse.h in Headers */,
 				1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -741,7 +881,7 @@
 			name = SecurifiToolkitTests;
 			productName = SecurifiToolkitTests;
 			productReference = 221185CB178D371200EE23ED /* SecurifiToolkitTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		221185F4178D453A00EE23ED /* SecurifiCloudResources */ = {
 			isa = PBXNativeTarget;
@@ -766,6 +906,7 @@
 		221185B2178D371100EE23ED /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0600;
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Nirav Uchat";
 			};
@@ -885,6 +1026,7 @@
 			files = (
 				CE91315919C6C02600D94876 /* UserProfileResponse.h in Sources */,
 				CE91315819C6C02100D94876 /* UserProfileRequest.h in Sources */,
+				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
 				CE5EB5BB17E703BA00985636 /* LogoutAllRequest.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
 				CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */,
@@ -898,7 +1040,9 @@
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
 				22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */,
 				CE539F8F17FAD40B00640820 /* SNLog.m in Sources */,
+				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				22A76D461791339B0099CD8F /* LogoutResponse.m in Sources */,
+				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
 				CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */,
@@ -906,7 +1050,9 @@
 				CE5EB5CB17E722BD00985636 /* AlmondListResponse.m in Sources */,
 				22A76D4A1791347D0099CD8F /* AffiliationUserComplete.m in Sources */,
 				CE5EB63A17E852E500985636 /* SFIDevice.m in Sources */,
+				CE91317219C9A2F900D94876 /* ChangePasswordResponse.m in Sources */,
 				1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */,
+				CE7F218519CC012C008AD4FB /* AlmondAffiliationData.m in Sources */,
 				22A76D4E179136B80099CD8F /* CommandParser.m in Sources */,
 				CE5EB5C717E7204000985636 /* AlmondListRequest.m in Sources */,
 				CE466A581823C2E800E55DF9 /* ValidateAccountRequest.m in Sources */,
@@ -915,13 +1061,23 @@
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
 				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
 				22011C9F179543E80019D5A4 /* Login.m in Sources */,
+				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
+				CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */,
+				CE2EA25219D00B3E00C6D6A8 /* UserInviteRequest.m in Sources */,
+				CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */,
+				CEAD85AA19CABCBE006D1048 /* DeleteAccountResponse.m in Sources */,
 				CE9A2913188D2B240063D562 /* SensorChangeRequest.m in Sources */,
 				22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */,
+				CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
 				CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */,
 				CE5EB64A17E86D2200985636 /* DeviceListResponse.m in Sources */,
+				CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */,
+				CE91316E19C9A2DD00D94876 /* ChangePasswordRequest.m in Sources */,
 				22B326D01796D447004B3642 /* SanityResponse.m in Sources */,
+				CE2EA25E19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m in Sources */,
+				CE2EA26619D04BEA00C6D6A8 /* AlmondNameChangeResponse.m in Sources */,
 				2253388617A6B7380051BF0F /* AffiliationUserRequest.m in Sources */,
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
@@ -930,9 +1086,14 @@
 				1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */,
 				CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */,
 				CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */,
+				CEAD85AE19CACE43006D1048 /* UpdateUserProfileRequest.m in Sources */,
+				CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */,
 				22FAE88917A8E528002FFEE8 /* Signup.m in Sources */,
 				CE5EB64F17EAD41F00985636 /* DeviceValueRequest.m in Sources */,
+				CE2EA26A19D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m in Sources */,
 				22FE9B8017AA331300B53869 /* Logout.m in Sources */,
+				CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */,
+				CE2EA25A19D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
 				1DF0352850B972F9D28F2BD0 /* SUnit.m in Sources */,
 				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
