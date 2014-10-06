@@ -51,6 +51,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_METERING_DEVICETYPE,
     SFIDevicePropertyType_OCCUPANCY,
     SFIDevicePropertyType_PANIC_ALARM,
+    SFIDevicePropertyType_POWER,
     SFIDevicePropertyType_RMS_CURRENT,
     SFIDevicePropertyType_RMS_VOLTAGE,
     SFIDevicePropertyType_SENSOR_BINARY,

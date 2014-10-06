@@ -56,6 +56,7 @@
                 @"METERING_DEVICETYPE" : @(SFIDevicePropertyType_METERING_DEVICETYPE),
                 @"OCCUPANCY" : @(SFIDevicePropertyType_OCCUPANCY),
                 @"PANIC_ALARM" : @(SFIDevicePropertyType_PANIC_ALARM),
+                @"POWER" : @(SFIDevicePropertyType_POWER),
                 @"RMS_CURRENT" : @(SFIDevicePropertyType_RMS_CURRENT),
                 @"RMS_VOLTAGE" : @(SFIDevicePropertyType_RMS_VOLTAGE),
                 @"SENSOR BINARY" : @(SFIDevicePropertyType_SENSOR_BINARY),
