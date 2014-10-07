@@ -68,7 +68,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_THERMOSTAT_OPERATING_STATE,
     SFIDevicePropertyType_THERMOSTAT_SETPOINT_COOLING,
     SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING,
-    SFIDevicePropertyType_TOLERANCE
+    SFIDevicePropertyType_TOLERANCE,
+    SFIDevicePropertyType_USER_CODE,
 };
 
 @interface SFIDeviceKnownValues : NSObject <NSCoding, NSCopying>
@@ -82,6 +83,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
 
 // Converts the standard Device Property Name string into a type ID
 + (SFIDevicePropertyType)nameToPropertyType:(NSString *)valueName;
+
++ (NSString*)propertyTypeToName:(SFIDevicePropertyType)propertyType;
 
 // true when a non-nil and non-empty value is present
 - (BOOL)hasValue;
