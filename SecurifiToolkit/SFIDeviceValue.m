@@ -56,6 +56,15 @@
     return copy;
 }
 
+- (SFIDeviceKnownValues *)knownValuesForPropertyName:(NSString *)name {
+    for (SFIDeviceKnownValues *values in _knownValues) {
+        if ([values.valueName isEqualToString:name]) {
+            return values;
+        }
+    }
+    return nil;
+}
+
 - (NSArray *)knownDevicesValues {
     if (_knownValues == nil) {
         return [NSArray array];

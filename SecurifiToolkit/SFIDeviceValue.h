@@ -25,6 +25,8 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
+- (SFIDeviceKnownValues*)knownValuesForPropertyName:(NSString*)name;
+
 // returns a copy of the known values for the specified property, or nil if none found.
 // changes to SFIDeviceKnownValues are not reflected in the instances retained by this container.
 // call replaceKnownDeviceValues: to update this container's collection
