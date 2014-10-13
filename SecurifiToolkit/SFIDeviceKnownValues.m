@@ -10,7 +10,7 @@
 
 @implementation SFIDeviceKnownValues
 
-+ (SFIDevicePropertyType) nameToPropertyType:(NSString*)valueName {
++ (NSDictionary *)nameToTypeDictionary {
     static NSDictionary *lookupTable;
 
     if (lookupTable == nil) {
@@ -56,6 +56,7 @@
                 @"METERING_DEVICETYPE" : @(SFIDevicePropertyType_METERING_DEVICETYPE),
                 @"OCCUPANCY" : @(SFIDevicePropertyType_OCCUPANCY),
                 @"PANIC_ALARM" : @(SFIDevicePropertyType_PANIC_ALARM),
+                @"POWER" : @(SFIDevicePropertyType_POWER),
                 @"RMS_CURRENT" : @(SFIDevicePropertyType_RMS_CURRENT),
                 @"RMS_VOLTAGE" : @(SFIDevicePropertyType_RMS_VOLTAGE),
                 @"SENSOR BINARY" : @(SFIDevicePropertyType_SENSOR_BINARY),
@@ -72,15 +73,40 @@
                 @"THERMOSTAT OPERATING STATE" : @(SFIDevicePropertyType_THERMOSTAT_OPERATING_STATE),
                 @"THERMOSTAT SETPOINT COOLING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_COOLING),
                 @"THERMOSTAT SETPOINT HEATING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING),
-                @"TOLERANCE" : @(SFIDevicePropertyType_TOLERANCE)
+                @"TOLERANCE" : @(SFIDevicePropertyType_TOLERANCE),
+                @"USER_CODE" : @(SFIDevicePropertyType_USER_CODE),
         };
     }
+    return lookupTable;
+}
+
++ (SFIDevicePropertyType) nameToPropertyType:(NSString*)valueName {
+    NSDictionary *lookupTable = [self nameToTypeDictionary];
 
     NSNumber *o = lookupTable[valueName];
     if (!o) {
         return SFIDevicePropertyType_UNKNOWN;
     }
     return (SFIDevicePropertyType) [o intValue];
+}
+
++ (NSString *)propertyTypeToName:(SFIDevicePropertyType)propertyType {
+    static NSDictionary *lookupTable;
+
+    if (lookupTable == nil) {
+        NSDictionary *namesToType = [self nameToTypeDictionary];
+        NSMutableDictionary *typeToName = [NSMutableDictionary dictionary];
+
+        for (NSString *key in namesToType.allKeys) {
+            NSNumber *value = namesToType[key];
+            typeToName[value] = key;
+        }
+
+        lookupTable = [NSDictionary dictionaryWithDictionary:typeToName];
+    }
+
+    NSNumber *key = @(propertyType);
+    return lookupTable[key];
 }
 
 - (id)initWithCoder:(NSCoder *)coder {

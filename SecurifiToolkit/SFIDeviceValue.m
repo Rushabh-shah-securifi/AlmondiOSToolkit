@@ -56,6 +56,15 @@
     return copy;
 }
 
+- (SFIDeviceKnownValues *)knownValuesForPropertyName:(NSString *)name {
+    for (SFIDeviceKnownValues *values in _knownValues) {
+        if ([values.valueName isEqualToString:name]) {
+            return [values copy];
+        }
+    }
+    return nil;
+}
+
 - (NSArray *)knownDevicesValues {
     if (_knownValues == nil) {
         return [NSArray array];
@@ -111,6 +120,7 @@
     return o;
 }
 
+// builds the SFIDevicePropertyType to values look up table
 - (NSDictionary*)buildLookupTable:(NSArray*)knownValues {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
@@ -119,7 +129,7 @@
         dict[key] = values;
     }
     
-    return dict;
+    return [NSDictionary dictionaryWithDictionary:dict];
 }
 
 @end
