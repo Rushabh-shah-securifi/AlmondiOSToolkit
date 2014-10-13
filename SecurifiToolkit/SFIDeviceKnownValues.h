@@ -93,6 +93,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
 
 - (int)intValue;
 
+- (unsigned int)hexToIntValue;
+
 - (float)floatValue;
 
 - (void)setIntValue:(int)value;

@@ -157,6 +157,14 @@
     return [self.value intValue];
 }
 
+- (unsigned int)hexToIntValue {
+    NSScanner *scanner = [NSScanner scannerWithString:self.value];
+
+    unsigned int aInt = 0;
+    [scanner scanHexInt:&aInt];
+    return aInt;
+}
+
 - (float)floatValue {
     return [self.value floatValue];
 }
