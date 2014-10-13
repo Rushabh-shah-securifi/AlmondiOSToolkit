@@ -25,6 +25,13 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
+// returns a copy of the known values for the specified property name, or nil if none found.
+// the property name is the string representation of SFIDevicePropertyType, as used on the wire with the cloud.
+// this method provides a way to access indexed or synthesized properties for which there is no, or cannot be,
+// a single SFIDevicePropertyType representation. For example, door lock pin codes are assigned to
+// any number of named properties derived from SFIDevicePropertyType_USER_CODE.
+// changes to SFIDeviceKnownValues are not reflected in the instances retained by this container.
+// call replaceKnownDeviceValues: to update this container's collection
 - (SFIDeviceKnownValues*)knownValuesForPropertyName:(NSString*)name;
 
 // returns a copy of the known values for the specified property, or nil if none found.
