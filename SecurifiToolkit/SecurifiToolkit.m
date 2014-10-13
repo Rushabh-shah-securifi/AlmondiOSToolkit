@@ -67,7 +67,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         [self setupReachability:CLOUD_DEV_SERVER];
 
         // default; do not change
-        self.useProductionCloud = NO;
+        self.useProductionCloud = YES;
 
         _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
         _socketDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
