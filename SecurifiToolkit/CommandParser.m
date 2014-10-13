@@ -1558,12 +1558,12 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_isActivated, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_LOGIN_RESPONSE))
         {
-            [parser.command setIsActivated:[parser currentString]];
+            [parser.command setIsAccountActivated:[parser currentString]];
         }
         else if (!strncmp((const char *)localname, kName_minsRemaining, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_LOGIN_RESPONSE))
         {
-            [parser.command setMinsRemaining:[parser currentString]];
+            [parser.command setMinsRemainingForUnactivatedAccount:[parser currentString]];
         }
         
         else if (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag)) {

@@ -131,8 +131,8 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 - (BOOL)isLoggedIn;
 
--(BOOL) isActivated;
--(int)minsRemaining;
+-(BOOL) isAccountActivated;
+-(int) minsRemainingForUnactivatedAccount;
 
 - (BOOL)hasLoginCredentials;
 

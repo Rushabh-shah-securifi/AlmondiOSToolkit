@@ -18,8 +18,8 @@
 #define SEC_EMAIL                                           @"com.securifi.email"
 #define SEC_PWD                                             @"com.securifi.pwd"
 #define SEC_USER_ID                                         @"com.securifi.userid"
-#define SEC_IS_ACITVATED                                    @"com.securifi.isActivated"
-#define SEC_MINS_REMAINING                                  @"com.securifi.minsRemaining"
+#define SEC_IS_ACCOUNT_ACITVATED                            @"com.securifi.isActivated"
+#define SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT          @"com.securifi.minsRemaining"
 
 NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
 NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
@@ -67,7 +67,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         [self setupReachability:CLOUD_DEV_SERVER];
 
         // default; do not change
-        self.useProductionCloud = YES;
+        self.useProductionCloud = NO;
 
         _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
         _socketDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
@@ -172,12 +172,12 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     return singleton && singleton.isLoggedIn;
 }
 
-- (BOOL)isActivated {
-    return [[self secIsActivated] boolValue];
+- (BOOL)isAccountActivated {
+    return [[self secIsAccountActivated] boolValue];
 }
 
-- (int)minsRemaining {
-    return [[self secMinsRemaining] intValue];
+- (int)minsRemainingForUnactivatedAccount {
+    return [[self secMinsRemainingForUnactivatedAccount] intValue];
 }
 
 - (SDKCloudStatus)getConnectionState {
@@ -480,13 +480,13 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     NSString *userId = obj.userID;
     
     //PY: 101014 - Not activated accounts can be accessed for 7 days
-    NSString * isActivated = obj.isActivated;
-    NSString * minsRemaining = obj.minsRemaining;
+    NSString * isAccountActivated = obj.isAccountActivated;
+    NSString * minsRemainingForUnactivatedAccount = obj.minsRemainingForUnactivatedAccount;
 
     [self setSecPassword:tempPass];
     [self setSecUserId:userId];
-    [self setSecActivationStatus:isActivated];
-    [self setSecMinsRemaining:minsRemaining];
+    [self setSecAccountActivationStatus:isAccountActivated];
+    [self setSecMinsRemainingForUnactivatedAccount:minsRemainingForUnactivatedAccount];
 }
 
 - (void)tearDownLoginSession {
@@ -889,20 +889,20 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 //PY: 101014 - Not activated accounts can be accessed for 7 days
-- (NSString *)secIsActivated {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_IS_ACITVATED forService:SEC_SERVICE_NAME];
+- (NSString *)secIsAccountActivated {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_IS_ACCOUNT_ACITVATED forService:SEC_SERVICE_NAME];
 }
 
--(void)setSecActivationStatus:(NSString *)isActivated{
-     [KeyChainWrapper createEntryForUser:SEC_IS_ACITVATED entryValue:isActivated forService:SEC_SERVICE_NAME];
+-(void)setSecAccountActivationStatus:(NSString *)isActivated{
+     [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACITVATED entryValue:isActivated forService:SEC_SERVICE_NAME];
 }
 
-- (NSString *)secMinsRemaining {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_MINS_REMAINING forService:SEC_SERVICE_NAME];
+- (NSString *)secMinsRemainingForUnactivatedAccount {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT forService:SEC_SERVICE_NAME];
 }
 
--(void)setSecMinsRemaining:(NSString *)minsRemaining{
-     [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING entryValue:minsRemaining forService:SEC_SERVICE_NAME];
+-(void)setSecMinsRemainingForUnactivatedAccount:(NSString *)minsRemaining{
+     [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:minsRemaining forService:SEC_SERVICE_NAME];
 }
 
 #pragma mark - SingleTon management
