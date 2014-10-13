@@ -18,6 +18,8 @@
 #define SEC_EMAIL                                           @"com.securifi.email"
 #define SEC_PWD                                             @"com.securifi.pwd"
 #define SEC_USER_ID                                         @"com.securifi.userid"
+#define SEC_IS_ACITVATED                                    @"com.securifi.isActivated"
+#define SEC_MINS_REMAINING                                  @"com.securifi.minsRemaining"
 
 NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
 NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
@@ -79,6 +81,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         [center addObserver:self selector:@selector(onLoginResponse:) name:LOGIN_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutResponse:) name:LOGOUT_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onLogoutAllResponse:) name:LOGOUT_ALL_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onDeleteAccountResponse:) name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
 
         [center addObserver:self selector:@selector(onDynamicAlmondListAdd:) name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDynamicAlmondListDelete:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
@@ -118,6 +121,8 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
     [center removeObserver:self name:ALMOND_LIST_NOTIFIER object:nil];
     [center removeObserver:self name:DEVICEDATA_HASH_NOTIFIER object:nil];
+    
+    [center removeObserver:self name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
 }
 
 #pragma mark - SDK state
@@ -165,6 +170,14 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 - (BOOL)isLoggedIn {
     SingleTon *singleton = self.networkSingleton;
     return singleton && singleton.isLoggedIn;
+}
+
+- (BOOL)isActivated {
+    return [[self secIsActivated] boolValue];
+}
+
+- (int)minsRemaining {
+    return [[self secMinsRemaining] intValue];
 }
 
 - (SDKCloudStatus)getConnectionState {
@@ -465,9 +478,15 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 - (void)storeLoginCredentials:(LoginResponse *)obj {
     NSString *tempPass = obj.tempPass;
     NSString *userId = obj.userID;
+    
+    //PY: 101014 - Not activated accounts can be accessed for 7 days
+    NSString * isActivated = obj.isActivated;
+    NSString * minsRemaining = obj.minsRemaining;
 
     [self setSecPassword:tempPass];
     [self setSecUserId:userId];
+    [self setSecActivationStatus:isActivated];
+    [self setSecMinsRemaining:minsRemaining];
 }
 
 - (void)tearDownLoginSession {
@@ -518,6 +537,18 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         [self postNotification:kSFIDidLogoutAllNotification data:nil];
     }
 }
+
+- (void)onDeleteAccountResponse:(NSNotification *)notification {
+    NSDictionary *info = notification.userInfo;
+    DeleteAccountResponse *res = info[@"data"];
+    if (res.isSuccessful) {
+        DLog(@"SDK received success on Delete Account");
+        [self tearDownLoginSession];
+        [self tearDownNetworkSingleton];
+        [self postNotification:kSFIDidLogoutAllNotification data:nil];
+    }
+}
+
 
 #pragma mark - Almond Management
 
@@ -855,6 +886,23 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
 - (void)setSecUserId:(NSString *)userId {
     [KeyChainWrapper createEntryForUser:SEC_USER_ID entryValue:userId forService:SEC_SERVICE_NAME];
+}
+
+//PY: 101014 - Not activated accounts can be accessed for 7 days
+- (NSString *)secIsActivated {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_IS_ACITVATED forService:SEC_SERVICE_NAME];
+}
+
+-(void)setSecActivationStatus:(NSString *)isActivated{
+     [KeyChainWrapper createEntryForUser:SEC_IS_ACITVATED entryValue:isActivated forService:SEC_SERVICE_NAME];
+}
+
+- (NSString *)secMinsRemaining {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_MINS_REMAINING forService:SEC_SERVICE_NAME];
+}
+
+-(void)setSecMinsRemaining:(NSString *)minsRemaining{
+     [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING entryValue:minsRemaining forService:SEC_SERVICE_NAME];
 }
 
 #pragma mark - SingleTon management

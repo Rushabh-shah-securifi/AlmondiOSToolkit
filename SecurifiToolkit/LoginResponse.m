@@ -9,5 +9,6 @@
 #import "LoginResponse.h"
 
 @implementation LoginResponse
-
+@synthesize isActivated, minsRemaining;
+@synthesize isSuccessful, reason, reasonCode;
 @end

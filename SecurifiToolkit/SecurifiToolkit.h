@@ -131,6 +131,9 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 - (BOOL)isLoggedIn;
 
+-(BOOL) isActivated;
+-(int)minsRemaining;
+
 - (BOOL)hasLoginCredentials;
 
 - (void)asyncSendLoginWithEmail:(NSString*)email password:(NSString*)password;

@@ -162,6 +162,9 @@ static const char *kName_OwnerEmailID =                     "OwnerEmailID";
 static const char *kName_AName =                            "AlmondName";
 static const char *kName_DeleteMeAsSecondaryUserResponse =  "DeleteMeAsSecondaryUserResponse";
 
+static const char *kName_isActivated    = "IsActivated";
+static const char *kName_minsRemaining  = "MinutesRemaining";
+
 static const NSUInteger kLength_MaxTag  =                   35;
 //static const NSUInteger kLength_LoginResponse =             14;
 //static const NSUInteger kLength_UserID =                    7;
@@ -1447,6 +1450,8 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
                                                           || (!strncmp((const char *)localname, kName_EmailID,kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_OwnerEmailID,kLength_MaxTag))
                                                            || (!strncmp((const char *)localname, kName_AName,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_isActivated,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_minsRemaining,kLength_MaxTag))
                                                           )  ))
     {
         //// NSLog(@"Storing Character for : %s",localname);
@@ -1549,6 +1554,18 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         {
             [parser.command setReasonCode:[[parser currentString] intValue]];
         }
+        //PY: 101014 - Not activated accounts can be accessed for 7 days
+        else if (!strncmp((const char *)localname, kName_isActivated, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_LOGIN_RESPONSE))
+        {
+            [parser.command setIsActivated:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_minsRemaining, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_LOGIN_RESPONSE))
+        {
+            [parser.command setMinsRemaining:[parser currentString]];
+        }
+        
         else if (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag)) {
             //[parser finishedCurrentSong];
             // [SNLog Log:@"Method Name: %s Command Parsing done", __PRETTY_FUNCTION__];
