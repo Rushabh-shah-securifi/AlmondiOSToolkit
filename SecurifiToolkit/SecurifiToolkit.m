@@ -11,6 +11,8 @@
 #import "LoginTempPass.h"
 #import "KeyChainWrapper.h"
 
+
+
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
 #define kPREF_USER_DEFAULT_LOGGED_IN_ONCE                   @"kLoggedInOnce"
 
@@ -479,12 +481,18 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     NSString *tempPass = obj.tempPass;
     NSString *userId = obj.userID;
     
+    [self setSecPassword:tempPass];
+    [self setSecUserId:userId];
+    
+    //PY: 101014 - Not activated accounts can be accessed for 7 days
+    [self storeAccountActivationCredentials:obj];
+  
+}
+
+-(void)storeAccountActivationCredentials:(LoginResponse *)obj{
     //PY: 101014 - Not activated accounts can be accessed for 7 days
     NSString * isAccountActivated = obj.isAccountActivated;
     NSString * minsRemainingForUnactivatedAccount = obj.minsRemainingForUnactivatedAccount;
-
-    [self setSecPassword:tempPass];
-    [self setSecUserId:userId];
     [self setSecAccountActivationStatus:isAccountActivated];
     [self setSecMinsRemainingForUnactivatedAccount:minsRemainingForUnactivatedAccount];
 }
@@ -506,6 +514,9 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
             // The response will contain the TempPass token, which we store in the keychain. The original password is not stored.
             [self storeLoginCredentials:res];
         }
+        
+        //PY 141014: Store account activatation information everytime the user logins
+        [self storeAccountActivationCredentials:res];
 
         // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
         // But the client was not logged in. Send them now...
@@ -894,7 +905,11 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 -(void)setSecAccountActivationStatus:(NSString *)isActivated{
+    if(isActivated == nil){
+        [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACITVATED entryValue:IS_ACCOUNT_ACTIVATED_DEFAULT forService:SEC_SERVICE_NAME];
+    }else{
      [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACITVATED entryValue:isActivated forService:SEC_SERVICE_NAME];
+    }
 }
 
 - (NSString *)secMinsRemainingForUnactivatedAccount {
@@ -902,7 +917,11 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 -(void)setSecMinsRemainingForUnactivatedAccount:(NSString *)minsRemaining{
+    if(minsRemaining == nil){
+       [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:MINS_REMAINING_DEFAULT forService:SEC_SERVICE_NAME];
+    }else{
      [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:minsRemaining forService:SEC_SERVICE_NAME];
+    }
 }
 
 #pragma mark - SingleTon management

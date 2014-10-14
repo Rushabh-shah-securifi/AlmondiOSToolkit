@@ -105,6 +105,8 @@
 		CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */; };
 		CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */; };
 		CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */; };
+		CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */; };
+		CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE458D5B19EBBBC000689251 /* SFICredentialsValidator.m */; };
 		CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE466A581823C2E800E55DF9 /* ValidateAccountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A561823C2E800E55DF9 /* ValidateAccountRequest.m */; };
 		CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A591823C50700E55DF9 /* ValidateAccountResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -315,6 +317,8 @@
 		CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserRequest.m; sourceTree = "<group>"; };
 		CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMeAsSecondaryUserResponse.h; sourceTree = "<group>"; };
 		CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserResponse.m; sourceTree = "<group>"; };
+		CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFICredentialsValidator.h; sourceTree = "<group>"; };
+		CE458D5B19EBBBC000689251 /* SFICredentialsValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFICredentialsValidator.m; sourceTree = "<group>"; };
 		CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValidateAccountRequest.h; sourceTree = "<group>"; };
 		CE466A561823C2E800E55DF9 /* ValidateAccountRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ValidateAccountRequest.m; sourceTree = "<group>"; };
 		CE466A591823C50700E55DF9 /* ValidateAccountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValidateAccountResponse.h; sourceTree = "<group>"; };
@@ -591,6 +595,7 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
 				1CA3535B194ED4410042D429 /* OfflineStorage */,
 				1C23FBCC19480D6C00E353D1 /* Reachability */,
@@ -723,6 +728,15 @@
 			name = parser;
 			sourceTree = "<group>";
 		};
+		CE458D5919EBBB5000689251 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */,
+				CE458D5B19EBBBC000689251 /* SFICredentialsValidator.m */,
+			);
+			name = util;
+			sourceTree = "<group>";
+		};
 		CE539F8B17FAD3F900640820 /* Logs */ = {
 			isa = PBXGroup;
 			children = (
@@ -795,6 +809,7 @@
 				CE5EB64117E8549200985636 /* DeviceDataHashResponse.h in Headers */,
 				CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */,
 				22A76D451791339B0099CD8F /* LogoutResponse.h in Headers */,
+				CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */,
 				1C75820C19B028F70074C601 /* Scoreboard.h in Headers */,
 				CE6DC94917EC60D1006F48C4 /* MobileCommandResponse.h in Headers */,
 				CE5EB5CA17E722BD00985636 /* AlmondListResponse.h in Headers */,
@@ -1082,6 +1097,7 @@
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
+				CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */,
 				1C2350C9195132B500F97EA7 /* KeyChainWrapper.m in Sources */,
 				1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */,
 				CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */,

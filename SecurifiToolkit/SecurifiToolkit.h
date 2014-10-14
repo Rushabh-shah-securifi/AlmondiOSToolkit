@@ -8,6 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import <SecurifiToolkit/GenericCommand.h>
+#import <SecurifiToolkit/SFIDevice.h>
+#import <SecurifiToolkit/SFIDeviceValue.h>
+#import <SecurifiToolkit/SFIAlmondPlus.h>
+#import <SecurifiToolkit/SFIDeviceKnownValues.h>
+#import <SecurifiToolkit/Scoreboard.h>
+#import <SecurifiToolkit/AlmondPlusSDKConstants.h>
+
 #import <SecurifiToolkit/CommandTypes.h>
 #import <SecurifiToolkit/LoginResponse.h>
 #import <SecurifiToolkit/Login.h>
@@ -27,10 +34,7 @@
 #import <SecurifiToolkit/DeviceListResponse.h>
 #import <SecurifiToolkit/DeviceValueRequest.h>
 #import <SecurifiToolkit/DeviceValueResponse.h>
-#import <SecurifiToolkit/SFIDevice.h>
-#import <SecurifiToolkit/SFIDeviceValue.h>
-#import <SecurifiToolkit/SFIAlmondPlus.h>
-#import <SecurifiToolkit/SFIDeviceKnownValues.h>
+
 #import <SecurifiToolkit/SFIReachabilityManager.h>
 #import <SecurifiToolkit/MobileCommandRequest.h>
 #import <SecurifiToolkit/MobileCommandResponse.h>
@@ -42,9 +46,9 @@
 #import <SecurifiToolkit/ResetPasswordResponse.h>
 #import <SecurifiToolkit/SensorForcedUpdateRequest.h>
 #import <SecurifiToolkit/SensorChangeRequest.h>
-#import <SecurifiToolkit/Scoreboard.h>
+
 #import <SecurifiToolkit/SensorChangeResponse.h>
-#import <SecurifiToolkit/AlmondPlusSDKConstants.h>
+
 #import <SecurifiToolkit/DynamicAlmondNameChangeResponse.h>
 #import <SecurifiToolkit/SFIOfflineDataManager.h>
 #import <SecurifiToolkit/UserProfileRequest.h>
@@ -69,7 +73,7 @@
 #import <SecurifiToolkit/MeAsSecondaryUserResponse.h>
 #import <SecurifiToolkit/DeleteMeAsSecondaryUserRequest.h>
 #import <SecurifiToolkit/DeleteMeAsSecondaryUserResponse.h>
-
+#import <SecurifiToolkit/SFICredentialsValidator.h>
 
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
