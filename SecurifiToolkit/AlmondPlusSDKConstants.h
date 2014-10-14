@@ -96,4 +96,7 @@
 #define WPA_MIN_CHAR_COUNT 8
 #define WPA2_MIN_CHAR_COUNT 8
 
+#define IS_ACCOUNT_ACTIVATED_DEFAULT    @"1"
+#define MINS_REMAINING_DEFAULT          @"0"
+
 #endif
