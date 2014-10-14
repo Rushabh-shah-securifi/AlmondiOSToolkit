@@ -189,18 +189,9 @@
 - (void)initializeFromValues:(SFIDeviceValue *)values {
 
     switch (self.deviceType) {
-        case SFIDeviceType_BinarySwitch_1: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values];
-            break;
-        }
 
         case SFIDeviceType_MultiLevelSwitch_2: {
             [self configureDeviceForState:SFIDevicePropertyType_SWITCH_MULTILEVEL values:values];
-            break;
-        }
-
-        case SFIDeviceType_BinarySensor_3: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values];
             break;
         }
 
@@ -225,77 +216,35 @@
             break;
         }
 
-        case SFIDeviceType_Alarm_6: {
-            [self configureDeviceForState:SFIDevicePropertyType_BASIC values:values];
-            break;
-        }
-
-        case SFIDeviceType_MotionSensor_11: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_ContactSwitch_12: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_FireSensor_13: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_WaterSensor_14: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_GasSensor_15: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_VibrationOrMovementSensor_17: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_KeyFob_19: {
-
-        }
-
-        case SFIDeviceType_Keypad_20: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_SmartACSwitch_22: {
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_BinarySensor_3:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_SmartDCSwitch_23:
+        case SFIDeviceType_Shade_34:
+        case SFIDeviceType_MovementSensor_41:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45: {
             [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values];
             break;
         }
 
-        case SFIDeviceType_SmartDCSwitch_23: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values];
-            break;
-        }
-
-        case SFIDeviceType_Shade_34: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values];
-            break;
-        }
-
-        case SFIDeviceType_FloodSensor_37: {
-            [self configureDeviceForState:SFIDevicePropertyType_BASIC values:values];
-            break;
-        }
-
+        case SFIDeviceType_Alarm_6:
+        case SFIDeviceType_FloodSensor_37:
         case SFIDeviceType_MoistureSensor_40: {
             [self configureDeviceForState:SFIDevicePropertyType_BASIC values:values];
             break;
         }
 
-        case SFIDeviceType_MovementSensor_41: {
-            [self configureDeviceForState:SFIDevicePropertyType_SENSOR_BINARY values:values];
+        case SFIDeviceType_MotionSensor_11:
+        case SFIDeviceType_ContactSwitch_12:
+        case SFIDeviceType_FireSensor_13:
+        case SFIDeviceType_WaterSensor_14:
+        case SFIDeviceType_GasSensor_15:
+        case SFIDeviceType_VibrationOrMovementSensor_17:
+        case SFIDeviceType_Keypad_20:
+        case SFIDeviceType_StandardWarningDevice_21: {
+            [self configureStandardStateDevice:values];
             break;
         }
 
@@ -306,7 +255,7 @@
         case SFIDeviceType_StandardCIE_10:
         case SFIDeviceType_PersonalEmergencyDevice_16:
         case SFIDeviceType_RemoteControl_18:
-        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_KeyFob_19:
         case SFIDeviceType_OccupancySensor_24:
         case SFIDeviceType_LightSensor_25:
         case SFIDeviceType_WindowCovering_26:
@@ -320,9 +269,7 @@
         case SFIDeviceType_SmokeDetector_36:
         case SFIDeviceType_ShockSensor_38:
         case SFIDeviceType_DoorSensor_39:
-        case SFIDeviceType_Siren_42:
         case SFIDeviceType_MultiSwitch_43:
-        case SFIDeviceType_UnknownOnOffModule_44:
         default: {
             self.imageName = @"default_device.png";
             break;
