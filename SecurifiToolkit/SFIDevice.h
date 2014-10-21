@@ -75,13 +75,11 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 @property(nonatomic) unsigned int valueCount;
 @property(nonatomic) NSString *location;
 
-@property(nonatomic) BOOL isExpanded; //todo remove me; this is strictly UI
 @property(nonatomic) NSString *imageName; //todo remove me; this is strictly UI
 @property(nonatomic) NSString *mostImpValueName; //todo remove me
 @property(nonatomic) int mostImpValueIndex; //todo remove me
 @property(nonatomic) int stateIndex; //todo remove me
 @property(nonatomic) BOOL isTampered;
-@property(nonatomic) int tamperValueIndex; //todo remove me; no longer needed
 @property(nonatomic) BOOL isBatteryLow;
 
 // Converts a type into a standard mnemonic name suitable for event logging

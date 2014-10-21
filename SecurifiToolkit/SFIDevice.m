@@ -10,9 +10,7 @@
 #import "SFIDeviceKnownValues.h"
 #import "SFIDeviceValue.h"
 
-#define STATE @"STATE"
 #define TAMPER @"TAMPER"
-#define LOW_BATTERY @"LOW BATTERY"
 
 @implementation SFIDevice
 
@@ -84,13 +82,11 @@
         self.allowNotification = [coder decodeObjectForKey:@"self.allowNotification"];
         self.valueCount = (unsigned int) [coder decodeIntForKey:@"self.valueCount"];
         self.location = [coder decodeObjectForKey:@"self.location"];
-        self.isExpanded = [coder decodeBoolForKey:@"self.isExpanded"];
         self.imageName = [coder decodeObjectForKey:@"self.imageName"];
         self.mostImpValueName = [coder decodeObjectForKey:@"self.mostImpValueName"];
         self.mostImpValueIndex = [coder decodeIntForKey:@"self.mostImpValueIndex"];
         self.stateIndex = [coder decodeIntForKey:@"self.stateIndex"];
         self.isTampered = [coder decodeBoolForKey:@"self.isTampered"];
-        self.tamperValueIndex = [coder decodeIntForKey:@"self.tamperValueIndex"];
         self.isBatteryLow = [coder decodeBoolForKey:@"self.isBatteryLow"];
     }
 
@@ -112,13 +108,11 @@
     [coder encodeObject:self.allowNotification forKey:@"self.allowNotification"];
     [coder encodeInt:self.valueCount forKey:@"self.valueCount"];
     [coder encodeObject:self.location forKey:@"self.location"];
-    [coder encodeBool:self.isExpanded forKey:@"self.isExpanded"];
     [coder encodeObject:self.imageName forKey:@"self.imageName"];
     [coder encodeObject:self.mostImpValueName forKey:@"self.mostImpValueName"];
     [coder encodeInt:self.mostImpValueIndex forKey:@"self.mostImpValueIndex"];
     [coder encodeInt:self.stateIndex forKey:@"self.stateIndex"];
     [coder encodeBool:self.isTampered forKey:@"self.isTampered"];
-    [coder encodeInt:self.tamperValueIndex forKey:@"self.tamperValueIndex"];
     [coder encodeBool:self.isBatteryLow forKey:@"self.isBatteryLow"];
 }
 
@@ -138,13 +132,11 @@
     [description appendFormat:@", self.allowNotification=%@", self.allowNotification];
     [description appendFormat:@", self.valueCount=%u", self.valueCount];
     [description appendFormat:@", self.location=%@", self.location];
-    [description appendFormat:@", self.isExpanded=%d", self.isExpanded];
     [description appendFormat:@", self.imageName=%@", self.imageName];
     [description appendFormat:@", self.mostImpValueName=%@", self.mostImpValueName];
     [description appendFormat:@", self.mostImpValueIndex=%i", self.mostImpValueIndex];
     [description appendFormat:@", self.stateIndex=%i", self.stateIndex];
     [description appendFormat:@", self.isTampered=%d", self.isTampered];
-    [description appendFormat:@", self.tamperValueIndex=%i", self.tamperValueIndex];
     [description appendFormat:@", self.isBatteryLow=%d", self.isBatteryLow];
     [description appendString:@">"];
     return description;
@@ -168,13 +160,11 @@
         copy.allowNotification = self.allowNotification;
         copy.valueCount = self.valueCount;
         copy.location = self.location;
-        copy.isExpanded = self.isExpanded;
         copy.imageName = self.imageName;
         copy.mostImpValueName = self.mostImpValueName;
         copy.mostImpValueIndex = self.mostImpValueIndex;
         copy.stateIndex = self.stateIndex;
         copy.isTampered = self.isTampered;
-        copy.tamperValueIndex = self.tamperValueIndex;
         copy.isBatteryLow = self.isBatteryLow;
     }
 
