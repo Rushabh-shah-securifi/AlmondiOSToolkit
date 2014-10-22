@@ -9,6 +9,5 @@
 #import "UserProfileResponse.h"
 
 @implementation UserProfileResponse
-@synthesize firstName, lastName, addressLine1, addressLine2, addressLine3, country, zipCode;
-@synthesize reason, reasonCode, isSuccessful;
+
 @end

@@ -55,7 +55,6 @@
 #import <SecurifiToolkit/UserProfileResponse.h>
 #import <SecurifiToolkit/BaseCommandRequest.h>
 #import <SecurifiToolkit/ChangePasswordResponse.h>
-#import <SecurifiToolkit/DeleteAccountRequest.h>
 #import <SecurifiToolkit/DeleteAccountResponse.h>
 #import <SecurifiToolkit/UpdateUserProfileRequest.h>
 #import <SecurifiToolkit/UpdateUserProfileResponse.h>

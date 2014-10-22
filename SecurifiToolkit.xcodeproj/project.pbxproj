@@ -32,6 +32,7 @@
 		1C75820D19B028F70074C601 /* Scoreboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C75820B19B028F70074C601 /* Scoreboard.m */; };
 		1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */; };
+		1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0303A77013C449B86C26B /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF033FE398C1B48B1CA5CCC /* SUnit.h */; };
 		1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */; };
 		1DF0352850B972F9D28F2BD0 /* SUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03CBFC72431ED1B6B81A3 /* SUnit.m */; };
@@ -160,8 +161,6 @@
 		CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91315119C6B83B00D94876 /* UserProfileRequest.m */; };
 		CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91315419C6B94500D94876 /* UserProfileResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; };
-		CE91315819C6C02100D94876 /* UserProfileRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = CE91315019C6B83B00D94876 /* UserProfileRequest.h */; };
-		CE91315919C6C02600D94876 /* UserProfileResponse.h in Sources */ = {isa = PBXBuildFile; fileRef = CE91315419C6B94500D94876 /* UserProfileResponse.h */; };
 		CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91316B19C9A2DD00D94876 /* ChangePasswordRequest.h */; };
 		CE91316E19C9A2DD00D94876 /* ChangePasswordRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE91316C19C9A2DD00D94876 /* ChangePasswordRequest.m */; };
 		CE91317119C9A2F900D94876 /* ChangePasswordResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE91316F19C9A2F900D94876 /* ChangePasswordResponse.h */; };
@@ -829,10 +828,12 @@
 				CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */,
 				CE2EA26119D04BDD00C6D6A8 /* AlmondNameChange.h in Headers */,
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
+				CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */,
 				CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */,
 				CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */,
 				CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */,
 				CEAD85B119CAEED1006D1048 /* UpdateUserProfileResponse.h in Headers */,
+				1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */,
 				CE5EB65217EAD43000985636 /* DeviceValueResponse.h in Headers */,
 				CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
@@ -844,7 +845,6 @@
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
-				CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
 				CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */,
 				1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */,
@@ -1046,8 +1046,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE91315919C6C02600D94876 /* UserProfileResponse.h in Sources */,
-				CE91315819C6C02100D94876 /* UserProfileRequest.h in Sources */,
 				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
 				CE5EB5BB17E703BA00985636 /* LogoutAllRequest.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
