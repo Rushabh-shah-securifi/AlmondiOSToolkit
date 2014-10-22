@@ -61,17 +61,12 @@
 #import <SecurifiToolkit/UpdateUserProfileResponse.h>
 #import <SecurifiToolkit/AlmondAffiliationData.h>
 #import <SecurifiToolkit/AlmondAffiliationDataResponse.h>
-#import <SecurifiToolkit/UnlinkAlmondRequest.h>
-#import <SecurifiToolkit/UnlinkAlmondResponse.h>
-#import <SecurifiToolkit/UserInviteRequest.h>
-#import <SecurifiToolkit/UserInviteResponse.h>
-#import <SecurifiToolkit/DeleteSecondaryUserRequest.h>
-#import <SecurifiToolkit/DeleteSecondaryUserResponse.h>
 #import <SecurifiToolkit/AlmondNameChange.h>
 #import <SecurifiToolkit/AlmondNameChangeResponse.h>
-#import <SecurifiToolkit/MeAsSecondaryUserRequest.h>
+#import <SecurifiToolkit/UnlinkAlmondResponse.h>
+#import <SecurifiToolkit/UserInviteResponse.h>
+#import <SecurifiToolkit/DeleteSecondaryUserResponse.h>
 #import <SecurifiToolkit/MeAsSecondaryUserResponse.h>
-#import <SecurifiToolkit/DeleteMeAsSecondaryUserRequest.h>
 #import <SecurifiToolkit/DeleteMeAsSecondaryUserResponse.h>
 #import <SecurifiToolkit/SFICredentialsValidator.h>
 
@@ -195,6 +190,9 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 // Send a command to the cloud requesting to change the name of current Almond
 - (void)asyncRequestChangeAlmondName:(NSString*)changedAlmondName almondMAC:(NSString*)almondMAC;
+
+// Send a command to the cloud requesting to
+- (void)asyncRequestMeAsSecondaryUser;
 
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;

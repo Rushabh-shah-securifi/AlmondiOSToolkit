@@ -10,7 +10,14 @@
 #import "SingleTon.h"
 #import "LoginTempPass.h"
 #import "KeyChainWrapper.h"
-
+#import "ChangePasswordRequest.h"
+#import "DeleteAccountRequest.h"
+#import "UnlinkAlmondRequest.h"
+#import "UserInviteRequest.h"
+#import "DeleteSecondaryUserRequest.h"
+#import "DeleteMeAsSecondaryUserRequest.h"
+#import "AlmondNameChange.h"
+#import "MeAsSecondaryUserRequest.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -797,6 +804,14 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncSendToCloud:command];
 
 
+}
+
+- (void)asyncRequestMeAsSecondaryUser {
+    GenericCommand *cmd = [[GenericCommand alloc] init];
+    cmd.commandType = CommandType_ME_AS_SECONDARY_USER_REQUEST;
+    cmd.command = [MeAsSecondaryUserRequest new];
+
+    [self asyncSendToCloud:cmd];
 }
 
 #pragma mark - Device value updates
