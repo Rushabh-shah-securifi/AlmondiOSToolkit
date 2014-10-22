@@ -14,27 +14,25 @@
     XMLWriter *writer = [XMLWriter new];
     writer.indentation = @"";
     writer.lineBreak = @"";
-    
+
     [writer writeStartElement:@"root"];
     [writer writeStartElement:@"UserInviteRequest"];
-    
+
     [writer writeStartElement:@"AlmondMAC"];
     [writer writeCharacters:self.almondMAC];
     [writer writeEndElement];
-    
+
     [writer writeStartElement:@"EmailID"];
     [writer writeCharacters:self.emailID];
     [writer writeEndElement];
-    
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.internalIndex];
-    [writer writeEndElement];
-    
+
+    [self writeMobileInternalIndexElement:writer];
+
     // close UserInviteRequest
     [writer writeEndElement];
     // close root
     [writer writeEndElement];
-    
+
     return writer.toString;
 }
 @end

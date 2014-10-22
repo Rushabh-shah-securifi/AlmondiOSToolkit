@@ -8,6 +8,7 @@
 
 #import "SensorForcedUpdateRequest.h"
 #import "XMLWriter.h"
+#import "BaseCommandRequest.h"
 
 
 @implementation SensorForcedUpdateRequest
@@ -25,9 +26,7 @@
     [writer writeCharacters:self.almondMAC];
     [writer writeEndElement];
 
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.mobileInternalIndex];
-    [writer writeEndElement];
+    [self writeMobileInternalIndexElement:writer];
 
     // close DeviceDataForcedUpdate
     [writer writeEndElement];

@@ -35,9 +35,7 @@
     // close Device
     [writer writeEndElement];
 
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.internalIndex];
-    [writer writeEndElement];
+    [self writeMobileInternalIndexElement:writer];
 
     // close MobileCommand
     [writer writeEndElement];

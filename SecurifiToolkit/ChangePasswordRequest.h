@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface ChangePasswordRequest : NSObject  <SecurifiCommand>
+@interface ChangePasswordRequest : BaseCommandRequest  <SecurifiCommand>
 @property NSString *emailID;
 @property NSString *currentPassword;
 @property NSString *changedPassword;

@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface UpdateUserProfileRequest : NSObject  <SecurifiCommand>
+@interface UpdateUserProfileRequest : BaseCommandRequest <SecurifiCommand>
 @property NSString *firstName;
 @property NSString *lastName;
 @property NSString *addressLine1;
@@ -17,7 +18,7 @@
 @property NSString *addressLine3;
 @property NSString *country;
 @property NSString *zipCode;
-@property(nonatomic) NSString *internalIndex;
-- (NSString*)toXml;
+
+- (NSString *)toXml;
 
 @end

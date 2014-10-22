@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface DeleteMeAsSecondaryUserRequest : NSObject <SecurifiCommand>
+@interface DeleteMeAsSecondaryUserRequest : BaseCommandRequest <SecurifiCommand>
 @property NSString *almondMAC;
 @property NSString *internalIndex;
 

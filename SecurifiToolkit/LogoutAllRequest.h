@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface LogoutAllRequest : NSObject <SecurifiCommand>
+@interface LogoutAllRequest : BaseCommandRequest <SecurifiCommand>
 @property BOOL isSuccessful;
 @property NSString *UserID;
 @property NSString *Password;

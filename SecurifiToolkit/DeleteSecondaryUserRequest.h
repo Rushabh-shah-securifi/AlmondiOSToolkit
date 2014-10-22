@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface DeleteSecondaryUserRequest : NSObject  <SecurifiCommand>
+@interface DeleteSecondaryUserRequest : BaseCommandRequest  <SecurifiCommand>
 @property NSString *almondMAC;
 @property NSString *emailID;
 @property(nonatomic) NSString *internalIndex;

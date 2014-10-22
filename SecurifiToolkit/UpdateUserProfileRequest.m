@@ -46,10 +46,8 @@
     [writer writeStartElement:@"ZipCode"];
     [writer writeCharacters:self.zipCode];
     [writer writeEndElement];
-    
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.internalIndex];
-    [writer writeEndElement];
+
+    [self writeMobileInternalIndexElement:writer];
     
     // close DeleteAccountRequest
     [writer writeEndElement];

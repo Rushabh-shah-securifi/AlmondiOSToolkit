@@ -28,9 +28,7 @@
     [writer writeCharacters:self.applicationID];
     [writer writeEndElement];
 
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.mobileInternalIndex];
-    [writer writeEndElement];
+    [self writeMobileInternalIndexElement:writer];
 
     NSData *dataToEncode = [self.data dataUsingEncoding:NSUTF8StringEncoding];
     NSData *encodedData = [dataToEncode base64EncodedDataWithOptions:0];

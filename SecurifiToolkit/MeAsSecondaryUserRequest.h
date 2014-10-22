@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BaseCommandRequest.h"
 
-@interface MeAsSecondaryUserRequest : NSObject 
+@interface MeAsSecondaryUserRequest : BaseCommandRequest
 
 @end

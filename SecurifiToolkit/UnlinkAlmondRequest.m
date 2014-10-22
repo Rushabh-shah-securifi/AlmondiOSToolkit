@@ -29,10 +29,8 @@
     [writer writeStartElement:@"Password"];
     [writer writeCharacters:self.password];
     [writer writeEndElement];
-    
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.internalIndex];
-    [writer writeEndElement];
+
+    [self writeMobileInternalIndexElement:writer];
     
     // close UnlinkAlmondRequest
     [writer writeEndElement];

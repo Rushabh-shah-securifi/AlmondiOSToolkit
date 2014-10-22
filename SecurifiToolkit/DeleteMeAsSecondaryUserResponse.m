@@ -9,5 +9,5 @@
 #import "DeleteMeAsSecondaryUserResponse.h"
 
 @implementation DeleteMeAsSecondaryUserResponse
-@synthesize isSuccessful, reason, reasonCode, internalIndex;
+
 @end

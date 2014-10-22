@@ -8,11 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface UserInviteRequest : NSObject  <SecurifiCommand>
+@interface UserInviteRequest : BaseCommandRequest <SecurifiCommand>
 @property NSString *almondMAC;
 @property NSString *emailID;
-@property(nonatomic) NSString *internalIndex;
 
-- (NSString*)toXml;
+- (NSString *)toXml;
 @end

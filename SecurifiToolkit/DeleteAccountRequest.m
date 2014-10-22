@@ -14,23 +14,23 @@
     XMLWriter *writer = [XMLWriter new];
     writer.indentation = @"";
     writer.lineBreak = @"";
-    
+
     [writer writeStartElement:@"root"];
     [writer writeStartElement:@"DeleteAccountRequest"];
-    
+
     [writer writeStartElement:@"EmailID"];
     [writer writeCharacters:self.emailID];
     [writer writeEndElement];
-    
+
     [writer writeStartElement:@"Password"];
     [writer writeCharacters:self.password];
     [writer writeEndElement];
-    
+
     // close DeleteAccountRequest
     [writer writeEndElement];
     // close root
     [writer writeEndElement];
-    
+
     return writer.toString;
 }
 @end

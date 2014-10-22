@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface UserProfileRequest : NSObject <SecurifiCommand>
-- (NSString*)toXml;
+@interface UserProfileRequest : BaseCommandRequest <SecurifiCommand>
+- (NSString *)toXml;
 @end

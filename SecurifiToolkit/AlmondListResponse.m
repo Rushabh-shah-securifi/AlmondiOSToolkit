@@ -9,5 +9,5 @@
 #import "AlmondListResponse.h"
 
 @implementation AlmondListResponse
-@synthesize isSuccessful, deviceCount, almondPlusMACList, reason, action;
+
 @end

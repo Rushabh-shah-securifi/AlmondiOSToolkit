@@ -25,11 +25,9 @@
     [writer writeStartElement:@"NewName"];
     [writer writeCharacters:self.changedAlmondName];
     [writer writeEndElement];
-    
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.mobileInternalIndex];
-    [writer writeEndElement];
-    
+
+    [self writeMobileInternalIndexElement:writer];
+
     // close AlmondNameChange
     [writer writeEndElement];
     // close root
@@ -37,4 +35,5 @@
     
     return writer.toString;
 }
+
 @end

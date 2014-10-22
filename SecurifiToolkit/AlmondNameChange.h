@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BaseCommandRequest.h"
 #import "SecurifiCommand.h"
 
-@interface AlmondNameChange : NSObject  <SecurifiCommand>
+@interface AlmondNameChange : BaseCommandRequest  <SecurifiCommand>
 @property NSString *almondMAC;
 @property NSString *changedAlmondName;
-@property NSString *mobileInternalIndex;
 
 - (NSString*)toXml;
 @end

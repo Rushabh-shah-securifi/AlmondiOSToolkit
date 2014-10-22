@@ -43,9 +43,7 @@
     // close Device
     [writer writeEndElement];
 
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.mobileInternalIndex];
-    [writer writeEndElement];
+    [self writeMobileInternalIndexElement:writer];
 
     // close SensorChange
     [writer writeEndElement];

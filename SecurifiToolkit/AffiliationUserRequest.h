@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface AffiliationUserRequest : NSObject <SecurifiCommand>
+@interface AffiliationUserRequest : BaseCommandRequest <SecurifiCommand>
 
 @property NSString *Code;
 

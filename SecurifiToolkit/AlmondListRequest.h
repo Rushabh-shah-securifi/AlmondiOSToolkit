@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BaseCommandRequest.h"
 
-@interface AlmondListRequest : NSObject
+@interface AlmondListRequest : BaseCommandRequest
 
 @end

@@ -8,9 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface DeleteAccountRequest : NSObject  <SecurifiCommand>
+@interface DeleteAccountRequest : BaseCommandRequest <SecurifiCommand>
 @property NSString *emailID;
 @property NSString *password;
-- (NSString*)toXml;
+
+- (NSString *)toXml;
 @end

@@ -22,10 +22,8 @@
     [writer writeStartElement:@"AlmondMAC"];
     [writer writeCharacters:self.almondMAC];
     [writer writeEndElement];
-    
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.internalIndex];
-    [writer writeEndElement];
+
+    [self writeMobileInternalIndexElement:writer];
     
     // close DeleteMeAsSecondaryUserRequest
     [writer writeEndElement];

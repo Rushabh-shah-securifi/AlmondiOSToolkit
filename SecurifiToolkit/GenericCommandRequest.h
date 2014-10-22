@@ -17,10 +17,12 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiCommand.h"
+#import "BaseCommandRequest.h"
 
-@interface GenericCommandRequest : NSObject <SecurifiCommand>
+@interface GenericCommandRequest : BaseCommandRequest <SecurifiCommand>
+
 @property NSString *almondMAC;
 @property NSString *applicationID;
-@property NSString *mobileInternalIndex;
 @property NSString *data;
+
 @end

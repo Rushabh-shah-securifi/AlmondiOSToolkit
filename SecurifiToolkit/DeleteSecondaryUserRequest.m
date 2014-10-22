@@ -25,10 +25,8 @@
     [writer writeStartElement:@"EmailID"];
     [writer writeCharacters:self.emailID];
     [writer writeEndElement];
-    
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:self.internalIndex];
-    [writer writeEndElement];
+
+    [self writeMobileInternalIndexElement:writer];
     
     // close DeleteSecondaryUserRequest
     [writer writeEndElement];
