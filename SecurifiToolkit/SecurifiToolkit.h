@@ -135,8 +135,8 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 - (BOOL)isLoggedIn;
 
--(BOOL) isAccountActivated;
--(int) minsRemainingForUnactivatedAccount;
+- (BOOL)isAccountActivated;
+- (int)minsRemainingForUnactivatedAccount;
 
 - (BOOL)hasLoginCredentials;
 
@@ -163,9 +163,6 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 // Fetch the locally stored values for the Almond's devices
 - (NSArray*)deviceValuesList:(NSString*)almondMac;
-
-// Synchronously locally store the device list
-- (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac;
 
 // Send a command to the cloud requesting a device list for the specified Almond
 - (void)asyncRequestDeviceList:(NSString *)almondMac;
@@ -194,12 +191,13 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 - (void)asyncRequestInviteForSharingAlmond:(NSString*)almondMAC inviteEmail:(NSString*)inviteEmailID;
 
 // Send a command to the cloud requesting to remove another secondary user from the current Almond from cloud account
-- (void)asyncRequestDelSecondaryUser:(NSString*)almondMAC email:(NSString*)emailID;
+- (void)asyncRequestDeleteSecondaryUser:(NSString *)almondMAC email:(NSString*)emailID;
 
 // Send a command to the cloud requesting to change the name of current Almond
 - (void)asyncRequestChangeAlmondName:(NSString*)changedAlmondName almondMAC:(NSString*)almondMAC;
 
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
-- (void)asyncRequestDelMeAsSecondaryUser:(NSString*)almondMAC;
+- (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;
+
 @end
  

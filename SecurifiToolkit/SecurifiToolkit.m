@@ -749,7 +749,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncSendToCloud:command];
 }
 
-- (void)asyncRequestDelSecondaryUser:(NSString*)almondMAC email:(NSString*)emailID{
+- (void)asyncRequestDeleteSecondaryUser:(NSString *)almondMAC email:(NSString*)emailID{
     // Generate internal index between 1 to 100
     unsigned int internalIndex = (arc4random() % 100) + 1;
     
@@ -765,7 +765,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncSendToCloud:command];
 }
 
-- (void)asyncRequestDelMeAsSecondaryUser:(NSString*)almondMAC{
+- (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC{
     // Generate internal index between 1 to 100
     unsigned int internalIndex = (arc4random() % 100) + 1;
     
@@ -800,10 +800,6 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 #pragma mark - Device value updates
-
-- (void)writeDeviceValueList:(NSArray *)deviceList currentMAC:(NSString *)almondMac {
-    [self.dataManager writeDeviceValueList:deviceList currentMAC:almondMac];
-}
 
 #pragma mark - Command constructors
 
