@@ -103,7 +103,7 @@
 
             NSString *server = useProductionCloud ? CLOUD_PROD_SERVER : CLOUD_DEV_SERVER;
             CFStringRef host = (__bridge CFStringRef) server;
-            UInt32 port = 1028;
+            UInt32 port = CLOUD_SERVER_PORT;
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
 
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
