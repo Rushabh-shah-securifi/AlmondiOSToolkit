@@ -7,9 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BaseCommandRequest.h"
 #import "SecurifiCommand.h"
-
-@class BaseCommandRequest;
 
 @interface SensorForcedUpdateRequest : BaseCommandRequest <SecurifiCommand>
 @property NSString *almondMAC;

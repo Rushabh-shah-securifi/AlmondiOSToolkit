@@ -8,11 +8,8 @@
 
 #import "SensorForcedUpdateRequest.h"
 #import "XMLWriter.h"
-#import "BaseCommandRequest.h"
-
 
 @implementation SensorForcedUpdateRequest
-
 
 - (NSString *)toXml {
     XMLWriter *writer = [XMLWriter new];
