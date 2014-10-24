@@ -79,7 +79,6 @@
 #define LOG_FILE_NAME  @"AlmondPlusLog.log"
 #define SDK_LOG_FILE_NAME  @"AlmondPlusSDKLog.log"
 
-#define COLORS @"colors"
 #define ALMONDLIST @"AlmondList"
 #define SETTINGS_LIST @"Settings"
 
