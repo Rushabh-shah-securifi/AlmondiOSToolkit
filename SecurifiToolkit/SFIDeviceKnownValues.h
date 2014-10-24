@@ -79,7 +79,6 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
 @property(nonatomic) SFIDevicePropertyType propertyType;
 @property(nonatomic) NSString *valueType;
 @property(nonatomic) NSString *value;
-@property(nonatomic) BOOL isUpdating; //todo remove me
 
 // Converts the standard Device Property Name string into a type ID
 + (SFIDevicePropertyType)nameToPropertyType:(NSString *)valueName;

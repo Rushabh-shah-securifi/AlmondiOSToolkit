@@ -117,7 +117,6 @@
         self.propertyType = (SFIDevicePropertyType) [coder decodeIntForKey:@"self.propertyType"];
         self.valueType = [coder decodeObjectForKey:@"self.valueType"];
         self.value = [coder decodeObjectForKey:@"self.value"];
-        self.isUpdating = [coder decodeBoolForKey:@"self.isUpdating"];
     }
 
     return self;
@@ -129,7 +128,6 @@
     [coder encodeInt:self.propertyType forKey:@"self.propertyType"];
     [coder encodeObject:self.valueType forKey:@"self.valueType"];
     [coder encodeObject:self.value forKey:@"self.value"];
-    [coder encodeBool:self.isUpdating forKey:@"self.isUpdating"];
 }
 
 - (NSString *)description {
@@ -139,7 +137,6 @@
     [description appendFormat:@", self.propertyType=%d", self.propertyType];
     [description appendFormat:@", self.valueType=%@", self.valueType];
     [description appendFormat:@", self.value=%@", self.value];
-    [description appendFormat:@", self.isUpdating=%d", self.isUpdating];
     [description appendString:@">"];
     return description;
 }
@@ -238,7 +235,6 @@
         copy.propertyType = self.propertyType;
         copy.valueType = self.valueType;
         copy.value = self.value;
-        copy.isUpdating = self.isUpdating;
     }
 
     return copy;
