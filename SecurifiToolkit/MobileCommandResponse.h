@@ -8,8 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+#import "BaseCommandRequest.h"
+
 @interface MobileCommandResponse : NSObject
 @property BOOL isSuccessful;
-@property unsigned int mobileInternalIndex;
+@property sfi_id mobileInternalIndex;
 @property (copy) NSString *reason;
 @end

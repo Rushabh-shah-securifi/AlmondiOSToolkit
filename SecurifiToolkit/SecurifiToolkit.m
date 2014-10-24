@@ -11,9 +11,10 @@
 #import "LoginTempPass.h"
 #import "KeyChainWrapper.h"
 #import "ChangePasswordRequest.h"
-#import "DeleteAccountRequest.h"
 #import "UnlinkAlmondRequest.h"
 #import "UserInviteRequest.h"
+#import "DeleteAccountRequest.h"
+#import "DeleteAccountResponse.h"
 #import "DeleteSecondaryUserRequest.h"
 #import "DeleteMeAsSecondaryUserRequest.h"
 #import "AlmondNameChange.h"
@@ -402,20 +403,22 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     });
 }
 
-- (void)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
+- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
     // Generate internal index between 1 to 100
-    MobileCommandRequest *mobileCommand = [[MobileCommandRequest alloc] init];
-    mobileCommand.almondMAC = almond.almondplusMAC;
-    mobileCommand.deviceID = [NSString stringWithFormat:@"%d", device.deviceID];
-    mobileCommand.deviceType = device.deviceType;
-    mobileCommand.indexID = [NSString stringWithFormat:@"%d", newValue.index];
-    mobileCommand.changedValue = newValue.value;
+    MobileCommandRequest *request = [MobileCommandRequest new];
+    request.almondMAC = almond.almondplusMAC;
+    request.deviceID = [NSString stringWithFormat:@"%d", device.deviceID];
+    request.deviceType = device.deviceType;
+    request.indexID = [NSString stringWithFormat:@"%d", newValue.index];
+    request.changedValue = newValue.value;
 
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_MOBILE_COMMAND;
-    command.command = mobileCommand;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_MOBILE_COMMAND;
+    cmd.command = request;
 
-    [self asyncSendToCloud:command];
+    [self asyncSendToCloud:cmd];
+
+    return request.correlationId;
 }
 
 
@@ -439,11 +442,11 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     loginCommand.UserID = email;
     loginCommand.Password = password;
 
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_LOGIN_COMMAND;
-    cloudCommand.command = loginCommand;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_LOGIN_COMMAND;
+    cmd.command = loginCommand;
 
-    [self asyncSendToCloud:cloudCommand];
+    [self asyncSendToCloud:cmd];
 }
 
 - (NSString *)loginEmail {
@@ -457,7 +460,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     }
 
     if (self.isCloudOnline) {
-        GenericCommand *cmd = [[GenericCommand alloc] init];
+        GenericCommand *cmd = [GenericCommand new];
         cmd.commandType = CommandType_LOGOUT_COMMAND;
         cmd.command = nil;
 
@@ -470,15 +473,15 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password {
-    LogoutAllRequest *cmd = [[LogoutAllRequest alloc] init];
-    cmd.UserID = [NSString stringWithString:email];
-    cmd.Password = [NSString stringWithString:password];
+    LogoutAllRequest *request = [LogoutAllRequest new];
+    request.UserID = [NSString stringWithString:email];
+    request.Password = [NSString stringWithString:password];
 
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_LOGOUT_ALL_COMMAND;
-    cloudCommand.command = cmd;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_LOGOUT_ALL_COMMAND;
+    cmd.command = request;
 
-    [self asyncSendToCloud:cloudCommand];
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)storeLoginCredentials:(LoginResponse *)obj {
@@ -519,7 +522,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
             [self storeLoginCredentials:res];
         }
         
-        //PY 141014: Store account activatation information everytime the user logins
+        //PY 141014: Store account activation information every time the user logs in
         [self storeAccountActivationCredentials:res];
 
         // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
@@ -527,6 +530,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         [self asyncInitializeConnection1:self.networkSingleton];
     }
     else {
+        // Logon failed:
         // Ensure all credentials are cleared
         [self tearDownLoginSession];
         [self tearDownNetworkSingleton];
@@ -658,26 +662,26 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     }
     [self.networkSingleton markWillFetchDeviceListForAlmond:almondMac];
 
-    DeviceListRequest *deviceListCommand = [[DeviceListRequest alloc] init];
+    DeviceListRequest *deviceListCommand = [DeviceListRequest new];
     deviceListCommand.almondMAC = almondMac;
 
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_DEVICE_DATA;
-    cloudCommand.command = deviceListCommand;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_DEVICE_DATA;
+    cmd.command = deviceListCommand;
 
-    [self asyncSendToCloud:cloudCommand];
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeviceValueList:(NSString *)almondMac {
-    DeviceValueRequest *command = [[DeviceValueRequest alloc] init];
+    DeviceValueRequest *command = [DeviceValueRequest new];
     command.almondMAC = almondMac;
 
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_DEVICE_VALUE;
-    cloudCommand.command = command;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_DEVICE_VALUE;
+    cmd.command = command;
 
     [self.networkSingleton markDeviceValuesFetchedForAlmond:almondMac];
-    [self asyncSendToCloud:cloudCommand];
+    [self asyncSendToCloud:cmd];
 }
 
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
@@ -696,41 +700,41 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
 #pragma mark - Account related commands
 - (void)asyncRequestChangeCloudPassword:(NSString*)currentPwd changedPwd:(NSString*)changedPwd{
-    ChangePasswordRequest *changePwdCommand = [[ChangePasswordRequest alloc] init];
+    ChangePasswordRequest *changePwdCommand = [ChangePasswordRequest new];
     changePwdCommand.emailID = [self loginEmail];
     changePwdCommand.currentPassword = currentPwd;
     changePwdCommand.changedPassword = changedPwd;
     
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_CHANGE_PASSWORD_REQUEST;
-    command.command = changePwdCommand;
-    
-    [self asyncSendToCloud:command];
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_CHANGE_PASSWORD_REQUEST;
+    cmd.command = changePwdCommand;
+
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeleteCloudAccount:(NSString*)password{
-    DeleteAccountRequest *delAccountCommand = [[DeleteAccountRequest alloc] init];
+    DeleteAccountRequest *delAccountCommand = [DeleteAccountRequest new];
     delAccountCommand.emailID = [self loginEmail];
     delAccountCommand.password = password;
     
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_DELETE_ACCOUNT_REQUEST;
-    command.command = delAccountCommand;
-    
-    [self asyncSendToCloud:command];
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_DELETE_ACCOUNT_REQUEST;
+    cmd.command = delAccountCommand;
+
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestUnlinkAlmond:(NSString *)almondMAC password:(NSString *)password {
-    UnlinkAlmondRequest *unlinkAlmondCommand = [[UnlinkAlmondRequest alloc] init];
+    UnlinkAlmondRequest *unlinkAlmondCommand = [UnlinkAlmondRequest new];
     unlinkAlmondCommand.almondMAC = almondMAC;
     unlinkAlmondCommand.password = password;
     unlinkAlmondCommand.emailID = [self loginEmail];
 
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_UNLINK_ALMOND_REQUEST;
-    command.command = unlinkAlmondCommand;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_UNLINK_ALMOND_REQUEST;
+    cmd.command = unlinkAlmondCommand;
 
-    [self asyncSendToCloud:command];
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestInviteForSharingAlmond:(NSString*)almondMAC inviteEmail:(NSString*)inviteEmailID{
@@ -738,50 +742,50 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     userInviteCommand.almondMAC = almondMAC;
     userInviteCommand.emailID = inviteEmailID;
 
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_USER_INVITE_REQUEST;
-    command.command = userInviteCommand;
-    
-    [self asyncSendToCloud:command];
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_USER_INVITE_REQUEST;
+    cmd.command = userInviteCommand;
+
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeleteSecondaryUser:(NSString *)almondMAC email:(NSString *)emailID {
-    DeleteSecondaryUserRequest *delUserCommand = [[DeleteSecondaryUserRequest alloc] init];
+    DeleteSecondaryUserRequest *delUserCommand = [DeleteSecondaryUserRequest new];
     delUserCommand.almondMAC = almondMAC;
     delUserCommand.emailID = emailID;
 
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_DELETE_SECONDARY_USER_REQUEST;
-    command.command = delUserCommand;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_DELETE_SECONDARY_USER_REQUEST;
+    cmd.command = delUserCommand;
 
-    [self asyncSendToCloud:command];
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString *)almondMAC {
-    DeleteMeAsSecondaryUserRequest *delUserCommand = [[DeleteMeAsSecondaryUserRequest alloc] init];
+    DeleteMeAsSecondaryUserRequest *delUserCommand = [DeleteMeAsSecondaryUserRequest new];
     delUserCommand.almondMAC = almondMAC;
 
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST;
-    command.command = delUserCommand;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST;
+    cmd.command = delUserCommand;
 
-    [self asyncSendToCloud:command];
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestChangeAlmondName:(NSString *)changedAlmondName almondMAC:(NSString *)almondMAC {
-    AlmondNameChange *nameChange = [[AlmondNameChange alloc] init];
+    AlmondNameChange *nameChange = [AlmondNameChange new];
     nameChange.almondMAC = almondMAC;
     nameChange.changedAlmondName = changedAlmondName;
 
-    GenericCommand *command = [[GenericCommand alloc] init];
-    command.commandType = CommandType_ALMOND_NAME_CHANGE_REQUEST;
-    command.command = nameChange;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_ALMOND_NAME_CHANGE_REQUEST;
+    cmd.command = nameChange;
 
-    [self asyncSendToCloud:command];
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestMeAsSecondaryUser {
-    GenericCommand *cmd = [[GenericCommand alloc] init];
+    GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ME_AS_SECONDARY_USER_REQUEST;
     cmd.command = [MeAsSecondaryUserRequest new];
 
@@ -793,40 +797,40 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 #pragma mark - Command constructors
 
 - (GenericCommand *)makeCloudSanityCommand {
-    GenericCommand *sanityCommand = [[GenericCommand alloc] init];
-    sanityCommand.commandType = CommandType_CLOUD_SANITY;
-    sanityCommand.command = nil;
-    return sanityCommand;
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_CLOUD_SANITY;
+    cmd.command = nil;
+    return cmd;
 }
 
 - (GenericCommand *)makeTempPassLoginCommand {
-    LoginTempPass *cmd = [[LoginTempPass alloc] init];
+    LoginTempPass *cmd = [LoginTempPass new];
     cmd.UserID = [self secUserId];
     cmd.TempPass = [self secPassword];
 
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_LOGIN_COMMAND; // use Login command type
-    cloudCommand.command = cmd;
+    GenericCommand *command = [GenericCommand new];
+    command.commandType = CommandType_LOGIN_COMMAND; // use Login command type
+    command.command = cmd;
 
-    return cloudCommand;
+    return command;
 }
 
 - (GenericCommand *)makeAlmondListCommand {
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_ALMOND_LIST;
-    cloudCommand.command = [AlmondListRequest new];
-    return cloudCommand;
+    GenericCommand *command = [GenericCommand new];
+    command.commandType = CommandType_ALMOND_LIST;
+    command.command = [AlmondListRequest new];
+    return command;
 }
 
 - (GenericCommand *)makeDeviceHashCommand:(NSString *)almondMac {
-    DeviceDataHashRequest *deviceHashCommand = [[DeviceDataHashRequest alloc] init];
+    DeviceDataHashRequest *deviceHashCommand = [DeviceDataHashRequest new];
     deviceHashCommand.almondMAC = almondMac;
 
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_DEVICE_DATA_HASH;
-    cloudCommand.command = deviceHashCommand;
+    GenericCommand *command = [GenericCommand new];
+    command.commandType = CommandType_DEVICE_DATA_HASH;
+    command.command = deviceHashCommand;
 
-    return cloudCommand;
+    return command;
 }
 
 #pragma mark - Keychain Access
