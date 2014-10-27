@@ -25,41 +25,41 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
-// returns a copy of the known values for the specified property name, or nil if none found.
-// the property name is the string representation of SFIDevicePropertyType, as used on the wire with the cloud.
-// this method provides a way to access indexed or synthesized properties for which there is no, or cannot be,
+// Returns a copy of the known values for the specified property name, or nil if none found.
+// The property name is the string representation of SFIDevicePropertyType, as used on the wire with the cloud.
+// This method provides a way to access indexed or synthesized properties for which there is no, or cannot be,
 // a single SFIDevicePropertyType representation. For example, door lock pin codes are assigned to
 // any number of named properties derived from SFIDevicePropertyType_USER_CODE.
 // changes to SFIDeviceKnownValues are not reflected in the instances retained by this container.
-// call replaceKnownDeviceValues: to update this container's collection
+// Call replaceKnownDeviceValues: to update this container's collection
 - (SFIDeviceKnownValues*)knownValuesForPropertyName:(NSString*)name;
 
-// returns a copy of the known values for the specified property, or nil if none found.
-// changes to SFIDeviceKnownValues are not reflected in the instances retained by this container.
-// call replaceKnownDeviceValues: to update this container's collection
+// Returns a copy of the known values for the specified property, or nil if none found.
+// Changes to SFIDeviceKnownValues are not reflected in the instances retained by this container.
+// Call replaceKnownDeviceValues: to update this container's collection
 - (SFIDeviceKnownValues*)knownValuesForProperty:(SFIDevicePropertyType)propertyType;
 
-// returns the value for the specified property, or nil if none found
-// this is the most efficient method for returns the value when only the string representation is required.
+// Returns the value for the specified property, or nil if none found
+// This is the most efficient method when a string representation is required.
 - (NSString*)valueForProperty:(SFIDevicePropertyType)propertyType;
 
-// returns the value for the specified property, or the ifNil value when no value is found.
-// this is the most efficient method for returns the value when only the string representation is required.
+// Returns the value for the specified property, or the ifNil value when no value is found.
+// This is the most efficient method when a string representation is required.
 - (NSString*)valueForProperty:(SFIDevicePropertyType)propertyType default:(NSString*)ifNil;
 
-// returns the dictionary value associated with the specified property's value, or ifNil value when no match is found.
-// this method provides a convenience to UI controls, such as segmented buttons, that must set their state depending
-// on more than one possible value.
-// The dictionary key is the property value to match on, and the dictionary value is the object to be returned.
+// Returns the dictionary value associated with the specified property's value, or ifNil value when no match is found.
+// This method provides a convenience to UI controls, such as segmented buttons, that must set their state depending
+// on more than one possible value. The dictionary key is the literal property value to match on,
+// and the dictionary value is the object to be returned.
 - (id)choiceForPropertyValue:(SFIDevicePropertyType)propertyType choices:(NSDictionary *)choices default:(id)ifNil;
 
-// returns a copy of the SFIDeviceKnownValues;
+// Returns a copy of the SFIDeviceKnownValues;
 // changes to SFIDeviceKnownValues are not reflected in the instances retained by this container.
-// call replaceKnownDeviceValues: to update this container's collection
+// Call replaceKnownDeviceValues: to update this container's collection
 - (NSArray*)knownDevicesValues;
 
-// sets the SFIDeviceKnownValues with the specified values.
-// the values are copied
+// Sets the SFIDeviceKnownValues with the specified values.
+// The values are copied.
 - (void)replaceKnownDeviceValues:(NSArray*)values;
 
 @end
