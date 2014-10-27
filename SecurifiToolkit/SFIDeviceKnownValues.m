@@ -29,6 +29,8 @@
                 @"ARMMODE" : @(SFIDevicePropertyType_ARMMODE),
                 @"BASIC" : @(SFIDevicePropertyType_BASIC),
                 @"BATTERY" : @(SFIDevicePropertyType_BATTERY),
+                @"BRIGHTNESS" : @(SFIDevicePropertyType_BRIGHTNESS),
+                @"COLOUR(HUE)" : @(SFIDevicePropertyType_COLOR_HUE),
                 @"COLOR_TEMPERATURE" : @(SFIDevicePropertyType_COLOR_TEMPERATURE),
                 @"CURRENT POSITION" : @(SFIDevicePropertyType_CURRENT_POSITION),
                 @"CURRENT_HUE" : @(SFIDevicePropertyType_CURRENT_HUE),
@@ -60,6 +62,7 @@
                 @"POWER" : @(SFIDevicePropertyType_POWER),
                 @"RMS_CURRENT" : @(SFIDevicePropertyType_RMS_CURRENT),
                 @"RMS_VOLTAGE" : @(SFIDevicePropertyType_RMS_VOLTAGE),
+                @"SATURATION" : @(SFIDevicePropertyType_SATURATION),
                 @"SENSOR BINARY" : @(SFIDevicePropertyType_SENSOR_BINARY),
                 @"SENSOR MULTILEVEL" : @(SFIDevicePropertyType_SENSOR_MULTILEVEL),
                 @"STATE" : @(SFIDevicePropertyType_STATE),
@@ -196,13 +199,6 @@
 }
 
 
-- (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr {
-    if ([self.value isEqualToString:@"true"]) {
-        return aTrueStr;
-    }
-    return aFalseStr;
-}
-
 - (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr nilValue:(id)aNoneValue {
     if ([self.value isEqualToString:@"true"]) {
         return aTrueStr;
@@ -213,19 +209,6 @@
     return aNoneValue;
 }
 
-
-- (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr nilValue:(id)aNoneValue nonNilValue:(NSString*)aNonNilValue {
-    if ([self.value isEqualToString:@"true"]) {
-        return aTrueStr;
-    }
-    if ([self.value isEqualToString:@"false"]) {
-        return aFalseStr;
-    }
-    if (self.value == nil) {
-        return aNoneValue;
-    }
-    return aNonNilValue;
-}
 
 - (id)copyWithZone:(NSZone *)zone {
     SFIDeviceKnownValues *copy = [[[self class] allocWithZone:zone] init];

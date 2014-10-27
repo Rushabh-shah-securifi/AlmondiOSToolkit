@@ -24,6 +24,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_ARMMODE,
     SFIDevicePropertyType_BASIC,
     SFIDevicePropertyType_BATTERY,
+    SFIDevicePropertyType_BRIGHTNESS,
+    SFIDevicePropertyType_COLOR_HUE,
     SFIDevicePropertyType_COLOR_TEMPERATURE,
     SFIDevicePropertyType_CURRENT_POSITION,
     SFIDevicePropertyType_CURRENT_HUE,
@@ -55,6 +57,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_POWER,
     SFIDevicePropertyType_RMS_CURRENT,
     SFIDevicePropertyType_RMS_VOLTAGE,
+    SFIDevicePropertyType_SATURATION,
     SFIDevicePropertyType_SENSOR_BINARY,
     SFIDevicePropertyType_SENSOR_MULTILEVEL,
     SFIDevicePropertyType_STATE,
@@ -107,11 +110,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
 
 - (id)choiceForLevelValueZeroValue:(id)aZeroVal nonZeroValue:(id)aNonZeroValue nilValue:(id)aNoneValue;
 
-- (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr;
-
 - (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr nilValue:(id)aNoneValue;
-
-- (id)choiceForBoolValueTrueValue:(id)aTrueStr falseValue:(id)aFalseStr nilValue:(id)aNoneValue nonNilValue:(id)aNonNilValue;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
