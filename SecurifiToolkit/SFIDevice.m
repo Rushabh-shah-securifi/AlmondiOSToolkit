@@ -7,10 +7,7 @@
 //
 
 #import "SFIDevice.h"
-#import "SFIDeviceKnownValues.h"
 #import "SFIDeviceValue.h"
-
-#define TAMPER @"TAMPER"
 
 @implementation SFIDevice
 
@@ -65,6 +62,90 @@
     }
 }
 
+- (SFIDevicePropertyType)statePropertyType {
+    switch (self.deviceType) {
+        case SFIDeviceType_MultiLevelSwitch_2: {
+            return SFIDevicePropertyType_SWITCH_MULTILEVEL;
+        }
+
+        case SFIDeviceType_DoorLock_5: {
+            return SFIDevicePropertyType_LOCK_STATE;
+        }
+
+        case SFIDeviceType_StandardWarningDevice_21: {
+            return SFIDevicePropertyType_ALARM_STATE;
+        }
+
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_BinarySensor_3:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_SmartDCSwitch_23:
+        case SFIDeviceType_Shade_34:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45: {
+            return SFIDevicePropertyType_SWITCH_BINARY;
+        }
+
+        case SFIDeviceType_Alarm_6:
+        case SFIDeviceType_FloodSensor_37:
+        case SFIDeviceType_MoistureSensor_40: {
+            return SFIDevicePropertyType_BASIC;
+        }
+
+        case SFIDeviceType_MotionSensor_11:
+        case SFIDeviceType_ContactSwitch_12:
+        case SFIDeviceType_FireSensor_13:
+        case SFIDeviceType_WaterSensor_14:
+        case SFIDeviceType_GasSensor_15:
+        case SFIDeviceType_VibrationOrMovementSensor_17:
+        case SFIDeviceType_Keypad_20: {
+            return SFIDevicePropertyType_STATE;
+        }
+
+        case SFIDeviceType_ShockSensor_38:
+        case SFIDeviceType_DoorSensor_39:
+        case SFIDeviceType_MovementSensor_41:
+        {
+            return SFIDevicePropertyType_SENSOR_BINARY;
+        }
+
+        case SFIDeviceType_UnknownDevice_0:
+        case SFIDeviceType_Thermostat_7:
+        case SFIDeviceType_Controller_8:
+        case SFIDeviceType_SceneController_9:
+        case SFIDeviceType_StandardCIE_10:
+        case SFIDeviceType_PersonalEmergencyDevice_16:
+        case SFIDeviceType_RemoteControl_18:
+        case SFIDeviceType_KeyFob_19:
+        case SFIDeviceType_OccupancySensor_24:
+        case SFIDeviceType_LightSensor_25:
+        case SFIDeviceType_WindowCovering_26:
+        case SFIDeviceType_TemperatureSensor_27:
+        case SFIDeviceType_SimpleMetering_28:
+        case SFIDeviceType_ColorControl_29:
+        case SFIDeviceType_PressureSensor_30:
+        case SFIDeviceType_FlowSensor_31:
+        case SFIDeviceType_ColorDimmableLight_32:
+        case SFIDeviceType_HAPump_33:
+        case SFIDeviceType_SmokeDetector_36:
+        case SFIDeviceType_MultiSwitch_43:
+        default: {
+            return SFIDevicePropertyType_STATE;
+        }
+    }}
+
+- (SFIDevicePropertyType)mutableStatePropertyType {
+    switch (self.deviceType) {
+        case SFIDeviceType_MultiLevelOnOff_4:
+            return SFIDevicePropertyType_SWITCH_MULTILEVEL;
+
+        default:
+            return [self statePropertyType];
+    }
+}
+
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
@@ -82,12 +163,6 @@
         self.allowNotification = [coder decodeObjectForKey:@"self.allowNotification"];
         self.valueCount = (unsigned int) [coder decodeIntForKey:@"self.valueCount"];
         self.location = [coder decodeObjectForKey:@"self.location"];
-        self.imageName = [coder decodeObjectForKey:@"self.imageName"];
-        self.mostImpValueName = [coder decodeObjectForKey:@"self.mostImpValueName"];
-        self.mostImpValueIndex = [coder decodeIntForKey:@"self.mostImpValueIndex"];
-        self.stateIndex = [coder decodeIntForKey:@"self.stateIndex"];
-        self.isTampered = [coder decodeBoolForKey:@"self.isTampered"];
-        self.isBatteryLow = [coder decodeBoolForKey:@"self.isBatteryLow"];
     }
 
     return self;
@@ -108,12 +183,6 @@
     [coder encodeObject:self.allowNotification forKey:@"self.allowNotification"];
     [coder encodeInt:self.valueCount forKey:@"self.valueCount"];
     [coder encodeObject:self.location forKey:@"self.location"];
-    [coder encodeObject:self.imageName forKey:@"self.imageName"];
-    [coder encodeObject:self.mostImpValueName forKey:@"self.mostImpValueName"];
-    [coder encodeInt:self.mostImpValueIndex forKey:@"self.mostImpValueIndex"];
-    [coder encodeInt:self.stateIndex forKey:@"self.stateIndex"];
-    [coder encodeBool:self.isTampered forKey:@"self.isTampered"];
-    [coder encodeBool:self.isBatteryLow forKey:@"self.isBatteryLow"];
 }
 
 - (NSString *)description {
@@ -132,12 +201,6 @@
     [description appendFormat:@", self.allowNotification=%@", self.allowNotification];
     [description appendFormat:@", self.valueCount=%u", self.valueCount];
     [description appendFormat:@", self.location=%@", self.location];
-    [description appendFormat:@", self.imageName=%@", self.imageName];
-    [description appendFormat:@", self.mostImpValueName=%@", self.mostImpValueName];
-    [description appendFormat:@", self.mostImpValueIndex=%i", self.mostImpValueIndex];
-    [description appendFormat:@", self.stateIndex=%i", self.stateIndex];
-    [description appendFormat:@", self.isTampered=%d", self.isTampered];
-    [description appendFormat:@", self.isBatteryLow=%d", self.isBatteryLow];
     [description appendString:@">"];
     return description;
 }
@@ -160,149 +223,25 @@
         copy.allowNotification = self.allowNotification;
         copy.valueCount = self.valueCount;
         copy.location = self.location;
-        copy.imageName = self.imageName;
-        copy.mostImpValueName = self.mostImpValueName;
-        copy.mostImpValueIndex = self.mostImpValueIndex;
-        copy.stateIndex = self.stateIndex;
-        copy.isTampered = self.isTampered;
-        copy.isBatteryLow = self.isBatteryLow;
     }
 
     return copy;
 }
 
-
-- (NSString *)imageName:(NSString *)defaultName {
-    return self.imageName ? self.imageName : defaultName;
-}
-
-- (void)initializeFromValues:(SFIDeviceValue *)values {
-
-    switch (self.deviceType) {
-
-        case SFIDeviceType_MultiLevelSwitch_2: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_MULTILEVEL values:values];
-            break;
-        }
-
-        case SFIDeviceType_MultiLevelOnOff_4: {
-            NSArray *currentKnownValues = values.knownDevicesValues;
-            for (unsigned int index = 0; index < [currentKnownValues count]; index++) {
-                SFIDeviceKnownValues *curDeviceValues;
-                curDeviceValues = currentKnownValues[index];
-
-                if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_BINARY) {
-                    self.stateIndex = index;
-                }
-                else if (curDeviceValues.propertyType == SFIDevicePropertyType_SWITCH_MULTILEVEL) {
-                    self.mostImpValueIndex = index;
-                    self.mostImpValueName = curDeviceValues.valueName;
-                }
-            }
-            break;
-        }
-        case SFIDeviceType_DoorLock_5: {
-            [self configureDeviceForState:SFIDevicePropertyType_LOCK_STATE values:values];
-            break;
-        }
-
-        case SFIDeviceType_BinarySwitch_1:
-        case SFIDeviceType_BinarySensor_3:
-        case SFIDeviceType_SmartACSwitch_22:
-        case SFIDeviceType_SmartDCSwitch_23:
-        case SFIDeviceType_Shade_34:
-        case SFIDeviceType_MovementSensor_41:
-        case SFIDeviceType_Siren_42:
-        case SFIDeviceType_UnknownOnOffModule_44:
-        case SFIDeviceType_BinaryPowerSwitch_45: {
-            [self configureDeviceForState:SFIDevicePropertyType_SWITCH_BINARY values:values];
-            break;
-        }
-
-        case SFIDeviceType_Alarm_6:
-        case SFIDeviceType_FloodSensor_37:
-        case SFIDeviceType_MoistureSensor_40: {
-            [self configureDeviceForState:SFIDevicePropertyType_BASIC values:values];
-            break;
-        }
-
-        case SFIDeviceType_MotionSensor_11:
-        case SFIDeviceType_ContactSwitch_12:
-        case SFIDeviceType_FireSensor_13:
-        case SFIDeviceType_WaterSensor_14:
-        case SFIDeviceType_GasSensor_15:
-        case SFIDeviceType_VibrationOrMovementSensor_17:
-        case SFIDeviceType_Keypad_20:
-        case SFIDeviceType_StandardWarningDevice_21: {
-            [self configureStandardStateDevice:values];
-            break;
-        }
-
-        case SFIDeviceType_UnknownDevice_0:
-        case SFIDeviceType_Thermostat_7:
-        case SFIDeviceType_Controller_8:
-        case SFIDeviceType_SceneController_9:
-        case SFIDeviceType_StandardCIE_10:
-        case SFIDeviceType_PersonalEmergencyDevice_16:
-        case SFIDeviceType_RemoteControl_18:
-        case SFIDeviceType_KeyFob_19:
-        case SFIDeviceType_OccupancySensor_24:
-        case SFIDeviceType_LightSensor_25:
-        case SFIDeviceType_WindowCovering_26:
-        case SFIDeviceType_TemperatureSensor_27:
-        case SFIDeviceType_SimpleMetering_28:
-        case SFIDeviceType_ColorControl_29:
-        case SFIDeviceType_PressureSensor_30:
-        case SFIDeviceType_FlowSensor_31:
-        case SFIDeviceType_ColorDimmableLight_32:
-        case SFIDeviceType_HAPump_33:
-        case SFIDeviceType_SmokeDetector_36:
-        case SFIDeviceType_ShockSensor_38:
-        case SFIDeviceType_DoorSensor_39:
-        case SFIDeviceType_MultiSwitch_43:
-        default: {
-            self.imageName = @"default_device.png";
-            break;
-        }
-    };
-}
-
-- (void)configureDeviceForState:(SFIDevicePropertyType)stateProperty values:(SFIDeviceValue *)deviceValue {
-    //todo remove need for iteration
-    NSArray *devicesValues = deviceValue.knownDevicesValues;
-    NSUInteger count = [devicesValues count];
-    for (unsigned int index = 0; index < count; index++) {
-        SFIDeviceKnownValues *values = devicesValues[index];
-
-        if (values.propertyType == stateProperty) {
-            self.stateIndex = index;
-            self.mostImpValueIndex = index;
-            self.mostImpValueName = values.valueName;
-
-            break;
-        }
+- (BOOL)isTampered:(SFIDeviceValue *)deviceValue {
+    SFIDeviceKnownValues *values = [deviceValue knownValuesForProperty:SFIDevicePropertyType_TAMPER];
+    if (!values) {
+        return NO;
     }
-
-    SFIDeviceKnownValues *values;
-
-    values = [deviceValue knownValuesForProperty:SFIDevicePropertyType_TAMPER];
-    if (values) {
-        self.isTampered = [values.value boolValue];
-    }
-
-    values = [deviceValue knownValuesForProperty:SFIDevicePropertyType_LOW_BATTERY];
-    if (values) {
-        self.isBatteryLow = [values.value boolValue];
-    }
-    
+    return [values.value boolValue];
 }
 
-- (void)configureStandardStateDevice:(SFIDeviceValue *)deviceValue {
-    [self configureDeviceForState:SFIDevicePropertyType_STATE values:deviceValue];
-}
-
-- (BOOL)isTamperMostImportantValue {
-    return [self.mostImpValueName isEqualToString:TAMPER];
+- (BOOL)isBatteryLow:(SFIDeviceValue *)deviceValue {
+    SFIDeviceKnownValues *values = [deviceValue knownValuesForProperty:SFIDevicePropertyType_LOW_BATTERY];
+    if (!values) {
+        return NO;
+    }
+    return [values.value boolValue];
 }
 
 @end

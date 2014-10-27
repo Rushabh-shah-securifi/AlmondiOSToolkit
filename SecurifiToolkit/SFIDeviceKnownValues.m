@@ -25,6 +25,7 @@
                 @"AC_VOLTAGEDIVISOR" : @(SFIDevicePropertyType_AC_VOLTAGEDIVISOR),
                 @"AC_VOLTAGEMULTIPLIER" : @(SFIDevicePropertyType_AC_VOLTAGEMULTIPLIER),
                 @"ACTIVE_POWER" : @(SFIDevicePropertyType_ACTIVE_POWER),
+                @"ALARM_STATE" : @(SFIDevicePropertyType_ALARM_STATE),
                 @"ARMMODE" : @(SFIDevicePropertyType_ARMMODE),
                 @"BASIC" : @(SFIDevicePropertyType_BASIC),
                 @"BATTERY" : @(SFIDevicePropertyType_BATTERY),
@@ -185,7 +186,7 @@
 }
 
 - (id)choiceForLevelValueZeroValue:(id)aZeroVal nonZeroValue:(id)aNonZeroValue nilValue:(id)aNoneValue {
-    if (self.value == nil) {
+    if (self.value == nil || self.value.length == 0) {
         return aNoneValue;
     }
     if (self.isZeroLevelValue) {

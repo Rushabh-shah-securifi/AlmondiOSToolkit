@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SFIDeviceKnownValues.h"
 
 typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_UnknownDevice_0               = 0,
@@ -60,6 +61,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 
 @interface SFIDevice : NSObject <NSCoding, NSCopying>
 
+@property(nonatomic) SFIDeviceType deviceType;
 @property(nonatomic) unsigned int deviceID;
 @property(nonatomic) NSString *deviceName;
 @property(nonatomic) NSString *OZWNode;
@@ -67,7 +69,6 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 @property(nonatomic) NSString *zigBeeEUI64;
 @property(nonatomic) unsigned int deviceTechnology;
 @property(nonatomic) NSString *associationTimestamp;
-@property(nonatomic) SFIDeviceType deviceType;
 @property(nonatomic) NSString *deviceTypeName;
 @property(nonatomic) NSString *friendlyDeviceType;
 @property(nonatomic) NSString *deviceFunction;
@@ -75,29 +76,24 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 @property(nonatomic) unsigned int valueCount;
 @property(nonatomic) NSString *location;
 
-@property(nonatomic) NSString *imageName; //todo remove me; this is strictly UI
-@property(nonatomic) NSString *mostImpValueName; //todo remove me
-@property(nonatomic) int mostImpValueIndex; //todo remove me
-@property(nonatomic) int stateIndex; //todo remove me
-@property(nonatomic) BOOL isTampered;
-@property(nonatomic) BOOL isBatteryLow;
+// Specified the property in the device values that represents the state of the device
+@property(nonatomic, readonly) SFIDevicePropertyType statePropertyType;
+@property(nonatomic, readonly) SFIDevicePropertyType mutableStatePropertyType; //todo probably need a better name for this; it was 'most important property index'
 
 // Converts a type into a standard mnemonic name suitable for event logging
-+ (NSString*)nameForType:(SFIDeviceType)type;
++ (NSString *)nameForType:(SFIDeviceType)type;
+
+// Indicates whether the device has been tampered
+- (BOOL)isTampered:(SFIDeviceValue *)deviceValue;
+
+// Indicates whether the device has a low battery
+- (BOOL)isBatteryLow:(SFIDeviceValue *)deviceValue;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
 
 - (NSString *)description;
-
-// returns the imageName property value or when null returns the default value
-- (NSString *)imageName:(NSString *)defaultName;
-
-//todo not sure why it's called "most important" value
-- (BOOL)isTamperMostImportantValue;
-
-- (void)initializeFromValues:(SFIDeviceValue *)values;
 
 - (id)copyWithZone:(NSZone *)zone;
 

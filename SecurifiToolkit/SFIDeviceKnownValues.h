@@ -20,6 +20,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_AC_VOLTAGEDIVISOR,
     SFIDevicePropertyType_AC_VOLTAGEMULTIPLIER,
     SFIDevicePropertyType_ACTIVE_POWER,
+    SFIDevicePropertyType_ALARM_STATE,
     SFIDevicePropertyType_ARMMODE,
     SFIDevicePropertyType_BASIC,
     SFIDevicePropertyType_BATTERY,
