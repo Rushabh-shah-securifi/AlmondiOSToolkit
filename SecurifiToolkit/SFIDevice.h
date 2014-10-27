@@ -89,6 +89,14 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 // Indicates whether the device has a low battery
 - (BOOL)isBatteryLow:(SFIDeviceValue *)deviceValue;
 
+// Indicates whether the device has a binary "on/off" (or "open/closed" or so on) state that can be toggled.
+- (BOOL)isBinaryStateSwitchable;
+
+// Toggles the device state, returning the new state values.
+// Returns nil if the device does not support switching state or when the value is missing and cannot be determined.
+// Caller may test whether the device supports this capability by calling isBinaryStateSwitchable
+- (SFIDeviceKnownValues*)switchBinaryState:(SFIDeviceValue *)value;
+
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;

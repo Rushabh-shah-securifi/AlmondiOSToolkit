@@ -146,6 +146,80 @@
     }
 }
 
+- (BOOL)isBinaryStateSwitchable {
+    switch (self.deviceType) {
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_MultiLevelSwitch_2:
+        case SFIDeviceType_BinarySensor_3:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_DoorLock_5:
+        case SFIDeviceType_Alarm_6:
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_SmartDCSwitch_23:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45: {
+            return YES;
+        }
+
+        default: {
+            return NO;
+        }
+    }
+}
+
+
+- (SFIDeviceKnownValues *)switchBinaryState:(SFIDeviceValue *)value {
+    SFIDeviceKnownValues *deviceValues = nil;
+
+    switch (self.deviceType) {
+        case SFIDeviceType_MultiLevelSwitch_2: {
+            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+
+            int newValue = (deviceValues.intValue == 0) ? 99 : 0;
+            [deviceValues setIntValue:newValue];
+            break;
+        }
+
+        case SFIDeviceType_BinarySensor_3: {
+            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+            [deviceValues setBoolValue:NO];
+            break;
+        }
+
+        case SFIDeviceType_DoorLock_5:
+        case SFIDeviceType_Alarm_6: {
+            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+
+            int newValue = (deviceValues.intValue == 0) ? 255 : 0;
+            [deviceValues setIntValue:newValue];
+            break;
+        }
+
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_SmartDCSwitch_23:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45: {
+            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+            if (deviceValues.hasValue) {
+                [deviceValues setBoolValue:!deviceValues.boolValue];
+            }
+            break;
+        }
+
+        default: {
+            // do nothing
+        }
+    } // end switch
+
+    return deviceValues; // can be nil
+}
+
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
