@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-
+@protocol ScoreboardEvent<NSObject>
+- (NSString*)label;
+@end
 
 @interface Scoreboard : NSObject <NSCopying>
 
@@ -37,8 +39,15 @@
 // Number of responses received for commands sent to the cloud
 @property NSUInteger commandResponseCount;
 
-- (id)copyWithZone:(NSZone *)zone;
-
 - (NSString*)formattedValue:(NSUInteger)value;
 
+- (void)markEvent:(id<ScoreboardEvent>)event;
+
+- (NSUInteger)allEventsCount;
+
+- (NSArray*)allEvents;
+
+- (id)copyWithZone:(NSZone *)zone;
+
 @end
+

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CommandTypes.h"
 
 typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
     SDKCloudStatusUninitialized = 1,
@@ -27,9 +28,10 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 - (void)singletTonCloudConnectionDidEstablish:(SingleTon *)singleTon;
 - (void)singletTonCloudConnectionDidClose:(SingleTon *)singleTon;
 
-- (void)singletTonDidReceiveDynamicUpdate:(SingleTon *)singleTon;
-- (void)singletTonDidSendCommand:(SingleTon *)singleTon;
-- (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime;
+- (void)singletTonDidReceiveDynamicUpdate:(SingleTon *)singleTon commandType:(enum CommandType)type;
+- (void)singletTonDidSendCommand:(SingleTon *)singleTon command:(GenericCommand *)command;
+
+- (void)singletTonDidReceiveCommandResponse:(SingleTon *)singleTon command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime responseType:(CommandType)type;
 
 @end
 

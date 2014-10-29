@@ -107,6 +107,12 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 // Changes take effect on next connection attempt. Use closeConnection to force a connection change.
 @property(nonatomic) BOOL useProductionCloud;
 
+// When YES events will be collected by the Scorecard for reporting and tracking commands, responses,
+// dynamic updates, and other significant actions taken in the toolkit. The events can be retrieved
+// from the Scorecard. This is a debug facility and should not be run in production due to potential
+// performance and memory costs.
+@property(nonatomic) BOOL collectEvents;
+
 + (instancetype)sharedInstance;
 
 - (void)initToolkit;
