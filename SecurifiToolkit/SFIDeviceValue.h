@@ -58,6 +58,14 @@
 // Call replaceKnownDeviceValues: to update this container's collection
 - (NSArray*)knownDevicesValues;
 
+// Updates the values for the specified property.
+// The receiver's state is not altered and a clone reflecting the change is returned.
+- (SFIDeviceValue*)setKnownValues:(SFIDeviceKnownValues *)newValues forProperty:(SFIDevicePropertyType)type;
+
+// Updates the values for the specified property.
+// The receiver's state is not altered and a clone reflecting the change is returned.
+- (SFIDeviceValue*)setKnownValues:(SFIDeviceKnownValues *)newValues forPropertyName:(NSString*)name;
+
 // Sets the SFIDeviceKnownValues with the specified values.
 // The values are copied.
 - (void)replaceKnownDeviceValues:(NSArray*)values;

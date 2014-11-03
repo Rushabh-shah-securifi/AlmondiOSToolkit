@@ -56,13 +56,13 @@
     return copy;
 }
 
+- (SFIDeviceKnownValues*)knownValuesForProperty:(SFIDevicePropertyType)propertyType {
+    SFIDeviceKnownValues *values = [self internalKnownValuesForProperty:propertyType];
+    return [values copy];
+}
+
 - (SFIDeviceKnownValues *)knownValuesForPropertyName:(NSString *)name {
-    for (SFIDeviceKnownValues *values in _knownValues) {
-        if ([values.valueName isEqualToString:name]) {
-            return [values copy];
-        }
-    }
-    return nil;
+    return (self.lookupTable)[name];
 }
 
 - (NSArray *)knownDevicesValues {
@@ -72,6 +72,34 @@
     return [[NSArray alloc] initWithArray:_knownValues copyItems:YES];
 }
 
+- (SFIDeviceValue *)setKnownValues:(SFIDeviceKnownValues *)newValues forProperty:(SFIDevicePropertyType)type {
+    SFIDeviceValue *clone = [self copy];
+    SFIDeviceKnownValues *oldValues = [clone internalKnownValuesForProperty:type];
+    [SFIDeviceValue tryUpdateDeviceValue:clone oldValues:oldValues newValues:newValues];
+    return clone;
+}
+
+- (SFIDeviceValue *)setKnownValues:(SFIDeviceKnownValues *)newValues forPropertyName:(NSString *)name {
+    SFIDeviceValue *clone = [self copy];
+    SFIDeviceKnownValues *oldValues = [clone internalKnownValuesForPropertyName:name];
+    [SFIDeviceValue tryUpdateDeviceValue:clone oldValues:oldValues newValues:newValues];
+    return clone;
+}
+
++ (void)tryUpdateDeviceValue:(SFIDeviceValue *)clone oldValues:(SFIDeviceKnownValues *)newValues newValues:(SFIDeviceKnownValues *)values {
+    if (values) {
+        NSMutableArray *new_values = [NSMutableArray arrayWithArray:clone.knownValues];
+        NSUInteger count = clone.knownValues.count;
+        for (NSUInteger index=0; index < count; index++) {
+            SFIDeviceKnownValues *v = clone.knownValues[index];
+            if (v == values) {
+                new_values[index] = newValues;
+                [clone replaceKnownDeviceValues:new_values];
+                break;
+            }
+        }
+    }
+}
 
 - (void)replaceKnownDeviceValues:(NSArray *)values {
     NSArray *copy = [[NSArray alloc] initWithArray:values copyItems:YES];
@@ -80,14 +108,16 @@
     _lookupTable = lookupTable;
 }
 
-- (SFIDeviceKnownValues*)knownValuesForProperty:(SFIDevicePropertyType)propertyType {
-    SFIDeviceKnownValues *values = [self internalKnownValuesForProperty:propertyType];
-    return [values copy];
-}
-
 - (SFIDeviceKnownValues *)internalKnownValuesForProperty:(SFIDevicePropertyType)propertyType {
     NSNumber *key = @(propertyType);
     return (self.lookupTable)[key];
+}
+
+- (SFIDeviceKnownValues *)internalKnownValuesForPropertyName:(NSString*)name {
+    if (name == nil) {
+        return nil;
+    }
+    return (self.lookupTable)[name];
 }
 
 - (NSString *)valueForProperty:(SFIDevicePropertyType)propertyType {
@@ -125,8 +155,17 @@
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
     for (SFIDeviceKnownValues *values in knownValues) {
+        // lookup by two keys: property ID and name
+        // some properties such as PIN codes for a door lock do not have a well-defined property type ID
+        // as they are synthesized based on a common property type and then an index number; in their case,
+        // only a lookup by property name will yield a result.
         NSNumber *key = @(values.propertyType);
         dict[key] = values;
+
+        NSString *value = values.valueName;
+        if (value != nil) {
+            dict[value] = values;
+        }
     }
     
     return [NSDictionary dictionaryWithDictionary:dict];
