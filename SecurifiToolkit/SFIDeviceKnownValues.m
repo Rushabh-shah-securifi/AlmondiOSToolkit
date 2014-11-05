@@ -30,7 +30,6 @@
                 @"BASIC" : @(SFIDevicePropertyType_BASIC),
                 @"BATTERY" : @(SFIDevicePropertyType_BATTERY),
                 @"BRIGHTNESS" : @(SFIDevicePropertyType_BRIGHTNESS),
-                @"COLOUR(HUE)" : @(SFIDevicePropertyType_COLOR_HUE),
                 @"COLOR_TEMPERATURE" : @(SFIDevicePropertyType_COLOR_TEMPERATURE),
                 @"CURRENT POSITION" : @(SFIDevicePropertyType_CURRENT_POSITION),
                 @"CURRENT_HUE" : @(SFIDevicePropertyType_CURRENT_HUE),
@@ -49,6 +48,7 @@
                 @"DC_VOLTAGEDIVISOR" : @(SFIDevicePropertyType_DC_VOLTAGEDIVISOR),
                 @"DC_VOLTAGEMULTIPLIER" : @(SFIDevicePropertyType_DC_VOLTAGEMULTIPLIER),
                 @"EMER_ALARM" : @(SFIDevicePropertyType_EMER_ALARM),
+                @"HUE" : @(SFIDevicePropertyType_COLOR_HUE),
                 @"HUMIDITY" : @(SFIDevicePropertyType_HUMIDITY),
                 @"ILLUMINANCE" : @(SFIDevicePropertyType_ILLUMINANCE),
                 @"LOCK_CONF" : @(SFIDevicePropertyType_LOCK_CONF),
@@ -79,12 +79,19 @@
                 @"THERMOSTAT SETPOINT HEATING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING),
                 @"TOLERANCE" : @(SFIDevicePropertyType_TOLERANCE),
                 @"USER_CODE" : @(SFIDevicePropertyType_USER_CODE),
+
         };
     }
     return lookupTable;
 }
 
 + (SFIDevicePropertyType) nameToPropertyType:(NSString*)valueName {
+    if (valueName == nil) {
+        return SFIDevicePropertyType_UNKNOWN;
+    }
+    
+    valueName = [valueName uppercaseString];
+
     NSDictionary *lookupTable = [self nameToTypeDictionary];
 
     NSNumber *o = lookupTable[valueName];
