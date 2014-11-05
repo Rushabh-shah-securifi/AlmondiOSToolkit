@@ -15,6 +15,7 @@
 
     if (lookupTable == nil) {
         lookupTable = @{
+                // Normalize all names to upper case
                 @"AC_CURRENTDIVISOR" : @(SFIDevicePropertyType_AC_CURRENTDIVISOR),
                 @"AC_CURRENTMULTIPLIER" : @(SFIDevicePropertyType_AC_CURRENTMULTIPLIER),
                 @"AC_FREQUENCY" : @(SFIDevicePropertyType_AC_FREQUENCY),
@@ -85,6 +86,13 @@
 }
 
 + (SFIDevicePropertyType) nameToPropertyType:(NSString*)valueName {
+    if (valueName == nil) {
+        return SFIDevicePropertyType_UNKNOWN;
+    }
+
+    // normalize all names
+    valueName = [valueName uppercaseString];
+
     NSDictionary *lookupTable = [self nameToTypeDictionary];
 
     NSNumber *o = lookupTable[valueName];
