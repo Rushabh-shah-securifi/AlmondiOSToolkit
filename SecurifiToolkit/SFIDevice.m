@@ -87,7 +87,7 @@
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48: {
-            return SFIDevicePropertyType_SWITCH_BINARY;
+            return SFIDevicePropertyType_STATE;
         }
 
         case SFIDeviceType_Alarm_6:
