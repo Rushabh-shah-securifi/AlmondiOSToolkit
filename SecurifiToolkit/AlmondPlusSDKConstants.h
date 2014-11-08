@@ -99,6 +99,4 @@
 #define IS_ACCOUNT_ACTIVATED_DEFAULT    @"1"
 #define MINS_REMAINING_DEFAULT          @"0"
 
-#define FIRMWARE_VERSION @"FirmwareVersion"
-
 #endif
