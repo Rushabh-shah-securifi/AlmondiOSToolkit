@@ -14,10 +14,8 @@
 #import "UnlinkAlmondRequest.h"
 #import "UserInviteRequest.h"
 #import "DeleteAccountRequest.h"
-#import "DeleteAccountResponse.h"
 #import "DeleteSecondaryUserRequest.h"
 #import "DeleteMeAsSecondaryUserRequest.h"
-#import "AlmondNameChange.h"
 #import "MeAsSecondaryUserRequest.h"
 
 
@@ -228,9 +226,8 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
 
-        [self setupReachability:CLOUD_DEV_SERVER];
-
         // default; do not change
+        [self setupReachability:CLOUD_PROD_SERVER];
         self.useProductionCloud = YES;
 
         _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
