@@ -77,19 +77,6 @@
             return SFIDevicePropertyType_ALARM_STATE;
         }
 
-        case SFIDeviceType_BinarySwitch_1:
-        case SFIDeviceType_BinarySensor_3:
-        case SFIDeviceType_MultiLevelOnOff_4:
-        case SFIDeviceType_SmartACSwitch_22:
-        case SFIDeviceType_SmartDCSwitch_23:
-        case SFIDeviceType_Shade_34:
-        case SFIDeviceType_Siren_42:
-        case SFIDeviceType_UnknownOnOffModule_44:
-        case SFIDeviceType_BinaryPowerSwitch_45:
-        case SFIDeviceType_HueLamp_48: {
-            return SFIDevicePropertyType_STATE;
-        }
-
         case SFIDeviceType_Alarm_6:
         case SFIDeviceType_FloodSensor_37:
         case SFIDeviceType_MoistureSensor_40: {
@@ -102,10 +89,25 @@
         case SFIDeviceType_WaterSensor_14:
         case SFIDeviceType_GasSensor_15:
         case SFIDeviceType_VibrationOrMovementSensor_17:
-        case SFIDeviceType_Keypad_20: {
+        case SFIDeviceType_Keypad_20:
+        case SFIDeviceType_HueLamp_48:
+        {
             return SFIDevicePropertyType_STATE;
         }
 
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_SmartDCSwitch_23:
+        case SFIDeviceType_Shade_34:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45:
+        {
+            return SFIDevicePropertyType_SWITCH_BINARY;
+        }
+
+        case SFIDeviceType_BinarySensor_3:
         case SFIDeviceType_ShockSensor_38:
         case SFIDeviceType_DoorSensor_39:
         case SFIDeviceType_MovementSensor_41:
@@ -113,6 +115,7 @@
             return SFIDevicePropertyType_SENSOR_BINARY;
         }
 
+        // Not implemented devices
         case SFIDeviceType_UnknownDevice_0:
         case SFIDeviceType_Thermostat_7:
         case SFIDeviceType_Controller_8:
@@ -140,6 +143,7 @@
 
 - (SFIDevicePropertyType)mutableStatePropertyType {
     switch (self.deviceType) {
+        case SFIDeviceType_MultiLevelSwitch_2:
         case SFIDeviceType_MultiLevelOnOff_4:
             return SFIDevicePropertyType_SWITCH_MULTILEVEL;
 
@@ -178,7 +182,7 @@
 
     switch (self.deviceType) {
         case SFIDeviceType_MultiLevelSwitch_2: {
-            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
 
             int newValue = (deviceValues.intValue == 0) ? 99 : 0;
             [deviceValues setIntValue:newValue];
@@ -186,14 +190,14 @@
         }
 
         case SFIDeviceType_BinarySensor_3: {
-            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
             [deviceValues setBoolValue:NO];
             break;
         }
 
         case SFIDeviceType_DoorLock_5:
         case SFIDeviceType_Alarm_6: {
-            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
 
             int newValue = (deviceValues.intValue == 0) ? 255 : 0;
             [deviceValues setIntValue:newValue];
@@ -210,7 +214,7 @@
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
         {
-            deviceValues = [value knownValuesForProperty:self.mutableStatePropertyType];
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
             if (deviceValues.hasValue) {
                 [deviceValues setBoolValue:!deviceValues.boolValue];
             }
