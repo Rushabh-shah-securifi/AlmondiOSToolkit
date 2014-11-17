@@ -10,35 +10,19 @@
 #import "SFIWirelessSetting.h"
 #import "SFIWirelessSummary.h"
 
-@interface SFIRouterSummary ()
-@property(nonatomic, strong) NSMutableDictionary *summaryBySsid;
-@end
-
 @implementation SFIRouterSummary
 
-- (void)setWirelessSummaries:(NSArray *)wirelessSummaries {
-    _wirelessSummaries = wirelessSummaries;
-
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-    for (SFIWirelessSummary *summary in wirelessSummaries) {
-        NSString *key = summary.ssid;
-
-        if (key != nil) {
-            dict[key] = summary;
+- (void)updateWirelessSummaryWithSettings:(NSArray*)wirelessSettings {
+    for (SFIWirelessSummary *sum in self.wirelessSummaries) {
+        // check for wireless settings
+        for (SFIWirelessSetting *setting in wirelessSettings) {
+            if (setting.index == sum.wirelessIndex) {
+                sum.ssid = setting.ssid;
+                sum.enabled = setting.enabled;
+                break;
+            }
         }
     }
-
-    self.summaryBySsid = dict;
 }
-
-- (SFIWirelessSummary *)summaryFor:(NSString *)ssid {
-    if (ssid == nil) {
-        return nil;
-    }
-
-    return self.summaryBySsid[ssid];
-}
-
 
 @end

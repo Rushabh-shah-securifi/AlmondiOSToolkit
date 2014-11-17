@@ -8,10 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class SFIWirelessSummary;
-@class SFIWirelessSetting;
-
-
 @interface SFIRouterSummary : NSObject
 
 @property(nonatomic) int wirelessSettingsCount;
@@ -22,8 +18,6 @@
 @property(nonatomic) NSString *routerUptime;
 @property(nonatomic) NSString *firmwareVersion;
 
-// Returns the settings associated with the summary
-- (SFIWirelessSummary *)summaryFor:(NSString *)ssid;
-
+- (void)updateWirelessSummaryWithSettings:(NSArray *)wirelessSettings;
 
 @end

@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SFIWirelessSetting : NSObject
-//<AlmondWirelessSettings index="1">
+@interface SFIWirelessSetting : NSObject <NSCopying>
+
+//<AlmondWirelessSettings index="1" enabled="true">
 //<SSID>AlmondNetwork</SSID>
 //<Password>1234567890</Password>
 //<Channel>1</Channel>
@@ -19,6 +20,7 @@
 //<CountryRegion>0</CountryRegion>
 //</AlmondWirelessSettings>
 @property(nonatomic) int index;
+@property(nonatomic) BOOL enabled;
 @property(nonatomic) NSString *ssid;
 @property(nonatomic) NSString *password;
 @property(nonatomic) int channel;
@@ -26,5 +28,10 @@
 @property(nonatomic) NSString *security;
 @property(nonatomic) NSString *wirelessMode;
 @property(nonatomic) int wirelessModeCode;
-@property(nonatomic) int countryRegion;
+@property(nonatomic) NSString *countryRegion;
+
+- (NSString *)toXml;
+
+- (id)copyWithZone:(NSZone *)zone;
+
 @end

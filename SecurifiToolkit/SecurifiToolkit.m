@@ -953,6 +953,19 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncSendToCloud:cmd];
 }
 
+- (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings {
+    GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
+    req.almondMAC = almondMAC;
+    req.data = [settings toXml];
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = req;
+    [self asyncSendToCloud:cmd];
+
+    return req.correlationId;
+}
+
 #pragma mark - Command constructors
 
 - (GenericCommand *)makeCloudSanityCommand {

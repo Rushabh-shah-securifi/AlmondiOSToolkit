@@ -207,7 +207,7 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;
 
-- (void)asyncSetWireless
+- (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
 @end
  
