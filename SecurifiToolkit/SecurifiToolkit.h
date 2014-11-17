@@ -69,6 +69,11 @@
 #import <SecurifiToolkit/DeleteMeAsSecondaryUserResponse.h>
 #import <SecurifiToolkit/SFICredentialsValidator.h>
 
+#import <SecurifiToolkit/SFIRouterSummary.h>
+#import <SecurifiToolkit/SFIWirelessSetting.h>
+#import <SecurifiToolkit/SFIWirelessSummary.h>
+#import <SecurifiToolkit/SFIWirelessUsers.h>
+
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
 // Sent in response to a call to asyncSendLoginWithEmail:password:
@@ -201,6 +206,8 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;
+
+- (void)asyncSetWireless
 
 @end
  

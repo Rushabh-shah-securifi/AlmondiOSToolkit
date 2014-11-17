@@ -23,6 +23,14 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1C0C99011A19CD5D00148010 /* SFIRouterSummary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C0C98F91A19CD5D00148010 /* SFIRouterSummary.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C0C99021A19CD5D00148010 /* SFIRouterSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C0C98FA1A19CD5D00148010 /* SFIRouterSummary.m */; };
+		1C0C99031A19CD5D00148010 /* SFIWirelessSetting.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C0C98FB1A19CD5D00148010 /* SFIWirelessSetting.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C0C99041A19CD5D00148010 /* SFIWirelessSetting.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C0C98FC1A19CD5D00148010 /* SFIWirelessSetting.m */; };
+		1C0C99051A19CD5D00148010 /* SFIWirelessSummary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C0C98FD1A19CD5D00148010 /* SFIWirelessSummary.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C0C99061A19CD5D00148010 /* SFIWirelessSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C0C98FE1A19CD5D00148010 /* SFIWirelessSummary.m */; };
+		1C0C99071A19CD5D00148010 /* SFIWirelessUsers.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C0C98FF1A19CD5D00148010 /* SFIWirelessUsers.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C0C99081A19CD5D00148010 /* SFIWirelessUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C0C99001A19CD5D00148010 /* SFIWirelessUsers.m */; };
 		1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */; };
 		1C2350C9195132B500F97EA7 /* KeyChainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */; };
 		1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBCE19480D6C00E353D1 /* Reachability.m */; };
@@ -227,6 +235,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1C0C98F91A19CD5D00148010 /* SFIRouterSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIRouterSummary.h; sourceTree = "<group>"; };
+		1C0C98FA1A19CD5D00148010 /* SFIRouterSummary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIRouterSummary.m; sourceTree = "<group>"; };
+		1C0C98FB1A19CD5D00148010 /* SFIWirelessSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIWirelessSetting.h; sourceTree = "<group>"; };
+		1C0C98FC1A19CD5D00148010 /* SFIWirelessSetting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessSetting.m; sourceTree = "<group>"; };
+		1C0C98FD1A19CD5D00148010 /* SFIWirelessSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIWirelessSummary.h; sourceTree = "<group>"; };
+		1C0C98FE1A19CD5D00148010 /* SFIWirelessSummary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessSummary.m; sourceTree = "<group>"; };
+		1C0C98FF1A19CD5D00148010 /* SFIWirelessUsers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIWirelessUsers.h; sourceTree = "<group>"; };
+		1C0C99001A19CD5D00148010 /* SFIWirelessUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessUsers.m; sourceTree = "<group>"; };
 		1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyChainWrapper.h; sourceTree = "<group>"; };
 		1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainWrapper.m; sourceTree = "<group>"; };
 		1C23FBCD19480D6C00E353D1 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
@@ -431,6 +447,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1C0C98F81A19CD5D00148010 /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				1C0C98F91A19CD5D00148010 /* SFIRouterSummary.h */,
+				1C0C98FA1A19CD5D00148010 /* SFIRouterSummary.m */,
+				1C0C98FB1A19CD5D00148010 /* SFIWirelessSetting.h */,
+				1C0C98FC1A19CD5D00148010 /* SFIWirelessSetting.m */,
+				1C0C98FD1A19CD5D00148010 /* SFIWirelessSummary.h */,
+				1C0C98FE1A19CD5D00148010 /* SFIWirelessSummary.m */,
+				1C0C98FF1A19CD5D00148010 /* SFIWirelessUsers.h */,
+				1C0C99001A19CD5D00148010 /* SFIWirelessUsers.m */,
+			);
+			path = Router;
+			sourceTree = "<group>";
+		};
 		1C23FBCC19480D6C00E353D1 /* Reachability */ = {
 			isa = PBXGroup;
 			children = (
@@ -598,6 +629,7 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				1C0C98F81A19CD5D00148010 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
 				1CA3535B194ED4410042D429 /* OfflineStorage */,
@@ -799,11 +831,13 @@
 				CE5EB63917E852E500985636 /* SFIDevice.h in Headers */,
 				CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */,
 				22A76D4017912FF10099CD8F /* LogoutAllResponse.h in Headers */,
+				1C0C99031A19CD5D00148010 /* SFIWirelessSetting.h in Headers */,
 				CE5EB5B917E703AB00985636 /* LogoutAllRequest.h in Headers */,
 				22B326CF1796D447004B3642 /* SanityResponse.h in Headers */,
 				CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */,
 				22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */,
 				22A76D4D179136B80099CD8F /* CommandParser.h in Headers */,
+				1C0C99071A19CD5D00148010 /* SFIWirelessUsers.h in Headers */,
 				CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */,
 				2204C20A179428B200B05F17 /* SingleTon.h in Headers */,
 				CE5EB64117E8549200985636 /* DeviceDataHashResponse.h in Headers */,
@@ -839,6 +873,7 @@
 				CE2EA26119D04BDD00C6D6A8 /* AlmondNameChange.h in Headers */,
 				CE2EA24D19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
+				1C0C99011A19CD5D00148010 /* SFIRouterSummary.h in Headers */,
 				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
 				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
@@ -852,6 +887,7 @@
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
 				1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */,
+				1C0C99051A19CD5D00148010 /* SFIWirelessSummary.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
@@ -1053,6 +1089,7 @@
 				CE466A5C1823C50700E55DF9 /* ValidateAccountResponse.m in Sources */,
 				22A76D3917912EAC0099CD8F /* LoginResponse.m in Sources */,
 				CE5EB64217E8549200985636 /* DeviceDataHashResponse.m in Sources */,
+				1C0C99081A19CD5D00148010 /* SFIWirelessUsers.m in Sources */,
 				CE5EB63517E82CB400985636 /* DeviceListRequest.m in Sources */,
 				CE5EB65717EAD44E00985636 /* SFIDeviceValue.m in Sources */,
 				CE9A2917188D30270063D562 /* SensorChangeResponse.m in Sources */,
@@ -1065,6 +1102,7 @@
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
+				1C0C99041A19CD5D00148010 /* SFIWirelessSetting.m in Sources */,
 				CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */,
 				CE5EB63E17E8548500985636 /* DeviceDataHashRequest.m in Sources */,
 				CE5EB5CB17E722BD00985636 /* AlmondListResponse.m in Sources */,
@@ -1102,9 +1140,11 @@
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
+				1C0C99021A19CD5D00148010 /* SFIRouterSummary.m in Sources */,
 				CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */,
 				1C2350C9195132B500F97EA7 /* KeyChainWrapper.m in Sources */,
 				1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */,
+				1C0C99061A19CD5D00148010 /* SFIWirelessSummary.m in Sources */,
 				CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */,
 				CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */,
 				CEAD85AE19CACE43006D1048 /* UpdateUserProfileRequest.m in Sources */,
