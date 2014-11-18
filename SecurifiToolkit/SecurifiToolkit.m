@@ -17,6 +17,7 @@
 #import "DeleteSecondaryUserRequest.h"
 #import "DeleteMeAsSecondaryUserRequest.h"
 #import "MeAsSecondaryUserRequest.h"
+#import "XMLWriter.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -957,6 +958,41 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
     req.almondMAC = almondMAC;
     req.data = [settings toXml];
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = req;
+    [self asyncSendToCloud:cmd];
+
+    return req.correlationId;
+}
+
+- (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)blockedMacs {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+
+    [writer writeStartElement:@"AlmondBlockedMACs"];
+    [writer writeAttribute:@"action" value:@"set"];
+    [writer writeAttribute:@"count" value:[NSString stringWithFormat:@"%d", blockedMacs.count]];
+
+    int index=0;
+    for (NSString *mac in blockedMacs) {
+        index++;
+        [writer writeStartElement:@"BlockedMAC"];
+        [writer writeAttribute:@"index" value:[NSString stringWithFormat:@"%d", index]];
+        [writer writeCharacters:mac];
+        [writer writeEndElement];
+    }
+
+    [writer writeEndElement];
+    [writer writeEndElement];
+
+    GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
+    req.almondMAC = almondMAC;
+    req.data = [writer toString];
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;

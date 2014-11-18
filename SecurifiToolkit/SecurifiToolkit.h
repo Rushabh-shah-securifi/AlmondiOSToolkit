@@ -209,5 +209,7 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
+- (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)deviceMAC;
+
 @end
  
