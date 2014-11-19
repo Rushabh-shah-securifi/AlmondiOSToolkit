@@ -79,7 +79,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 
 // Specified the property in the device values that represents the state of the device
 @property(nonatomic, readonly) SFIDevicePropertyType statePropertyType;
-@property(nonatomic, readonly) SFIDevicePropertyType mutableStatePropertyType; //todo probably need a better name for this; it was 'most important property index'
+@property(nonatomic, readonly) SFIDevicePropertyType mutableStatePropertyType; //todo probably need a better name for this; it was 'most important property index'; maybe call it "variableStatePropertyType" to mean the value can be in a range, not just binary.
 
 // Converts a type into a standard mnemonic name suitable for event logging
 + (NSString *)nameForType:(SFIDeviceType)type;

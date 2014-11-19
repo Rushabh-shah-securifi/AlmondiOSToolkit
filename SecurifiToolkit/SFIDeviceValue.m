@@ -86,13 +86,14 @@
     return clone;
 }
 
-+ (void)tryUpdateDeviceValue:(SFIDeviceValue *)clone oldValues:(SFIDeviceKnownValues *)newValues newValues:(SFIDeviceKnownValues *)values {
-    if (values) {
++ (void)tryUpdateDeviceValue:(SFIDeviceValue *)clone oldValues:(SFIDeviceKnownValues *)oldValues newValues:(SFIDeviceKnownValues *)newValues {
+    if (newValues) {
         NSMutableArray *new_values = [NSMutableArray arrayWithArray:clone.knownValues];
         NSUInteger count = clone.knownValues.count;
+
         for (NSUInteger index=0; index < count; index++) {
             SFIDeviceKnownValues *v = clone.knownValues[index];
-            if (v == values) {
+            if (v == oldValues) {
                 new_values[index] = newValues;
                 [clone replaceKnownDeviceValues:new_values];
                 break;
@@ -113,6 +114,7 @@
     return (self.lookupTable)[key];
 }
 
+// get values from internal storage; does not copy values
 - (SFIDeviceKnownValues *)internalKnownValuesForPropertyName:(NSString*)name {
     if (name == nil) {
         return nil;
