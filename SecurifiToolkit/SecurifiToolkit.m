@@ -956,6 +956,42 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncSendToCloud:cmd];
 }
 
+//PY 071114 - Notifications
+- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken{
+    NotificationRegistration *notificationRegister = [NotificationRegistration new];
+    notificationRegister.regID = deviceToken;
+    notificationRegister.platform = @"iOS";
+    
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_REGISTRATION;
+    cmd.command = notificationRegister;
+    
+    [self asyncSendToCloud:cmd];
+}
+
+- (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken{
+    NotificationDeleteRegistrationRequest *notificationDeregister = [NotificationDeleteRegistrationRequest new];
+    notificationDeregister.regID = deviceToken;
+    notificationDeregister.platform = @"iOS";
+    
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_DEREGISTRATION;
+    cmd.command = notificationDeregister;
+    
+    [self asyncSendToCloud:cmd];
+}
+
+- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC{
+    NotificationPreferenceListRequest *notificationPrefList = [NotificationPreferenceListRequest new];
+    notificationPrefList.almondplusMAC = almondMAC;
+    
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST;
+    cmd.command = notificationPrefList;
+    
+    [self asyncSendToCloud:cmd];
+}
+
 #pragma mark - Command constructors
 
 - (GenericCommand *)makeCloudSanityCommand {

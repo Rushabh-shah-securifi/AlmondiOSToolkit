@@ -69,6 +69,13 @@
 #import <SecurifiToolkit/DeleteMeAsSecondaryUserResponse.h>
 #import <SecurifiToolkit/SFICredentialsValidator.h>
 
+#import <SecurifiToolkit/NotificationRegistration.h>
+#import <SecurifiToolkit/NotificationRegistrationResponse.h>
+#import <SecurifiToolkit/NotificationDeleteRegistrationRequest.h>
+#import <SecurifiToolkit/NotificationDeleteRegistrationResponse.h>
+#import <SecurifiToolkit/NotificationPreferenceListRequest.h>
+#import <SecurifiToolkit/NotificationPreferenceListResponse.h>
+
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
 // Sent in response to a call to asyncSendLoginWithEmail:password:
@@ -201,6 +208,11 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;
+
+//PY 071114 - Notifications
+- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
+- (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken;
+- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
 
 @end
  

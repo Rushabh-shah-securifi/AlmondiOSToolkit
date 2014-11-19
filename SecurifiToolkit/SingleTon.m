@@ -627,6 +627,28 @@
                                             break;
                                         }
                                             
+                                        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:commandType];
+                                            [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                            
+                                        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:commandType];
+                                            [self postData:NOTIFICATION_DEREGISTRATION_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                        
+                                        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:{
+                                            [self tryMarkUnitCompletion:YES responseType:commandType];
+                                            [self postData:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+                                        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:{
+                                            [self tryMarkUnitCompletion:YES responseType:commandType];
+                                            [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
                                         default:
                                             break;
                                     }
@@ -1095,6 +1117,9 @@
                 case CommandType_USER_INVITE_REQUEST:
                 case CommandType_DELETE_SECONDARY_USER_REQUEST:
                 case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
+                case CommandType_NOTIFICATION_REGISTRATION:
+                case CommandType_NOTIFICATION_DEREGISTRATION:
+                case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
                 {
                     id<SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
