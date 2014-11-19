@@ -981,7 +981,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
     [writer writeStartElement:@"AlmondBlockedMACs"];
     [writer writeAttribute:@"action" value:@"set"];
-    [writer writeAttribute:@"count" value:[NSString stringWithFormat:@"%d", blockedMacs.count]];
+    [writer writeAttribute:@"count" value:[NSString stringWithFormat:@"%lu", (unsigned long)blockedMacs.count]];
 
     int index = 0;
     for (NSString *mac in blockedMacs) {
