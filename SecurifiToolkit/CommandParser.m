@@ -43,6 +43,13 @@
 #import "MeAsSecondaryUserResponse.h"
 #import "DeleteMeAsSecondaryUserResponse.h"
 
+#import "NotificationRegistrationResponse.h"
+#import "NotificationDeleteRegistrationResponse.h"
+#import "DynamicNotificationPreferenceList.h"
+#import "NotificationPreferenceListResponse.h"
+#import "SFINotificationUser.h"
+#import "SFINotificationDevice.h"
+
 #pragma mark Constants
 
 // The following constants are the XML element names and their string lengths for parsing comparison.
@@ -53,7 +60,7 @@ static const char *kName_TempPass =                         "TempPass";
 static const char *kName_Reason =                           "Reason";
 static const char *kName_KeepAlive =                        "KeepAlive";
 static const char *kName_AffiliationCode =                  "Code";
-static const char *kName_AlmondMAC =                        "AlmondplusMAC";
+static const char *kName_AlmondplusMAC =                    "AlmondplusMAC";
 static const char *kName_AlmondName =                       "AlmondplusName";
 //Response
 static const char *kName_LoginResponse =                    "LoginResponse";
@@ -160,10 +167,23 @@ static const char *kName_OwnerEmailID =                     "OwnerEmailID";
 static const char *kName_AName =                            "AlmondName";
 static const char *kName_DeleteMeAsSecondaryUserResponse =  "DeleteMeAsSecondaryUserResponse";
 
+//PY 071114 - Notifications
+static const char *kName_NotificationRegistrationResponse =         "NotificationAddRegistrationResponse";
+static const char *kName_NotificationDeleteRegistrationResponse =   "NotificationDeleteRegistrationResponse";
+static const char *kName_DynamicNotificationPreferenceList =        "DynamicNotificationPreferenceList";
+static const char *kName_NotificationPreferenceListResponse =       "NotificationPreferenceListResponse";
+
+static const char *kName_AlmondMAC      = "AlmondMAC";
+static const char *kName_Users          = "Users";
+static const char *kName_User           = "User";
+static const char *kName_Preference     = "Preference";
+
 static const char *kName_isActivated    = "IsActivated";
 static const char *kName_minsRemaining  = "MinutesRemaining";
 
-static const NSUInteger kLength_MaxTag  =                   35;
+//PY 071114
+
+static const NSUInteger kLength_MaxTag  =                   40;
 //static const NSUInteger kLength_LoginResponse =             14;
 //static const NSUInteger kLength_UserID =                    7;
 //static const NSUInteger kLength_TempPass =                  9;
@@ -228,6 +248,11 @@ static xmlSAXHandler simpleSAXHandlerStruct;
 @property(nonatomic) CommandType storingCommandType;
 @property(nonatomic) id command;
 @property(nonatomic) NSMutableArray *tmpEmailList;
+@property(nonatomic) NSMutableArray *tmpNotificationPrefList;
+@property(nonatomic) SFINotificationUser *tmpNotificationUser;
+@property(nonatomic) NSMutableArray *tmpNotificationDeviceList;
+@property(nonatomic) SFINotificationDevice *tmpNotificationDevice;
+
 @end
 
 @implementation CommandParser
@@ -288,6 +313,10 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
         case CommandType_ME_AS_SECONDARY_USER_RESPONSE:
         case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:
+        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:
+        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:
+        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:
+        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
             obj.command = self.command;
             obj.commandType = self.commandType;
             break;
@@ -1405,15 +1434,186 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE;
     }
-
-
+    //PY071114 - Notification Registration Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_NotificationRegistrationResponse, kLength_MaxTag)){
+        NotificationRegistrationResponse *notificationRegisterResponse = [[NotificationRegistrationResponse alloc]init];
+        parser.command = notificationRegisterResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_NOTIFICATION_REGISTRATION_RESPONSE;
+    }
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_NotificationDeleteRegistrationResponse, kLength_MaxTag)){
+        NotificationDeleteRegistrationResponse *notificationDeregisterResponse = [[NotificationDeleteRegistrationResponse alloc]init];
+        parser.command = notificationDeregisterResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE;
+    }
+    //PY 101114 - Dynamic Notification Preference Listener
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicNotificationPreferenceList, kLength_MaxTag)){
+        DynamicNotificationPreferenceList *dynamicNotificationList = [[DynamicNotificationPreferenceList alloc]init];
+        parser.command = dynamicNotificationList;
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST;
+    }
+    else if (!strncmp((const char *)localname, kName_Users,kLength_MaxTag)  && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get User Count from attribute
+        NSString *userCountKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* userCountVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        if([userCountKey isEqualToString:@"count"]){
+            [parser.command setUserCount:[userCountVal intValue]];
+            parser.tmpNotificationPrefList = [[NSMutableArray alloc]init];
+        }else{
+            [parser.command setUserCount:0];
+        }
+    }
+    else if (!strncmp((const char *)localname, kName_User,kLength_MaxTag)  && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get User ID from attribute
+        NSString *userIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* userIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        parser.tmpNotificationUser = [[SFINotificationUser alloc]init];
+        
+        if([userIDKey isEqualToString:@"ID"]){
+            [parser.tmpNotificationUser setUserID:userIDVal];
+        }
+    }
+    else if (!strncmp((const char *)localname, kName_Preference,kLength_MaxTag)  && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get User ID from attribute
+        NSString *preferenceKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* preferenceVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        if([preferenceKey isEqualToString:@"count"]){
+            [parser.tmpNotificationUser setPreferenceCount:[preferenceVal intValue]];
+            parser.tmpNotificationDeviceList = [[NSMutableArray alloc]init];
+        }
+    }
+    else if (!strncmp((const char *)localname, kName_Device,kLength_MaxTag)  && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get User ID from attribute
+        NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        //To get Success attribute
+        attributes += 5;
+        NSString *deviceIndexKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* deviceIndexVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        parser.tmpNotificationDevice = [[SFINotificationDevice alloc]init];
+        
+       // NSMutableString *deviceID_Index = [[NSMutableString alloc]init];
+        
+        if([deviceIDKey isEqualToString:@"ID"]){
+            //[deviceID_Index appendString:deviceIDVal];
+            [parser.tmpNotificationDevice setDeviceID:[deviceIDVal intValue]];
+        }
+        
+        if([deviceIndexKey isEqualToString:@"Index"]){
+            [parser.tmpNotificationDevice setValueIndex:[deviceIndexVal intValue]];
+        }
+        
+        [parser.tmpNotificationDeviceList addObject:parser.tmpNotificationDevice];
+    }
+    //PY 131114 - Notification Preference List Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_NotificationPreferenceListResponse, kLength_MaxTag)){
+        NotificationPreferenceListResponse *notificationPrefListResponse = [[NotificationPreferenceListResponse alloc]init];
+        parser.command = notificationPrefListResponse;
+        
+        parser.tmpNotificationUser = [[SFINotificationUser alloc]init];
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE;
+    }
+    else if (!strncmp((const char *)localname, kName_Preference,kLength_MaxTag)  && (parser.storingCommandType == CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get count from attribute
+        NSString *preferenceKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* preferenceVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        if([preferenceKey isEqualToString:@"count"]){
+            [parser.command setPreferenceCount:[preferenceVal intValue]];
+            [parser.tmpNotificationUser setPreferenceCount:[preferenceVal intValue]];
+            parser.tmpNotificationDeviceList = [[NSMutableArray alloc]init];
+        }
+    }
+    else if (!strncmp((const char *)localname, kName_Device,kLength_MaxTag)  && (parser.storingCommandType == CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE)){
+        parser.storingCharacters = YES;
+        parser.parsingCommand = YES;
+        
+        //Get User ID from attribute
+        NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        //To get Success attribute
+        attributes += 5;
+        NSString *deviceIndexKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* deviceIndexVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
+        parser.tmpNotificationDevice = [[SFINotificationDevice alloc]init];
+        
+        // NSMutableString *deviceID_Index = [[NSMutableString alloc]init];
+        
+        if([deviceIDKey isEqualToString:@"ID"]){
+            //[deviceID_Index appendString:deviceIDVal];
+            [parser.tmpNotificationDevice setDeviceID:[deviceIDVal intValue]];
+        }
+        
+        if([deviceIndexKey isEqualToString:@"Index"]){
+            [parser.tmpNotificationDevice setValueIndex:[deviceIndexVal intValue]];
+        }
+        
+        [parser.tmpNotificationDeviceList addObject:parser.tmpNotificationDevice];
+    }
     else if (parser.parsingCommand && (prefix == NULL && (
                                                           (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_UserID, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_TempPass, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_AffiliationCode, kLength_MaxTag))
-                                                          || (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_AlmondName, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_Hash, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_DeviceName, kLength_MaxTag))
@@ -1450,6 +1650,10 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
                                                            || (!strncmp((const char *)localname, kName_AName,kLength_MaxTag))
                                                            || (!strncmp((const char *)localname, kName_isActivated,kLength_MaxTag))
                                                            || (!strncmp((const char *)localname, kName_minsRemaining,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_AlmondMAC,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_Users,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_User,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_Preference,kLength_MaxTag))
                                                           )  ))
     {
         //// NSLog(@"Storing Character for : %s",localname);
@@ -1491,7 +1695,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         //            parser.parsingCommand = NO;
         //        }
         //else
-        if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
             && (parser.storingCommandType == CommandType_AFFILIATION_USER_COMPLETE))
         {
     
@@ -1865,7 +2069,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.parsingCommand = NO;
         }
         
-        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ALMOND_LIST_RESPONSE))
         {
             
@@ -1897,7 +2101,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         {
             parser.commandType = CommandType_GENERIC_COMMAND_RESPONSE;
             parser.parsingCommand = NO;
-        }else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        }else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
                   && (parser.storingCommandType == CommandType_GENERIC_COMMAND_RESPONSE))
         {
             [parser.command setAlmondMAC:[parser currentString]];
@@ -1927,7 +2131,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         {
             parser.commandType = CommandType_GENERIC_COMMAND_NOTIFICATION;
             parser.parsingCommand = NO;
-        }else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        }else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
                   && (parser.storingCommandType == CommandType_GENERIC_COMMAND_NOTIFICATION))
         {
             [parser.command setAlmondMAC:[parser currentString]];
@@ -1977,7 +2181,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.parsingCommand = NO;
         }
         
-        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_ADD))
         {
             
@@ -2008,7 +2212,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.parsingCommand = NO;
         }
         
-        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_DELETE))
         {
             
@@ -2073,7 +2277,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         }
         
         //PY 280214 - Dynamic Almond Name Change Response
-        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
             && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_NAME_CHANGE))
         {
             
@@ -2382,6 +2586,86 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.parsingCommand = NO;
         }
         //PY 240914 - Delete Me As Secondary User Response - END
+        
+        //PY 071114 - Notification Registration Response - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_REGISTRATION_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_REGISTRATION_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_NotificationRegistrationResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_NOTIFICATION_REGISTRATION_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 071114 - Notification Registration Response - END
+        
+        //PY 071114 - Notification Deregistration Response - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_NotificationDeleteRegistrationResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 071114 - Notification Deregistration Response - END
+        
+        //PY 101114 - Dynamic Notification Preference List - BEGIN
+        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST))
+        {
+            [parser.command setAlmondMAC:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_Users, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST))
+        {
+            [parser.command setNotificationUserList:parser.tmpNotificationPrefList];
+        }
+        else if (!strncmp((const char *)localname, kName_User, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST))
+        {
+            [parser.tmpNotificationPrefList addObject:parser.tmpNotificationUser];
+        }
+        else if (!strncmp((const char *)localname, kName_Preference, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST))
+        {
+            [parser.tmpNotificationUser setNotificationDeviceList:parser.tmpNotificationDeviceList];
+        }
+        else if (!strncmp((const char *)localname, kName_DynamicNotificationPreferenceList, kLength_MaxTag)) {
+            parser.commandType = CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST;
+            parser.parsingCommand = NO;
+        }
+        //PY 101114 - Dynamic Notification Preference List - END
+        
+        //PY 131114 - Notification Preference List Response - BEGIN
+        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE))
+        {
+            [parser.command setAlmondMAC:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_Preference, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE))
+        {
+            [parser.command setNotificationDeviceList:parser.tmpNotificationDeviceList];
+             [parser.tmpNotificationUser setNotificationDeviceList:parser.tmpNotificationDeviceList];
+        }
+        else if (!strncmp((const char *)localname, kName_NotificationPreferenceListResponse, kLength_MaxTag)) {
+            [parser.command setNotificationUser:parser.tmpNotificationUser];
+            parser.commandType = CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 131114 - Notification Preference List Response - END
     }
     
     parser.storingCharacters = NO;

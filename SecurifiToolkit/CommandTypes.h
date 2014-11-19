@@ -73,4 +73,13 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE    = 268,
     CommandType_UNLINK_ALMOND_REQUEST                   = 269,
     CommandType_UNLINK_ALMOND_RESPONSE                  = 270,
+    
+    //PY 071114 - Notification
+    CommandType_NOTIFICATION_REGISTRATION               = 281,
+    CommandType_NOTIFICATION_REGISTRATION_RESPONSE      = 282,
+    CommandType_NOTIFICATION_DEREGISTRATION             = 283,
+    CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE    = 284,
+    CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST    = 87,
+    CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST    = 113,
+    CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE   = 114,
 };

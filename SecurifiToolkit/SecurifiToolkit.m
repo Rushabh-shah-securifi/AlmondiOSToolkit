@@ -18,6 +18,9 @@
 #import "DeleteMeAsSecondaryUserRequest.h"
 #import "MeAsSecondaryUserRequest.h"
 #import "XMLWriter.h"
+#import "NotificationRegistration.h"
+#import "NotificationDeleteRegistrationRequest.h"
+#import "NotificationPreferenceListRequest.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -954,6 +957,8 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncSendToCloud:cmd];
 }
 
+#pragma mark - Almond and router settings
+
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings {
     GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
     req.almondMAC = almondMAC;
@@ -978,7 +983,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [writer writeAttribute:@"action" value:@"set"];
     [writer writeAttribute:@"count" value:[NSString stringWithFormat:@"%d", blockedMacs.count]];
 
-    int index=0;
+    int index = 0;
     for (NSString *mac in blockedMacs) {
         index++;
         [writer writeStartElement:@"BlockedMAC"];
@@ -1000,6 +1005,58 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncSendToCloud:cmd];
 
     return req.correlationId;
+}
+
+#pragma mark - Notifications
+
+- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken {
+    if (deviceToken == nil) {
+        SLog(@"asyncRequestRegisterForNotification : device toke is nil");
+        return;
+    }
+    
+    NotificationRegistration *notificationRegister = [NotificationRegistration new];
+    notificationRegister.regID = deviceToken;
+    notificationRegister.platform = @"iOS";
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_REGISTRATION;
+    cmd.command = notificationRegister;
+
+    [self asyncSendToCloud:cmd];
+}
+
+- (void)asyncRequestDeregisterForNotification:(NSString *)deviceToken {
+    if (deviceToken == nil) {
+        SLog(@"asyncRequestRegisterForNotification : device toke is nil");
+        return;
+    }
+
+    NotificationDeleteRegistrationRequest *notificationDeregister = [NotificationDeleteRegistrationRequest new];
+    notificationDeregister.regID = deviceToken;
+    notificationDeregister.platform = @"iOS";
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_DEREGISTRATION;
+    cmd.command = notificationDeregister;
+
+    [self asyncSendToCloud:cmd];
+}
+
+- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC {
+    if (almondMAC == nil) {
+        SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
+        return;
+    }
+
+    NotificationPreferenceListRequest *notificationPrefList = [NotificationPreferenceListRequest new];
+    notificationPrefList.almondplusMAC = almondMAC;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST;
+    cmd.command = notificationPrefList;
+
+    [self asyncSendToCloud:cmd];
 }
 
 #pragma mark - Command constructors

@@ -116,6 +116,10 @@
 		CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */; };
 		CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */; };
+		CE432FCB1A0BA3AD00BDE7A1 /* NotificationRegistration.h in Headers */ = {isa = PBXBuildFile; fileRef = CE432FC91A0BA3AD00BDE7A1 /* NotificationRegistration.h */; };
+		CE432FCC1A0BA3AD00BDE7A1 /* NotificationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = CE432FCA1A0BA3AD00BDE7A1 /* NotificationRegistration.m */; };
+		CE432FCF1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE432FCD1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.h */; };
+		CE432FD01A0BA72F00BDE7A1 /* NotificationRegistrationResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE432FCE1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.m */; };
 		CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE458D5B19EBBBC000689251 /* SFICredentialsValidator.m */; };
 		CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -128,6 +132,10 @@
 		CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */; };
 		CE539F8E17FAD40B00640820 /* SNLog.h in Headers */ = {isa = PBXBuildFile; fileRef = CE539F8C17FAD40B00640820 /* SNLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE539F8F17FAD40B00640820 /* SNLog.m in Sources */ = {isa = PBXBuildFile; fileRef = CE539F8D17FAD40B00640820 /* SNLog.m */; };
+		CE55F3D11A0CE2E90086912E /* NotificationDeleteRegistrationRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE55F3CF1A0CE2E90086912E /* NotificationDeleteRegistrationRequest.h */; };
+		CE55F3D21A0CE2E90086912E /* NotificationDeleteRegistrationRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE55F3D01A0CE2E90086912E /* NotificationDeleteRegistrationRequest.m */; };
+		CE55F3D51A0CE32F0086912E /* NotificationDeleteRegistrationResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE55F3D31A0CE32F0086912E /* NotificationDeleteRegistrationResponse.h */; };
+		CE55F3D61A0CE32F0086912E /* NotificationDeleteRegistrationResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE55F3D41A0CE32F0086912E /* NotificationDeleteRegistrationResponse.m */; };
 		CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */; };
 		CE5EB5B917E703AB00985636 /* LogoutAllRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -182,6 +190,16 @@
 		CE9A2917188D30270063D562 /* SensorChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9A2915188D30270063D562 /* SensorChangeResponse.m */; };
 		CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE9C5B48188669B6006F2306 /* SensorForcedUpdateRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */; };
+		CEA605B71A113E4E008380D3 /* DynamicNotificationPreferenceList.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA605B51A113E4E008380D3 /* DynamicNotificationPreferenceList.h */; };
+		CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA605B61A113E4E008380D3 /* DynamicNotificationPreferenceList.m */; };
+		CEA605BB1A113F55008380D3 /* SFINotificationUser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA605B91A113F55008380D3 /* SFINotificationUser.h */; };
+		CEA605BC1A113F55008380D3 /* SFINotificationUser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA605BA1A113F55008380D3 /* SFINotificationUser.m */; };
+		CEAA83241A1532E600573CC8 /* SFINotificationDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAA83221A1532E600573CC8 /* SFINotificationDevice.h */; };
+		CEAA83251A1532E600573CC8 /* SFINotificationDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAA83231A1532E600573CC8 /* SFINotificationDevice.m */; };
+		CEAA83281A1535E400573CC8 /* NotificationPreferenceListRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAA83261A1535E400573CC8 /* NotificationPreferenceListRequest.h */; };
+		CEAA83291A1535E400573CC8 /* NotificationPreferenceListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAA83271A1535E400573CC8 /* NotificationPreferenceListRequest.m */; };
+		CEAA832C1A1535F100573CC8 /* NotificationPreferenceListResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAA832A1A1535F100573CC8 /* NotificationPreferenceListResponse.h */; };
+		CEAA832D1A1535F100573CC8 /* NotificationPreferenceListResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAA832B1A1535F100573CC8 /* NotificationPreferenceListResponse.m */; };
 		CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAD85A319CAB7D8006D1048 /* DeleteAccountRequest.h */; };
 		CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAD85A419CAB7D8006D1048 /* DeleteAccountRequest.m */; };
 		CEAD85A919CABCBE006D1048 /* DeleteAccountResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAD85A719CABCBE006D1048 /* DeleteAccountResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -336,6 +354,10 @@
 		CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserRequest.m; sourceTree = "<group>"; };
 		CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMeAsSecondaryUserResponse.h; sourceTree = "<group>"; };
 		CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserResponse.m; sourceTree = "<group>"; };
+		CE432FC91A0BA3AD00BDE7A1 /* NotificationRegistration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationRegistration.h; sourceTree = "<group>"; };
+		CE432FCA1A0BA3AD00BDE7A1 /* NotificationRegistration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationRegistration.m; sourceTree = "<group>"; };
+		CE432FCD1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationRegistrationResponse.h; sourceTree = "<group>"; };
+		CE432FCE1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationRegistrationResponse.m; sourceTree = "<group>"; };
 		CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFICredentialsValidator.h; sourceTree = "<group>"; };
 		CE458D5B19EBBBC000689251 /* SFICredentialsValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFICredentialsValidator.m; sourceTree = "<group>"; };
 		CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValidateAccountRequest.h; sourceTree = "<group>"; };
@@ -348,6 +370,10 @@
 		CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResetPasswordResponse.m; sourceTree = "<group>"; };
 		CE539F8C17FAD40B00640820 /* SNLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNLog.h; sourceTree = "<group>"; };
 		CE539F8D17FAD40B00640820 /* SNLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNLog.m; sourceTree = "<group>"; };
+		CE55F3CF1A0CE2E90086912E /* NotificationDeleteRegistrationRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationRequest.h; sourceTree = "<group>"; };
+		CE55F3D01A0CE2E90086912E /* NotificationDeleteRegistrationRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationDeleteRegistrationRequest.m; sourceTree = "<group>"; };
+		CE55F3D31A0CE32F0086912E /* NotificationDeleteRegistrationResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationResponse.h; sourceTree = "<group>"; };
+		CE55F3D41A0CE32F0086912E /* NotificationDeleteRegistrationResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationDeleteRegistrationResponse.m; sourceTree = "<group>"; };
 		CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SFIAlmondPlus.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SFIAlmondPlus.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllRequest.h; sourceTree = "<group>"; };
@@ -401,6 +427,16 @@
 		CE9A2915188D30270063D562 /* SensorChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorChangeResponse.m; sourceTree = "<group>"; };
 		CE9C5B48188669B6006F2306 /* SensorForcedUpdateRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorForcedUpdateRequest.h; sourceTree = "<group>"; };
 		CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorForcedUpdateRequest.m; sourceTree = "<group>"; };
+		CEA605B51A113E4E008380D3 /* DynamicNotificationPreferenceList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicNotificationPreferenceList.h; sourceTree = "<group>"; };
+		CEA605B61A113E4E008380D3 /* DynamicNotificationPreferenceList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicNotificationPreferenceList.m; sourceTree = "<group>"; };
+		CEA605B91A113F55008380D3 /* SFINotificationUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotificationUser.h; sourceTree = "<group>"; };
+		CEA605BA1A113F55008380D3 /* SFINotificationUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFINotificationUser.m; sourceTree = "<group>"; };
+		CEAA83221A1532E600573CC8 /* SFINotificationDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotificationDevice.h; sourceTree = "<group>"; };
+		CEAA83231A1532E600573CC8 /* SFINotificationDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFINotificationDevice.m; sourceTree = "<group>"; };
+		CEAA83261A1535E400573CC8 /* NotificationPreferenceListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationPreferenceListRequest.h; sourceTree = "<group>"; };
+		CEAA83271A1535E400573CC8 /* NotificationPreferenceListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationPreferenceListRequest.m; sourceTree = "<group>"; };
+		CEAA832A1A1535F100573CC8 /* NotificationPreferenceListResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationPreferenceListResponse.h; sourceTree = "<group>"; };
+		CEAA832B1A1535F100573CC8 /* NotificationPreferenceListResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationPreferenceListResponse.m; sourceTree = "<group>"; };
 		CEAD85A319CAB7D8006D1048 /* DeleteAccountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteAccountRequest.h; sourceTree = "<group>"; };
 		CEAD85A419CAB7D8006D1048 /* DeleteAccountRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteAccountRequest.m; sourceTree = "<group>"; };
 		CEAD85A719CABCBE006D1048 /* DeleteAccountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteAccountResponse.h; sourceTree = "<group>"; };
@@ -692,6 +728,13 @@
 				CE2EA26B19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h */,
 				CE2EA26F19D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h */,
 				CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */,
+				CE432FC91A0BA3AD00BDE7A1 /* NotificationRegistration.h */,
+				CE432FCD1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.h */,
+				CE55F3CF1A0CE2E90086912E /* NotificationDeleteRegistrationRequest.h */,
+				CE55F3D31A0CE32F0086912E /* NotificationDeleteRegistrationResponse.h */,
+				CEA605B51A113E4E008380D3 /* DynamicNotificationPreferenceList.h */,
+				CEAA83261A1535E400573CC8 /* NotificationPreferenceListRequest.h */,
+				CEAA832A1A1535F100573CC8 /* NotificationPreferenceListResponse.h */,
 			);
 			name = public;
 			sourceTree = "<group>";
@@ -699,6 +742,13 @@
 		22A76D2517912B830099CD8F /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				CE432FCA1A0BA3AD00BDE7A1 /* NotificationRegistration.m */,
+				CE432FCE1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.m */,
+				CE55F3D01A0CE2E90086912E /* NotificationDeleteRegistrationRequest.m */,
+				CE55F3D41A0CE32F0086912E /* NotificationDeleteRegistrationResponse.m */,
+				CEA605B61A113E4E008380D3 /* DynamicNotificationPreferenceList.m */,
+				CEAA83271A1535E400573CC8 /* NotificationPreferenceListRequest.m */,
+				CEAA832B1A1535F100573CC8 /* NotificationPreferenceListResponse.m */,
 				CE7F218319CC012C008AD4FB /* AlmondAffiliationData.m */,
 				CE7F218719CC0165008AD4FB /* AlmondAffiliationDataResponse.m */,
 				CE91316C19C9A2DD00D94876 /* ChangePasswordRequest.m */,
@@ -794,6 +844,10 @@
 				CE5EB65517EAD44E00985636 /* SFIDeviceValue.m */,
 				CE5EB65817EAD46500985636 /* SFIDeviceKnownValues.h */,
 				CE5EB65917EAD46500985636 /* SFIDeviceKnownValues.m */,
+				CEA605B91A113F55008380D3 /* SFINotificationUser.h */,
+				CEA605BA1A113F55008380D3 /* SFINotificationUser.m */,
+				CEAA83221A1532E600573CC8 /* SFINotificationDevice.h */,
+				CEAA83231A1532E600573CC8 /* SFINotificationDevice.m */,
 			);
 			name = models;
 			sourceTree = "<group>";
@@ -822,6 +876,8 @@
 				22A76D491791347D0099CD8F /* AffiliationUserComplete.h in Headers */,
 				2204C20E1794349400B05F17 /* GenericCommand.h in Headers */,
 				22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */,
+				CE432FCF1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.h in Headers */,
+				CE55F3D51A0CE32F0086912E /* NotificationDeleteRegistrationResponse.h in Headers */,
 				22011C9E179543E80019D5A4 /* Login.h in Headers */,
 				CE5EB63417E82CB400985636 /* DeviceListRequest.h in Headers */,
 				CE5EB64917E86D2200985636 /* DeviceListResponse.h in Headers */,
@@ -832,6 +888,7 @@
 				CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */,
 				22A76D4017912FF10099CD8F /* LogoutAllResponse.h in Headers */,
 				1C0C99031A19CD5D00148010 /* SFIWirelessSetting.h in Headers */,
+				CEAA83281A1535E400573CC8 /* NotificationPreferenceListRequest.h in Headers */,
 				CE5EB5B917E703AB00985636 /* LogoutAllRequest.h in Headers */,
 				22B326CF1796D447004B3642 /* SanityResponse.h in Headers */,
 				CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */,
@@ -852,6 +909,7 @@
 				CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */,
 				22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */,
 				CE5EB63D17E8548500985636 /* DeviceDataHashRequest.h in Headers */,
+				CE432FCB1A0BA3AD00BDE7A1 /* NotificationRegistration.h in Headers */,
 				CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */,
 				CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */,
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
@@ -867,6 +925,7 @@
 				CE5EB65217EAD43000985636 /* DeviceValueResponse.h in Headers */,
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
+				CEAA83241A1532E600573CC8 /* SFINotificationDevice.h in Headers */,
 				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
 				CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */,
 				CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */,
@@ -874,9 +933,12 @@
 				CE2EA24D19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
 				1C0C99011A19CD5D00148010 /* SFIRouterSummary.h in Headers */,
+				CE55F3D11A0CE2E90086912E /* NotificationDeleteRegistrationRequest.h in Headers */,
 				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
+				CEA605BB1A113F55008380D3 /* SFINotificationUser.h in Headers */,
 				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
+				CEAA832C1A1535F100573CC8 /* NotificationPreferenceListResponse.h in Headers */,
 				CE2EA26D19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h in Headers */,
 				22FAE88817A8E528002FFEE8 /* Signup.h in Headers */,
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
@@ -888,6 +950,7 @@
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
 				1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */,
 				1C0C99051A19CD5D00148010 /* SFIWirelessSummary.h in Headers */,
+				CEA605B71A113E4E008380D3 /* DynamicNotificationPreferenceList.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
@@ -1082,24 +1145,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEAA832D1A1535F100573CC8 /* NotificationPreferenceListResponse.m in Sources */,
 				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
 				CE5EB5BB17E703BA00985636 /* LogoutAllRequest.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
 				CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */,
 				CE466A5C1823C50700E55DF9 /* ValidateAccountResponse.m in Sources */,
 				22A76D3917912EAC0099CD8F /* LoginResponse.m in Sources */,
+				CE432FD01A0BA72F00BDE7A1 /* NotificationRegistrationResponse.m in Sources */,
 				CE5EB64217E8549200985636 /* DeviceDataHashResponse.m in Sources */,
 				1C0C99081A19CD5D00148010 /* SFIWirelessUsers.m in Sources */,
 				CE5EB63517E82CB400985636 /* DeviceListRequest.m in Sources */,
 				CE5EB65717EAD44E00985636 /* SFIDeviceValue.m in Sources */,
+				CE432FCC1A0BA3AD00BDE7A1 /* NotificationRegistration.m in Sources */,
+				CEAA83251A1532E600573CC8 /* SFINotificationDevice.m in Sources */,
 				CE9A2917188D30270063D562 /* SensorChangeResponse.m in Sources */,
 				CE466A601823CFF900E55DF9 /* ResetPasswordRequest.m in Sources */,
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
 				22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */,
+				CEAA83291A1535E400573CC8 /* NotificationPreferenceListRequest.m in Sources */,
 				CE539F8F17FAD40B00640820 /* SNLog.m in Sources */,
+				CEA605BC1A113F55008380D3 /* SFINotificationUser.m in Sources */,
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				22A76D461791339B0099CD8F /* LogoutResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
+				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
+				CE55F3D61A0CE32F0086912E /* NotificationDeleteRegistrationResponse.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
 				1C0C99041A19CD5D00148010 /* SFIWirelessSetting.m in Sources */,
@@ -1122,6 +1193,7 @@
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
 				CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */,
+				CE55F3D21A0CE2E90086912E /* NotificationDeleteRegistrationRequest.m in Sources */,
 				CE2EA25219D00B3E00C6D6A8 /* UserInviteRequest.m in Sources */,
 				CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */,
 				CEAD85AA19CABCBE006D1048 /* DeleteAccountResponse.m in Sources */,

@@ -74,6 +74,13 @@
 #import <SecurifiToolkit/SFIWirelessSummary.h>
 #import <SecurifiToolkit/SFIWirelessUsers.h>
 
+#import <SecurifiToolkit/NotificationRegistration.h>
+#import <SecurifiToolkit/NotificationRegistrationResponse.h>
+#import <SecurifiToolkit/NotificationDeleteRegistrationRequest.h>
+#import <SecurifiToolkit/NotificationDeleteRegistrationResponse.h>
+#import <SecurifiToolkit/NotificationPreferenceListRequest.h>
+#import <SecurifiToolkit/NotificationPreferenceListResponse.h>
+
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
 // Sent in response to a call to asyncSendLoginWithEmail:password:
@@ -210,6 +217,11 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
 - (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)deviceMAC;
+
+- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
+- (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken;
+- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
+
 
 @end
  
