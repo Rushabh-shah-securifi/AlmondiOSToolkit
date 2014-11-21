@@ -8,6 +8,7 @@
 
 #import "SFINotificationUser.h"
 #import "SFINotificationDevice.h"
+#import "SecurifiToolkit.h"
 
 @implementation SFINotificationUser
 
@@ -49,13 +50,15 @@
     return copy;
 }
 
-- (BOOL)isNotificationEnabled:(NSString*)deviceID{
-    //Check if current device ID is in the notification list
-    for(SFINotificationDevice *currentDevice in self.notificationDeviceList){
-        if(currentDevice.deviceID==[deviceID intValue]){
-            return true;
-        }
-    }
-    return false;
-}
+//- (BOOL)isNotificationEnabled:(NSString*)deviceID currentMAC:(NSString*)currentMac{
+//    //Read from offline data
+//    NSArray *notificationList = [[SecurifiToolkit sharedInstance] notificationPrefList:currentMac];
+//    //Check if current device ID is in the notification list
+//    for(SFINotificationDevice *currentDevice in notificationList){
+//        if(currentDevice.deviceID==[deviceID intValue]){
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 @end

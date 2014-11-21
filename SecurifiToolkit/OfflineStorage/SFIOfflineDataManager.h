@@ -28,6 +28,10 @@
 
 - (NSArray *)readDeviceValueList:(NSString *)strCurrentMAC;
 
+- (void)writeNotificationList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC;
+
+- (NSArray *)readNotificationList:(NSString *)strCurrentMAC;
+
 - (void)purgeAll;
 
 // removes the specified Almond and returns the new Almond List

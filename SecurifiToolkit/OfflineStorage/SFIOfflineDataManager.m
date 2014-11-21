@@ -16,6 +16,7 @@
 @property(nonatomic, readonly) NSString *hashFp;
 @property(nonatomic, readonly) NSString *deviceListFp;
 @property(nonatomic, readonly) NSString *deviceValueFp;
+@property(nonatomic, readonly) NSString *notificationPreferenceListFp;
 @end
 
 @implementation SFIOfflineDataManager
@@ -29,6 +30,7 @@
         _hashFp = [SFIOfflineDataManager filePathForName:HASH_FILENAME];
         _deviceListFp = [SFIOfflineDataManager filePathForName:DEVICELIST_FILENAME];
         _deviceValueFp = [SFIOfflineDataManager filePathForName:DEVICEVALUE_FILENAME];
+        _notificationPreferenceListFp = [SFIOfflineDataManager filePathForName:NOTIFICATION_PREF_FILENAME];
     }
 
     return self;
@@ -93,6 +95,7 @@
         [SFIOfflineDataManager deleteFile:HASH_FILENAME];
         [SFIOfflineDataManager deleteFile:DEVICELIST_FILENAME];
         [SFIOfflineDataManager deleteFile:DEVICEVALUE_FILENAME];
+        [SFIOfflineDataManager deleteFile:NOTIFICATION_PREF_FILENAME];
     }
 }
 
@@ -226,6 +229,43 @@
     [dictDeviceValueList removeObjectForKey:strCurrentMAC];
     [NSKeyedArchiver archiveRootObject:dictDeviceValueList toFile:filePath];
 }
+
+
+// Write Notification Preference List for the current MAC to offline storage
+- (void)writeNotificationList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        NSString *filePath = self.notificationPreferenceListFp;
+        
+        //Read the entire dictionary from the list
+        NSMutableDictionary *dictNotificationList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        if (dictNotificationList == nil) {
+            // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
+            dictNotificationList = [[NSMutableDictionary alloc] init];
+        }
+        dictNotificationList[strCurrentMAC] = notificationList;
+        
+        BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictNotificationList toFile:filePath];
+        if (!didWriteSuccessful) {
+            NSLog(@"Faile to write device list");
+        }
+    }
+}
+
+// Read Notification Preference List for the current MAC from offline storage
+- (NSArray *)readNotificationList:(NSString *)strCurrentMAC {
+    @synchronized (self.syncLocker) {
+        NSString *filePath = self.notificationPreferenceListFp;
+        
+        NSMutableDictionary *dictNotificationList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        
+        NSMutableArray *notificationList = nil;
+        if (dictNotificationList != nil) {
+            notificationList = [dictNotificationList valueForKey:strCurrentMAC];
+        }
+        return notificationList;
+    }
+}
+
 
 + (BOOL)deleteFile:(NSString *)fileName {
     NSFileManager *fileManager = [NSFileManager defaultManager];
