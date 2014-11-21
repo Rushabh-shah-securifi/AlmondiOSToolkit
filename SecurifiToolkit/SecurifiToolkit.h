@@ -69,6 +69,11 @@
 #import <SecurifiToolkit/DeleteMeAsSecondaryUserResponse.h>
 #import <SecurifiToolkit/SFICredentialsValidator.h>
 
+#import <SecurifiToolkit/SFIRouterSummary.h>
+#import <SecurifiToolkit/SFIWirelessSetting.h>
+#import <SecurifiToolkit/SFIWirelessSummary.h>
+#import <SecurifiToolkit/SFIWirelessUsers.h>
+
 #import <SecurifiToolkit/NotificationRegistration.h>
 #import <SecurifiToolkit/NotificationRegistrationResponse.h>
 #import <SecurifiToolkit/NotificationDeleteRegistrationRequest.h>
@@ -212,10 +217,14 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;
 
-//PY 071114 - Notifications
+- (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
+
+- (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)deviceMAC;
+
 - (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
+
 
 @end
  

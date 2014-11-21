@@ -11,6 +11,17 @@
 
 @implementation GenericCommandRequest
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        // set non-null defaults; protect against segfaults when generating XML
+        self.almondMAC = @"";
+        self.applicationID = @"1001";
+    }
+
+    return self;
+}
+
 
 - (NSString *)toXml {
     XMLWriter *writer = [XMLWriter new];

@@ -17,6 +17,10 @@
 #import "DeleteSecondaryUserRequest.h"
 #import "DeleteMeAsSecondaryUserRequest.h"
 #import "MeAsSecondaryUserRequest.h"
+#import "XMLWriter.h"
+#import "NotificationRegistration.h"
+#import "NotificationDeleteRegistrationRequest.h"
+#import "NotificationPreferenceListRequest.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -962,39 +966,105 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
     [self asyncSendToCloud:cmd];
 }
 
-//PY 071114 - Notifications
-- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken{
+#pragma mark - Almond and router settings
+
+- (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings {
+    GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
+    req.almondMAC = almondMAC;
+    req.data = [settings toXml];
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = req;
+    [self asyncSendToCloud:cmd];
+
+    return req.correlationId;
+}
+
+- (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)blockedMacs {
+    XMLWriter *writer = [XMLWriter new];
+    writer.indentation = @"";
+    writer.lineBreak = @"";
+
+    [writer writeStartElement:@"root"];
+
+    [writer writeStartElement:@"AlmondBlockedMACs"];
+    [writer writeAttribute:@"action" value:@"set"];
+    [writer writeAttribute:@"count" value:[NSString stringWithFormat:@"%lu", (unsigned long)blockedMacs.count]];
+
+    int index = 0;
+    for (NSString *mac in blockedMacs) {
+        index++;
+        [writer writeStartElement:@"BlockedMAC"];
+        [writer writeAttribute:@"index" value:[NSString stringWithFormat:@"%d", index]];
+        [writer writeCharacters:mac];
+        [writer writeEndElement];
+    }
+
+    [writer writeEndElement];
+    [writer writeEndElement];
+
+    GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
+    req.almondMAC = almondMAC;
+    req.data = [writer toString];
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = req;
+    [self asyncSendToCloud:cmd];
+
+    return req.correlationId;
+}
+
+#pragma mark - Notifications
+
+- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken {
+    if (deviceToken == nil) {
+        SLog(@"asyncRequestRegisterForNotification : device toke is nil");
+        return;
+    }
+    
     NotificationRegistration *notificationRegister = [NotificationRegistration new];
     notificationRegister.regID = deviceToken;
     notificationRegister.platform = @"iOS";
-    
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_REGISTRATION;
     cmd.command = notificationRegister;
-    
+
     [self asyncSendToCloud:cmd];
 }
 
-- (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken{
+- (void)asyncRequestDeregisterForNotification:(NSString *)deviceToken {
+    if (deviceToken == nil) {
+        SLog(@"asyncRequestRegisterForNotification : device toke is nil");
+        return;
+    }
+
     NotificationDeleteRegistrationRequest *notificationDeregister = [NotificationDeleteRegistrationRequest new];
     notificationDeregister.regID = deviceToken;
     notificationDeregister.platform = @"iOS";
-    
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_DEREGISTRATION;
     cmd.command = notificationDeregister;
-    
+
     [self asyncSendToCloud:cmd];
 }
 
-- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC{
+- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC {
+    if (almondMAC == nil) {
+        SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
+        return;
+    }
+
     NotificationPreferenceListRequest *notificationPrefList = [NotificationPreferenceListRequest new];
     notificationPrefList.almondplusMAC = almondMAC;
-    
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST;
     cmd.command = notificationPrefList;
-    
+
     [self asyncSendToCloud:cmd];
 }
 
