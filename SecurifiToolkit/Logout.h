@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface Logout : NSObject
-@property NSString *reserved;
+@property (nonatomic, copy) NSString *reserved;
 @end

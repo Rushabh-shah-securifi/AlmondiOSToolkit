@@ -7,34 +7,25 @@
 //
 
 #import "ChangePasswordRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation ChangePasswordRequest
+
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
-    
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"ChangePasswordRequest"];
-    
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.emailID];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"CurrentPass"];
-    [writer writeCharacters:self.currentPassword];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"NewPass"];
-    [writer writeCharacters:self.changedPassword];
-    [writer writeEndElement];
-    
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+
+    [writer startElement:@"root"];
+    [writer startElement:@"ChangePasswordRequest"];
+
+    [writer element:@"EmailID" text:self.emailID];
+    [writer element:@"CurrentPass" text:self.currentPassword];
+    [writer element:@"NewPass" text:self.changedPassword];
+
     // close ChangePasswordRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
-    
+    [writer endElement];
+
     return writer.toString;
 }
 @end

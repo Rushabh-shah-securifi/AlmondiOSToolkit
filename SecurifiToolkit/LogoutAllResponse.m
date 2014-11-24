@@ -9,5 +9,4 @@
 #import "LogoutAllResponse.h"
 
 @implementation LogoutAllResponse
-@synthesize isSuccessful, reason, reasonCode;
 @end

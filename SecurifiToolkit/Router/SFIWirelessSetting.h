@@ -21,14 +21,14 @@
 //</AlmondWirelessSettings>
 @property(nonatomic) int index;
 @property(nonatomic) BOOL enabled;
-@property(nonatomic) NSString *ssid;
-@property(nonatomic) NSString *password;
+@property(nonatomic, copy) NSString *ssid;
+@property(nonatomic, copy) NSString *password;
 @property(nonatomic) int channel;
-@property(nonatomic) NSString *encryptionType;
-@property(nonatomic) NSString *security;
-@property(nonatomic) NSString *wirelessMode;
+@property(nonatomic, copy) NSString *encryptionType;
+@property(nonatomic, copy) NSString *security;
+@property(nonatomic, copy) NSString *wirelessMode;
 @property(nonatomic) int wirelessModeCode;
-@property(nonatomic) NSString *countryRegion;
+@property(nonatomic, copy) NSString *countryRegion;
 
 - (NSString *)toXml;
 

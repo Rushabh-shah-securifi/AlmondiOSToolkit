@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface SanityResponse : NSObject
-@property NSString *reason;
+@property (nonatomic, copy) NSString *reason;
 @end

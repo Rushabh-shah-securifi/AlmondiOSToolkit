@@ -5,7 +5,7 @@
 //
 
 #import "BaseCommandRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation BaseCommandRequest
 
@@ -19,12 +19,9 @@
     return self;
 }
 
-- (void)writeMobileInternalIndexElement:(XMLWriter *)writer {
+- (void)writeMobileInternalIndexElement:(SFIXmlWriter *)writer {
     NSString *value = [NSString stringWithFormat:@"%d", _correlationId];
-
-    [writer writeStartElement:@"MobileInternalIndex"];
-    [writer writeCharacters:value];
-    [writer writeEndElement];
+    [writer element:@"MobileInternalIndex" text:value];
 }
 
 @end

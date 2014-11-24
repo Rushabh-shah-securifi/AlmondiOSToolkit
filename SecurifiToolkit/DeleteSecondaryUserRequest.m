@@ -7,32 +7,26 @@
 //
 
 #import "DeleteSecondaryUserRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation DeleteSecondaryUserRequest
+
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
-    
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"DeleteSecondaryUserRequest"];
-    
-    [writer writeStartElement:@"AlmondMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.emailID];
-    [writer writeEndElement];
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+
+    [writer startElement:@"root"];
+    [writer startElement:@"DeleteSecondaryUserRequest"];
+
+    [writer element:@"AlmondMAC" text:self.almondMAC];
+    [writer element:@"EmailID" text:self.emailID];
 
     [self writeMobileInternalIndexElement:writer];
-    
+
     // close DeleteSecondaryUserRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
-    
+    [writer endElement];
+
     return writer.toString;
 }
 @end

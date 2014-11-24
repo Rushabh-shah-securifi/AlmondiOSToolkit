@@ -7,30 +7,23 @@
 //
 
 #import "Login.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation Login
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"Login"];
+    [writer startElement:@"root"];
+    [writer startElement:@"Login"];
 
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.UserID];
-    [writer writeEndElement];
-
-    [writer writeStartElement:@"Password"];
-    [writer writeCharacters:self.Password];
-    [writer writeEndElement];
+    [writer element:@"EmailID" text:self.UserID];
+    [writer element:@"Password" text:self.Password];
 
     // close Login
-    [writer writeEndElement];
+    [writer endElement];
     // close root element
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

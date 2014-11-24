@@ -9,5 +9,4 @@
 #import "Logout.h"
 
 @implementation Logout
-@synthesize reserved;
 @end

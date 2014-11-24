@@ -10,9 +10,9 @@
 #import "SecurifiCommand.h"
 
 @interface Login : NSObject <SecurifiCommand>
-@property BOOL isSuccessful;
-@property (copy) NSString *UserID;
-@property (copy) NSString *Password;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *UserID;
+@property(nonatomic, copy) NSString *Password;
 
 - (NSString *)toXml;
 

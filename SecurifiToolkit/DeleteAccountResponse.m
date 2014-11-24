@@ -9,5 +9,4 @@
 #import "DeleteAccountResponse.h"
 
 @implementation DeleteAccountResponse
-@synthesize isSuccessful, reason, reasonCode;
 @end

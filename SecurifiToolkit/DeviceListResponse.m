@@ -9,5 +9,4 @@
 #import "DeviceListResponse.h"
 
 @implementation DeviceListResponse
-@synthesize almondMAC, deviceCount, deviceList, isSuccessful, reason;
 @end

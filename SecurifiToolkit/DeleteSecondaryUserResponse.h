@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 
 @interface DeleteSecondaryUserResponse : NSObject
-@property BOOL isSuccessful;
-@property NSString *reason;
-@property int reasonCode;
-@property(nonatomic) NSString *internalIndex;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) int reasonCode;
+@property(nonatomic, copy) NSString *internalIndex;
 @end

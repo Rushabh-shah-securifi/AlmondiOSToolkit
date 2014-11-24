@@ -9,5 +9,4 @@
 #import "AlmondAffiliationDataResponse.h"
 
 @implementation AlmondAffiliationDataResponse
-@synthesize isSuccessful, reason, almondCount, almondList;
 @end

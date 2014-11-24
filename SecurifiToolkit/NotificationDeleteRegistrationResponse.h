@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface NotificationDeleteRegistrationResponse : NSObject
-@property BOOL isSuccessful;
-@property NSString *reason;
-@property int reasonCode;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) int reasonCode;
 @end

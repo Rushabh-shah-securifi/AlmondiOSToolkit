@@ -9,5 +9,4 @@
 #import "UnlinkAlmondResponse.h"
 
 @implementation UnlinkAlmondResponse
-@synthesize reason, reasonCode, isSuccessful, internalIndex;
 @end

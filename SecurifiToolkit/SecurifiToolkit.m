@@ -17,10 +17,10 @@
 #import "DeleteSecondaryUserRequest.h"
 #import "DeleteMeAsSecondaryUserRequest.h"
 #import "MeAsSecondaryUserRequest.h"
-#import "XMLWriter.h"
 #import "NotificationRegistration.h"
 #import "NotificationDeleteRegistrationRequest.h"
 #import "NotificationPreferenceListRequest.h"
+#import "SFIXmlWriter.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -973,27 +973,25 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 }
 
 - (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)blockedMacs {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
+    [writer startElement:@"root"];
 
-    [writer writeStartElement:@"AlmondBlockedMACs"];
-    [writer writeAttribute:@"action" value:@"set"];
-    [writer writeAttribute:@"count" value:[NSString stringWithFormat:@"%lu", (unsigned long)blockedMacs.count]];
+    [writer startElement:@"AlmondBlockedMACs"];
+    [writer addAttribute:@"action" value:@"set"];
+    [writer addAttribute:@"count" value:[NSString stringWithFormat:@"%lu", (unsigned long)blockedMacs.count]];
 
     int index = 0;
     for (NSString *mac in blockedMacs) {
         index++;
-        [writer writeStartElement:@"BlockedMAC"];
-        [writer writeAttribute:@"index" value:[NSString stringWithFormat:@"%d", index]];
-        [writer writeCharacters:mac];
-        [writer writeEndElement];
+        [writer startElement:@"BlockedMAC"];
+        [writer addAttribute:@"index" value:[NSString stringWithFormat:@"%d", index]];
+        [writer addText:mac];
+        [writer endElement];
     }
 
-    [writer writeEndElement];
-    [writer writeEndElement];
+    [writer endElement];
+    [writer endElement];
 
     GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
     req.almondMAC = almondMAC;

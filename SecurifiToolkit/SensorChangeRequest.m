@@ -7,48 +7,40 @@
 //
 
 #import "SensorChangeRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation SensorChangeRequest
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"SensorChange"];
+    [writer startElement:@"root"];
+    [writer startElement:@"SensorChange"];
 
-    [writer writeStartElement:@"AlmondplusMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
+    [writer element:@"AlmondplusMAC" text:self.almondMAC];
 
-    [writer writeStartElement:@"Device"];
-    [writer writeAttribute:@"ID" value:self.deviceID];
+    [writer startElement:@"Device"];
+    [writer addAttribute:@"ID" value:self.deviceID];
     //
     NSString *name = [self.changedName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (name.length > 0) {
-        [writer writeStartElement:@"NewName"];
-        [writer writeCharacters:name];
-        [writer writeEndElement];
+        [writer element:@"NewName" text:name];
     }
     //
     NSString *location = [self.changedLocation stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (location.length > 0) {
-        [writer writeStartElement:@"NewLocation"];
-        [writer writeCharacters:location];
-        [writer writeEndElement];
+        [writer element:@"NewLocation" text:location];
     }
     //
     // close Device
-    [writer writeEndElement];
+    [writer endElement];
 
     [self writeMobileInternalIndexElement:writer];
 
     // close SensorChange
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

@@ -11,8 +11,8 @@
 #import "BaseCommandRequest.h"
 
 @interface DeleteAccountRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *emailID;
-@property NSString *password;
+@property(nonatomic, copy) NSString *emailID;
+@property(nonatomic, copy) NSString *password;
 
 - (NSString *)toXml;
 @end

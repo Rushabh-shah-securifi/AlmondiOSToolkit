@@ -11,8 +11,8 @@
 #import "BaseCommandRequest.h"
 
 @interface NotificationDeleteRegistrationRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *regID;
-@property NSString *platform;
+@property(nonatomic, copy) NSString *regID;
+@property(nonatomic, copy) NSString *platform;
 
 - (NSString *)toXml;
 @end

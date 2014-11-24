@@ -11,13 +11,13 @@
 #import "BaseCommandRequest.h"
 
 @interface UpdateUserProfileRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *firstName;
-@property NSString *lastName;
-@property NSString *addressLine1;
-@property NSString *addressLine2;
-@property NSString *addressLine3;
-@property NSString *country;
-@property NSString *zipCode;
+@property(nonatomic, copy) NSString *firstName;
+@property(nonatomic, copy) NSString *lastName;
+@property(nonatomic, copy) NSString *addressLine1;
+@property(nonatomic, copy) NSString *addressLine2;
+@property(nonatomic, copy) NSString *addressLine3;
+@property(nonatomic, copy) NSString *country;
+@property(nonatomic, copy) NSString *zipCode;
 
 - (NSString *)toXml;
 

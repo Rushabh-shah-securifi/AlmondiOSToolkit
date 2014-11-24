@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 
 @interface UpdateUserProfileResponse : NSObject
-@property BOOL isSuccessful;
-@property int reasonCode;
-@property NSString *reason;
-@property(nonatomic) NSString *internalIndex;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) int reasonCode;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic, copy) NSString *internalIndex;
 @end

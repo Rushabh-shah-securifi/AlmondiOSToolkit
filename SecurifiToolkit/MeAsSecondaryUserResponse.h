@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 @interface MeAsSecondaryUserResponse : NSObject
-@property BOOL isSuccessful;
-@property unsigned int almondCount;
-@property NSString *reason;
-@property NSMutableArray *almondList;
-@property int reasonCode;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) unsigned int almondCount;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) NSMutableArray *almondList;
+@property(nonatomic) int reasonCode;
 @end

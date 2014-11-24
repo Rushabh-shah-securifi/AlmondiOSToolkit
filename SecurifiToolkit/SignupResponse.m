@@ -9,6 +9,4 @@
 #import "SignupResponse.h"
 
 @implementation SignupResponse
-@synthesize isSuccessful, Reason;
-@synthesize reasonCode;
 @end

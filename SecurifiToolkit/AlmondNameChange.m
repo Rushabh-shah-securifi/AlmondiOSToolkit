@@ -7,31 +7,25 @@
 //
 
 #import "AlmondNameChange.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
+
 @implementation AlmondNameChange
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
     
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"AlmondNameChange"];
+    [writer startElement:@"root"];
+    [writer startElement:@"AlmondNameChange"];
     
-    [writer writeStartElement:@"AlmondplusMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"NewName"];
-    [writer writeCharacters:self.changedAlmondName];
-    [writer writeEndElement];
+    [writer element:@"AlmondplusMAC" text:self.almondMAC];
+    [writer element:@"NewName" text:self.changedAlmondName];
 
     [self writeMobileInternalIndexElement:writer];
 
     // close AlmondNameChange
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
     
     return writer.toString;
 }

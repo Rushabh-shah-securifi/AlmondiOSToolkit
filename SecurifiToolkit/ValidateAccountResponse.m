@@ -9,5 +9,4 @@
 #import "ValidateAccountResponse.h"
 
 @implementation ValidateAccountResponse
-@synthesize isSuccessful, reason, reasonCode;
 @end

@@ -9,5 +9,4 @@
 #import "UserInviteResponse.h"
 
 @implementation UserInviteResponse
-@synthesize reason, reasonCode, isSuccessful, internalIndex;
 @end

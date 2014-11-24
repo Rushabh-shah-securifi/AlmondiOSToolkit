@@ -11,10 +11,10 @@
 #import "BaseCommandRequest.h"
 
 @interface UnlinkAlmondRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *almondMAC;
-@property NSString *emailID;
-@property NSString *password;
-@property(nonatomic) NSString *internalIndex;
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic, copy) NSString *emailID;
+@property(nonatomic, copy) NSString *password;
+@property(nonatomic, copy) NSString *internalIndex;
 
 - (NSString *)toXml;
 @end

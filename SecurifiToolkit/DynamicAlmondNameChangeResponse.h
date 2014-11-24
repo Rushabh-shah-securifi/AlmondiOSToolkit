@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 
 @interface DynamicAlmondNameChangeResponse : NSObject
-@property (nonatomic, retain) NSString      *almondplusMAC;
-@property (nonatomic, retain) NSString      *almondplusName;
+@property (nonatomic, copy) NSString      *almondplusMAC;
+@property (nonatomic, copy) NSString      *almondplusName;
 @end

@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 @interface AlmondListResponse : NSObject
-@property BOOL isSuccessful;
-@property unsigned int deviceCount;
-@property NSString *reason;
-@property NSMutableArray *almondPlusMACList;
-@property NSString *action;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) unsigned int deviceCount;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) NSMutableArray *almondPlusMACList;
+@property(nonatomic, copy) NSString *action;
 @end

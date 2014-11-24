@@ -9,5 +9,4 @@
 #import "MeAsSecondaryUserResponse.h"
 
 @implementation MeAsSecondaryUserResponse
-@synthesize isSuccessful, reason, reasonCode, almondCount, almondList;
 @end

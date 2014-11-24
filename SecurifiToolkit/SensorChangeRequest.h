@@ -11,11 +11,11 @@
 #import "SecurifiCommand.h"
 
 @interface SensorChangeRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *almondMAC;
-@property NSString *deviceID;
-@property NSString *changedName;
-@property NSString *changedLocation;
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic, copy) NSString *deviceID;
+@property(nonatomic, copy) NSString *changedName;
+@property(nonatomic, copy) NSString *changedLocation;
 
-- (NSString*)toXml;
+- (NSString *)toXml;
 
 @end

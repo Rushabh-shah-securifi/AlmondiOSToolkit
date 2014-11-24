@@ -7,63 +7,40 @@
 //
 
 #import "SFIWirelessSetting.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation SFIWirelessSetting
 
 // @"<root><AlmondWirelessSettings action=\"set\" count=\"%d\"><WirelessSetting index=\"%d\"><SSID>%@</SSID><Password>%@</Password><Channel>%d</Channel><EncryptionType>%@</EncryptionType><Security>%@</Security><WirelessMode>%d</WirelessMode></WirelessSetting></AlmondWirelessSettings></root>"
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
+    [writer startElement:@"root"];
 
-    [writer writeStartElement:@"AlmondWirelessSettings"];
-    [writer writeAttribute:@"action" value:@"set"];
-    [writer writeAttribute:@"count" value:@"1"];
+    [writer startElement:@"AlmondWirelessSettings"];
+    [writer addAttribute:@"action" value:@"set"];
+    [writer addAttribute:@"count" value:@"1"];
 
-    [writer writeStartElement:@"WirelessSetting"];
-    [writer writeAttribute:@"index" value:[NSString stringWithFormat:@"%d", self.index]];
-    [writer writeAttribute:@"enabled" value:(self.enabled ? @"true" : @"false")];
+    [writer startElement:@"WirelessSetting"];
+    [writer addAttribute:@"index" value:[NSString stringWithFormat:@"%d", self.index]];
+    [writer addAttribute:@"enabled" value:(self.enabled ? @"true" : @"false")];
     //
-    [writer writeStartElement:@"SSID"];
-    [writer writeCharacters:[self stringOrEmpty:self.ssid]];
-    [writer writeEndElement];
+    [writer element:@"SSID" text:self.ssid];
+    [writer element:@"Password" text:self.password];
+    [writer element:@"Channel" text:[NSString stringWithFormat:@"%d", self.channel]];
+    [writer element:@"EncryptionType" text:self.encryptionType];
+    [writer element:@"Security" text:self.security];
+    [writer element:@"WirelessMode" text:[NSString stringWithFormat:@"%d", self.wirelessModeCode]];
     //
-    [writer writeStartElement:@"Password"];
-    [writer writeCharacters:[self stringOrEmpty:self.password]];
-    [writer writeEndElement];
-    //
-    [writer writeStartElement:@"Channel"];
-    [writer writeCharacters:[NSString stringWithFormat:@"%d", self.channel]];
-    [writer writeEndElement];
-    //
-    [writer writeStartElement:@"EncryptionType"];
-    [writer writeCharacters:[self stringOrEmpty:self.encryptionType]];
-    [writer writeEndElement];
-    //
-    [writer writeStartElement:@"Security"];
-    [writer writeCharacters:[self stringOrEmpty:self.security]];
-    [writer writeEndElement];
-    //
-    [writer writeStartElement:@"WirelessMode"];
-    [writer writeCharacters:[NSString stringWithFormat:@"%d", self.wirelessModeCode]];
-    [writer writeEndElement];
-    //
-    [writer writeEndElement];
+    [writer endElement];
     //
     // close AlmondWirelessSettings
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
-}
-
-- (NSString *)stringOrEmpty:(NSString*)str {
-    return str.length == 0 ? @"" : str;
 }
 
 - (id)copyWithZone:(NSZone *)zone {

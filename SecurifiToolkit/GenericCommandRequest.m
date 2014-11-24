@@ -7,7 +7,7 @@
 //
 
 #import "GenericCommandRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation GenericCommandRequest
 
@@ -15,8 +15,8 @@
     self = [super init];
     if (self) {
         // set non-null defaults; protect against segfaults when generating XML
-        self.almondMAC = @"";
-        self.applicationID = @"1001";
+        _almondMAC = @"";
+        _applicationID = @"1001";
     }
 
     return self;
@@ -24,39 +24,33 @@
 
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"GenericCommandRequest"];
+    [writer startElement:@"root"];
+    [writer startElement:@"GenericCommandRequest"];
 
-    [writer writeStartElement:@"AlmondplusMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
-
-    [writer writeStartElement:@"ApplicationID"];
-    [writer writeCharacters:self.applicationID];
-    [writer writeEndElement];
+    [writer element:@"AlmondplusMAC" text:self.almondMAC];
+    [writer element:@"ApplicationID" text:self.applicationID];
 
     [self writeMobileInternalIndexElement:writer];
 
-    NSData *dataToEncode = [self.data dataUsingEncoding:NSUTF8StringEncoding];
-    NSData *encodedData = [dataToEncode base64EncodedDataWithOptions:0];
-    NSString *encodedString = [[NSString alloc] initWithData:encodedData encoding:NSUTF8StringEncoding];
-
-    [writer writeStartElement:@"Data"];
-    [writer writeCharacters:encodedString];
-    [writer writeEndElement];
+    NSString *encodedString;
+    if (self.data) {
+        NSData *dataToEncode = [self.data dataUsingEncoding:NSUTF8StringEncoding];
+        NSData *encodedData = [dataToEncode base64EncodedDataWithOptions:0];
+        encodedString = [[NSString alloc] initWithData:encodedData encoding:NSUTF8StringEncoding];
+    }
+    else {
+        encodedString = @"";
+    }
+    [writer element:@"Data" text:encodedString];
 
     // close GenericCommandRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root element
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }
-
-
 
 @end

@@ -7,30 +7,23 @@
 //
 
 #import "LoginTempPass.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation LoginTempPass
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"Login"];
+    [writer startElement:@"root"];
+    [writer startElement:@"Login"];
 
-    [writer writeStartElement:@"UserID"];
-    [writer writeCharacters:self.UserID];
-    [writer writeEndElement];
-
-    [writer writeStartElement:@"TempPass"];
-    [writer writeCharacters:self.TempPass];
-    [writer writeEndElement];
+    [writer element:@"UserID" text:self.UserID];
+    [writer element:@"TempPass" text:self.TempPass];
 
     // close Login
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

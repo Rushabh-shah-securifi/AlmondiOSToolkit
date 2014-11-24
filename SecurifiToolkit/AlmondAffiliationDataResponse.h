@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 
 @interface AlmondAffiliationDataResponse : NSObject
-@property BOOL isSuccessful;
-@property unsigned int almondCount;
-@property NSString *reason;
-@property NSMutableArray *almondList;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) unsigned int almondCount;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) NSMutableArray *almondList;
 @end

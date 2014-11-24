@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 
 @interface SensorChangeResponse : NSObject
-@property BOOL isSuccessful;
-@property unsigned int mobileInternalIndex;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) unsigned int mobileInternalIndex;
 @end

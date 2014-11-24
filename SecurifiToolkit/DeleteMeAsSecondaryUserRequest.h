@@ -11,8 +11,8 @@
 #import "BaseCommandRequest.h"
 
 @interface DeleteMeAsSecondaryUserRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *almondMAC;
-@property NSString *internalIndex;
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic, copy) NSString *internalIndex;
 
-- (NSString*)toXml;
+- (NSString *)toXml;
 @end

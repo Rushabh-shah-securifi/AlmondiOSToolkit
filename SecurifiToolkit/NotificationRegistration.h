@@ -10,9 +10,9 @@
 #import "SecurifiCommand.h"
 #import "BaseCommandRequest.h"
 
-@interface NotificationRegistration :BaseCommandRequest <SecurifiCommand>
-@property NSString *regID;
-@property NSString *platform;
+@interface NotificationRegistration : BaseCommandRequest <SecurifiCommand>
+@property(nonatomic, copy) NSString *regID;
+@property(nonatomic, copy) NSString *platform;
 
 - (NSString *)toXml;
 @end

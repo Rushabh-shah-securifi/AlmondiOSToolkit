@@ -7,30 +7,23 @@
 //
 
 #import "LogoutAllRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation LogoutAllRequest
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"LogoutAll"];
+    [writer startElement:@"root"];
+    [writer startElement:@"LogoutAll"];
 
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.UserID];
-    [writer writeEndElement];
-
-    [writer writeStartElement:@"Password"];
-    [writer writeCharacters:self.Password];
-    [writer writeEndElement];
+    [writer element:@"EmailID" text:self.UserID];
+    [writer element:@"Password" text:self.Password];
 
     // close LogoutAll
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

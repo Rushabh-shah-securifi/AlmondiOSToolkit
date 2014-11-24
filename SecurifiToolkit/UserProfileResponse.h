@@ -9,14 +9,14 @@
 #import <Foundation/Foundation.h>
 
 @interface UserProfileResponse : NSObject
-@property BOOL isSuccessful;
-@property NSString *firstName;
-@property NSString *lastName;
-@property NSString *addressLine1;
-@property NSString *addressLine2;
-@property NSString *addressLine3;
-@property NSString *country;
-@property NSString *zipCode;
-@property int reasonCode;
-@property NSString *reason;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *firstName;
+@property(nonatomic, copy) NSString *lastName;
+@property(nonatomic, copy) NSString *addressLine1;
+@property(nonatomic, copy) NSString *addressLine2;
+@property(nonatomic, copy) NSString *addressLine3;
+@property(nonatomic, copy) NSString *country;
+@property(nonatomic, copy) NSString *zipCode;
+@property(nonatomic) int reasonCode;
+@property(nonatomic, copy) NSString *reason;
 @end

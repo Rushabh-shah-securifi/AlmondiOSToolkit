@@ -7,29 +7,25 @@
 //
 
 #import "NotificationPreferenceListRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation NotificationPreferenceListRequest
+
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
-    
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"NotificationPreferenceListRequest"];
-    
-    [writer writeStartElement:@"AlmondplusMAC"];
-    [writer writeCharacters:self.almondplusMAC];
-    [writer writeEndElement];
-       
-    
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+
+    [writer startElement:@"root"];
+    [writer startElement:@"NotificationPreferenceListRequest"];
+
+    [writer element:@"AlmondplusMAC" text:self.almondplusMAC];
+
     [self writeMobileInternalIndexElement:writer];
-    
+
     // close NotificationPreferenceListRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
-    
+    [writer endElement];
+
     return writer.toString;
 }
 

@@ -7,28 +7,24 @@
 //
 
 #import "DeleteMeAsSecondaryUserRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation DeleteMeAsSecondaryUserRequest
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
     
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"DeleteMeAsSecondaryUserRequest"];
+    [writer startElement:@"root"];
+    [writer startElement:@"DeleteMeAsSecondaryUserRequest"];
     
-    [writer writeStartElement:@"AlmondMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
+    [writer element:@"AlmondMAC" text:self.almondMAC];
 
     [self writeMobileInternalIndexElement:writer];
     
     // close DeleteMeAsSecondaryUserRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
     
     return writer.toString;
 }

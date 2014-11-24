@@ -9,5 +9,4 @@
 #import "SanityResponse.h"
 
 @implementation SanityResponse
-@synthesize reason;
 @end

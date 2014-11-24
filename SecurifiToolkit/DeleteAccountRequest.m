@@ -7,29 +7,22 @@
 //
 
 #import "DeleteAccountRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation DeleteAccountRequest
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"DeleteAccountRequest"];
+    [writer startElement:@"root"];
+    [writer startElement:@"DeleteAccountRequest"];
 
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.emailID];
-    [writer writeEndElement];
-
-    [writer writeStartElement:@"Password"];
-    [writer writeCharacters:self.password];
-    [writer writeEndElement];
+    [writer element:@"EmailID" text:self.emailID];
+    [writer element:@"Password" text:self.password];
 
     // close DeleteAccountRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

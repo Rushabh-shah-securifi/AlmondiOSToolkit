@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 
 @interface AffiliationUserComplete : NSObject
-@property BOOL isSuccessful;
-@property NSString *almondplusName;
+@property (nonatomic) BOOL isSuccessful;
+@property (nonatomic, copy) NSString *almondplusName;
 //8 bytes
-@property NSString *almondplusMAC;
-@property NSString *reason;
-@property NSString *wifiSSID;
-@property NSString *wifiPassword;
+@property (nonatomic, copy)NSString *almondplusMAC;
+@property (nonatomic, copy)NSString *reason;
+@property (nonatomic, copy)NSString *wifiSSID;
+@property (nonatomic, copy)NSString *wifiPassword;
 @property int reasonCode;
 @end
