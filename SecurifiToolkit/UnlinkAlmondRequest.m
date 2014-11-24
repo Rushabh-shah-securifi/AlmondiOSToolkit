@@ -16,12 +16,12 @@
     
     [writer startElement:@"root"];
     [writer startElement:@"UnlinkAlmondRequest"];
-    
-    [writer element:@"AlmondMAC" text:self.almondMAC];
-    [writer element:@"EmailID" text:self.emailID];
-    [writer element:@"Password" text:self.password];
 
-    [self writeMobileInternalIndexElement:writer];
+    [writer addElement:@"AlmondMAC" text:self.almondMAC];
+    [writer addElement:@"EmailID" text:self.emailID];
+    [writer addElement:@"Password" text:self.password];
+
+    [self addMobileInternalIndexElement:writer];
     
     // close UnlinkAlmondRequest
     [writer endElement];

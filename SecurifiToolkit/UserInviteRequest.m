@@ -16,10 +16,10 @@
     [writer startElement:@"root"];
     [writer startElement:@"UserInviteRequest"];
 
-    [writer element:@"AlmondMAC" text:self.almondMAC];
-    [writer element:@"EmailID" text:self.emailID];
+    [writer addElement:@"AlmondMAC" text:self.almondMAC];
+    [writer addElement:@"EmailID" text:self.emailID];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close UserInviteRequest
     [writer endElement];

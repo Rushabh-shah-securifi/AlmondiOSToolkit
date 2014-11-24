@@ -8,7 +8,7 @@
 @interface SFIXmlWriter : NSObject
 
 // <elementName>text</elementName>
-- (void)element:(NSString *)elementName text:(NSString*)text;
+- (void)addElement:(NSString *)elementName text:(NSString*)text;
 
 // <elementName....
 - (void)startElement:(NSString *)elementName;

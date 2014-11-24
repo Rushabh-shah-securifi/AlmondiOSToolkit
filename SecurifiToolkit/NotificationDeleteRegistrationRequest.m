@@ -16,10 +16,10 @@
     [writer startElement:@"root"];
     [writer startElement:@"NotificationDeleteRegistrationRequest"];
 
-    [writer element:@"RegID" text:self.regID];
-    [writer element:@"Platform" text:self.platform];
+    [writer addElement:@"RegID" text:self.regID];
+    [writer addElement:@"Platform" text:self.platform];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close NotificationDeleteRegistrationRequest
     [writer endElement];

@@ -16,8 +16,8 @@
     [writer startElement:@"root"];
     [writer startElement:@"DeleteAccountRequest"];
 
-    [writer element:@"EmailID" text:self.emailID];
-    [writer element:@"Password" text:self.password];
+    [writer addElement:@"EmailID" text:self.emailID];
+    [writer addElement:@"Password" text:self.password];
 
     // close DeleteAccountRequest
     [writer endElement];

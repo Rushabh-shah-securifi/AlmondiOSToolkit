@@ -17,9 +17,9 @@
     [writer startElement:@"root"];
     [writer startElement:@"DeviceDataForcedUpdate"];
 
-    [writer element:@"AlmondplusMAC" text:self.almondMAC];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close DeviceDataForcedUpdate
     [writer endElement];

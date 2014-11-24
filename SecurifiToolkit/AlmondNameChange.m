@@ -16,11 +16,11 @@
     
     [writer startElement:@"root"];
     [writer startElement:@"AlmondNameChange"];
-    
-    [writer element:@"AlmondplusMAC" text:self.almondMAC];
-    [writer element:@"NewName" text:self.changedAlmondName];
 
-    [self writeMobileInternalIndexElement:writer];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
+    [writer addElement:@"NewName" text:self.changedAlmondName];
+
+    [self addMobileInternalIndexElement:writer];
 
     // close AlmondNameChange
     [writer endElement];

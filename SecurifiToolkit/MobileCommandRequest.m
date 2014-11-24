@@ -18,7 +18,7 @@
     [writer startElement:@"root"];
     [writer startElement:@"MobileCommand"];
 
-    [writer element:@"AlmondplusMAC" text:self.almondMAC];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
     [writer startElement:@"Device"];
     [writer addAttribute:@"ID" value:self.deviceID];
@@ -31,7 +31,7 @@
     // close Device
     [writer endElement];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close MobileCommand
     [writer endElement];

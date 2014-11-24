@@ -17,9 +17,9 @@
     [writer startElement:@"root"];
     [writer startElement:@"NotificationPreferenceListRequest"];
 
-    [writer element:@"AlmondplusMAC" text:self.almondplusMAC];
+    [writer addElement:@"AlmondplusMAC" text:self.almondplusMAC];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close NotificationPreferenceListRequest
     [writer endElement];

@@ -24,7 +24,7 @@
 }
 
 
-- (void)element:(NSString *)elementName text:(NSString *)text {
+- (void)addElement:(NSString *)elementName text:(NSString *)text {
     elementName = [self stringOrEmpty:elementName];
     text = [self stringOrEmpty:text];
 

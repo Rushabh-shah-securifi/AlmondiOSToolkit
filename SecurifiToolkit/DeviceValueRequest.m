@@ -24,7 +24,7 @@
     [writer startElement:@"root"];
     [writer startElement:@"DeviceValue"];
 
-    [writer element:@"AlmondplusMAC" text:self.almondMAC];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
     // close DeviceValue
     [writer endElement];

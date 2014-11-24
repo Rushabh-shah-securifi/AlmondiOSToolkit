@@ -26,12 +26,12 @@
     [writer addAttribute:@"index" value:[NSString stringWithFormat:@"%d", self.index]];
     [writer addAttribute:@"enabled" value:(self.enabled ? @"true" : @"false")];
     //
-    [writer element:@"SSID" text:self.ssid];
-    [writer element:@"Password" text:self.password];
-    [writer element:@"Channel" text:[NSString stringWithFormat:@"%d", self.channel]];
-    [writer element:@"EncryptionType" text:self.encryptionType];
-    [writer element:@"Security" text:self.security];
-    [writer element:@"WirelessMode" text:[NSString stringWithFormat:@"%d", self.wirelessModeCode]];
+    [writer addElement:@"SSID" text:self.ssid];
+    [writer addElement:@"Password" text:self.password];
+    [writer addElement:@"Channel" text:[NSString stringWithFormat:@"%d", self.channel]];
+    [writer addElement:@"EncryptionType" text:self.encryptionType];
+    [writer addElement:@"Security" text:self.security];
+    [writer addElement:@"WirelessMode" text:[NSString stringWithFormat:@"%d", self.wirelessModeCode]];
     //
     [writer endElement];
     //

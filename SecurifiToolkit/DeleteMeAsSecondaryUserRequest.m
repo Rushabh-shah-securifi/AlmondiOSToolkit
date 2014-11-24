@@ -16,10 +16,10 @@
     
     [writer startElement:@"root"];
     [writer startElement:@"DeleteMeAsSecondaryUserRequest"];
-    
-    [writer element:@"AlmondMAC" text:self.almondMAC];
 
-    [self writeMobileInternalIndexElement:writer];
+    [writer addElement:@"AlmondMAC" text:self.almondMAC];
+
+    [self addMobileInternalIndexElement:writer];
     
     // close DeleteMeAsSecondaryUserRequest
     [writer endElement];

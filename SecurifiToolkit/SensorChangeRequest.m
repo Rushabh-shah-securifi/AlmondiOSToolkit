@@ -17,25 +17,25 @@
     [writer startElement:@"root"];
     [writer startElement:@"SensorChange"];
 
-    [writer element:@"AlmondplusMAC" text:self.almondMAC];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
     [writer startElement:@"Device"];
     [writer addAttribute:@"ID" value:self.deviceID];
     //
     NSString *name = [self.changedName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (name.length > 0) {
-        [writer element:@"NewName" text:name];
+        [writer addElement:@"NewName" text:name];
     }
     //
     NSString *location = [self.changedLocation stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (location.length > 0) {
-        [writer element:@"NewLocation" text:location];
+        [writer addElement:@"NewLocation" text:location];
     }
     //
     // close Device
     [writer endElement];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close SensorChange
     [writer endElement];

@@ -17,7 +17,7 @@
     [writer startElement:@"root"];
     [writer startElement:@"AffiliationCodeRequest"];
 
-    [writer element:@"Code" text:self.self.Code];
+    [writer addElement:@"Code" text:self.self.Code];
 
     // close AffiliationCodeRequest
     [writer endElement];

@@ -17,6 +17,6 @@ typedef unsigned int sfi_id;
 
 - (instancetype)init;
 
-- (void)writeMobileInternalIndexElement:(SFIXmlWriter *)writer;
+- (void)addMobileInternalIndexElement:(SFIXmlWriter *)writer;
 
 @end

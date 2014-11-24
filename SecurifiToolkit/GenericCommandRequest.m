@@ -29,10 +29,10 @@
     [writer startElement:@"root"];
     [writer startElement:@"GenericCommandRequest"];
 
-    [writer element:@"AlmondplusMAC" text:self.almondMAC];
-    [writer element:@"ApplicationID" text:self.applicationID];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
+    [writer addElement:@"ApplicationID" text:self.applicationID];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     NSString *encodedString;
     if (self.data) {
@@ -43,7 +43,7 @@
     else {
         encodedString = @"";
     }
-    [writer element:@"Data" text:encodedString];
+    [writer addElement:@"Data" text:encodedString];
 
     // close GenericCommandRequest
     [writer endElement];

@@ -17,9 +17,9 @@
     [writer startElement:@"root"];
     [writer startElement:@"ChangePasswordRequest"];
 
-    [writer element:@"EmailID" text:self.emailID];
-    [writer element:@"CurrentPass" text:self.currentPassword];
-    [writer element:@"NewPass" text:self.changedPassword];
+    [writer addElement:@"EmailID" text:self.emailID];
+    [writer addElement:@"CurrentPass" text:self.currentPassword];
+    [writer addElement:@"NewPass" text:self.changedPassword];
 
     // close ChangePasswordRequest
     [writer endElement];

@@ -19,9 +19,9 @@
     return self;
 }
 
-- (void)writeMobileInternalIndexElement:(SFIXmlWriter *)writer {
+- (void)addMobileInternalIndexElement:(SFIXmlWriter *)writer {
     NSString *value = [NSString stringWithFormat:@"%d", _correlationId];
-    [writer element:@"MobileInternalIndex" text:value];
+    [writer addElement:@"MobileInternalIndex" text:value];
 }
 
 @end

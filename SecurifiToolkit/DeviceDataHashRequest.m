@@ -17,7 +17,7 @@
     [writer startElement:@"root"];
     [writer startElement:@"DeviceDataHash"];
 
-    [writer element:@"AlmondplusMAC" text:self.almondMAC];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
     // close DeviceDataHash
     [writer endElement];

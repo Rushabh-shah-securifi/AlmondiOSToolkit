@@ -17,7 +17,7 @@
     [writer startElement:@"root"];
     [writer startElement:@"ResetPasswordRequest"];
 
-    [writer element:@"EmailID" text:self.email];
+    [writer addElement:@"EmailID" text:self.email];
 
     // close ValidateAccountRequest
     [writer endElement];

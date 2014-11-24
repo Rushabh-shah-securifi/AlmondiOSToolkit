@@ -17,8 +17,8 @@
     [writer startElement:@"root"];
     [writer startElement:@"Login"];
 
-    [writer element:@"UserID" text:self.UserID];
-    [writer element:@"TempPass" text:self.TempPass];
+    [writer addElement:@"UserID" text:self.UserID];
+    [writer addElement:@"TempPass" text:self.TempPass];
 
     // close Login
     [writer endElement];

@@ -17,7 +17,7 @@
     [writer startElement:@"root"];
     [writer startElement:@"ValidateAccountRequest"];
 
-    [writer element:@"EmailID" text:self.email];
+    [writer addElement:@"EmailID" text:self.email];
 
     // close ValidateAccountRequest
     [writer endElement];

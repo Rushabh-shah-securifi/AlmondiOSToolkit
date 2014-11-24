@@ -17,8 +17,8 @@
     [writer startElement:@"root"];
     [writer startElement:@"LogoutAll"];
 
-    [writer element:@"EmailID" text:self.UserID];
-    [writer element:@"Password" text:self.Password];
+    [writer addElement:@"EmailID" text:self.UserID];
+    [writer addElement:@"Password" text:self.Password];
 
     // close LogoutAll
     [writer endElement];

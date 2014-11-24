@@ -16,16 +16,16 @@
     
     [writer startElement:@"root"];
     [writer startElement:@"UpdateUserProfileRequest"];
-    
-    [writer element:@"FirstName" text:self.firstName];
-    [writer element:@"LastName" text:self.lastName];
-    [writer element:@"AddressLine1" text:self.addressLine1];
-    [writer element:@"AddressLine2" text:self.addressLine2];
-    [writer element:@"AddressLine3" text:self.addressLine3];
-    [writer element:@"Country" text:self.country];
-    [writer element:@"ZipCode" text:self.zipCode];
 
-    [self writeMobileInternalIndexElement:writer];
+    [writer addElement:@"FirstName" text:self.firstName];
+    [writer addElement:@"LastName" text:self.lastName];
+    [writer addElement:@"AddressLine1" text:self.addressLine1];
+    [writer addElement:@"AddressLine2" text:self.addressLine2];
+    [writer addElement:@"AddressLine3" text:self.addressLine3];
+    [writer addElement:@"Country" text:self.country];
+    [writer addElement:@"ZipCode" text:self.zipCode];
+
+    [self addMobileInternalIndexElement:writer];
     
     // close DeleteAccountRequest
     [writer endElement];

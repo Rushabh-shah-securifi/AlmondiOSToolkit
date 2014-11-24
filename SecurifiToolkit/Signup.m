@@ -17,8 +17,8 @@
     [writer startElement:@"root"];
     [writer startElement:@"Signup"];
 
-    [writer element:@"EmailID" text:self.UserID];
-    [writer element:@"Password" text:self.Password];
+    [writer addElement:@"EmailID" text:self.UserID];
+    [writer addElement:@"Password" text:self.Password];
 
     // close Signup
     [writer endElement];
