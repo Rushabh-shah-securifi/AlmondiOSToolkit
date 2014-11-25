@@ -333,12 +333,15 @@
     return [values.value boolValue];
 }
 
-- (BOOL)isNotificationEnabled:(int)deviceID currentMAC:(NSString*)currentMac{
+- (BOOL)isNotificationEnabled {
     //Read from offline data
-    NSArray *notificationList = [[SecurifiToolkit sharedInstance] notificationPrefList:currentMac];
+    NSArray *notificationList = [[SecurifiToolkit sharedInstance] notificationPrefList:self.almondMAC];
+
+    unsigned int device_id = self.deviceID;
+
     //Check if current device ID is in the notification list
-    for(SFINotificationDevice *currentDevice in notificationList){
-        if(currentDevice.deviceID==deviceID){
+    for (SFINotificationDevice *currentDevice in notificationList) {
+        if (currentDevice.deviceID == device_id) {
             return true;
         }
     }
