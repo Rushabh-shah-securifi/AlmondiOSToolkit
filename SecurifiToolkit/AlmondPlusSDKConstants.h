@@ -81,6 +81,7 @@
 #define HASH_FILENAME @"hashlist"
 #define DEVICELIST_FILENAME  @"devicelist"
 #define DEVICEVALUE_FILENAME @"devicevalue"
+#define NOTIFICATION_PREF_FILENAME @"notificationpreference"
 
 #define LOG_FILE_NAME  @"AlmondPlusLog.log"
 #define SDK_LOG_FILE_NAME  @"AlmondPlusSDKLog.log"

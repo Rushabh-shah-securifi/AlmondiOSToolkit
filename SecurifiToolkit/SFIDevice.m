@@ -8,6 +8,8 @@
 
 #import "SFIDevice.h"
 #import "SFIDeviceValue.h"
+#import "SFINotificationDevice.h"
+#import "SecurifiToolkit.h"
 
 @implementation SFIDevice
 
@@ -246,6 +248,7 @@
         self.allowNotification = [coder decodeObjectForKey:@"self.allowNotification"];
         self.valueCount = (unsigned int) [coder decodeIntForKey:@"self.valueCount"];
         self.location = [coder decodeObjectForKey:@"self.location"];
+        self.almondMAC = [coder decodeObjectForKey:@"self.almondMAC"];
     }
 
     return self;
@@ -266,6 +269,7 @@
     [coder encodeObject:self.allowNotification forKey:@"self.allowNotification"];
     [coder encodeInt:self.valueCount forKey:@"self.valueCount"];
     [coder encodeObject:self.location forKey:@"self.location"];
+    [coder encodeObject:self.almondMAC forKey:@"self.almondMAC"];
 }
 
 - (NSString *)description {
@@ -284,6 +288,7 @@
     [description appendFormat:@", self.allowNotification=%@", self.allowNotification];
     [description appendFormat:@", self.valueCount=%u", self.valueCount];
     [description appendFormat:@", self.location=%@", self.location];
+    [description appendFormat:@", self.almondMAC=%@", self.almondMAC];
     [description appendString:@">"];
     return description;
 }
@@ -306,6 +311,7 @@
         copy.allowNotification = self.allowNotification;
         copy.valueCount = self.valueCount;
         copy.location = self.location;
+        copy.almondMAC = self.almondMAC;
     }
 
     return copy;
@@ -325,6 +331,18 @@
         return NO;
     }
     return [values.value boolValue];
+}
+
+- (BOOL)isNotificationEnabled:(int)deviceID currentMAC:(NSString*)currentMac{
+    //Read from offline data
+    NSArray *notificationList = [[SecurifiToolkit sharedInstance] notificationPrefList:currentMac];
+    //Check if current device ID is in the notification list
+    for(SFINotificationDevice *currentDevice in notificationList){
+        if(currentDevice.deviceID==deviceID){
+            return true;
+        }
+    }
+    return false;
 }
 
 @end

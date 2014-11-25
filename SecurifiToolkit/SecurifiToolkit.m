@@ -42,6 +42,7 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
 NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
+NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList";
 
 @interface CommandTypeEvent : NSObject <ScoreboardEvent>
 @property (readonly) CommandType commandType;
@@ -257,6 +258,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
 
         [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
 
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceHashResponse:) name:DEVICEDATA_HASH_NOTIFIER object:nil];
@@ -288,6 +290,7 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [center removeObserver:self name:DEVICEDATA_HASH_NOTIFIER object:nil];
 
     [center removeObserver:self name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
+    [center removeObserver:self name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
 }
 
 #pragma mark - SDK state
@@ -809,6 +812,10 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     return [self.dataManager readDeviceValueList:almondMac];
 }
 
+-(NSArray *)notificationPrefList:(NSString *)almondMac{
+    return [self.dataManager readNotificationList:almondMac];
+}
+
 #pragma mark - Device and Device Value Management
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
@@ -848,6 +855,8 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self asyncRequestDeviceValueList:almondMac];
     return YES;
 }
+
+
 
 #pragma mark - Scoreboard management
 
@@ -1643,6 +1652,109 @@ NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCom
     [self.dataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
 
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
+}
+
+
+#pragma mark - Notification Preference List
+- (void)onNotificationPrefListChange:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    
+    NotificationPreferenceListResponse *obj = (NotificationPreferenceListResponse *) [data valueForKey:@"data"];
+    NSString *currentMAC = obj.almondMAC;
+    
+    if (currentMAC.length == 0) {
+        return;
+    }
+    
+    if([obj.notificationDeviceList count]!=0){
+        // Update offline storage
+        [self.dataManager writeNotificationList:obj.notificationDeviceList currentMAC:currentMAC];
+        [self postNotification:kSFIDidChangeNotificationList data:currentMAC];
+    }
+}
+
+
+//- (void)onDynamicNotificationListChange:(id)sender {
+//    NSNotification *notifier = (NSNotification *) sender;
+//    NSDictionary *data = [notifier userInfo];
+//    if (data == nil) {
+//        return;
+//    }
+//    
+//    DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
+//    NSString *currentMAC = obj.almondMAC;
+//    
+//    [self processDynamicDeviceValueChange:obj currentMAC:currentMAC];
+//}
+
+// Processes a dynamic change to a device value
+- (void)processDynamicNotificationPrefChange:(NotificationPreferenceListResponse *)obj currentMAC:(NSString *)currentMAC {
+    if (currentMAC.length == 0) {
+        return;
+    }
+    
+//    NSMutableArray *cloudDeviceValueList = obj.deviceValueList;
+//    NSArray *currentDeviceValueList = [self.dataManager readDeviceValueList:currentMAC];
+//    
+//    NSMutableArray *newDeviceValueList;
+//    if (currentDeviceValueList != nil) {
+//        for (SFIDeviceValue *currentValue in currentDeviceValueList) {
+//            for (SFIDeviceValue *cloudValue in cloudDeviceValueList) {
+//                if (currentValue.deviceID == cloudValue.deviceID) {
+//                    cloudValue.isPresent = YES;
+//                    
+//                    NSArray *currentValues = [currentValue knownDevicesValues];
+//                    NSArray *cloudValues = [cloudValue knownDevicesValues];
+//                    
+//                    for (SFIDeviceKnownValues *currentMobileKnownValue in currentValues) {
+//                        for (SFIDeviceKnownValues *currentCloudKnownValue in cloudValues) {
+//                            if (currentMobileKnownValue.index == currentCloudKnownValue.index) {
+//                                currentMobileKnownValue.value = currentCloudKnownValue.value;
+//                                break;
+//                            }
+//                        }
+//                    }
+//                    
+//                    [currentValue replaceKnownDeviceValues:currentValues];
+//                }
+//            }
+//        }
+//        
+//        newDeviceValueList = [NSMutableArray arrayWithArray:currentDeviceValueList];
+//        
+//        // Traverse the list and add the new value to offline list
+//        // If there are new values without corresponding devices, we know to request the device list.
+//        BOOL isDeviceMissing = NO;
+//        if (cloudDeviceValueList.count > 0 && currentDeviceValueList.count == 0) {
+//            isDeviceMissing = YES;
+//        }
+//        else {
+//            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
+//                if (!currentCloudValue.isPresent) {
+//                    [newDeviceValueList addObject:currentCloudValue];
+//                    isDeviceMissing = YES;
+//                }
+//            }
+//        }
+//        
+//        if (isDeviceMissing) {
+//            NSLog(@"Missing devices for values. Requesting device hash for %@", currentMAC);
+//            GenericCommand *command = [self makeDeviceHashCommand:currentMAC];
+//            [self asyncSendToCloud:command];
+//        }
+//    }
+//    else {
+//        newDeviceValueList = cloudDeviceValueList;
+//    }
+//    
+//    // Update offline storage
+//    [self.dataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
+//    
+//    [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
 
 @end

@@ -92,4 +92,8 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 // TRUE if requested. FALSE otherwise.
 - (BOOL)wasDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac;
 
+// Tests whether a Device Notification List has been requested already.
+// TRUE if requested. FALSE otherwise.
+- (BOOL)willFetchNotificationListFetchedForAlmond:(NSString *)aAlmondMac;
+
 @end

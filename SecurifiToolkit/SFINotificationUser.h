@@ -21,6 +21,6 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
-// Indicates whether the device has notification preference on
-- (BOOL)isNotificationEnabled:(NSString*)deviceID;
+//// Indicates whether the device has notification preference on
+//- (BOOL)isNotificationEnabled:(NSString*)deviceID currentMAC:(NSString*)currentMac;
 @end

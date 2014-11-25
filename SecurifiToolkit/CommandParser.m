@@ -2649,7 +2649,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         //PY 101114 - Dynamic Notification Preference List - END
         
         //PY 131114 - Notification Preference List Response - BEGIN
-        else if (!strncmp((const char *)localname, kName_AlmondMAC, kLength_MaxTag)
+        else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE))
         {
             [parser.command setAlmondMAC:[parser currentString]];

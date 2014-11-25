@@ -176,6 +176,9 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 // Fetch the locally stored values for the Almond's devices
 - (NSArray*)deviceValuesList:(NSString*)almondMac;
 
+// Fetch the locally stored values for the Almond's notification
+-(NSArray *)notificationPrefList:(NSString *)almondMac;
+
 // Send a command to the cloud requesting a device list for the specified Almond
 - (void)asyncRequestDeviceList:(NSString *)almondMac;
 
