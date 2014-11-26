@@ -7,7 +7,7 @@
 //
 
 #import "DeviceListRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation DeviceListRequest
 
@@ -19,21 +19,17 @@
 }
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"DeviceData"];
+    [writer startElement:@"root"];
+    [writer startElement:@"DeviceData"];
 
-    [writer writeStartElement:@"AlmondplusMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
     // close DeviceData
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

@@ -7,18 +7,15 @@
 //
 
 #import "UserProfileRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation UserProfileRequest
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
     
-    [writer writeStartElement:@"root"];
-    // close root
-    [writer writeEndElement];
+    [writer startElement:@"root"];
+    [writer endElement];
     
     return writer.toString;
 }

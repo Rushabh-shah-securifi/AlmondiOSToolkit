@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 
 @interface AlmondNameChangeResponse : NSObject
-@property BOOL isSuccessful;
-@property(nonatomic) NSString *internalIndex;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *internalIndex;
 @end

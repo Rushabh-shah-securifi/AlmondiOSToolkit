@@ -10,11 +10,11 @@
 #import "SFINotificationUser.h"
 
 @interface NotificationPreferenceListResponse : NSObject
-@property BOOL isSuccessful;
-@property NSString *reason;
-@property int reasonCode;
-@property NSString *almondMAC;
-@property int preferenceCount;
-@property SFINotificationUser *notificationUser;
-@property NSMutableArray *notificationDeviceList;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) int reasonCode;
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic) int preferenceCount;
+@property(nonatomic) SFINotificationUser *notificationUser;
+@property(nonatomic) NSMutableArray *notificationDeviceList;
 @end

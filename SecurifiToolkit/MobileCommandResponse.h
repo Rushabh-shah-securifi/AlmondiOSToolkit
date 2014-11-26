@@ -11,7 +11,7 @@
 #import "BaseCommandRequest.h"
 
 @interface MobileCommandResponse : NSObject
-@property BOOL isSuccessful;
-@property sfi_id mobileInternalIndex;
-@property (copy) NSString *reason;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) sfi_id mobileInternalIndex;
+@property(nonatomic, copy) NSString *reason;
 @end

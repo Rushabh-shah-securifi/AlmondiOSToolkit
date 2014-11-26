@@ -9,5 +9,4 @@
 #import "NotificationDeleteRegistrationResponse.h"
 
 @implementation NotificationDeleteRegistrationResponse
-@synthesize isSuccessful, reason, reasonCode;
 @end

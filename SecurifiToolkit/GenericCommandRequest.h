@@ -21,8 +21,8 @@
 
 @interface GenericCommandRequest : BaseCommandRequest <SecurifiCommand>
 
-@property NSString *almondMAC;
-@property NSString *applicationID;
-@property NSString *data;
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic, copy) NSString *applicationID;
+@property(nonatomic, copy) NSString *data;
 
 @end

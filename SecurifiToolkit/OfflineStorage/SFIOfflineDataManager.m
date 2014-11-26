@@ -12,6 +12,7 @@
 
 @interface SFIOfflineDataManager ()
 @property(nonatomic, readonly) NSObject *syncLocker;
+@property(nonatomic, readonly) NSObject *notification_syncLocker;
 @property(nonatomic, readonly) NSString *almondListFp;
 @property(nonatomic, readonly) NSString *hashFp;
 @property(nonatomic, readonly) NSString *deviceListFp;
@@ -25,6 +26,7 @@
     self = [super init];
     if (self) {
         _syncLocker = [NSObject new];
+        _notification_syncLocker = [NSObject new];
 
         _almondListFp = [SFIOfflineDataManager filePathForName:ALMONDLIST_FILENAME];
         _hashFp = [SFIOfflineDataManager filePathForName:HASH_FILENAME];
@@ -233,27 +235,26 @@
 
 // Write Notification Preference List for the current MAC to offline storage
 - (void)writeNotificationList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC {
-    @synchronized (self.syncLocker) {
+    @synchronized (self.notification_syncLocker) {
         NSString *filePath = self.notificationPreferenceListFp;
         
         //Read the entire dictionary from the list
         NSMutableDictionary *dictNotificationList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
         if (dictNotificationList == nil) {
-            // [SNLog Log:@"Method Name: %s First time write!", __PRETTY_FUNCTION__];
             dictNotificationList = [[NSMutableDictionary alloc] init];
         }
         dictNotificationList[strCurrentMAC] = notificationList;
         
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictNotificationList toFile:filePath];
         if (!didWriteSuccessful) {
-            NSLog(@"Faile to write device list");
+            NSLog(@"Failed to write notification list");
         }
     }
 }
 
 // Read Notification Preference List for the current MAC from offline storage
 - (NSArray *)readNotificationList:(NSString *)strCurrentMAC {
-    @synchronized (self.syncLocker) {
+    @synchronized (self.notification_syncLocker) {
         NSString *filePath = self.notificationPreferenceListFp;
         
         NSMutableDictionary *dictNotificationList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];

@@ -10,9 +10,9 @@
 #import "BaseCommandRequest.h"
 #import "SecurifiCommand.h"
 
-@interface AlmondNameChange : BaseCommandRequest  <SecurifiCommand>
-@property NSString *almondMAC;
-@property NSString *changedAlmondName;
+@interface AlmondNameChange : BaseCommandRequest <SecurifiCommand>
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic, copy) NSString *changedAlmondName;
 
-- (NSString*)toXml;
+- (NSString *)toXml;
 @end

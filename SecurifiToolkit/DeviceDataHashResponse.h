@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface DeviceDataHashResponse : NSObject
-@property BOOL isSuccessful;
-@property NSString *almondHash;
-@property NSString *reason;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *almondHash;
+@property(nonatomic, copy) NSString *reason;
 @end

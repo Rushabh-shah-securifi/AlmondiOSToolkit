@@ -11,7 +11,7 @@
 #import "BaseCommandRequest.h"
 
 @interface DeviceDataHashRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *almondMAC;
+@property(nonatomic, copy) NSString *almondMAC;
 
 - (NSString *)toXml;
 

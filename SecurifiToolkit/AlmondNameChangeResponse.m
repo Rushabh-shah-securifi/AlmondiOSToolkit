@@ -9,5 +9,4 @@
 #import "AlmondNameChangeResponse.h"
 
 @implementation AlmondNameChangeResponse
-@synthesize isSuccessful, internalIndex;
 @end

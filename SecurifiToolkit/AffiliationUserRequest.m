@@ -7,26 +7,22 @@
 //
 
 #import "AffiliationUserRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation AffiliationUserRequest
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"AffiliationCodeRequest"];
+    [writer startElement:@"root"];
+    [writer startElement:@"AffiliationCodeRequest"];
 
-    [writer writeStartElement:@"Code"];
-    [writer writeCharacters:self.Code];
-    [writer writeEndElement];
+    [writer addElement:@"Code" text:self.self.Code];
 
     // close AffiliationCodeRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

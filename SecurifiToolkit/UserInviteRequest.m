@@ -7,31 +7,24 @@
 //
 
 #import "UserInviteRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation UserInviteRequest
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"UserInviteRequest"];
+    [writer startElement:@"root"];
+    [writer startElement:@"UserInviteRequest"];
 
-    [writer writeStartElement:@"AlmondMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
+    [writer addElement:@"AlmondMAC" text:self.almondMAC];
+    [writer addElement:@"EmailID" text:self.emailID];
 
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.emailID];
-    [writer writeEndElement];
-
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close UserInviteRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

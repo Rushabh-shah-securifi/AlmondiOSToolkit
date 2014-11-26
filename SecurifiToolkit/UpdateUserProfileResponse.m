@@ -9,5 +9,4 @@
 #import "UpdateUserProfileResponse.h"
 
 @implementation UpdateUserProfileResponse
-@synthesize isSuccessful, reasonCode, reason, internalIndex;
 @end

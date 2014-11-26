@@ -12,7 +12,7 @@
 
 @interface AffiliationUserRequest : BaseCommandRequest <SecurifiCommand>
 
-@property NSString *Code;
+@property(nonatomic, copy) NSString *Code;
 
 - (NSString *)toXml;
 

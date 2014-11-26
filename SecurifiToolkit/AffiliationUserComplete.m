@@ -9,8 +9,4 @@
 #import "AffiliationUserComplete.h"
 
 @implementation AffiliationUserComplete
-@synthesize almondplusName,almondplusMAC;
-@synthesize reason, isSuccessful;
-@synthesize wifiPassword, wifiSSID;
-@synthesize reasonCode;
 @end

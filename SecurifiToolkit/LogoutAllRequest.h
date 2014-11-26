@@ -11,10 +11,10 @@
 #import "BaseCommandRequest.h"
 
 @interface LogoutAllRequest : BaseCommandRequest <SecurifiCommand>
-@property BOOL isSuccessful;
-@property NSString *UserID;
-@property NSString *Password;
-@property NSString *Reason;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *UserID;
+@property(nonatomic, copy) NSString *Password;
+@property(nonatomic, copy) NSString *Reason;
 
 - (NSString *)toXml;
 

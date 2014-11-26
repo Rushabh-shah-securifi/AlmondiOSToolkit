@@ -9,5 +9,4 @@
 #import "DynamicAlmondNameChangeResponse.h"
 
 @implementation DynamicAlmondNameChangeResponse
-@synthesize almondplusMAC, almondplusName;
 @end

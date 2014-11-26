@@ -9,5 +9,4 @@
 #import "DynamicNotificationPreferenceList.h"
 
 @implementation DynamicNotificationPreferenceList
-@synthesize almondMAC, userCount, notificationUserList;
 @end

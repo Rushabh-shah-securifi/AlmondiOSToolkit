@@ -7,40 +7,36 @@
 //
 
 #import "MobileCommandRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation MobileCommandRequest
 
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"MobileCommand"];
+    [writer startElement:@"root"];
+    [writer startElement:@"MobileCommand"];
 
-    [writer writeStartElement:@"AlmondplusMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
-    [writer writeStartElement:@"Device"];
-    [writer writeAttribute:@"ID" value:self.deviceID];
+    [writer startElement:@"Device"];
+    [writer addAttribute:@"ID" value:self.deviceID];
     //
-    [writer writeStartElement:@"NewValue"];
-    [writer writeAttribute:@"Index" value:self.indexID];
-    [writer writeCharacters:self.changedValue];
-    [writer writeEndElement];
+    [writer startElement:@"NewValue"];
+    [writer addAttribute:@"Index" value:self.indexID];
+    [writer addText:self.changedValue];
+    [writer endElement];
     //
     // close Device
-    [writer writeEndElement];
+    [writer endElement];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close MobileCommand
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

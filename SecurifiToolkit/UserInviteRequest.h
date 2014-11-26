@@ -11,8 +11,8 @@
 #import "BaseCommandRequest.h"
 
 @interface UserInviteRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *almondMAC;
-@property NSString *emailID;
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic, copy) NSString *emailID;
 
 - (NSString *)toXml;
 @end

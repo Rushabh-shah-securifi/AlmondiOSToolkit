@@ -7,28 +7,24 @@
 //
 
 #import "SensorForcedUpdateRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation SensorForcedUpdateRequest
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"DeviceDataForcedUpdate"];
+    [writer startElement:@"root"];
+    [writer startElement:@"DeviceDataForcedUpdate"];
 
-    [writer writeStartElement:@"AlmondplusMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
+    [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
-    [self writeMobileInternalIndexElement:writer];
+    [self addMobileInternalIndexElement:writer];
 
     // close DeviceDataForcedUpdate
-    [writer writeEndElement];
+    [writer endElement];
     // close root element
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

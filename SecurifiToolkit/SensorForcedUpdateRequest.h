@@ -11,5 +11,5 @@
 #import "SecurifiCommand.h"
 
 @interface SensorForcedUpdateRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *almondMAC;
+@property (nonatomic, copy) NSString *almondMAC;
 @end

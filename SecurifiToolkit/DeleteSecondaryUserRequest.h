@@ -10,10 +10,10 @@
 #import "SecurifiCommand.h"
 #import "BaseCommandRequest.h"
 
-@interface DeleteSecondaryUserRequest : BaseCommandRequest  <SecurifiCommand>
-@property NSString *almondMAC;
-@property NSString *emailID;
-@property(nonatomic) NSString *internalIndex;
+@interface DeleteSecondaryUserRequest : BaseCommandRequest <SecurifiCommand>
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic, copy) NSString *emailID;
+@property(nonatomic, copy) NSString *internalIndex;
 
-- (NSString*)toXml;
+- (NSString *)toXml;
 @end

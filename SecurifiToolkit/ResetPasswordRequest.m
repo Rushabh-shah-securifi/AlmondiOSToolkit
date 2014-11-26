@@ -7,26 +7,22 @@
 //
 
 #import "ResetPasswordRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation ResetPasswordRequest
 
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"ResetPasswordRequest"];
+    [writer startElement:@"root"];
+    [writer startElement:@"ResetPasswordRequest"];
 
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.email];
-    [writer writeEndElement];
+    [writer addElement:@"EmailID" text:self.email];
 
     // close ValidateAccountRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root element
-    [writer writeEndElement];
+    [writer endElement];
 
     return writer.toString;
 }

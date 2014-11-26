@@ -17,11 +17,12 @@
 #import "DeleteSecondaryUserRequest.h"
 #import "DeleteMeAsSecondaryUserRequest.h"
 #import "MeAsSecondaryUserRequest.h"
-#import "XMLWriter.h"
 #import "NotificationRegistration.h"
 #import "NotificationDeleteRegistrationRequest.h"
 #import "NotificationPreferenceListRequest.h"
 #import "DynamicNotificationPreferenceList.h"
+#import "SFIXmlWriter.h"
+#import "SecurifiConfigurator.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -31,7 +32,7 @@
 #define SEC_EMAIL                                           @"com.securifi.email"
 #define SEC_PWD                                             @"com.securifi.pwd"
 #define SEC_USER_ID                                         @"com.securifi.userid"
-#define SEC_IS_ACCOUNT_ACITVATED                            @"com.securifi.isActivated"
+#define SEC_IS_ACCOUNT_ACTIVATED                            @"com.securifi.isActivated"
 #define SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT          @"com.securifi.minsRemaining"
 
 NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
@@ -200,6 +201,7 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
 // ===============================================================================================
 
 @interface SecurifiToolkit () <SingleTonDelegate>
+@property(nonatomic, readonly) SecurifiConfigurator *config;
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
@@ -215,30 +217,34 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
 
 #pragma mark - Lifecycle methods
 
-+ (instancetype)sharedInstance {
+static SecurifiToolkit *singleton = nil;
+
++ (void)initialize:(SecurifiConfigurator *)config {
     static dispatch_once_t once_predicate;
-    static SecurifiToolkit *singleton = nil;
 
     dispatch_once(&once_predicate, ^{
-        singleton = [SecurifiToolkit new];
+        singleton = [[SecurifiToolkit alloc] initWithConfig:config];
     });
+}
 
++ (instancetype)sharedInstance {
     return singleton;
 }
 
-- (id)init {
+- (instancetype)initWithConfig:(SecurifiConfigurator *)config {
     self = [super init];
     if (self) {
+        _config = [config copy];
+
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
 
         // default; do not change
-        [self setupReachability:CLOUD_PROD_SERVER];
+        [self setupReachability:config.productionCloudHost];
         self.useProductionCloud = YES;
 
         _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
         _socketDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
-
         _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -985,27 +991,25 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
 }
 
 - (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)blockedMacs {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
 
-    [writer writeStartElement:@"root"];
+    [writer startElement:@"root"];
 
-    [writer writeStartElement:@"AlmondBlockedMACs"];
-    [writer writeAttribute:@"action" value:@"set"];
-    [writer writeAttribute:@"count" value:[NSString stringWithFormat:@"%lu", (unsigned long)blockedMacs.count]];
+    [writer startElement:@"AlmondBlockedMACs"];
+    [writer addAttribute:@"action" value:@"set"];
+    [writer addAttribute:@"count" value:[NSString stringWithFormat:@"%lu", (unsigned long)blockedMacs.count]];
 
     int index = 0;
     for (NSString *mac in blockedMacs) {
         index++;
-        [writer writeStartElement:@"BlockedMAC"];
-        [writer writeAttribute:@"index" value:[NSString stringWithFormat:@"%d", index]];
-        [writer writeCharacters:mac];
-        [writer writeEndElement];
+        [writer startElement:@"BlockedMAC"];
+        [writer addAttribute:@"index" value:[NSString stringWithFormat:@"%d", index]];
+        [writer addText:mac];
+        [writer endElement];
     }
 
-    [writer writeEndElement];
-    [writer writeEndElement];
+    [writer endElement];
+    [writer endElement];
 
     GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
     req.almondMAC = almondMAC;
@@ -1167,15 +1171,15 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
 
 //PY: 101014 - Not activated accounts can be accessed for 7 days
 - (NSString *)secIsAccountActivated {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_IS_ACCOUNT_ACITVATED forService:SEC_SERVICE_NAME];
+    return [KeyChainWrapper retrieveEntryForUser:SEC_IS_ACCOUNT_ACTIVATED forService:SEC_SERVICE_NAME];
 }
 
 - (void)setSecAccountActivationStatus:(NSString *)isActivated {
     if (isActivated == nil) {
-        [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACITVATED entryValue:IS_ACCOUNT_ACTIVATED_DEFAULT forService:SEC_SERVICE_NAME];
+        [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACTIVATED entryValue:IS_ACCOUNT_ACTIVATED_DEFAULT forService:SEC_SERVICE_NAME];
     }
     else {
-        [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACITVATED entryValue:isActivated forService:SEC_SERVICE_NAME];
+        [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACTIVATED entryValue:isActivated forService:SEC_SERVICE_NAME];
     }
 }
 
@@ -1201,8 +1205,10 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
     SingleTon *newSingleton = [SingleTon newSingletonWithResponseCallbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];
     newSingleton.delegate = self;
     newSingleton.connectionState = SDKCloudStatusInitializing;
+    newSingleton.config = self.config;
 
     _networkSingleton = newSingleton;
+
     [newSingleton initNetworkCommunication:self.useProductionCloud];
 
     return newSingleton;

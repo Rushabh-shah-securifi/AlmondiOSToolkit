@@ -10,8 +10,8 @@
 #import "SecurifiCommand.h"
 
 @interface LoginTempPass : NSObject <SecurifiCommand>
-@property NSString *UserID;
-@property NSString *TempPass;
+@property(nonatomic, copy) NSString *UserID;
+@property(nonatomic, copy) NSString *TempPass;
 
 - (NSString *)toXml;
 

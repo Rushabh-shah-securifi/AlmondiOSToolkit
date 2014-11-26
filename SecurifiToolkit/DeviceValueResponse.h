@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 @interface DeviceValueResponse : NSObject
-@property BOOL isSuccessful;
-@property unsigned int deviceCount;
-@property NSString *reason;
-@property NSMutableArray *deviceValueList;
-@property NSString *almondMAC;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) unsigned int deviceCount;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) NSMutableArray *deviceValueList;
+@property(nonatomic, copy) NSString *almondMAC;
 @end

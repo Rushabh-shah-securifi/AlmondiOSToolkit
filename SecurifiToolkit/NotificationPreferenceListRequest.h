@@ -11,7 +11,7 @@
 #import "BaseCommandRequest.h"
 
 @interface NotificationPreferenceListRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *almondplusMAC;
+@property(nonatomic, copy) NSString *almondplusMAC;
 
 - (NSString *)toXml;
 @end

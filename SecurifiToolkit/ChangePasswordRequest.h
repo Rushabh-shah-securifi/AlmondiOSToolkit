@@ -10,9 +10,10 @@
 #import "SecurifiCommand.h"
 #import "BaseCommandRequest.h"
 
-@interface ChangePasswordRequest : BaseCommandRequest  <SecurifiCommand>
-@property NSString *emailID;
-@property NSString *currentPassword;
-@property NSString *changedPassword;
-- (NSString*)toXml;
+@interface ChangePasswordRequest : BaseCommandRequest <SecurifiCommand>
+@property(nonatomic, copy) NSString *emailID;
+@property(nonatomic, copy) NSString *currentPassword;
+@property(nonatomic, copy) NSString *changedPassword;
+
+- (NSString *)toXml;
 @end

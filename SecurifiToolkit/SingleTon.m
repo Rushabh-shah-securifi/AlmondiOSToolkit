@@ -10,6 +10,7 @@
 #import <SecurifiToolkit/SecurifiToolkit.h>
 #import "Commandparser.h"
 #import "SUnit.h"
+#import "SecurifiConfigurator.h"
 
 @interface SingleTon ()
 @property (nonatomic, readonly) NSObject *syncLocker;
@@ -101,9 +102,9 @@
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
 
-            NSString *server = useProductionCloud ? CLOUD_PROD_SERVER : CLOUD_DEV_SERVER;
+            NSString *server = useProductionCloud ? self.config.productionCloudHost : self.config.developmentCloudHost;
             CFStringRef host = (__bridge CFStringRef) server;
-            UInt32 port = CLOUD_SERVER_PORT;
+            UInt32 port = self.config.cloudPort;
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
 
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
@@ -684,7 +685,7 @@
 
         case NSStreamEventHasSpaceAvailable: {
             // Evaluate the SSL connection
-            if (!self.certificateTrusted) {
+            if (self.config.enableCertificateValidation && !self.certificateTrusted) {
                 BOOL trusted = [self isTrustedCertificate:theStream];
                 if (!trusted) {
                     NSLog(@"%s: SSL Cert is not trusted. Issuing shutdown.", __PRETTY_FUNCTION__);
@@ -757,7 +758,8 @@
 #pragma mark - SSL certificates
 
 - (void)loadCertificate {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"cert" ofType:@"der"];
+    NSString *certFileName = self.config.certificateFileName;
+    NSString *path = [[NSBundle mainBundle] pathForResource:certFileName ofType:@"der"];
     NSData *certData = [NSData dataWithContentsOfFile:path];
 
     SecCertificateRef oldCertificate = self.certificate;
@@ -821,7 +823,6 @@
     return [self evaluateCertificate:secTrust];
 }
 
-
 - (BOOL)evaluateCertificate:(SecTrustRef)secTrust {
     CFIndex count = SecTrustGetCertificateCount(secTrust);
     if (count == 0) {
@@ -876,7 +877,6 @@
     
     return trusted;
 }
-
 
 #pragma mark - Hash value management
 

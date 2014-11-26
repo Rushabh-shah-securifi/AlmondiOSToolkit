@@ -7,33 +7,25 @@
 //
 
 #import "NotificationDeleteRegistrationRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation NotificationDeleteRegistrationRequest
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
-    
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"NotificationDeleteRegistrationRequest"];
-    
-    [writer writeStartElement:@"RegID"];
-    [writer writeCharacters:self.regID];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"Platform"];
-    [writer writeCharacters:self.platform];
-    [writer writeEndElement];
-    
-    
-    [self writeMobileInternalIndexElement:writer];
-    
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+
+    [writer startElement:@"root"];
+    [writer startElement:@"NotificationDeleteRegistrationRequest"];
+
+    [writer addElement:@"RegID" text:self.regID];
+    [writer addElement:@"Platform" text:self.platform];
+
+    [self addMobileInternalIndexElement:writer];
+
     // close NotificationDeleteRegistrationRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
-    
+    [writer endElement];
+
     return writer.toString;
 }
 @end

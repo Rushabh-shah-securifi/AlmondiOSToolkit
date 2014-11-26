@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 
 @interface DeviceListResponse : NSObject
-@property BOOL isSuccessful;
-@property unsigned int deviceCount;
-@property NSString *reason;
-@property NSMutableArray *deviceList;
-@property NSString *almondMAC; //For dynamic update
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) unsigned int deviceCount;
+@property(nonatomic, copy) NSString *reason;
+@property(nonatomic) NSMutableArray *deviceList;
+@property(nonatomic, copy) NSString *almondMAC; //For dynamic update
 
 @end

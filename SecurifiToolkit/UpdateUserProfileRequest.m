@@ -7,52 +7,30 @@
 //
 
 #import "UpdateUserProfileRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation UpdateUserProfileRequest
 
 -(NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
+    SFIXmlWriter *writer = [SFIXmlWriter new];
     
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"UpdateUserProfileRequest"];
-    
-    [writer writeStartElement:@"FirstName"];
-    [writer writeCharacters:self.firstName];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"LastName"];
-    [writer writeCharacters:self.lastName];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"AddressLine1"];
-    [writer writeCharacters:self.addressLine1];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"AddressLine2"];
-    [writer writeCharacters:self.addressLine2];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"AddressLine3"];
-    [writer writeCharacters:self.addressLine3];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"Country"];
-    [writer writeCharacters:self.country];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"ZipCode"];
-    [writer writeCharacters:self.zipCode];
-    [writer writeEndElement];
+    [writer startElement:@"root"];
+    [writer startElement:@"UpdateUserProfileRequest"];
 
-    [self writeMobileInternalIndexElement:writer];
+    [writer addElement:@"FirstName" text:self.firstName];
+    [writer addElement:@"LastName" text:self.lastName];
+    [writer addElement:@"AddressLine1" text:self.addressLine1];
+    [writer addElement:@"AddressLine2" text:self.addressLine2];
+    [writer addElement:@"AddressLine3" text:self.addressLine3];
+    [writer addElement:@"Country" text:self.country];
+    [writer addElement:@"ZipCode" text:self.zipCode];
+
+    [self addMobileInternalIndexElement:writer];
     
     // close DeleteAccountRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
     
     return writer.toString;
 }

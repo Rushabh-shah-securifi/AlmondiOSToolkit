@@ -11,5 +11,5 @@
 #import "BaseCommandRequest.h"
 
 @interface ResetPasswordRequest : BaseCommandRequest <SecurifiCommand>
-@property NSString *email;
+@property(nonatomic, copy) NSString *email;
 @end

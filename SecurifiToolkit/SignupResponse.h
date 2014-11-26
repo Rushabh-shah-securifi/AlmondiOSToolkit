@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface SignupResponse : NSObject
-@property BOOL isSuccessful;
-@property NSString *Reason;
-@property int reasonCode;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic, copy) NSString *Reason;
+@property(nonatomic) int reasonCode;
 @end

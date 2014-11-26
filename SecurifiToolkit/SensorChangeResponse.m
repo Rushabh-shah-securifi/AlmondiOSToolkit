@@ -9,6 +9,4 @@
 #import "SensorChangeResponse.h"
 
 @implementation SensorChangeResponse
-@synthesize mobileInternalIndex;
-@synthesize isSuccessful;
 @end

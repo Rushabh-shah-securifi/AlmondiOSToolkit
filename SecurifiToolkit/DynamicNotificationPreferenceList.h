@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface DynamicNotificationPreferenceList : NSObject
-@property NSString *almondMAC;
-@property int userCount;
-@property NSMutableArray *notificationUserList;
+@property(nonatomic, copy) NSString *almondMAC;
+@property(nonatomic) int userCount;
+@property(nonatomic) NSMutableArray *notificationUserList;
 @end

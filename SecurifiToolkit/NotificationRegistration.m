@@ -7,33 +7,25 @@
 //
 
 #import "NotificationRegistration.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation NotificationRegistration
 - (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
-    
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"NotificationAddRegistration"];
-    
-    [writer writeStartElement:@"RegID"];
-    [writer writeCharacters:self.regID];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"Platform"];
-    [writer writeCharacters:self.platform];
-    [writer writeEndElement];
-    
-    
-    [self writeMobileInternalIndexElement:writer];
-    
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+
+    [writer startElement:@"root"];
+    [writer startElement:@"NotificationAddRegistration"];
+
+    [writer addElement:@"RegID" text:self.regID];
+    [writer addElement:@"Platform" text:self.platform];
+
+    [self addMobileInternalIndexElement:writer];
+
     // close NotificationAddRegistration
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
-    
+    [writer endElement];
+
     return writer.toString;
 }
 @end

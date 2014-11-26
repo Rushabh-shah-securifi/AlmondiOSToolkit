@@ -9,5 +9,4 @@
 #import "NotificationPreferenceListResponse.h"
 
 @implementation NotificationPreferenceListResponse
-@synthesize isSuccessful, reason, reasonCode, almondMAC, preferenceCount, notificationDeviceList, notificationUser;
 @end

@@ -7,37 +7,29 @@
 //
 
 #import "UnlinkAlmondRequest.h"
-#import "XMLWriter.h"
+#import "SFIXmlWriter.h"
 
 @implementation UnlinkAlmondRequest
-- (NSString *)toXml {
-    XMLWriter *writer = [XMLWriter new];
-    writer.indentation = @"";
-    writer.lineBreak = @"";
-    
-    [writer writeStartElement:@"root"];
-    [writer writeStartElement:@"UnlinkAlmondRequest"];
-    
-    [writer writeStartElement:@"AlmondMAC"];
-    [writer writeCharacters:self.almondMAC];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"EmailID"];
-    [writer writeCharacters:self.emailID];
-    [writer writeEndElement];
-    
-    [writer writeStartElement:@"Password"];
-    [writer writeCharacters:self.password];
-    [writer writeEndElement];
 
-    [self writeMobileInternalIndexElement:writer];
+- (NSString *)toXml {
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+    
+    [writer startElement:@"root"];
+    [writer startElement:@"UnlinkAlmondRequest"];
+
+    [writer addElement:@"AlmondMAC" text:self.almondMAC];
+    [writer addElement:@"EmailID" text:self.emailID];
+    [writer addElement:@"Password" text:self.password];
+
+    [self addMobileInternalIndexElement:writer];
     
     // close UnlinkAlmondRequest
-    [writer writeEndElement];
+    [writer endElement];
     // close root
-    [writer writeEndElement];
+    [writer endElement];
     
     return writer.toString;
 }
+
 @end
 

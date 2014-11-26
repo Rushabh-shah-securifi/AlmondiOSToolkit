@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface ChangePasswordResponse : NSObject
-@property BOOL isSuccessful;
-@property int reasonCode;
-@property NSString *reason;
+@property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) int reasonCode;
+@property(nonatomic, copy) NSString *reason;
 @end

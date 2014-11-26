@@ -9,5 +9,4 @@
 #import "ResetPasswordResponse.h"
 
 @implementation ResetPasswordResponse
-@synthesize isSuccessful, reason, reasonCode;
 @end
