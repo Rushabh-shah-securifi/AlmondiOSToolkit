@@ -21,6 +21,7 @@
 #import "NotificationRegistration.h"
 #import "NotificationDeleteRegistrationRequest.h"
 #import "NotificationPreferenceListRequest.h"
+#import "DynamicNotificationPreferenceList.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -259,6 +260,8 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
         [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
+        
+        [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
 
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceHashResponse:) name:DEVICEDATA_HASH_NOTIFIER object:nil];
@@ -1680,83 +1683,43 @@ NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList"
 }
 
 
-//- (void)onDynamicNotificationListChange:(id)sender {
-//    NSNotification *notifier = (NSNotification *) sender;
-//    NSDictionary *data = [notifier userInfo];
-//    if (data == nil) {
-//        return;
-//    }
-//    
-//    DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
-//    NSString *currentMAC = obj.almondMAC;
-//    
-//    [self processDynamicDeviceValueChange:obj currentMAC:currentMAC];
-//}
+- (void)onDynamicNotificationListChange:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    
+    DynamicNotificationPreferenceList *obj = (DynamicNotificationPreferenceList *) [data valueForKey:@"data"];
+    NSString *currentMAC = obj.almondMAC;
+    
+    [self processDynamicNotificationPrefChange:obj currentMAC:currentMAC];
+}
 
-// Processes a dynamic change to a device value
-- (void)processDynamicNotificationPrefChange:(NotificationPreferenceListResponse *)obj currentMAC:(NSString *)currentMAC {
+// Processes a dynamic change to a notification preference value
+- (void)processDynamicNotificationPrefChange:(DynamicNotificationPreferenceList *)obj currentMAC:(NSString *)currentMAC {
     if (currentMAC.length == 0) {
         return;
     }
     
-//    NSMutableArray *cloudDeviceValueList = obj.deviceValueList;
-//    NSArray *currentDeviceValueList = [self.dataManager readDeviceValueList:currentMAC];
-//    
-//    NSMutableArray *newDeviceValueList;
-//    if (currentDeviceValueList != nil) {
-//        for (SFIDeviceValue *currentValue in currentDeviceValueList) {
-//            for (SFIDeviceValue *cloudValue in cloudDeviceValueList) {
-//                if (currentValue.deviceID == cloudValue.deviceID) {
-//                    cloudValue.isPresent = YES;
-//                    
-//                    NSArray *currentValues = [currentValue knownDevicesValues];
-//                    NSArray *cloudValues = [cloudValue knownDevicesValues];
-//                    
-//                    for (SFIDeviceKnownValues *currentMobileKnownValue in currentValues) {
-//                        for (SFIDeviceKnownValues *currentCloudKnownValue in cloudValues) {
-//                            if (currentMobileKnownValue.index == currentCloudKnownValue.index) {
-//                                currentMobileKnownValue.value = currentCloudKnownValue.value;
-//                                break;
-//                            }
-//                        }
-//                    }
-//                    
-//                    [currentValue replaceKnownDeviceValues:currentValues];
-//                }
-//            }
-//        }
-//        
-//        newDeviceValueList = [NSMutableArray arrayWithArray:currentDeviceValueList];
-//        
-//        // Traverse the list and add the new value to offline list
-//        // If there are new values without corresponding devices, we know to request the device list.
-//        BOOL isDeviceMissing = NO;
-//        if (cloudDeviceValueList.count > 0 && currentDeviceValueList.count == 0) {
-//            isDeviceMissing = YES;
-//        }
-//        else {
-//            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
-//                if (!currentCloudValue.isPresent) {
-//                    [newDeviceValueList addObject:currentCloudValue];
-//                    isDeviceMissing = YES;
-//                }
-//            }
-//        }
-//        
-//        if (isDeviceMissing) {
-//            NSLog(@"Missing devices for values. Requesting device hash for %@", currentMAC);
-//            GenericCommand *command = [self makeDeviceHashCommand:currentMAC];
-//            [self asyncSendToCloud:command];
-//        }
-//    }
-//    else {
-//        newDeviceValueList = cloudDeviceValueList;
-//    }
-//    
-//    // Update offline storage
-//    [self.dataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
-//    
-//    [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
+    //Get the email id of current user
+    NSString *loggedInUser = [self loginEmail];
+    
+    //Get the notification list of that current user from offline storage
+    NSMutableArray *notificationPrefUserList = obj.notificationUserList;
+    NSMutableArray *cloudNotificationPrefList = obj.notificationUserList;
+    for(SFINotificationUser *currentUser in notificationPrefUserList){
+        if([currentUser.userID isEqualToString:loggedInUser]){
+            cloudNotificationPrefList = currentUser.notificationDeviceList;
+            break;
+        }
+    }
+    
+    //NSArray *currentNotificationPrefList = [self.dataManager readNotificationList:currentMAC];
+    // Update offline storage
+    [self.dataManager writeNotificationList:cloudNotificationPrefList currentMAC:currentMAC];
+    
+    [self postNotification:kSFIDidChangeNotificationList data:currentMAC];
 }
 
 @end

@@ -105,6 +105,7 @@ extern NSString *const kSFIDidChangeAlmondName;
 extern NSString *const kSFIDidChangeDeviceList;
 
 extern NSString *const kSFIDidChangeDeviceValueList;
+extern NSString *const kSFIDidChangeNotificationList;
 
 // Notification posted when a MobileCommand request has completed. Payload contains the command itself, and
 // a boxed NSTimeInterval indicating how long the request-response cycle took.
