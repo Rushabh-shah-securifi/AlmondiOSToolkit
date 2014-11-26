@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+
+#import <SecurifiToolkit/SecurifiConfigurator.h>
 #import <SecurifiToolkit/GenericCommand.h>
 #import <SecurifiToolkit/SFIDevice.h>
 #import <SecurifiToolkit/SFIDeviceValue.h>
@@ -81,6 +83,8 @@
 #import <SecurifiToolkit/NotificationPreferenceListRequest.h>
 #import <SecurifiToolkit/NotificationPreferenceListResponse.h>
 
+@class SecurifiConfigurator;
+
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
 // Sent in response to a call to asyncSendLoginWithEmail:password:
@@ -124,6 +128,8 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 // from the Scorecard. This is a debug facility and should not be run in production due to potential
 // performance and memory costs.
 @property(nonatomic) BOOL collectEvents;
+
++ (void)initialize:(SecurifiConfigurator *)config;
 
 + (instancetype)sharedInstance;
 
@@ -177,7 +183,7 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 - (NSArray*)deviceValuesList:(NSString*)almondMac;
 
 // Fetch the locally stored values for the Almond's notification
--(NSArray *)notificationPrefList:(NSString *)almondMac;
+- (NSArray *)notificationPrefList:(NSString *)almondMac;
 
 // Send a command to the cloud requesting a device list for the specified Almond
 - (void)asyncRequestDeviceList:(NSString *)almondMac;

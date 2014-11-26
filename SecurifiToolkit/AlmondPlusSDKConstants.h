@@ -17,10 +17,6 @@
 //NU: ec2-54-226-114-39.compute-1.amazonaws.com
 //ec2-54-224-16-165.compute-1.amazonaws.com
 
-#define CLOUD_PROD_SERVER   @"cloud.securifi.com"
-#define CLOUD_DEV_SERVER    @"clouddev.securifi.com"
-#define CLOUD_SERVER_PORT   1028
-
 //#define CLOUD_SERVER  @"ec2-54-226-114-39.compute-1.amazonaws.com"
 //#define CLOUD_SERVER  @"nodeLB-1553508487.us-east-1.elb.amazonaws.com"
 //#define CLOUD_SERVER  @"ec2-54-226-113-110.compute-1.amazonaws.com"

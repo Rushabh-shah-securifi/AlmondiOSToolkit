@@ -22,6 +22,7 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 
 @class SingleTon;
 @class GenericCommand;
+@class SecurifiConfigurator;
 
 @protocol SingleTonDelegate
 
@@ -43,6 +44,8 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 @property(nonatomic) SDKCloudStatus connectionState;
 @property(nonatomic) BOOL isStreamConnected;
 @property(nonatomic) BOOL isLoggedIn;
+
+@property(nonatomic, copy) SecurifiConfigurator *config;
 
 // queue on which notifications will be posted
 + (SingleTon *)newSingletonWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;
@@ -91,9 +94,5 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 // Tests whether a Device Values List was requested already.
 // TRUE if requested. FALSE otherwise.
 - (BOOL)wasDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac;
-
-// Tests whether a Device Notification List has been requested already.
-// TRUE if requested. FALSE otherwise.
-- (BOOL)willFetchNotificationListFetchedForAlmond:(NSString *)aAlmondMac;
 
 @end
