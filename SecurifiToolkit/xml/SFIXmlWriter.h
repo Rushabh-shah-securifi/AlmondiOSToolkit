@@ -19,6 +19,12 @@
 // <elementName name=value>
 - (void)addAttribute:(NSString *)name value:(NSString *)value;
 
+// <elementName name=value>
+- (void)addAttribute:(NSString *)name intValue:(int)value;
+
+// <elementName name=value>
+- (void)addAttribute:(NSString *)name integerValue:(NSInteger)value;
+
 // <elementName>text</elementName>
 - (void)addText:(NSString *)text;
 
