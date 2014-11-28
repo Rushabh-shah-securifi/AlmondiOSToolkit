@@ -23,7 +23,7 @@
     [writer addAttribute:@"count" value:@"1"];
 
     [writer startElement:@"WirelessSetting"];
-    [writer addAttribute:@"index" value:[NSString stringWithFormat:@"%d", self.index]];
+    [writer addAttribute:@"index" intValue:self.index];
     [writer addAttribute:@"enabled" value:(self.enabled ? @"true" : @"false")];
     //
     [writer addElement:@"SSID" text:self.ssid];

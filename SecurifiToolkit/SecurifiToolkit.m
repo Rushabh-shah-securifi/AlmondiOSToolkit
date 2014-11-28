@@ -991,13 +991,13 @@ static SecurifiToolkit *singleton = nil;
 
     [writer startElement:@"AlmondBlockedMACs"];
     [writer addAttribute:@"action" value:@"set"];
-    [writer addAttribute:@"count" value:[NSString stringWithFormat:@"%lu", (unsigned long)blockedMacs.count]];
+    [writer addAttribute:@"count" integerValue:blockedMacs.count];
 
     int index = 0;
     for (NSString *mac in blockedMacs) {
         index++;
         [writer startElement:@"BlockedMAC"];
-        [writer addAttribute:@"index" value:[NSString stringWithFormat:@"%d", index]];
+        [writer addAttribute:@"index" intValue:index];
         [writer addText:mac];
         [writer endElement];
     }

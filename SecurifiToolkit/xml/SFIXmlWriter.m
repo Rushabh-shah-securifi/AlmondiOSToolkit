@@ -48,6 +48,16 @@
     [self.writer writeAttribute:name value:value];
 }
 
+- (void)addAttribute:(NSString *)name intValue:(int)value {
+    NSString *string = [NSString stringWithFormat:@"%d", value];
+    [self addAttribute:name value:string];
+}
+
+- (void)addAttribute:(NSString *)name integerValue:(NSInteger)value {
+    NSString *string = [NSString stringWithFormat:@"%ld", (long) value];
+    [self addAttribute:name value:string];
+}
+
 - (void)addText:(NSString *)text {
     text = [self stringOrEmpty:text];
     [self.writer writeCharacters:text];
