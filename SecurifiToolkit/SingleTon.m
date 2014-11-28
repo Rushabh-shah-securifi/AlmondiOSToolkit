@@ -650,6 +650,11 @@
                                             [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
+                                        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:commandType];
+                                            [self postData:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
                                         default:
                                             break;
                                     }
@@ -1126,6 +1131,7 @@
                     break;
                 }
                 case CommandType_ALMOND_NAME_CHANGE_REQUEST:
+                case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
                     id<SecurifiCommand> cmd = obj.command;
                     //Send as Command 61

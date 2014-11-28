@@ -51,6 +51,8 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST   = 321,
     CommandType_ALMOND_NAME_CHANGE_REQUEST          = 401,
     CommandType_ALMOND_NAME_CHANGE_RESPONSE         = 404,
+    CommandType_NOTIFICATION_PREF_CHANGE_REQUEST    = 295,
+    CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE   = 298,
     
     
     CommandType_CHANGE_PASSWORD_REQUEST                 = 251,

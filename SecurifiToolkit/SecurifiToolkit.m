@@ -1075,6 +1075,27 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
+
+- (void)asyncRequestNotificationPreferenceChange:(NSString*)almondMAC deviceList:(NSArray*)deviceList forAction:action{
+    if (almondMAC == nil) {
+        SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
+        return;
+    }
+    
+    NotificationPreferences *notificationPrefChange = [NotificationPreferences new];
+    notificationPrefChange.action = action;
+    notificationPrefChange.almondMAC = almondMAC;
+    notificationPrefChange.userID = [self loginEmail];
+    notificationPrefChange.preferenceCount = (int)[deviceList count];
+    notificationPrefChange.notificationDeviceList = deviceList;
+    
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
+    cmd.command = notificationPrefChange;
+    
+    [self asyncSendToCloud:cmd];
+    
+}
 #pragma mark - Command constructors
 
 - (GenericCommand *)makeCloudSanityCommand {

@@ -82,6 +82,9 @@
 #import <SecurifiToolkit/NotificationDeleteRegistrationResponse.h>
 #import <SecurifiToolkit/NotificationPreferenceListRequest.h>
 #import <SecurifiToolkit/NotificationPreferenceListResponse.h>
+#import <SecurifiToolkit/NotificationPreferences.h>
+#import <SecurifiToolkit/NotificationPreferenceResponse.h>
+#import <SecurifiToolkit/SFINotificationDevice.h>
 
 @class SecurifiConfigurator;
 
@@ -231,6 +234,7 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 - (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
+- (void)asyncRequestNotificationPreferenceChange:(NSString*)almondMAC deviceList:(NSArray*)deviceList forAction:action;
 
 
 @end

@@ -47,6 +47,7 @@
 #import "NotificationDeleteRegistrationResponse.h"
 #import "DynamicNotificationPreferenceList.h"
 #import "NotificationPreferenceListResponse.h"
+#import "NotificationPreferenceResponse.h"
 #import "SFINotificationUser.h"
 #import "SFINotificationDevice.h"
 
@@ -172,6 +173,7 @@ static const char *kName_NotificationRegistrationResponse =         "Notificatio
 static const char *kName_NotificationDeleteRegistrationResponse =   "NotificationDeleteRegistrationResponse";
 static const char *kName_DynamicNotificationPreferenceList =        "DynamicNotificationPreferenceList";
 static const char *kName_NotificationPreferenceListResponse =       "NotificationPreferenceListResponse";
+static const char *kName_NotificationPreferenceResponse =           "NotificationPreferenceResponse";
 
 static const char *kName_AlmondMAC      = "AlmondMAC";
 static const char *kName_Users          = "Users";
@@ -317,6 +319,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:
         case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
+        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:
             obj.command = self.command;
             obj.commandType = self.commandType;
             break;
@@ -1607,6 +1610,28 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         
         [parser.tmpNotificationDeviceList addObject:parser.tmpNotificationDevice];
     }
+    //PY 271114 - Notification Preference Change Response
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_NotificationPreferenceResponse, kLength_MaxTag)){
+        NotificationPreferenceResponse *notificationPrefResponse = [[NotificationPreferenceResponse alloc]init];
+        parser.command = notificationPrefResponse;
+        
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+        
+        
+        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
+            [parser.command setIsSuccessful:1];
+        }else{
+            [parser.command setIsSuccessful:0];
+        }
+        
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE;
+    }
     else if (parser.parsingCommand && (prefix == NULL && (
                                                           (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_UserID, kLength_MaxTag))
@@ -2666,6 +2691,29 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.parsingCommand = NO;
         }
         //PY 131114 - Notification Preference List Response - END
+        
+        //PY 271114 - Notification Preference Response - BEGIN
+        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE))
+        {
+            [parser.command setReason:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_ReasonCode, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE))
+        {
+            [parser.command setReasonCode:[[parser currentString] intValue]];
+        }
+        else if (!strncmp((const char *)localname, kName_MobileInternalIndex, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE))
+        {
+            [parser.command setInternalIndex:[parser currentString]];
+        }
+
+        else if (!strncmp((const char *)localname, kName_NotificationPreferenceResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+        //PY 271114 - Notification Preference Response - END
     }
     
     parser.storingCharacters = NO;
