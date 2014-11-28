@@ -167,6 +167,10 @@
 		CE5EB65717EAD44E00985636 /* SFIDeviceValue.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5EB65517EAD44E00985636 /* SFIDeviceValue.m */; };
 		CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB65817EAD46500985636 /* SFIDeviceKnownValues.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5EB65917EAD46500985636 /* SFIDeviceKnownValues.m */; };
+		CE61FD601A2878D500713E7B /* NotificationPreferenceResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE61FD5E1A2878D500713E7B /* NotificationPreferenceResponse.m */; };
+		CE61FD611A2878D500713E7B /* NotificationPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = CE61FD5F1A2878D500713E7B /* NotificationPreferences.m */; };
+		CE61FD641A2878EE00713E7B /* NotificationPreferenceResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE61FD621A2878EE00713E7B /* NotificationPreferenceResponse.h */; };
+		CE61FD651A2878EE00713E7B /* NotificationPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = CE61FD631A2878EE00713E7B /* NotificationPreferences.h */; };
 		CE6DC94517EC60C2006F48C4 /* MobileCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6DC94317EC60C2006F48C4 /* MobileCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6DC94417EC60C2006F48C4 /* MobileCommandRequest.m */; };
 		CE6DC94917EC60D1006F48C4 /* MobileCommandResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6DC94717EC60D1006F48C4 /* MobileCommandResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -409,6 +413,10 @@
 		CE5EB65517EAD44E00985636 /* SFIDeviceValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIDeviceValue.m; sourceTree = "<group>"; };
 		CE5EB65817EAD46500985636 /* SFIDeviceKnownValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIDeviceKnownValues.h; sourceTree = "<group>"; };
 		CE5EB65917EAD46500985636 /* SFIDeviceKnownValues.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIDeviceKnownValues.m; sourceTree = "<group>"; };
+		CE61FD5E1A2878D500713E7B /* NotificationPreferenceResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationPreferenceResponse.m; sourceTree = "<group>"; };
+		CE61FD5F1A2878D500713E7B /* NotificationPreferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationPreferences.m; sourceTree = "<group>"; };
+		CE61FD621A2878EE00713E7B /* NotificationPreferenceResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationPreferenceResponse.h; sourceTree = "<group>"; };
+		CE61FD631A2878EE00713E7B /* NotificationPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationPreferences.h; sourceTree = "<group>"; };
 		CE6DC94317EC60C2006F48C4 /* MobileCommandRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = MobileCommandRequest.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CE6DC94417EC60C2006F48C4 /* MobileCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MobileCommandRequest.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE6DC94717EC60D1006F48C4 /* MobileCommandResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = MobileCommandResponse.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -683,6 +691,8 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				CE61FD621A2878EE00713E7B /* NotificationPreferenceResponse.h */,
+				CE61FD631A2878EE00713E7B /* NotificationPreferences.h */,
 				1C3270DB1A243B28007202C1 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
@@ -762,6 +772,8 @@
 		22A76D2517912B830099CD8F /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				CE61FD5E1A2878D500713E7B /* NotificationPreferenceResponse.m */,
+				CE61FD5F1A2878D500713E7B /* NotificationPreferences.m */,
 				CE432FCA1A0BA3AD00BDE7A1 /* NotificationRegistration.m */,
 				CE432FCE1A0BA72F00BDE7A1 /* NotificationRegistrationResponse.m */,
 				CE55F3D01A0CE2E90086912E /* NotificationDeleteRegistrationRequest.m */,
@@ -889,6 +901,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
+				CE61FD641A2878EE00713E7B /* NotificationPreferenceResponse.h in Headers */,
 				22A76D3817912EAC0099CD8F /* LoginResponse.h in Headers */,
 				1C3270E81A243B28007202C1 /* SFIWirelessSummary.h in Headers */,
 				CE5EB65617EAD44E00985636 /* SFIDeviceValue.h in Headers */,
@@ -963,6 +976,7 @@
 				22FAE88817A8E528002FFEE8 /* Signup.h in Headers */,
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
 				CEA605BB1A113F55008380D3 /* SFINotificationUser.h in Headers */,
+				CE61FD651A2878EE00713E7B /* NotificationPreferences.h in Headers */,
 				CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */,
 				CE2EA25919D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h in Headers */,
 				CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */,
@@ -1187,6 +1201,8 @@
 				22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */,
 				CEAA83291A1535E400573CC8 /* NotificationPreferenceListRequest.m in Sources */,
 				1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */,
+				CE61FD601A2878D500713E7B /* NotificationPreferenceResponse.m in Sources */,
+				CE61FD611A2878D500713E7B /* NotificationPreferences.m in Sources */,
 				CE539F8F17FAD40B00640820 /* SNLog.m in Sources */,
 				CEA605BC1A113F55008380D3 /* SFINotificationUser.m in Sources */,
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,

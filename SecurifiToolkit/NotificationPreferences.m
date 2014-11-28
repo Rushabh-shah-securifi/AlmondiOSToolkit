@@ -22,14 +22,14 @@
     [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
     [writer addElement:@"UserID" text:self.userID];
     [writer startElement:@"Preference"];
-    [writer addAttribute:@"count" value:[NSString stringWithFormat:@"%d",self.preferenceCount]];
+    [writer addAttribute:@"count" intValue:self.preferenceCount];
     
 
     //Iterate Array
     for(SFINotificationDevice *currentDevice in self.notificationDeviceList){
         [writer startElement:@"Device"];
-        [writer addAttribute:@"ID" value:[NSString stringWithFormat:@"%d",currentDevice.deviceID]];
-        [writer addAttribute:@"Index" value:[NSString stringWithFormat:@"%d",currentDevice.valueIndex]];
+        [writer addAttribute:@"ID" intValue:currentDevice.deviceID];
+        [writer addAttribute:@"Index" intValue:currentDevice.valueIndex];
         // close Device
         [writer addText:@""];
         [writer endElement];
