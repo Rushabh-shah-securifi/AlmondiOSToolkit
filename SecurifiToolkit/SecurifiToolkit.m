@@ -1077,7 +1077,7 @@ static SecurifiToolkit *singleton = nil;
 }
 
 
-- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:action {
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action {
     if (almondMAC == nil) {
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;

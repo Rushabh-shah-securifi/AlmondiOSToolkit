@@ -243,7 +243,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Send a command to configure notifications for the specified devices. Supported actions are:
 // kSFINotificationPreferenceChangeActionAdd;
 // kSFINotificationPreferenceChangeActionDelete;
-- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:action;
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action;
 
 @end
  
