@@ -17,12 +17,10 @@
 #import "DeleteSecondaryUserRequest.h"
 #import "DeleteMeAsSecondaryUserRequest.h"
 #import "MeAsSecondaryUserRequest.h"
-#import "NotificationRegistration.h"
-#import "NotificationDeleteRegistrationRequest.h"
-#import "NotificationPreferenceListRequest.h"
 #import "DynamicNotificationPreferenceList.h"
 #import "SFIXmlWriter.h"
 #import "SecurifiConfigurator.h"
+#import "NotificationPreferences.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -45,6 +43,9 @@ NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
 NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
 NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList";
+
+NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
+NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 @interface CommandTypeEvent : NSObject <ScoreboardEvent>
 @property (readonly) CommandType commandType;
@@ -1076,26 +1077,26 @@ static SecurifiToolkit *singleton = nil;
 }
 
 
-- (void)asyncRequestNotificationPreferenceChange:(NSString*)almondMAC deviceList:(NSArray*)deviceList forAction:action{
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:action {
     if (almondMAC == nil) {
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;
     }
-    
+
     NotificationPreferences *notificationPrefChange = [NotificationPreferences new];
     notificationPrefChange.action = action;
     notificationPrefChange.almondMAC = almondMAC;
     notificationPrefChange.userID = [self loginEmail];
-    notificationPrefChange.preferenceCount = (int)[deviceList count];
+    notificationPrefChange.preferenceCount = (int) [deviceList count];
     notificationPrefChange.notificationDeviceList = deviceList;
-    
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
     cmd.command = notificationPrefChange;
-    
+
     [self asyncSendToCloud:cmd];
-    
 }
+
 #pragma mark - Command constructors
 
 - (GenericCommand *)makeCloudSanityCommand {

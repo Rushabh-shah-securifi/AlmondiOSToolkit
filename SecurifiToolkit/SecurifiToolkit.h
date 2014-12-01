@@ -118,6 +118,11 @@ extern NSString *const kSFIDidChangeNotificationList;
 // a boxed NSTimeInterval indicating how long the request-response cycle took.
 extern NSString *const kSFIDidCompleteMobileCommandRequest;
 
+// Value used for the method asyncRequestNotificationPreferenceChange:deviceList:action: to enable notifications
+extern NSString *const kSFINotificationPreferenceChangeActionAdd;
+
+// Value used for the method asyncRequestNotificationPreferenceChange:deviceList:action: to disable notifications
+extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 @interface SecurifiToolkit : NSObject
 
@@ -234,8 +239,11 @@ extern NSString *const kSFIDidCompleteMobileCommandRequest;
 - (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
-- (void)asyncRequestNotificationPreferenceChange:(NSString*)almondMAC deviceList:(NSArray*)deviceList forAction:action;
 
+// Send a command to configure notifications for the specified devices. Supported actions are:
+// kSFINotificationPreferenceChangeActionAdd;
+// kSFINotificationPreferenceChangeActionDelete;
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:action;
 
 @end
  
