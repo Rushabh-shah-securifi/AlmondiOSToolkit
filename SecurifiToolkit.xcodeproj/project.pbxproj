@@ -64,11 +64,6 @@
 		221185BE178D371200EE23ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185BD178D371200EE23ED /* Foundation.framework */; };
 		221185C3178D371200EE23ED /* SecurifiToolkit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 221185C2178D371200EE23ED /* SecurifiToolkit.h */; };
 		221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */ = {isa = PBXBuildFile; fileRef = 221185C4178D371200EE23ED /* SecurifiToolkit.m */; };
-		221185CD178D371200EE23ED /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185CC178D371200EE23ED /* SenTestingKit.framework */; };
-		221185D0178D371200EE23ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185BD178D371200EE23ED /* Foundation.framework */; };
-		221185D3178D371200EE23ED /* libSecurifiToolkit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185BA178D371200EE23ED /* libSecurifiToolkit.a */; };
-		221185D9178D371200EE23ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 221185D7178D371200EE23ED /* InfoPlist.strings */; };
-		221185DC178D371200EE23ED /* SecurifiToolkitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 221185DB178D371200EE23ED /* SecurifiToolkitTests.m */; };
 		221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 221185C2178D371200EE23ED /* SecurifiToolkit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		221185F7178D453A00EE23ED /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185F6178D453A00EE23ED /* CoreFoundation.framework */; };
 		221185FD178D453A00EE23ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 221185FB178D453A00EE23ED /* InfoPlist.strings */; };
@@ -223,13 +218,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		221185D1178D371200EE23ED /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 221185B2178D371100EE23ED /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 221185B9178D371200EE23ED;
-			remoteInfo = SecurifiToolkit;
-		};
 		221185EE178D3F5500EE23ED /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 221185B2178D371100EE23ED /* Project object */;
@@ -303,12 +291,7 @@
 		221185C1178D371200EE23ED /* SecurifiToolkit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SecurifiToolkit-Prefix.pch"; sourceTree = "<group>"; };
 		221185C2178D371200EE23ED /* SecurifiToolkit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecurifiToolkit.h; sourceTree = "<group>"; };
 		221185C4178D371200EE23ED /* SecurifiToolkit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SecurifiToolkit.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		221185CB178D371200EE23ED /* SecurifiToolkitTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SecurifiToolkitTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		221185CC178D371200EE23ED /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		221185D6178D371200EE23ED /* SecurifiToolkitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SecurifiToolkitTests-Info.plist"; sourceTree = "<group>"; };
-		221185D8178D371200EE23ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		221185DA178D371200EE23ED /* SecurifiToolkitTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecurifiToolkitTests.h; sourceTree = "<group>"; };
-		221185DB178D371200EE23ED /* SecurifiToolkitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecurifiToolkitTests.m; sourceTree = "<group>"; };
 		221185F5178D453A00EE23ED /* SecurifiToolkit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SecurifiToolkit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		221185F6178D453A00EE23ED /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		221185FA178D453A00EE23ED /* SecurifiCloudResources-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SecurifiCloudResources-Info.plist"; sourceTree = "<group>"; };
@@ -478,16 +461,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		221185C7178D371200EE23ED /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				221185CD178D371200EE23ED /* SenTestingKit.framework in Frameworks */,
-				221185D0178D371200EE23ED /* Foundation.framework in Frameworks */,
-				221185D3178D371200EE23ED /* libSecurifiToolkit.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		221185F2178D453A00EE23ED /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -585,7 +558,6 @@
 			isa = PBXGroup;
 			children = (
 				221185BF178D371200EE23ED /* SecurifiToolkit */,
-				221185D4178D371200EE23ED /* SecurifiToolkitTests */,
 				221185F8178D453A00EE23ED /* SecurifiCloudResources */,
 				221185BC178D371200EE23ED /* Frameworks */,
 				221185BB178D371200EE23ED /* Products */,
@@ -596,7 +568,6 @@
 			isa = PBXGroup;
 			children = (
 				221185BA178D371200EE23ED /* libSecurifiToolkit.a */,
-				221185CB178D371200EE23ED /* SecurifiToolkitTests.octest */,
 				221185F5178D453A00EE23ED /* SecurifiToolkit.bundle */,
 			);
 			name = Products;
@@ -636,25 +607,6 @@
 				CE15FFB418684D7500371183 /* certificate.cer */,
 				CE15FFAC186842F400371183 /* cert.cer */,
 				221185C1178D371200EE23ED /* SecurifiToolkit-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		221185D4178D371200EE23ED /* SecurifiToolkitTests */ = {
-			isa = PBXGroup;
-			children = (
-				221185DA178D371200EE23ED /* SecurifiToolkitTests.h */,
-				221185DB178D371200EE23ED /* SecurifiToolkitTests.m */,
-				221185D5178D371200EE23ED /* Supporting Files */,
-			);
-			path = SecurifiToolkitTests;
-			sourceTree = "<group>";
-		};
-		221185D5178D371200EE23ED /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				221185D6178D371200EE23ED /* SecurifiToolkitTests-Info.plist */,
-				221185D7178D371200EE23ED /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1021,25 +973,6 @@
 			productReference = 221185BA178D371200EE23ED /* libSecurifiToolkit.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		221185CA178D371200EE23ED /* SecurifiToolkitTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 221185E2178D371200EE23ED /* Build configuration list for PBXNativeTarget "SecurifiToolkitTests" */;
-			buildPhases = (
-				221185C6178D371200EE23ED /* Sources */,
-				221185C7178D371200EE23ED /* Frameworks */,
-				221185C8178D371200EE23ED /* Resources */,
-				221185C9178D371200EE23ED /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				221185D2178D371200EE23ED /* PBXTargetDependency */,
-			);
-			name = SecurifiToolkitTests;
-			productName = SecurifiToolkitTests;
-			productReference = 221185CB178D371200EE23ED /* SecurifiToolkitTests.octest */;
-			productType = "com.apple.product-type.bundle.ocunit-test";
-		};
 		221185F4178D453A00EE23ED /* SecurifiCloudResources */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 22118601178D453A00EE23ED /* Build configuration list for PBXNativeTarget "SecurifiCloudResources" */;
@@ -1080,7 +1013,6 @@
 			projectRoot = "";
 			targets = (
 				221185B9178D371200EE23ED /* SecurifiToolkit */,
-				221185CA178D371200EE23ED /* SecurifiToolkitTests */,
 				221185EA178D3F4A00EE23ED /* Framework */,
 				221185F4178D453A00EE23ED /* SecurifiCloudResources */,
 			);
@@ -1088,14 +1020,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		221185C8178D371200EE23ED /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				221185D9178D371200EE23ED /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		221185F3178D453A00EE23ED /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1108,19 +1032,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		221185C9178D371200EE23ED /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
 		221185E9178D3C1100EE23ED /* Prepare Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1274,14 +1185,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		221185C6178D371200EE23ED /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				221185DC178D371200EE23ED /* SecurifiToolkitTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		221185F1178D453A00EE23ED /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1292,11 +1195,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		221185D2178D371200EE23ED /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 221185B9178D371200EE23ED /* SecurifiToolkit */;
-			targetProxy = 221185D1178D371200EE23ED /* PBXContainerItemProxy */;
-		};
 		221185EF178D3F5500EE23ED /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 221185B9178D371200EE23ED /* SecurifiToolkit */;
@@ -1310,14 +1208,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		221185D7178D371200EE23ED /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				221185D8178D371200EE23ED /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		221185FB178D453A00EE23ED /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1433,36 +1323,6 @@
 			};
 			name = Release;
 		};
-		221185E3178D371200EE23ED /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
-					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "SecurifiToolkit/SecurifiToolkit-Prefix.pch";
-				INFOPLIST_FILE = "SecurifiToolkitTests/SecurifiToolkitTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Debug;
-		};
-		221185E4178D371200EE23ED /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
-					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "SecurifiToolkit/SecurifiToolkit-Prefix.pch";
-				INFOPLIST_FILE = "SecurifiToolkitTests/SecurifiToolkitTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Release;
-		};
 		221185EC178D3F4A00EE23ED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1529,15 +1389,6 @@
 			buildConfigurations = (
 				221185E0178D371200EE23ED /* Debug */,
 				221185E1178D371200EE23ED /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		221185E2178D371200EE23ED /* Build configuration list for PBXNativeTarget "SecurifiToolkitTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				221185E3178D371200EE23ED /* Debug */,
-				221185E4178D371200EE23ED /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
