@@ -343,7 +343,13 @@
     for (SFINotificationDevice *currentDevice in notificationList) {
         if (currentDevice.deviceID == device_id) {
             //Set the notification mode for that notification preference
-            self.notificationMode = currentDevice.notificationMode;
+            unsigned int mode = currentDevice.notificationMode;
+            if (mode == 0) {
+                self.notificationMode = SFINotificationMode_always;
+            }
+            else {
+                self.notificationMode = (SFINotificationMode) mode;
+            }
             return true;
         }
     }

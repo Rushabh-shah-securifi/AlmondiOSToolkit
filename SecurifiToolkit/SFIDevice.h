@@ -58,6 +58,12 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_HueLamp_48                    = 48
 };
 
+typedef NS_ENUM(unsigned int, SFINotificationMode) {
+    SFINotificationMode_always                  = 1,
+    SFINotificationMode_home                    = 2,
+    SFINotificationMode_away                    = 3,
+};
+
 @class SFIDeviceValue;
 
 @interface SFIDevice : NSObject <NSCoding, NSCopying>
@@ -77,7 +83,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 @property(nonatomic) unsigned int valueCount;
 @property(nonatomic) NSString *location;
 @property(nonatomic) NSString *almondMAC; //todo remove me or set me in the toolkit
-@property(nonatomic) unsigned int notificationMode;
+@property(nonatomic) SFINotificationMode notificationMode;
 
 // Specified the property in the device values that represents the state of the device
 @property(nonatomic, readonly) SFIDevicePropertyType statePropertyType;
