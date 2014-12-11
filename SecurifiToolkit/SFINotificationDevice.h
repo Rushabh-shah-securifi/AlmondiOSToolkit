@@ -11,6 +11,7 @@
 @interface SFINotificationDevice : NSObject
 @property(nonatomic) unsigned int deviceID;
 @property(nonatomic) unsigned int valueIndex;
+@property(nonatomic) unsigned int notificationMode;
 
 - (id)initWithCoder:(NSCoder *)coder;
 

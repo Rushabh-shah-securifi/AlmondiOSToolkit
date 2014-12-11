@@ -342,6 +342,8 @@
     //Check if current device ID is in the notification list
     for (SFINotificationDevice *currentDevice in notificationList) {
         if (currentDevice.deviceID == device_id) {
+            //Set the notification mode for that notification preference
+            self.notificationMode = currentDevice.notificationMode;
             return true;
         }
     }

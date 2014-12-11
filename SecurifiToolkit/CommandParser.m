@@ -1534,26 +1534,32 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.storingCharacters = YES;
         parser.parsingCommand = YES;
         
-        //Get User ID from attribute
+        //Get Device ID from attribute
         NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         
-        //To get Success attribute
+        //To get Device Index attribute
         attributes += 5;
         NSString *deviceIndexKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* deviceIndexVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         
+        //To get Device Notification Mode attribute
+        attributes += 5;
+        NSString *notificationModeKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* notificationModeVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
         parser.tmpNotificationDevice = [[SFINotificationDevice alloc]init];
         
-       // NSMutableString *deviceID_Index = [[NSMutableString alloc]init];
-        
         if([deviceIDKey isEqualToString:@"ID"]){
-            //[deviceID_Index appendString:deviceIDVal];
             [parser.tmpNotificationDevice setDeviceID:[deviceIDVal intValue]];
         }
         
         if([deviceIndexKey isEqualToString:@"Index"]){
             [parser.tmpNotificationDevice setValueIndex:[deviceIndexVal intValue]];
+        }
+        
+        if([notificationModeKey isEqualToString:@"Mode"]){
+            [parser.tmpNotificationDevice setNotificationMode:[notificationModeVal intValue]];
         }
         
         [parser.tmpNotificationDeviceList addObject:parser.tmpNotificationDevice];
@@ -1586,26 +1592,32 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.storingCharacters = YES;
         parser.parsingCommand = YES;
         
-        //Get User ID from attribute
+        //Get Device ID from attribute
         NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         
-        //To get Success attribute
+        //To get Device Index attribute
         attributes += 5;
         NSString *deviceIndexKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
         NSString* deviceIndexVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
         
+        //To get Device Notification Mode attribute
+        attributes += 5;
+        NSString *notificationModeKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+        NSString* notificationModeVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+        
         parser.tmpNotificationDevice = [[SFINotificationDevice alloc]init];
         
-        // NSMutableString *deviceID_Index = [[NSMutableString alloc]init];
-        
         if([deviceIDKey isEqualToString:@"ID"]){
-            //[deviceID_Index appendString:deviceIDVal];
             [parser.tmpNotificationDevice setDeviceID:[deviceIDVal intValue]];
         }
         
         if([deviceIndexKey isEqualToString:@"Index"]){
             [parser.tmpNotificationDevice setValueIndex:[deviceIndexVal intValue]];
+        }
+        
+        if([notificationModeKey isEqualToString:@"Mode"]){
+            [parser.tmpNotificationDevice setNotificationMode:[notificationModeVal intValue]];
         }
         
         [parser.tmpNotificationDeviceList addObject:parser.tmpNotificationDevice];

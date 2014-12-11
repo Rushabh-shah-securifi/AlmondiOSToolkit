@@ -30,6 +30,7 @@
         [writer startElement:@"Device"];
         [writer addAttribute:@"ID" intValue:currentDevice.deviceID];
         [writer addAttribute:@"Index" intValue:currentDevice.valueIndex];
+        [writer addAttribute:@"Mode" intValue:currentDevice.notificationMode];
         // close Device
         [writer addText:@""];
         [writer endElement];

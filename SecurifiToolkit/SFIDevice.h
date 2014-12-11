@@ -77,6 +77,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 @property(nonatomic) unsigned int valueCount;
 @property(nonatomic) NSString *location;
 @property(nonatomic) NSString *almondMAC; //todo remove me or set me in the toolkit
+@property(nonatomic) unsigned int notificationMode;
 
 // Specified the property in the device values that represents the state of the device
 @property(nonatomic, readonly) SFIDevicePropertyType statePropertyType;
@@ -96,6 +97,8 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 
 // Indicates whether the device has notification preference on
 - (BOOL)isNotificationEnabled;
+
+
 
 // Toggles the device state, returning the new state values.
 // Returns nil if the device does not support switching state or when the value is missing and cannot be determined.
