@@ -207,6 +207,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard*)scoreboardSnapshot;
 
+// Issues a command to the specified Almond router to reboot itself
+- (sfi_id)asyncRebootAlmond:(NSString*)almondMAC;
+
 //PY 150914 - Accounts
 // Send a command to the cloud requesting to change the password for cloud account
 - (void)asyncRequestChangeCloudPassword:(NSString*)currentPwd changedPwd:(NSString*)changedPwd;

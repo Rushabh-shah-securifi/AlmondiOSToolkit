@@ -881,6 +881,27 @@ static SecurifiToolkit *singleton = nil;
     }
 }
 
+#pragma mark - Almond commands
+
+- (sfi_id)asyncRebootAlmond:(NSString *)almondMAC {
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+    [writer startElement:@"root"];
+    [writer addElement:@"Reboot" text:@"1"];
+    [writer endElement];;
+
+    GenericCommandRequest *request = [GenericCommandRequest new];
+    request.almondMAC = almondMAC;
+    request.data = [writer toString];
+
+    GenericCommand *cmd = [[GenericCommand alloc] init];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = request;
+
+    [self asyncSendToCloud:cmd];
+
+    return request.correlationId;
+}
+
 #pragma mark - Account related commands
 
 - (void)asyncRequestChangeCloudPassword:(NSString*)currentPwd changedPwd:(NSString*)changedPwd{
