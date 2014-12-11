@@ -72,7 +72,7 @@
 }
 
 - (NSString *)stringOrEmpty:(NSString*)str {
-    if (str.length == 0) {
+    if (str == nil) {
         NSString *xml = [self toString];
         NSLog(@"Unexpected nil value sent to XML writer; converting nil to empty string; the xml so far: '%@'", xml);
         return @"";
