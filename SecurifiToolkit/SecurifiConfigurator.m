@@ -15,17 +15,6 @@
 
 @implementation SecurifiConfigurator
 
-//+ (SecurifiConfigurator *)load:(NSString *)fileName {
-//    NSString *path = [[NSBundle mainBundle] bundlePath];
-//    NSString *finalPath = [path stringByAppendingPathComponent:fileName];
-//    NSDictionary *plistData = [NSDictionary dictionaryWithContentsOfFile:finalPath];
-//    return [[SecurifiConfigurator alloc] initWithData:plistData];
-//}
-
-//- (BOOL)store:(NSString *)filePath {
-//    return [self.data writeToFile:filePath atomically:YES];
-//}
-
 - (instancetype)init {
     self = [super init];
     if (self) {

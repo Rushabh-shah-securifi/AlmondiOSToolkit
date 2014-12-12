@@ -11,14 +11,11 @@
 // Specifies a configuration for the SecurifiToolkit
 @interface SecurifiConfigurator : NSObject <NSCopying>
 
-@property(nonatomic) NSString *productionCloudHost;
-@property(nonatomic) NSString *developmentCloudHost;
+@property(nonatomic, copy) NSString *productionCloudHost;
+@property(nonatomic, copy) NSString *developmentCloudHost;
 @property(nonatomic) UInt32 cloudPort;
 @property(nonatomic) BOOL enableCertificateValidation;
-@property(nonatomic) NSString  *certificateFileName;
-
-//+ (SecurifiConfigurator *)load:(NSString *)fileName;
-//- (BOOL)store:(NSString*)filePath;
+@property(nonatomic, copy) NSString *certificateFileName;
 
 - (id)copyWithZone:(NSZone *)zone;
 
