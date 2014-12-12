@@ -40,7 +40,7 @@
 		1C75820D19B028F70074C601 /* Scoreboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C75820B19B028F70074C601 /* Scoreboard.m */; };
 		1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */; };
-		1CFBB54F1A257D1900438B5F /* SecurifiConfigurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */; };
+		1CFBB54F1A257D1900438B5F /* SecurifiConfigurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CFBB5501A257D1900438B5F /* SecurifiConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */; };
 		1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0303A77013C449B86C26B /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF033FE398C1B48B1CA5CCC /* SUnit.h */; };
@@ -165,7 +165,7 @@
 		CE61FD601A2878D500713E7B /* NotificationPreferenceResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE61FD5E1A2878D500713E7B /* NotificationPreferenceResponse.m */; };
 		CE61FD611A2878D500713E7B /* NotificationPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = CE61FD5F1A2878D500713E7B /* NotificationPreferences.m */; };
 		CE61FD641A2878EE00713E7B /* NotificationPreferenceResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE61FD621A2878EE00713E7B /* NotificationPreferenceResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE61FD651A2878EE00713E7B /* NotificationPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = CE61FD631A2878EE00713E7B /* NotificationPreferences.h */; };
+		CE61FD651A2878EE00713E7B /* NotificationPreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = CE61FD631A2878EE00713E7B /* NotificationPreferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6DC94517EC60C2006F48C4 /* MobileCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6DC94317EC60C2006F48C4 /* MobileCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6DC94417EC60C2006F48C4 /* MobileCommandRequest.m */; };
 		CE6DC94917EC60D1006F48C4 /* MobileCommandResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6DC94717EC60D1006F48C4 /* MobileCommandResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -197,7 +197,7 @@
 		CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA605B61A113E4E008380D3 /* DynamicNotificationPreferenceList.m */; };
 		CEA605BB1A113F55008380D3 /* SFINotificationUser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA605B91A113F55008380D3 /* SFINotificationUser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEA605BC1A113F55008380D3 /* SFINotificationUser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA605BA1A113F55008380D3 /* SFINotificationUser.m */; };
-		CEAA83241A1532E600573CC8 /* SFINotificationDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAA83221A1532E600573CC8 /* SFINotificationDevice.h */; };
+		CEAA83241A1532E600573CC8 /* SFINotificationDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAA83221A1532E600573CC8 /* SFINotificationDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEAA83251A1532E600573CC8 /* SFINotificationDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAA83231A1532E600573CC8 /* SFINotificationDevice.m */; };
 		CEAA83281A1535E400573CC8 /* NotificationPreferenceListRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAA83261A1535E400573CC8 /* NotificationPreferenceListRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEAA83291A1535E400573CC8 /* NotificationPreferenceListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAA83271A1535E400573CC8 /* NotificationPreferenceListRequest.m */; };
