@@ -266,9 +266,15 @@ static SecurifiToolkit *singleton = nil;
 
         [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
+        
+        //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
+        //Push Notification - START
+        /*
         [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
         
         [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+         */
+        //Push Notification - END
 
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceHashResponse:) name:DEVICEDATA_HASH_NOTIFIER object:nil];
@@ -300,7 +306,15 @@ static SecurifiToolkit *singleton = nil;
     [center removeObserver:self name:DEVICEDATA_HASH_NOTIFIER object:nil];
 
     [center removeObserver:self name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
+    
+    //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
+    //Push Notification - START
+    /*
     [center removeObserver:self name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
+     [center removeObserver:self name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+     */
+    //Push Notification - END
+    
 }
 
 #pragma mark - SDK state

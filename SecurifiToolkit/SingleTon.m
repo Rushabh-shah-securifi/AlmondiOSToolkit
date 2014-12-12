@@ -627,7 +627,10 @@
                                             [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
+                                           
+                                            //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
+                                            //Push Notification - START
+                                            /*
                                         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:{
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:temp.command];
@@ -639,12 +642,13 @@
                                             [self postData:NOTIFICATION_DEREGISTRATION_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                        
+
                                         case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:{
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
+
                                         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:{
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:temp.command];
@@ -655,6 +659,8 @@
                                             [self postData:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
+                                             */
+                                            //Push Notification - END
                                         default:
                                             break;
                                     }
