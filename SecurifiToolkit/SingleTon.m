@@ -93,9 +93,10 @@
 
             // Load certificate
             //
-            DLog(@"Loading certificate");
-
-            [block_self loadCertificate];
+            if (self.config.enableCertificateValidation) {
+                DLog(@"Loading certificate");
+                [block_self loadCertificate];
+            }
 
             DLog(@"Initializing sockets");
 
