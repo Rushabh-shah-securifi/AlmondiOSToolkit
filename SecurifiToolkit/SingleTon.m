@@ -15,7 +15,7 @@
 @property(nonatomic, readonly) NSObject *syncLocker;
 
 @property(atomic) NSInteger currentUnitCounter;
-@property(atomic) SUnit *currentUnit;
+@property(nonatomic) SUnit *currentUnit;
 
 @property(nonatomic, readonly) dispatch_queue_t initializationQueue;    // serial queue to which network initialization commands submitted to the system are added
 @property(nonatomic, readonly) dispatch_queue_t commandQueue;           // serial queue to which commands submitted to the system are added
@@ -26,14 +26,14 @@
 @property(nonatomic, readonly) dispatch_semaphore_t cloud_initialized_latch;
 
 @property(nonatomic) SecCertificateRef certificate;
-@property(atomic) BOOL certificateTrusted;
+@property(nonatomic) BOOL certificateTrusted;
 @property(nonatomic) unsigned int command;
 @property(nonatomic, readonly) NSMutableData *partialData;
 @property(nonatomic) BOOL networkShutdown;
 @property(nonatomic) BOOL networkUpNoticePosted;
 @property(nonatomic) NSInputStream *inputStream;
 @property(nonatomic) NSOutputStream *outputStream;
-@property(atomic) BOOL sendCommandFail;
+@property(nonatomic) BOOL sendCommandFail;
 
 @property(nonatomic, readonly) NSObject *almondTableSyncLocker;
 @property(nonatomic, readonly) NSMutableSet *hashCheckedForAlmondTable;
