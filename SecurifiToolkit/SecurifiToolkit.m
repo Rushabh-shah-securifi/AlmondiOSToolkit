@@ -210,7 +210,6 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property(nonatomic, weak) SingleTon *networkSingleton;
-@property(atomic) BOOL initializing; // when TRUE an op is already in progress to set up a network
 @property(atomic) BOOL isShutdown;
 @end
 
@@ -350,9 +349,9 @@ static SecurifiToolkit *singleton = nil;
         case SDKCloudStatusCloudConnectionShutdown:
             return NO;
 
+        default:
+            return NO;
     }
-
-    return NO;
 }
 
 - (BOOL)isReachable {
@@ -395,27 +394,12 @@ static SecurifiToolkit *singleton = nil;
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void)initToolkit {
-    if (self.isShutdown) {
-        DLog(@"INIT SDK. Already shutdown. Returning.");
-        return;
-    }
-
-    if (self.initializing) {
-        DLog(@"INIT SDK. Already initializing.");
-        return;
-    }
-
     [self _asyncInitToolkit];
 }
 
 - (void)_asyncInitToolkit {
     if (self.isShutdown) {
-        DLog(@"INIT SDK. Already shutdown. Returning.");
-        return;
-    }
-
-    if (self.initializing) {
-        DLog(@"INIT SDK. Already initializing.");
+        DLog(@"guard: INIT SDK. Already shutdown. Returning.");
         return;
     }
 
@@ -423,14 +407,33 @@ static SecurifiToolkit *singleton = nil;
 
     dispatch_async(self.commandDispatchQueue, ^() {
         if (block_self.isShutdown) {
-            DLog(@"INIT SDK. Already shutdown. Returning.");
+            DLog(@"INIT SDK. SDK is already shutdown. Returning.");
             return;
         }
-        if (block_self.initializing) {
-            DLog(@"INIT SDK. Already initializing.");
-            return;
+
+        SDKCloudStatus state = [block_self getConnectionState];
+        switch (state) {
+            case SDKCloudStatusNotLoggedIn:
+            case SDKCloudStatusLoginInProcess:
+            case SDKCloudStatusLoggedIn:
+            case SDKCloudStatusInitialized: {
+                DLog(@"INIT SDK. Connection established already. Returning.");
+                return;
+            };
+
+            case SDKCloudStatusInitializing: {
+                DLog(@"INIT SDK. Already initializing. Returning.");
+                return;
+            };
+
+            case SDKCloudStatusUninitialized:
+            case SDKCloudStatusNetworkDown:
+            case SDKCloudStatusCloudConnectionShutdown:
+            default: {
+                DLog(@"INIT SDK. Connection needs establishment. Passing thru");
+            };
         }
-        block_self.initializing = YES;
+
         NSLog(@"INIT SDK");
 
         SingleTon *singleTon = [block_self setupNetworkSingleton];
@@ -450,7 +453,6 @@ static SecurifiToolkit *singleton = nil;
         if (!cmdSendSuccess) {
             NSLog(@"%s: init SDK: send sanity failed:", __PRETTY_FUNCTION__);
             singleTon.connectionState = SDKCloudStatusNetworkDown;
-            block_self.initializing = NO;
             return;
         }
 
@@ -462,8 +464,6 @@ static SecurifiToolkit *singleton = nil;
             DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
             singleTon.connectionState = SDKCloudStatusNotLoggedIn;
             [singleTon markCloudInitialized];
-
-            block_self.initializing = NO;
 
             // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
             // We probably should track things down and find a way to remove a dependency on this event in the UI.
@@ -481,7 +481,6 @@ static SecurifiToolkit *singleton = nil;
             DLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
             singleTon.connectionState = SDKCloudStatusNetworkDown;
         }
-        block_self.initializing = NO;
 
         // Request updates to the almond; See onLoginResponse handler for logic handling first-time login and follow-on requests.
         [block_self asyncInitializeConnection1:singleTon];
@@ -566,7 +565,7 @@ static SecurifiToolkit *singleton = nil;
 
     // Initialize network if need be
     SingleTon *socket = self.networkSingleton;
-    if (socket == nil || (!socket.isStreamConnected && !self.initializing)) {
+    if (socket == nil || (!socket.isStreamConnected && socket.connectionState != SDKCloudStatusInitializing)) {
         // Set up network and wait
         //
         NSLog(@"Waiting to initialize socket");
