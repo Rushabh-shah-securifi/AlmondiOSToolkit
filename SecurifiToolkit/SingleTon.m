@@ -10,13 +10,12 @@
 #import <SecurifiToolkit/SecurifiToolkit.h>
 #import "Commandparser.h"
 #import "SUnit.h"
-#import "SecurifiConfigurator.h"
 
 @interface SingleTon ()
-@property (nonatomic, readonly) NSObject *syncLocker;
+@property(nonatomic, readonly) NSObject *syncLocker;
 
-@property (atomic) NSInteger currentUnitCounter;
-@property (atomic) SUnit *currentUnit;
+@property(atomic) NSInteger currentUnitCounter;
+@property(nonatomic) SUnit *currentUnit;
 
 @property(nonatomic, readonly) dispatch_queue_t initializationQueue;    // serial queue to which network initialization commands submitted to the system are added
 @property(nonatomic, readonly) dispatch_queue_t commandQueue;           // serial queue to which commands submitted to the system are added
@@ -27,14 +26,14 @@
 @property(nonatomic, readonly) dispatch_semaphore_t cloud_initialized_latch;
 
 @property(nonatomic) SecCertificateRef certificate;
-@property BOOL certificateTrusted;
+@property(nonatomic) BOOL certificateTrusted;
 @property(nonatomic) unsigned int command;
 @property(nonatomic, readonly) NSMutableData *partialData;
 @property(nonatomic) BOOL networkShutdown;
 @property(nonatomic) BOOL networkUpNoticePosted;
 @property(nonatomic) NSInputStream *inputStream;
 @property(nonatomic) NSOutputStream *outputStream;
-@property BOOL sendCommandFail;
+@property(nonatomic) BOOL sendCommandFail;
 
 @property(nonatomic, readonly) NSObject *almondTableSyncLocker;
 @property(nonatomic, readonly) NSMutableSet *hashCheckedForAlmondTable;
@@ -78,7 +77,7 @@
         _willFetchDeviceListFlagSyncLocker = [NSObject new];
         _willFetchDeviceListFlag = [NSMutableSet new];
     }
-    
+
     return self;
 }
 
@@ -86,7 +85,7 @@
     NSLog(@"Initialzing network communication");
 
     __strong SingleTon *block_self = self;
-    
+
     dispatch_async(self.backgroundQueue, ^(void) {
         if (block_self.inputStream == nil && block_self.outputStream == nil) {
             [block_self postData:NETWORK_CONNECTING_NOTIFIER data:nil];
@@ -116,16 +115,6 @@
 
             [block_self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
             [block_self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
-
-            //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredRoots];
-            //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsExpiredCertificates];
-            //[SSLOptions setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCFStreamSSLAllowsAnyRoot];
-            //[SSLOptions setObject:[NSNumber numberWithBool:NO] forKey:(NSString *)kCFStreamSSLValidatesCertificateChain];
-            //[SSLOptions setObject:@"test.domain.com:443" forKey:(NSString *)kCFStreamSSLPeerName];
-            //[SSLOptions setObject:(NSString *)kCFStreamSocketSecurityLevelNegotiatedSSL forKey:(NSString*)kCFStreamSSLLevel];
-            //[SSLOptions setObject:(NSString *)kCFStreamSocketSecurityLevelNegotiatedSSL forKey:(NSString*)kCFStreamPropertySocketSecurityLevel];
-            //[SSLOptions setObject:myCerts forKey:(NSString *)kCFStreamSSLCertificates];
-            //[SSLOptions setObject:[NSNumber numberWithBool:NO] forKey:(NSString *)kCFStreamSSLIsServer];
 
             NSDictionary *settings = @{
                     (__bridge id) kCFStreamSSLValidatesCertificateChain : @YES
@@ -239,7 +228,7 @@
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.network_established_latch;
     NSString *msg = @"Giving up on connection establishment";
-    
+
     BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
     if (self.isStreamConnected) {
         // If the connection is up by now, no need to worry about the timeout.
@@ -270,7 +259,7 @@
 // Waits up to the specified number of seconds for the semaphore to be signalled.
 // Returns YES on timeout waiting on the latch.
 // Returns NO when the signal has been received before the timeout.
-- (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString*)msg {
+- (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString *)msg {
     dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
 
     BOOL timedOut = NO;
@@ -339,8 +328,7 @@
 }
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
-    if (!self.partialData)
-    {
+    if (!self.partialData) {
         _partialData = [[NSMutableData alloc] init];
     }
 
@@ -350,21 +338,21 @@
     NSString *startTagString = @"<root>";
     NSData *startTag = [startTagString dataUsingEncoding:NSUTF8StringEncoding];
 
-	// NSLog(@"stream event %i", streamEvent);
-	switch (streamEvent) {
-		case NSStreamEventOpenCompleted: {
+    // NSLog(@"stream event %i", streamEvent);
+    switch (streamEvent) {
+        case NSStreamEventOpenCompleted: {
             break;
         }
 
-		case NSStreamEventHasBytesAvailable:
-			if (theStream == self.inputStream) {
-				while (!self.networkShutdown && [self.inputStream hasBytesAvailable]) {
+        case NSStreamEventHasBytesAvailable:
+            if (theStream == self.inputStream) {
+                while (!self.networkShutdown && [self.inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
                     NSInteger len;
 
                     //Multiple entry in one callback possible
-					len = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
-					if (len > 0) {
+                    len = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
+                    if (len > 0) {
 
                         //[SNLog Log:@"%s: Response Length : %d",__PRETTY_FUNCTION__,len];
                         //If current stream has </root>
@@ -378,16 +366,14 @@
 
                         //Initialize range
                         NSRange endTagRange = NSMakeRange(0, [self.partialData length]);
-                        int count=0;
+                        int count = 0;
 
                         //NOT NEEDED- Convert received buffer to NSMutableData
                         //[totalReceivedData appendBytes:&inputBuffer[0] length:len];
 
-                        while (endTagRange.location != NSNotFound)
-                        {
+                        while (endTagRange.location != NSNotFound) {
                             endTagRange = [self.partialData rangeOfData:endTag options:0 range:endTagRange];
-                            if(endTagRange.location != NSNotFound)
-                            {
+                            if (endTagRange.location != NSNotFound) {
                                 //// NSLog(@"endTag Location: %i, Length: %i",endTagRange.location,endTagRange.length);
 
                                 //Look for <root> tag in [0 to endTag]
@@ -395,27 +381,25 @@
 
                                 startTagRange = [self.partialData rangeOfData:startTag options:0 range:startTagRange];
 
-                                if(startTagRange.location == NSNotFound)
-                                {
+                                if (startTagRange.location == NSNotFound) {
                                     // [SNLog Log:@"%s: Serious error !!! should not come here// Invalid command /// without startRootTag", __PRETTY_FUNCTION__];
                                 }
-                                else
-                                {
+                                else {
                                     [self.partialData getBytes:&_command range:NSMakeRange(4, 4)];
-                                    DLog(@"%s: Response Received: %d TIME => %f ",__PRETTY_FUNCTION__,NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
+                                    DLog(@"%s: Response Received: %d TIME => %f ", __PRETTY_FUNCTION__, NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
 
                                     self.command = NSSwapBigIntToHost(self.command);
                                     // [SNLog Log:@"%s: Command Again: %d", __PRETTY_FUNCTION__,command];
                                     CommandParser *tempObj = [[CommandParser alloc] init];
-                                    GenericCommand *temp = nil ;
+                                    GenericCommand *temp = nil;
 
                                     //Send single command data to parseXML rather than complete buffer
-                                    NSRange xmlParserRange = {startTagRange.location, (endTagRange.location+endTagRange.length - 8)};
+                                    NSRange xmlParserRange = {startTagRange.location, (endTagRange.location + endTagRange.length - 8)};
                                     NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
 
                                     DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
-                                    temp = (GenericCommand *)[tempObj parseXML:buffer];
+                                    temp = (GenericCommand *) [tempObj parseXML:buffer];
 
                                     //Remove 8 bytes from received command
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
@@ -561,74 +545,74 @@
                                             [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command commandType:commandType];
                                             break;
                                         }
-                                            
+
                                             //PY 150914 - Account Settings
-                                        case CommandType_USER_PROFILE_RESPONSE:{
+                                        case CommandType_USER_PROFILE_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:USER_PROFILE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_CHANGE_PASSWORD_RESPONSE:{
+
+                                        case CommandType_CHANGE_PASSWORD_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:CHANGE_PWD_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case CommandType_DELETE_ACCOUNT_RESPONSE:{
+                                        case CommandType_DELETE_ACCOUNT_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_UPDATE_USER_PROFILE_RESPONSE:{
+
+                                        case CommandType_UPDATE_USER_PROFILE_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:UPDATE_USER_PROFILE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE:{
+
+                                        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:ALMOND_AFFILIATION_DATA_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_UNLINK_ALMOND_RESPONSE:{
+
+                                        case CommandType_UNLINK_ALMOND_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:UNLINK_ALMOND_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_USER_INVITE_RESPONSE:{
+
+                                        case CommandType_USER_INVITE_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:USER_INVITE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_DELETE_SECONDARY_USER_RESPONSE:{
+
+                                        case CommandType_DELETE_SECONDARY_USER_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:DELETE_SECONDARY_USER_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_ALMOND_NAME_CHANGE_RESPONSE:{
+
+                                        case CommandType_ALMOND_NAME_CHANGE_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_ME_AS_SECONDARY_USER_RESPONSE:{
+
+                                        case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:{
+
+                                        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                           
+
                                             //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
                                             //Push Notification - START
                                             /*
@@ -673,8 +657,7 @@
                                 }
                                 count++;
                             }
-                            else
-                            {
+                            else {
                                 // [SNLog Log:@"%s: Number of Command Processed  : %d", __PRETTY_FUNCTION__,count];
                                 //At this point paritalBuffer will have unffinised command data
                             }
@@ -745,7 +728,7 @@
     [self post:notificationName payload:payload queue:self.callbackQueue];
 }
 
-- (void)postDataDynamic:(NSString*)notificationName data:(id)payload commandType:(CommandType)commandType {
+- (void)postDataDynamic:(NSString *)notificationName data:(id)payload commandType:(CommandType)commandType {
     // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
     // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
     // UI can easily become confused. This needs to be sorted out.
@@ -787,51 +770,53 @@
         NSLog(@"%s: Unable to evaluate trust; stream did not return security trust ref", __PRETTY_FUNCTION__);
         return NO;
     }
-    
+
     SecTrustResultType resultType;
     SecTrustGetTrustResult(secTrust, &resultType);
-    
+
     switch (resultType) {
         case kSecTrustResultDeny:
         case kSecTrustResultRecoverableTrustFailure:
         case kSecTrustResultFatalTrustFailure:
         case kSecTrustResultOtherError:
             return NO;
-            
+
         case kSecTrustResultInvalid:
         case kSecTrustResultProceed:
         case kSecTrustResultUnspecified:
-        default:break;
+        default:
+            break;
     }
-    
+
     if (resultType == kSecTrustResultInvalid) {
         NSLog(@"Cert test: kSecTrustResultInvalid");
-        
+
         SecTrustResultType result;
         OSStatus status = SecTrustEvaluate(secTrust, &result);
         if (status != errSecSuccess) {
             NSLog(@"Cert test fail: kSecTrustResultInvalid !errSecSuccess");
             return NO;
         }
-        
+
         switch (result) {
             case kSecTrustResultDeny:
             case kSecTrustResultRecoverableTrustFailure:
             case kSecTrustResultFatalTrustFailure:
             case kSecTrustResultOtherError:
                 return NO;
-                
+
             case kSecTrustResultInvalid: {
                 NSLog(@"Cert test fail: kSecTrustResultInvalid again");
                 return NO;
             }
-                
+
             case kSecTrustResultProceed:
             case kSecTrustResultUnspecified:
-            default:break;
+            default:
+                break;
         }
     }
-    
+
     return [self evaluateCertificate:secTrust];
 }
 
@@ -841,30 +826,30 @@
         NSLog(@"Cert test fail: zero certificate count");
         return NO;
     }
-    
+
     NSMutableArray *streamCertificates = [NSMutableArray array];
     for (CFIndex index = 0; index < count; index++) {
         SecCertificateRef certificate = SecTrustGetCertificateAtIndex(secTrust, index);
         id cert = (__bridge id) certificate;
         [streamCertificates addObject:cert];
     }
-    
+
     SecPolicyRef policy = SecPolicyCreateSSL(YES, CFSTR("*.securifi.com")); // must be released
-    
+
     SecTrustRef trust = NULL; // must be released
     OSStatus status;
-    
+
     status = SecTrustCreateWithCertificates((__bridge CFArrayRef) streamCertificates, policy, &trust);
     if (status != errSecSuccess) {
         NSLog(@"%s: Failed to create trust with certs copy", __PRETTY_FUNCTION__);
         return NO;
     }
-    
+
     SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) @[(id) self.certificate]);
-    
+
     SecTrustResultType trustResultType = kSecTrustResultInvalid;
     status = SecTrustEvaluate(trust, &trustResultType);
-    
+
     BOOL trusted;
     if (status == errSecSuccess) {
         if (trustResultType == kSecTrustResultUnspecified) {
@@ -879,14 +864,14 @@
         NSLog(@"%s: Unable to evaluate trust: %d", __PRETTY_FUNCTION__, (int) status);
         trusted = NO;
     }
-    
+
     if (trust) {
         CFRelease(trust);
     }
     if (policy) {
         CFRelease(policy);
     }
-    
+
     return trusted;
 }
 
@@ -980,7 +965,7 @@
         dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
         if (latch) {
             NSInteger limit = self.currentUnitCounter;
-            for (NSInteger i=0; i < limit; i++) {
+            for (NSInteger i = 0; i < limit; i++) {
                 dispatch_semaphore_signal(latch);
             }
             NSLog(@"Executed cloud initialization completed command");
@@ -1013,11 +998,16 @@
             waitForInit = NO;
             break;
 
-        case SDKCloudStatusUninitialized:break;
-        case SDKCloudStatusInitializing:break;
-        case SDKCloudStatusNotLoggedIn:break;
-        case SDKCloudStatusLoginInProcess:break;
-        case SDKCloudStatusLoggedIn:break;
+        case SDKCloudStatusUninitialized:
+            break;
+        case SDKCloudStatusInitializing:
+            break;
+        case SDKCloudStatusNotLoggedIn:
+            break;
+        case SDKCloudStatusLoginInProcess:
+            break;
+        case SDKCloudStatusLoggedIn:
+            break;
     }
 
     return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit];
@@ -1052,35 +1042,36 @@
         NSInteger tag = [block_self nextUnitCounter];
 
         SUnit *unit = [[SUnit alloc] initWithCommand:command];
-        [unit markWorking: tag];
+        [unit markWorking:tag];
         block_self.currentUnit = unit;
 
-        SLog(@"Command Queue: sending %ld (%@)", (long)tag, command);
+        SLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
 
         NSError *error;
         BOOL success = [block_self internalSendToCloud:block_self command:command error:&error];
         if (!success) {
-            NSLog(@"Command Queue: send error: %@, tag:%ld", error.description, (long)tag);
+            NSLog(@"Command Queue: send error: %@, tag:%ld", error.description, (long) tag);
             [unit markResponse:NO];
             return;
         }
         [block_self.delegate singletTonDidSendCommand:block_self command:command];
 
-        SLog(@"Command Queue: waiting for response: %ld (%@)", (long)tag, command);
+        SLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
 
         int const waitAtMostSecs = 5;
         [unit waitForResponse:waitAtMostSecs];
 
-        SLog(@"Command Queue: done waiting for response: %ld (%@)", (long)tag, command);
+        SLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
     });
 
     return YES;
 }
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
-    DLog(@"%s: Waiting to enter sync block",__PRETTY_FUNCTION__);
+    DLog(@"%s: Waiting to enter sync block", __PRETTY_FUNCTION__);
+
     @synchronized (self.syncLocker) {
-        DLog(@"%s: Entered sync block",__PRETTY_FUNCTION__);
+        DLog(@"%s: Entered sync block", __PRETTY_FUNCTION__);
 
         // Wait for connection establishment if need be.
         if (!socket.isStreamConnected) {
@@ -1131,16 +1122,15 @@
                 case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
                 case CommandType_NOTIFICATION_REGISTRATION:
                 case CommandType_NOTIFICATION_DEREGISTRATION:
-                case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
-                {
-                    id<SecurifiCommand> cmd = obj.command;
+                case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST: {
+                    id <SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
                     break;
                 }
                 case CommandType_ALMOND_NAME_CHANGE_REQUEST:
                 case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
-                    id<SecurifiCommand> cmd = obj.command;
+                    id <SecurifiCommand> cmd = obj.command;
                     //Send as Command 61
                     commandType = (unsigned int) htonl(CommandType_MOBILE_COMMAND);
                     commandPayload = [cmd toXml];
@@ -1164,88 +1154,82 @@
                 }
                 default:
                     break;
-            }
+            } // end switch
 
             NSData *sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
             unsigned int commandLength = (unsigned int) htonl([sendCommandPayload length]);
 
             DLog(@"@Payload being sent: %@", commandPayload);
 
-//            // Wait until socket is open
-//            NSStreamStatus type;
-//            do {
-//                type = [socket.outputStream streamStatus];
-//            } while (type == NSStreamStatusOpening);
-//
+            NSOutputStream *outputStream = socket.outputStream;
+            if (outputStream == nil) {
+                DLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, outputStream);
+                return NO;
+            }
+
+            // Wait until socket is open
+            NSStreamStatus type;
+            do {
+                type = [outputStream streamStatus];
+            } while (type == NSStreamStatusOpening);
+
 //            if (socket.isStreamConnected) {
-//                [socket.outputStream streamStatus];
+//                [outputStream streamStatus];
 //            }
 
-            if (socket.isStreamConnected && socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
-                if (-1 == [socket.outputStream write:(uint8_t *) &commandLength maxLength:4]) {
-                    socket.isLoggedIn = NO;
-                    socket.sendCommandFail = YES;
-                    socket.isStreamConnected = NO;
-
-                    *outError = [self makeError:@"Securifi Payload - Send Error"];
-
-                    return NO;
+            if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
+                if (-1 == [outputStream write:(uint8_t *) &commandLength maxLength:4]) {
+                    goto socket_failure_handler;
                 }
             }
 
-            //stream status
-            if (socket.isStreamConnected && socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
-                if (-1 == [socket.outputStream write:(uint8_t *) &commandType maxLength:4]) {
-                    socket.isLoggedIn = NO;
-                    socket.sendCommandFail = YES;
-                    socket.isStreamConnected = NO;
-
-                    *outError = [self makeError:@"Securifi Payload - Send Error"];
-
-                    return NO;
+            if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
+                if (-1 == [outputStream write:(uint8_t *) &commandType maxLength:4]) {
+                    goto socket_failure_handler;
                 }
             }
 
-            if (socket.isStreamConnected && socket.outputStream != nil && socket.outputStream.streamStatus != NSStreamStatusError) {
-                if (-1 == [socket.outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]]) {
-                    socket.isLoggedIn = NO;
-                    socket.sendCommandFail = YES;
-                    socket.isStreamConnected = NO;
-
-                    *outError = [self makeError:@"Securifi Payload - Send Error"];
-
-                    return NO;
+            if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
+                if (-1 == [outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]]) {
+                    goto socket_failure_handler;
                 }
             }
 
-            DLog(@"%s: Exiting sync block",__PRETTY_FUNCTION__);
+            DLog(@"%s: Exiting sync block", __PRETTY_FUNCTION__);
 
-            if (socket.outputStream == nil) {
-                DLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
+            if (!socket.isStreamConnected) {
+                DLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, outputStream);
                 return NO;
             }
-            else if (!socket.isStreamConnected) {
-                DLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
-                return NO;
-            }
-            else if (socket.outputStream.streamStatus == NSStreamStatusError) {
-                DLog(@"%s: Output stream has error status, out=%@", __PRETTY_FUNCTION__, socket.outputStream);
+            else if (outputStream.streamStatus == NSStreamStatusError) {
+                DLog(@"%s: Output stream has error status, out=%@", __PRETTY_FUNCTION__, outputStream);
                 return NO;
             }
             else {
                 DLog(@"%s: sent command to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 return YES;
             }
+
+            socket_failure_handler: {
+                DLog(@"Socket failure handler invoked");
+
+                socket.isLoggedIn = NO;
+                socket.sendCommandFail = YES;
+                socket.isStreamConnected = NO;
+
+                *outError = [self makeError:@"Securifi Payload - Send Error"];
+
+                return NO;
+            }//label socket_failure_handler
         }
         @catch (NSException *e) {
-            NSLog(@"%s: Exception : %@",__PRETTY_FUNCTION__, e.reason);
+            NSLog(@"%s: Exception : %@", __PRETTY_FUNCTION__, e.reason);
             @throw;
-        }
+        } //try-catch
     }//synchronized
-
 }
 
-- (NSError*)makeError:(NSString*)description {
+- (NSError *)makeError:(NSString *)description {
     NSDictionary *details = @{NSLocalizedDescriptionKey : description};
     return [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
 }
