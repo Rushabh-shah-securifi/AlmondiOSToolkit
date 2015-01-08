@@ -48,7 +48,8 @@ NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
 NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 @interface CommandTypeEvent : NSObject <ScoreboardEvent>
-@property (readonly) CommandType commandType;
+@property(readonly) CommandType commandType;
+
 - (instancetype)initWithCommandType:(CommandType)commandType;
 @end
 
@@ -265,7 +266,7 @@ static SecurifiToolkit *singleton = nil;
 
         [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
-        
+
         //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
         //Push Notification - START
         /*
@@ -305,7 +306,7 @@ static SecurifiToolkit *singleton = nil;
     [center removeObserver:self name:DEVICEDATA_HASH_NOTIFIER object:nil];
 
     [center removeObserver:self name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
-    
+
     //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
     //Push Notification - START
     /*
@@ -313,7 +314,7 @@ static SecurifiToolkit *singleton = nil;
      [center removeObserver:self name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
      */
     //Push Notification - END
-    
+
 }
 
 #pragma mark - SDK state
@@ -381,7 +382,7 @@ static SecurifiToolkit *singleton = nil;
     }
 }
 
-- (void)setupReachability:(NSString*)hostname {
+- (void)setupReachability:(NSString *)hostname {
     [_cloudReachability shutdown];
     _cloudReachability = [[SFIReachabilityManager alloc] initWithHost:hostname];
 }
@@ -677,10 +678,10 @@ static SecurifiToolkit *singleton = nil;
 
 }
 
--(void)storeAccountActivationCredentials:(LoginResponse *)obj{
+- (void)storeAccountActivationCredentials:(LoginResponse *)obj {
     //PY: 101014 - Not activated accounts can be accessed for 7 days
-    NSString * isAccountActivated = obj.isAccountActivated;
-    NSString * minsRemainingForUnactivatedAccount = obj.minsRemainingForUnactivatedAccount;
+    NSString *isAccountActivated = obj.isAccountActivated;
+    NSString *minsRemainingForUnactivatedAccount = obj.minsRemainingForUnactivatedAccount;
     [self setSecAccountActivationStatus:isAccountActivated];
     [self setSecMinsRemainingForUnactivatedAccount:minsRemainingForUnactivatedAccount];
 }
@@ -835,7 +836,7 @@ static SecurifiToolkit *singleton = nil;
     return [self.dataManager readDeviceValueList:almondMac];
 }
 
--(NSArray *)notificationPrefList:(NSString *)almondMac{
+- (NSArray *)notificationPrefList:(NSString *)almondMac {
     return [self.dataManager readNotificationList:almondMac];
 }
 
@@ -880,7 +881,6 @@ static SecurifiToolkit *singleton = nil;
 }
 
 
-
 #pragma mark - Scoreboard management
 
 - (Scoreboard *)scoreboardSnapshot {
@@ -917,7 +917,7 @@ static SecurifiToolkit *singleton = nil;
 
 #pragma mark - Account related commands
 
-- (void)asyncRequestChangeCloudPassword:(NSString*)currentPwd changedPwd:(NSString*)changedPwd{
+- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd {
     ChangePasswordRequest *changePwdCommand = [ChangePasswordRequest new];
     changePwdCommand.emailID = [self loginEmail];
     changePwdCommand.currentPassword = currentPwd;
@@ -930,7 +930,7 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-- (void)asyncRequestDeleteCloudAccount:(NSString*)password{
+- (void)asyncRequestDeleteCloudAccount:(NSString *)password {
     DeleteAccountRequest *delAccountCommand = [DeleteAccountRequest new];
     delAccountCommand.emailID = [self loginEmail];
     delAccountCommand.password = password;
@@ -955,8 +955,8 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-- (void)asyncRequestInviteForSharingAlmond:(NSString*)almondMAC inviteEmail:(NSString*)inviteEmailID{
-    UserInviteRequest *userInviteCommand = [[UserInviteRequest alloc]init];
+- (void)asyncRequestInviteForSharingAlmond:(NSString *)almondMAC inviteEmail:(NSString *)inviteEmailID {
+    UserInviteRequest *userInviteCommand = [[UserInviteRequest alloc] init];
     userInviteCommand.almondMAC = almondMAC;
     userInviteCommand.emailID = inviteEmailID;
 
@@ -1060,12 +1060,12 @@ static SecurifiToolkit *singleton = nil;
 
 #pragma mark - Notifications
 
-- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken {
+- (void)asyncRequestRegisterForNotification:(NSString *)deviceToken {
     if (deviceToken == nil) {
         SLog(@"asyncRequestRegisterForNotification : device toke is nil");
         return;
     }
-    
+
     NotificationRegistration *notificationRegister = [NotificationRegistration new];
     notificationRegister.regID = deviceToken;
     notificationRegister.platform = @"iOS";
@@ -1094,7 +1094,7 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC {
+- (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC {
     if (almondMAC == nil) {
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;
@@ -1111,7 +1111,7 @@ static SecurifiToolkit *singleton = nil;
 }
 
 
-- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action {
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action {
     if (almondMAC == nil) {
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;
@@ -1243,11 +1243,12 @@ static SecurifiToolkit *singleton = nil;
     return [KeyChainWrapper retrieveEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT forService:SEC_SERVICE_NAME];
 }
 
--(void)setSecMinsRemainingForUnactivatedAccount:(NSString *)minsRemaining{
-    if(minsRemaining == nil){
-       [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:MINS_REMAINING_DEFAULT forService:SEC_SERVICE_NAME];
-    }else{
-     [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:minsRemaining forService:SEC_SERVICE_NAME];
+- (void)setSecMinsRemainingForUnactivatedAccount:(NSString *)minsRemaining {
+    if (minsRemaining == nil) {
+        [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:MINS_REMAINING_DEFAULT forService:SEC_SERVICE_NAME];
+    }
+    else {
+        [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:minsRemaining forService:SEC_SERVICE_NAME];
     }
 }
 
@@ -1467,7 +1468,7 @@ static SecurifiToolkit *singleton = nil;
 // When the almond list is changed, ensure the Current Almond setting is consistent with the list.
 // The setting may be changed by this method.
 // Returns the current Almond, which might or might not be the same as the old one. May return nil.
-- (SFIAlmondPlus*)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
+- (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
     // Manage the "Current selected Almond" value
     if (almondList.count == 0) {
         [self removeCurrentAlmond];
@@ -1520,9 +1521,9 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-    DeviceDataHashResponse *obj = (DeviceDataHashResponse *) [data valueForKey:@"data"];
-    NSString *currentHash = obj.almondHash;
-    if (!obj.isSuccessful || currentHash.length == 0) {
+    DeviceDataHashResponse *response = (DeviceDataHashResponse *) [data valueForKey:@"data"];
+    NSString *reportedHash = response.almondHash;
+    if (!response.isSuccessful) {
         // We assume, on failure, the Almond is no longer associated with this account and
         // our list of Almonds is out of date. Therefore, issue a request for the Almond list.
         NSLog(@"Device hash response failed; requesting Almond list");
@@ -1535,29 +1536,29 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-    SFIAlmondPlus *plus = [self currentAlmond];
-    if (plus == nil) {
+    SFIAlmondPlus *currentAlmond = [self currentAlmond];
+    if (currentAlmond == nil) {
         NSLog(@"Device Hash Response failed: No current Almond");
         return;
     }
 
-    NSString *currentMac = plus.almondplusMAC;
+    NSString *currentMac = currentAlmond.almondplusMAC;
     NSString *storedHash = [self.dataManager readHashList:currentMac];
 
-    if (currentHash == nil || [currentHash isEqualToString:@"null"]) {
+    if (reportedHash.length == 0 || [reportedHash isEqualToString:@"null"]) {
         //Hash sent by cloud as null - No Device
         NSLog(@"Device Hash Response: null; request devices");
         [self asyncRequestDeviceList:currentMac];
     }
-    else if (storedHash.length > 0 && currentMac.length > 0 && [storedHash isEqualToString:currentHash]) {
+    else if (storedHash.length > 0 && currentMac.length > 0 && [storedHash isEqualToString:reportedHash]) {
         // Devices list is fresh. Update the device values.
         NSLog(@"Device Hash Response: matched; request values");
         [self tryRequestDeviceValueList:currentMac];
     }
     else {
         //Save hash in file for each almond
-        NSLog(@"Device Hash Response: mismatch; requesting devices; mac:%@, current:%@, stored:%@", currentMac, currentHash, storedHash);
-        [self.dataManager writeHashList:currentHash currentMAC:currentMac];
+        NSLog(@"Device Hash Response: mismatch; requesting devices; mac:%@, current:%@, stored:%@", currentMac, reportedHash, storedHash);
+        [self.dataManager writeHashList:reportedHash currentMAC:currentMac];
         // and update the device list -- on receipt of the device list, then the values will be updated
         [self asyncRequestDeviceList:currentMac];
     }
@@ -1723,21 +1724,22 @@ static SecurifiToolkit *singleton = nil;
 
 
 #pragma mark - Notification Preference List
+
 - (void)onNotificationPrefListChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
         return;
     }
-    
+
     NotificationPreferenceListResponse *obj = (NotificationPreferenceListResponse *) [data valueForKey:@"data"];
     NSString *currentMAC = obj.almondMAC;
-    
+
     if (currentMAC.length == 0) {
         return;
     }
-    
-    if([obj.notificationDeviceList count]!=0){
+
+    if ([obj.notificationDeviceList count] != 0) {
         // Update offline storage
         [self.dataManager writeNotificationList:obj.notificationDeviceList currentMAC:currentMAC];
         [self postNotification:kSFIDidChangeNotificationList data:currentMAC];
@@ -1751,10 +1753,10 @@ static SecurifiToolkit *singleton = nil;
     if (data == nil) {
         return;
     }
-    
+
     DynamicNotificationPreferenceList *obj = (DynamicNotificationPreferenceList *) [data valueForKey:@"data"];
     NSString *currentMAC = obj.almondMAC;
-    
+
     [self processDynamicNotificationPrefChange:obj currentMAC:currentMAC];
 }
 
@@ -1763,24 +1765,24 @@ static SecurifiToolkit *singleton = nil;
     if (currentMAC.length == 0) {
         return;
     }
-    
+
     //Get the email id of current user
     NSString *loggedInUser = [self loginEmail];
-    
+
     //Get the notification list of that current user from offline storage
     NSMutableArray *notificationPrefUserList = obj.notificationUserList;
     NSMutableArray *cloudNotificationPrefList = obj.notificationUserList;
-    for(SFINotificationUser *currentUser in notificationPrefUserList){
-        if([currentUser.userID isEqualToString:loggedInUser]){
+    for (SFINotificationUser *currentUser in notificationPrefUserList) {
+        if ([currentUser.userID isEqualToString:loggedInUser]) {
             cloudNotificationPrefList = currentUser.notificationDeviceList;
             break;
         }
     }
-    
+
     //NSArray *currentNotificationPrefList = [self.dataManager readNotificationList:currentMAC];
     // Update offline storage
     [self.dataManager writeNotificationList:cloudNotificationPrefList currentMAC:currentMAC];
-    
+
     [self postNotification:kSFIDidChangeNotificationList data:currentMAC];
 }
 
