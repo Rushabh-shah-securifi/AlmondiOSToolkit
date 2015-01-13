@@ -18,11 +18,13 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.enableScoreboard = NO;
         self.productionCloudHost = CLOUD_PROD_SERVER;
         self.developmentCloudHost = CLOUD_DEV_SERVER;
         self.cloudPort = CLOUD_SERVER_PORT;
         self.enableCertificateValidation = NO;
         self.certificateFileName = CLOUD_CERT_FILENAME; // file must be named "cert.der". But leave off the file extension in the config.
+        self.enableNotifications = NO;
     }
 
     return self;
@@ -32,11 +34,13 @@
     SecurifiConfigurator *copy = [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
-        copy.certificateFileName = self.certificateFileName;
-        copy.enableCertificateValidation = self.enableCertificateValidation;
+        copy.enableScoreboard = self.enableScoreboard;
+        copy.productionCloudHost = self.productionCloudHost;
         copy.developmentCloudHost = self.developmentCloudHost;
         copy.cloudPort = self.cloudPort;
-        copy.productionCloudHost = self.productionCloudHost;
+        copy.enableCertificateValidation = self.enableCertificateValidation;
+        copy.certificateFileName = self.certificateFileName;
+        copy.enableNotifications = self.enableNotifications;
     }
 
     return copy;

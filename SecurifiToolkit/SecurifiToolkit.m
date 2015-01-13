@@ -19,8 +19,6 @@
 #import "MeAsSecondaryUserRequest.h"
 #import "DynamicNotificationPreferenceList.h"
 #import "SFIXmlWriter.h"
-#import "SecurifiConfigurator.h"
-#import "NotificationPreferences.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -392,6 +390,10 @@ static SecurifiToolkit *singleton = nil;
 }
 
 #pragma mark - SDK Initialization
+
+- (SecurifiConfigurator *)configuration {
+    return [self.config copy];
+}
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void)initToolkit {
@@ -888,7 +890,7 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (void)markCommandEvent:(CommandType)commandType {
-    if (self.collectEvents) {
+    if (self.config.enableScoreboard) {
         CommandTypeEvent *event = [[CommandTypeEvent alloc] initWithCommandType:commandType];
         [self.scoreboard markEvent:event];
     }
