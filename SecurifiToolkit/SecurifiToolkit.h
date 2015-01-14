@@ -129,7 +129,7 @@ extern NSString *const kSFIDidDeregisterForNotifications;
 // Notification posted when deregistration for notifications failed
 extern NSString *const kSFIDidFailToDeregisterForNotifications;
 
-// Preferences for device notifications have changed; payload is ALmond MAC address
+// Preferences for device notifications have changed; payload is Almond MAC address
 extern NSString *const kSFINotificationPreferencesDidChange;
 
 // Value used for the method asyncRequestNotificationPreferenceChange:deviceList:action: to enable notifications
