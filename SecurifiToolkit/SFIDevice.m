@@ -61,6 +61,7 @@
         case SFIDeviceType_UnknownOnOffModule_44:return @"44_UnknownOnOffModule";
         case SFIDeviceType_BinaryPowerSwitch_45:return @"45_BinaryPowerSwitch";
         case SFIDeviceType_HueLamp_48:return @"48_HueLamp";
+        case SFIDeviceType_SecurifiSmartSwitch_50:return @"50_SecurifiSmartSwitch";
         default: return nil;
     }
 }
@@ -105,6 +106,7 @@
         case SFIDeviceType_Siren_42:
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
+        case SFIDeviceType_SecurifiSmartSwitch_50:
         {
             return SFIDevicePropertyType_SWITCH_BINARY;
         }
@@ -168,7 +170,8 @@
         case SFIDeviceType_Siren_42:
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
-        case SFIDeviceType_HueLamp_48: {
+        case SFIDeviceType_HueLamp_48:
+        case SFIDeviceType_SecurifiSmartSwitch_50: {
             return YES;
         }
 
@@ -215,6 +218,7 @@
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
+        case SFIDeviceType_SecurifiSmartSwitch_50:
         {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             if (deviceValues.hasValue) {

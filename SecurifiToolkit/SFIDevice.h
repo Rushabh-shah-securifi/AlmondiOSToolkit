@@ -55,7 +55,8 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_MultiSwitch_43                = 43,
     SFIDeviceType_UnknownOnOffModule_44         = 44,
     SFIDeviceType_BinaryPowerSwitch_45          = 45,
-    SFIDeviceType_HueLamp_48                    = 48
+    SFIDeviceType_HueLamp_48                    = 48,
+    SFIDeviceType_SecurifiSmartSwitch_50        = 50,
 };
 
 typedef NS_ENUM(unsigned int, SFINotificationMode) {
