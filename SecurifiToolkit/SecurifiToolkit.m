@@ -19,6 +19,14 @@
 #import "MeAsSecondaryUserRequest.h"
 #import "DynamicNotificationPreferenceList.h"
 #import "SFIXmlWriter.h"
+#import "SFINotificationUser.h"
+#import "NotificationRegistration.h"
+#import "NotificationDeleteRegistrationRequest.h"
+#import "NotificationPreferenceListRequest.h"
+#import "NotificationPreferenceListResponse.h"
+#import "NotificationRegistrationResponse.h"
+#import "NotificationDeleteRegistrationResponse.h"
+#import "NotificationPreferences.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -40,7 +48,11 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
 NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
-NSString *const kSFIDidChangeNotificationList = @"kSFIDidChangeNotificationList";
+NSString *const kSFIDidRegisterForNotifications = @"kSFIDidRegisterForNotifications";
+NSString *const kSFIDidFailToRegisterForNotifications = @"kSFIDidFailToRegisterForNotifications";
+NSString *const kSFIDidDeregisterForNotifications = @"kSFIDidDeregisterForNotifications";
+NSString *const kSFIDidFailToDeregisterForNotifications = @"kSFIDidFailToDeregisterForNotifications";
+NSString *const kSFINotificationPreferencesDidChange = @"kSFINotificationPreferencesDidChange";
 
 NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
 NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
@@ -190,6 +202,24 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
             return [NSString stringWithFormat:@"UNLINK_ALMOND_REQUEST_%d", type];
         case CommandType_UNLINK_ALMOND_RESPONSE:
             return [NSString stringWithFormat:@"UNLINK_ALMOND_RESPONSE_%d", type];
+        case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATION_PREF_CHANGE_REQUEST_%d", type];
+        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:
+            return [NSString stringWithFormat:@"NOTIFICATION_PREF_CHANGE_RESPONSE_%d", type];
+        case CommandType_NOTIFICATION_REGISTRATION:
+            return [NSString stringWithFormat:@"NOTIFICATION_REGISTRATION_%d", type];
+        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:
+            return [NSString stringWithFormat:@"NOTIFICATION_REGISTRATION_RESPONSE_%d", type];
+        case CommandType_NOTIFICATION_DEREGISTRATION:
+            return [NSString stringWithFormat:@"NOTIFICATION_DEREGISTRATION_%d", type];
+        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:
+            return [NSString stringWithFormat:@"NOTIFICATION_DEREGISTRATION_RESPONSE_%d", type];
+        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:
+            return [NSString stringWithFormat:@"DYNAMIC_NOTIFICATION_PREFERENCE_LIST_%d", type];
+        case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATION_PREFERENCE_LIST_REQUEST_%d", type];
+        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
+            return [NSString stringWithFormat:@"NOTIFICATION_PREFERENCE_LIST_RESPONSE_%d", type];
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -265,17 +295,15 @@ static SecurifiToolkit *singleton = nil;
         [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
 
-        //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
-        //Push Notification - START
-        /*
-        [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
-        
-        [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
-         */
-        //Push Notification - END
-
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceHashResponse:) name:DEVICEDATA_HASH_NOTIFIER object:nil];
+
+        if (config.enableNotifications) {
+            [center addObserver:self selector:@selector(onNotificationRegistrationResponseCallback:) name:NOTIFICATION_REGISTRATION_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onNotificationDeregistrationResponseCallback:) name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+        }
     }
 
     return self;
@@ -289,6 +317,7 @@ static SecurifiToolkit *singleton = nil;
     [center removeObserver:self name:LOGIN_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_NOTIFIER object:nil];
     [center removeObserver:self name:LOGOUT_ALL_NOTIFIER object:nil];
+    [center removeObserver:self name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
 
     [center removeObserver:self name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
     [center removeObserver:self name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
@@ -303,16 +332,12 @@ static SecurifiToolkit *singleton = nil;
     [center removeObserver:self name:ALMOND_LIST_NOTIFIER object:nil];
     [center removeObserver:self name:DEVICEDATA_HASH_NOTIFIER object:nil];
 
-    [center removeObserver:self name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
-
-    //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
-    //Push Notification - START
-    /*
-    [center removeObserver:self name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
-     [center removeObserver:self name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
-     */
-    //Push Notification - END
-
+    if (self.config.enableNotifications) {
+        [center removeObserver:self name:NOTIFICATION_REGISTRATION_NOTIFIER object:nil];
+        [center removeObserver:self name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
+        [center removeObserver:self name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
+        [center removeObserver:self name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+    }
 }
 
 #pragma mark - SDK state
@@ -1727,6 +1752,30 @@ static SecurifiToolkit *singleton = nil;
 
 #pragma mark - Notification Preference List
 
+- (void)onNotificationRegistrationResponseCallback:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    NotificationRegistrationResponse *obj = (NotificationRegistrationResponse *) [data valueForKey:@"data"];
+    NSString *notification = obj.isSuccessful ? kSFIDidRegisterForNotifications : kSFIDidFailToRegisterForNotifications;
+    [self postNotification:notification data:nil];
+}
+
+- (void)onNotificationDeregistrationResponseCallback:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    NotificationDeleteRegistrationResponse *obj = (NotificationDeleteRegistrationResponse *) [data valueForKey:@"data"];
+    NSString *notification = obj.isSuccessful ? kSFIDidDeregisterForNotifications : kSFIDidFailToDeregisterForNotifications;
+    [self postNotification:notification data:nil];
+}
+
 - (void)onNotificationPrefListChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
@@ -1744,10 +1793,9 @@ static SecurifiToolkit *singleton = nil;
     if ([obj.notificationDeviceList count] != 0) {
         // Update offline storage
         [self.dataManager writeNotificationList:obj.notificationDeviceList currentMAC:currentMAC];
-        [self postNotification:kSFIDidChangeNotificationList data:currentMAC];
+        [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
     }
 }
-
 
 - (void)onDynamicNotificationListChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
@@ -1759,21 +1807,17 @@ static SecurifiToolkit *singleton = nil;
     DynamicNotificationPreferenceList *obj = (DynamicNotificationPreferenceList *) [data valueForKey:@"data"];
     NSString *currentMAC = obj.almondMAC;
 
-    [self processDynamicNotificationPrefChange:obj currentMAC:currentMAC];
-}
-
-// Processes a dynamic change to a notification preference value
-- (void)processDynamicNotificationPrefChange:(DynamicNotificationPreferenceList *)obj currentMAC:(NSString *)currentMAC {
     if (currentMAC.length == 0) {
         return;
     }
 
-    //Get the email id of current user
+    // Get the email id of current user
     NSString *loggedInUser = [self loginEmail];
 
     //Get the notification list of that current user from offline storage
     NSMutableArray *notificationPrefUserList = obj.notificationUserList;
-    NSMutableArray *cloudNotificationPrefList = obj.notificationUserList;
+
+    NSArray *cloudNotificationPrefList = obj.notificationUserList;
     for (SFINotificationUser *currentUser in notificationPrefUserList) {
         if ([currentUser.userID isEqualToString:loggedInUser]) {
             cloudNotificationPrefList = currentUser.notificationDeviceList;
@@ -1781,11 +1825,9 @@ static SecurifiToolkit *singleton = nil;
         }
     }
 
-    //NSArray *currentNotificationPrefList = [self.dataManager readNotificationList:currentMAC];
     // Update offline storage
     [self.dataManager writeNotificationList:cloudNotificationPrefList currentMAC:currentMAC];
-
-    [self postNotification:kSFIDidChangeNotificationList data:currentMAC];
+    [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
 }
 
 @end

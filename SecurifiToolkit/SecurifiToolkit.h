@@ -76,14 +76,14 @@
 #import <SecurifiToolkit/SFIWirelessSummary.h>
 #import <SecurifiToolkit/SFIWirelessUsers.h>
 
-#import <SecurifiToolkit/NotificationRegistration.h>
-#import <SecurifiToolkit/NotificationRegistrationResponse.h>
-#import <SecurifiToolkit/NotificationDeleteRegistrationRequest.h>
-#import <SecurifiToolkit/NotificationDeleteRegistrationResponse.h>
-#import <SecurifiToolkit/NotificationPreferenceListRequest.h>
-#import <SecurifiToolkit/NotificationPreferenceListResponse.h>
-#import <SecurifiToolkit/NotificationPreferences.h>
-#import <SecurifiToolkit/NotificationPreferenceResponse.h>
+//#import <SecurifiToolkit/NotificationRegistration.h>
+//#import <SecurifiToolkit/NotificationRegistrationResponse.h>
+//#import <SecurifiToolkit/NotificationDeleteRegistrationRequest.h>
+//#import <SecurifiToolkit/NotificationDeleteRegistrationResponse.h>
+//#import <SecurifiToolkit/NotificationPreferenceListRequest.h>
+//#import <SecurifiToolkit/NotificationPreferenceListResponse.h>
+//#import <SecurifiToolkit/NotificationPreferences.h>
+//#import <SecurifiToolkit/NotificationPreferenceResponse.h>
 #import <SecurifiToolkit/SFINotificationDevice.h>
 
 @class SecurifiConfigurator;
@@ -112,17 +112,32 @@ extern NSString *const kSFIDidChangeAlmondName;
 extern NSString *const kSFIDidChangeDeviceList;
 
 extern NSString *const kSFIDidChangeDeviceValueList;
-extern NSString *const kSFIDidChangeNotificationList;
 
 // Notification posted when a MobileCommand request has completed. Payload contains the command itself, and
 // a boxed NSTimeInterval indicating how long the request-response cycle took.
 extern NSString *const kSFIDidCompleteMobileCommandRequest;
+
+// Notification posted when registration for notifications succeeded
+extern NSString *const kSFIDidRegisterForNotifications;
+
+// Notification posted when registration for notifications failed
+extern NSString *const kSFIDidFailToRegisterForNotifications;
+
+// Notification posted when deregistration for notifications succeeded
+extern NSString *const kSFIDidDeregisterForNotifications;
+
+// Notification posted when deregistration for notifications failed
+extern NSString *const kSFIDidFailToDeregisterForNotifications;
+
+// Preferences for device notifications have changed; payload is ALmond MAC address
+extern NSString *const kSFINotificationPreferencesDidChange;
 
 // Value used for the method asyncRequestNotificationPreferenceChange:deviceList:action: to enable notifications
 extern NSString *const kSFINotificationPreferenceChangeActionAdd;
 
 // Value used for the method asyncRequestNotificationPreferenceChange:deviceList:action: to disable notifications
 extern NSString *const kSFINotificationPreferenceChangeActionDelete;
+
 
 @interface SecurifiToolkit : NSObject
 
