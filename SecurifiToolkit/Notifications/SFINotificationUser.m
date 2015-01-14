@@ -7,8 +7,6 @@
 //
 
 #import "SFINotificationUser.h"
-#import "SFINotificationDevice.h"
-#import "SecurifiToolkit.h"
 
 @implementation SFINotificationUser
 
@@ -19,7 +17,7 @@
         self.preferenceCount = (unsigned int) [coder decodeIntForKey:@"self.preferenceCount"];
         _notificationDeviceList = [coder decodeObjectForKey:@"self.notificationDeviceList"];
     }
-    
+
     return self;
 }
 
@@ -32,7 +30,7 @@
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.userID=%@", self.userID];
-    [description appendFormat:@", self.preferenceCount=%u", self.preferenceCount];
+    [description appendFormat:@", self.preferenceCount=%i", self.preferenceCount];
     [description appendFormat:@", self.notificationDeviceList=%@", self.notificationDeviceList];
     [description appendString:@">"];
     return description;
@@ -40,13 +38,13 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     SFINotificationUser *copy = (SFINotificationUser *) [[[self class] allocWithZone:zone] init];
-    
+
     if (copy != nil) {
         copy.userID = self.userID;
         copy.preferenceCount = self.preferenceCount;
-        copy.notificationDeviceList =  self.notificationDeviceList;
+        copy.notificationDeviceList = self.notificationDeviceList;
     }
-    
+
     return copy;
 }
 
