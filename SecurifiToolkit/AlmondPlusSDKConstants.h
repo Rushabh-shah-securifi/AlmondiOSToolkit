@@ -83,9 +83,6 @@
 #define LOG_FILE_NAME  @"AlmondPlusLog.log"
 #define SDK_LOG_FILE_NAME  @"AlmondPlusSDKLog.log"
 
-#define ALMONDLIST @"AlmondList"
-#define SETTINGS_LIST @"Settings"
-
 //XMLS
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
 #define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"
