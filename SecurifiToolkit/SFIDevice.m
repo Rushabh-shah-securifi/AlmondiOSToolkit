@@ -6,9 +6,6 @@
 //  Copyright (c) 2013 Nirav Uchat. All rights reserved.
 //
 
-#import "SFIDevice.h"
-#import "SFIDeviceValue.h"
-#import "SFINotificationDevice.h"
 #import "SecurifiToolkit.h"
 
 @implementation SFIDevice

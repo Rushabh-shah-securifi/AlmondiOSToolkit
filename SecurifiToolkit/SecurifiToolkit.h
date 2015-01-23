@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <SecurifiToolkit/SecurifiTypes.h>
+
 #import <SecurifiToolkit/SecurifiConfigurator.h>
 #import <SecurifiToolkit/GenericCommand.h>
 #import <SecurifiToolkit/SFIDevice.h>
@@ -85,6 +87,7 @@
 //#import <SecurifiToolkit/NotificationPreferences.h>
 //#import <SecurifiToolkit/NotificationPreferenceResponse.h>
 #import <SecurifiToolkit/SFINotificationDevice.h>
+#import <SecurifiToolkit/SFINotification.h>
 
 @class SecurifiConfigurator;
 

@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "SecurifiTypes.h"
 #import "BaseCommandRequest.h"
 
 @interface MobileCommandResponse : NSObject

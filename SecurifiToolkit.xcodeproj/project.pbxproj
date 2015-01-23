@@ -65,9 +65,12 @@
 		1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0303A77013C449B86C26B /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF033FE398C1B48B1CA5CCC /* SUnit.h */; };
 		1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03322D3DC410824316347 /* SFINotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03895670DA1C15314D2F8 /* SFINotification.m */; };
 		1DF0352850B972F9D28F2BD0 /* SUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03CBFC72431ED1B6B81A3 /* SUnit.m */; };
 		1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF034243877C8131B0AE8FE /* XMLWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */; };
+		1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF037E41986B5D077457BCB /* SecurifiTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03ED7951D970D55780A5B /* SFIXmlWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CB16EDB103AB5B43224 /* SFIXmlWriter.h */; };
 		1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */; };
@@ -289,10 +292,13 @@
 		1CD1D5471A660B7A00C030E9 /* SFINotificationUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFINotificationUser.m; sourceTree = "<group>"; };
 		1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiConfigurator.h; sourceTree = "<group>"; };
 		1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurifiConfigurator.m; sourceTree = "<group>"; };
+		1DF03322D3DC410824316347 /* SFINotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotification.h; sourceTree = "<group>"; };
 		1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiCommand.h; sourceTree = "<group>"; };
 		1DF033FE398C1B48B1CA5CCC /* SUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUnit.h; path = Network/SUnit.h; sourceTree = "<group>"; };
 		1DF034243877C8131B0AE8FE /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLWriter.m; sourceTree = "<group>"; };
 		1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCommandRequest.h; sourceTree = "<group>"; };
+		1DF037E41986B5D077457BCB /* SecurifiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiTypes.h; sourceTree = "<group>"; };
+		1DF03895670DA1C15314D2F8 /* SFINotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFINotification.m; sourceTree = "<group>"; };
 		1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCommandRequest.m; sourceTree = "<group>"; };
 		1DF03B0459C4363665236FA1 /* SFIXmlWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIXmlWriter.m; sourceTree = "<group>"; };
 		1DF03CB16EDB103AB5B43224 /* SFIXmlWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIXmlWriter.h; sourceTree = "<group>"; };
@@ -539,6 +545,8 @@
 				1CD1D5451A660B7A00C030E9 /* SFINotificationDevice.m */,
 				1CD1D5461A660B7A00C030E9 /* SFINotificationUser.h */,
 				1CD1D5471A660B7A00C030E9 /* SFINotificationUser.m */,
+				1DF03895670DA1C15314D2F8 /* SFINotification.m */,
+				1DF03322D3DC410824316347 /* SFINotification.h */,
 			);
 			path = Notifications;
 			sourceTree = "<group>";
@@ -625,6 +633,7 @@
 				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
 				1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */,
 				1DF035609133676CE2B94C18 /* xml */,
+				1DF037E41986B5D077457BCB /* SecurifiTypes.h */,
 			);
 			path = SecurifiToolkit;
 			sourceTree = "<group>";
@@ -954,6 +963,8 @@
 				1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */,
 				1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */,
 				1DF03ED7951D970D55780A5B /* SFIXmlWriter.h in Headers */,
+				1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */,
+				1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1190,6 +1201,7 @@
 				1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */,
 				1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */,
 				1DF03FF5727F64CF4EDF5625 /* SFIXmlWriter.m in Sources */,
+				1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
