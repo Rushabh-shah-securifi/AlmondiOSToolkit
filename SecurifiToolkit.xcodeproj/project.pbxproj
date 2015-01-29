@@ -23,8 +23,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */; };
-		1C2350C9195132B500F97EA7 /* KeyChainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */; };
 		1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBCE19480D6C00E353D1 /* Reachability.m */; };
 		1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */; };
@@ -36,10 +34,21 @@
 		1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3270E11A243B28007202C1 /* SFIWirelessSummary.m */; };
 		1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3270E21A243B28007202C1 /* SFIWirelessUsers.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3270E31A243B28007202C1 /* SFIWirelessUsers.m */; };
+		1C414BC61A79F02600C448A4 /* ZHDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BC21A79F02600C448A4 /* ZHDatabase.h */; };
+		1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BC31A79F02600C448A4 /* ZHDatabase.m */; };
+		1C414BC81A79F02600C448A4 /* ZHDatabaseStatement.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BC41A79F02600C448A4 /* ZHDatabaseStatement.h */; };
+		1C414BC91A79F02600C448A4 /* ZHDatabaseStatement.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BC51A79F02600C448A4 /* ZHDatabaseStatement.m */; };
+		1C414BCB1A79F0AE00C448A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C414BCA1A79F0AE00C448A4 /* libsqlite3.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
+		1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BD01A79F2BE00C448A4 /* SFIOfflineDataManager.h */; };
+		1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BD11A79F2BE00C448A4 /* SFIOfflineDataManager.m */; };
+		1C414BDE1A79F35D00C448A4 /* SingleTon.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BDA1A79F35D00C448A4 /* SingleTon.h */; };
+		1C414BDF1A79F35D00C448A4 /* SingleTon.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BDB1A79F35D00C448A4 /* SingleTon.m */; };
+		1C414BE01A79F35D00C448A4 /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BDC1A79F35D00C448A4 /* SUnit.h */; };
+		1C414BE11A79F35D00C448A4 /* SUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BDD1A79F35D00C448A4 /* SUnit.m */; };
+		1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BE31A79F39600C448A4 /* KeyChainWrapper.h */; };
+		1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */; };
 		1C75820C19B028F70074C601 /* Scoreboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C75820A19B028F70074C601 /* Scoreboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C75820D19B028F70074C601 /* Scoreboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C75820B19B028F70074C601 /* Scoreboard.m */; };
-		1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */; };
 		1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */; };
 		1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CD1D5351A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m */; };
 		1CD1D54A1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD1D5361A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h */; };
@@ -63,25 +72,23 @@
 		1CFBB54F1A257D1900438B5F /* SecurifiConfigurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1CFBB5501A257D1900438B5F /* SecurifiConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */; };
 		1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; settings = {ATTRIBUTES = (Public, ); }; };
-		1DF0303A77013C449B86C26B /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF033FE398C1B48B1CA5CCC /* SUnit.h */; };
 		1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03322D3DC410824316347 /* SFINotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03895670DA1C15314D2F8 /* SFINotification.m */; };
-		1DF0352850B972F9D28F2BD0 /* SUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03CBFC72431ED1B6B81A3 /* SUnit.m */; };
 		1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF034243877C8131B0AE8FE /* XMLWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03230F1B32E197753B9B3 /* DatabaseStore.h */; };
 		1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */; };
 		1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF037E41986B5D077457BCB /* SecurifiTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03ED7951D970D55780A5B /* SFIXmlWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CB16EDB103AB5B43224 /* SFIXmlWriter.h */; };
 		1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */; };
 		1DF03FF5727F64CF4EDF5625 /* SFIXmlWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03B0459C4363665236FA1 /* SFIXmlWriter.m */; };
+		1DF03FFBF6EF6243078A2329 /* DatabaseStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F975AE4915FC041E2D3 /* DatabaseStore.m */; };
 		22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D42179132A40099CD8F /* CommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011C9E179543E80019D5A4 /* Login.h in Headers */ = {isa = PBXBuildFile; fileRef = 22011C9C179543E80019D5A4 /* Login.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011C9F179543E80019D5A4 /* Login.m in Sources */ = {isa = PBXBuildFile; fileRef = 22011C9D179543E80019D5A4 /* Login.m */; };
 		22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */ = {isa = PBXBuildFile; fileRef = 22011CA1179549C70019D5A4 /* LoginTempPass.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */ = {isa = PBXBuildFile; fileRef = 22011CA2179549C70019D5A4 /* LoginTempPass.m */; };
-		2204C20A179428B200B05F17 /* SingleTon.h in Headers */ = {isa = PBXBuildFile; fileRef = 2204C208179428B200B05F17 /* SingleTon.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2204C20B179428B200B05F17 /* SingleTon.m in Sources */ = {isa = PBXBuildFile; fileRef = 2204C209179428B200B05F17 /* SingleTon.m */; };
 		2204C20E1794349400B05F17 /* GenericCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 2204C20C1794349400B05F17 /* GenericCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2204C20F1794349400B05F17 /* GenericCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2204C20D1794349400B05F17 /* GenericCommand.m */; };
 		221185BE178D371200EE23ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185BD178D371200EE23ED /* Foundation.framework */; };
@@ -252,8 +259,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyChainWrapper.h; sourceTree = "<group>"; };
-		1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainWrapper.m; sourceTree = "<group>"; };
 		1C23FBCD19480D6C00E353D1 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		1C23FBCE19480D6C00E353D1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIReachabilityManager.h; sourceTree = "<group>"; };
@@ -266,10 +271,21 @@
 		1C3270E11A243B28007202C1 /* SFIWirelessSummary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessSummary.m; sourceTree = "<group>"; };
 		1C3270E21A243B28007202C1 /* SFIWirelessUsers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIWirelessUsers.h; sourceTree = "<group>"; };
 		1C3270E31A243B28007202C1 /* SFIWirelessUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessUsers.m; sourceTree = "<group>"; };
+		1C414BC21A79F02600C448A4 /* ZHDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZHDatabase.h; sourceTree = "<group>"; };
+		1C414BC31A79F02600C448A4 /* ZHDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZHDatabase.m; sourceTree = "<group>"; };
+		1C414BC41A79F02600C448A4 /* ZHDatabaseStatement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZHDatabaseStatement.h; sourceTree = "<group>"; };
+		1C414BC51A79F02600C448A4 /* ZHDatabaseStatement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZHDatabaseStatement.m; sourceTree = "<group>"; };
+		1C414BCA1A79F0AE00C448A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		1C414BD01A79F2BE00C448A4 /* SFIOfflineDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIOfflineDataManager.h; sourceTree = "<group>"; };
+		1C414BD11A79F2BE00C448A4 /* SFIOfflineDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIOfflineDataManager.m; sourceTree = "<group>"; };
+		1C414BDA1A79F35D00C448A4 /* SingleTon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingleTon.h; sourceTree = "<group>"; };
+		1C414BDB1A79F35D00C448A4 /* SingleTon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleTon.m; sourceTree = "<group>"; };
+		1C414BDC1A79F35D00C448A4 /* SUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUnit.h; sourceTree = "<group>"; };
+		1C414BDD1A79F35D00C448A4 /* SUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUnit.m; sourceTree = "<group>"; };
+		1C414BE31A79F39600C448A4 /* KeyChainWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyChainWrapper.h; sourceTree = "<group>"; };
+		1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainWrapper.m; sourceTree = "<group>"; };
 		1C75820A19B028F70074C601 /* Scoreboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scoreboard.h; sourceTree = "<group>"; };
 		1C75820B19B028F70074C601 /* Scoreboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scoreboard.m; sourceTree = "<group>"; };
-		1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIOfflineDataManager.h; sourceTree = "<group>"; };
-		1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIOfflineDataManager.m; sourceTree = "<group>"; };
 		1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationRequest.h; sourceTree = "<group>"; };
 		1CD1D5351A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationDeleteRegistrationRequest.m; sourceTree = "<group>"; };
 		1CD1D5361A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationResponse.h; sourceTree = "<group>"; };
@@ -292,9 +308,9 @@
 		1CD1D5471A660B7A00C030E9 /* SFINotificationUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFINotificationUser.m; sourceTree = "<group>"; };
 		1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiConfigurator.h; sourceTree = "<group>"; };
 		1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurifiConfigurator.m; sourceTree = "<group>"; };
+		1DF03230F1B32E197753B9B3 /* DatabaseStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatabaseStore.h; sourceTree = "<group>"; };
 		1DF03322D3DC410824316347 /* SFINotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotification.h; sourceTree = "<group>"; };
 		1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiCommand.h; sourceTree = "<group>"; };
-		1DF033FE398C1B48B1CA5CCC /* SUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUnit.h; path = Network/SUnit.h; sourceTree = "<group>"; };
 		1DF034243877C8131B0AE8FE /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLWriter.m; sourceTree = "<group>"; };
 		1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCommandRequest.h; sourceTree = "<group>"; };
 		1DF037E41986B5D077457BCB /* SecurifiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiTypes.h; sourceTree = "<group>"; };
@@ -302,14 +318,12 @@
 		1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCommandRequest.m; sourceTree = "<group>"; };
 		1DF03B0459C4363665236FA1 /* SFIXmlWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIXmlWriter.m; sourceTree = "<group>"; };
 		1DF03CB16EDB103AB5B43224 /* SFIXmlWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIXmlWriter.h; sourceTree = "<group>"; };
-		1DF03CBFC72431ED1B6B81A3 /* SUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUnit.m; path = Network/SUnit.m; sourceTree = "<group>"; };
 		1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLWriter.h; sourceTree = "<group>"; };
+		1DF03F975AE4915FC041E2D3 /* DatabaseStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DatabaseStore.m; sourceTree = "<group>"; };
 		22011C9C179543E80019D5A4 /* Login.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Login.h; sourceTree = "<group>"; };
 		22011C9D179543E80019D5A4 /* Login.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Login.m; sourceTree = "<group>"; };
 		22011CA1179549C70019D5A4 /* LoginTempPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginTempPass.h; sourceTree = "<group>"; };
 		22011CA2179549C70019D5A4 /* LoginTempPass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginTempPass.m; sourceTree = "<group>"; };
-		2204C208179428B200B05F17 /* SingleTon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingleTon.h; sourceTree = "<group>"; };
-		2204C209179428B200B05F17 /* SingleTon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SingleTon.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		2204C20C1794349400B05F17 /* GenericCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericCommand.h; sourceTree = "<group>"; };
 		2204C20D1794349400B05F17 /* GenericCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericCommand.m; sourceTree = "<group>"; };
 		221185BA178D371200EE23ED /* libSecurifiToolkit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSecurifiToolkit.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -461,6 +475,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C414BCB1A79F0AE00C448A4 /* libsqlite3.dylib in Frameworks */,
 				CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */,
 				22A19D941797AC7A003E6148 /* SystemConfiguration.framework in Frameworks */,
 				221185BE178D371200EE23ED /* Foundation.framework in Frameworks */,
@@ -504,6 +519,48 @@
 			path = Router;
 			sourceTree = "<group>";
 		};
+		1C414BC11A79F02600C448A4 /* Db */ = {
+			isa = PBXGroup;
+			children = (
+				1C414BC21A79F02600C448A4 /* ZHDatabase.h */,
+				1C414BC31A79F02600C448A4 /* ZHDatabase.m */,
+				1C414BC41A79F02600C448A4 /* ZHDatabaseStatement.h */,
+				1C414BC51A79F02600C448A4 /* ZHDatabaseStatement.m */,
+			);
+			path = Db;
+			sourceTree = "<group>";
+		};
+		1C414BCF1A79F2BE00C448A4 /* OfflineStorage */ = {
+			isa = PBXGroup;
+			children = (
+				1C414BD01A79F2BE00C448A4 /* SFIOfflineDataManager.h */,
+				1C414BD11A79F2BE00C448A4 /* SFIOfflineDataManager.m */,
+				1DF03F975AE4915FC041E2D3 /* DatabaseStore.m */,
+				1DF03230F1B32E197753B9B3 /* DatabaseStore.h */,
+			);
+			path = OfflineStorage;
+			sourceTree = "<group>";
+		};
+		1C414BD91A79F35D00C448A4 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				1C414BDA1A79F35D00C448A4 /* SingleTon.h */,
+				1C414BDB1A79F35D00C448A4 /* SingleTon.m */,
+				1C414BDC1A79F35D00C448A4 /* SUnit.h */,
+				1C414BDD1A79F35D00C448A4 /* SUnit.m */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		1C414BE21A79F39600C448A4 /* keychain */ = {
+			isa = PBXGroup;
+			children = (
+				1C414BE31A79F39600C448A4 /* KeyChainWrapper.h */,
+				1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */,
+			);
+			path = keychain;
+			sourceTree = "<group>";
+		};
 		1C75820919B028F70074C601 /* Stats */ = {
 			isa = PBXGroup;
 			children = (
@@ -511,15 +568,6 @@
 				1C75820B19B028F70074C601 /* Scoreboard.m */,
 			);
 			path = Stats;
-			sourceTree = "<group>";
-		};
-		1CA3535B194ED4410042D429 /* OfflineStorage */ = {
-			isa = PBXGroup;
-			children = (
-				1CA3535E194ED4410042D429 /* SFIOfflineDataManager.h */,
-				1CA3535F194ED4410042D429 /* SFIOfflineDataManager.m */,
-			);
-			path = OfflineStorage;
 			sourceTree = "<group>";
 		};
 		1CD1D5331A660B7A00C030E9 /* Notifications */ = {
@@ -569,26 +617,6 @@
 			path = xml;
 			sourceTree = "<group>";
 		};
-		1DF03F912D2886681925010C /* keychain */ = {
-			isa = PBXGroup;
-			children = (
-				1C2350C6195132B500F97EA7 /* KeyChainWrapper.h */,
-				1C2350C7195132B500F97EA7 /* KeyChainWrapper.m */,
-			);
-			path = keychain;
-			sourceTree = "<group>";
-		};
-		2204C2071794288500B05F17 /* network */ = {
-			isa = PBXGroup;
-			children = (
-				2204C208179428B200B05F17 /* SingleTon.h */,
-				2204C209179428B200B05F17 /* SingleTon.m */,
-				1DF03CBFC72431ED1B6B81A3 /* SUnit.m */,
-				1DF033FE398C1B48B1CA5CCC /* SUnit.h */,
-			);
-			name = network;
-			sourceTree = "<group>";
-		};
 		221185B1178D371100EE23ED = {
 			isa = PBXGroup;
 			children = (
@@ -611,6 +639,7 @@
 		221185BC178D371200EE23ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1C414BCA1A79F0AE00C448A4 /* libsqlite3.dylib */,
 				CE15FFAE186844AA00371183 /* Security.framework */,
 				22A76D51179180AE0099CD8F /* libxml2.dylib */,
 				22A19D931797AC7A003E6148 /* SystemConfiguration.framework */,
@@ -625,10 +654,14 @@
 			isa = PBXGroup;
 			children = (
 				CE7EA7DB18978910005DCBA3 /* Base64 */,
+				1C414BC11A79F02600C448A4 /* Db */,
 				CE539F8B17FAD3F900640820 /* Logs */,
+				1C414BE21A79F39600C448A4 /* keychain */,
+				1C414BD91A79F35D00C448A4 /* Network */,
 				1CD1D5331A660B7A00C030E9 /* Notifications */,
+				1C414BCF1A79F2BE00C448A4 /* OfflineStorage */,
+				22A76D2517912B830099CD8F /* parser */,
 				22A76D2417912B6E0099CD8F /* public */,
-				22A76D2317912A110099CD8F /* private */,
 				221185C0178D371200EE23ED /* Supporting Files */,
 				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
 				1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */,
@@ -667,23 +700,12 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		22A76D2317912A110099CD8F /* private */ = {
-			isa = PBXGroup;
-			children = (
-				2204C2071794288500B05F17 /* network */,
-				22A76D2517912B830099CD8F /* parser */,
-				1DF03F912D2886681925010C /* keychain */,
-			);
-			name = private;
-			sourceTree = "<group>";
-		};
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
 				1C3270DB1A243B28007202C1 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
-				1CA3535B194ED4410042D429 /* OfflineStorage */,
 				1C23FBCC19480D6C00E353D1 /* Reachability */,
 				CE5EB63617E852AA00985636 /* models */,
 				CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */,
@@ -869,6 +891,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */,
+				1C414BDE1A79F35D00C448A4 /* SingleTon.h in Headers */,
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
 				22A76D3817912EAC0099CD8F /* LoginResponse.h in Headers */,
 				1C3270E81A243B28007202C1 /* SFIWirelessSummary.h in Headers */,
@@ -898,7 +922,6 @@
 				22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */,
 				22A76D4D179136B80099CD8F /* CommandParser.h in Headers */,
 				CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */,
-				2204C20A179428B200B05F17 /* SingleTon.h in Headers */,
 				CE5EB64117E8549200985636 /* DeviceDataHashResponse.h in Headers */,
 				CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */,
 				22A76D451791339B0099CD8F /* LogoutResponse.h in Headers */,
@@ -908,6 +931,7 @@
 				CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */,
 				CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */,
 				CE2EA27119D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h in Headers */,
+				1C414BC81A79F02600C448A4 /* ZHDatabaseStatement.h in Headers */,
 				1CD1D5581A660B7A00C030E9 /* SFINotificationDevice.h in Headers */,
 				CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */,
 				22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */,
@@ -929,6 +953,7 @@
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
 				1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */,
+				1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */,
 				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
 				CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */,
 				CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */,
@@ -945,6 +970,7 @@
 				22FAE88817A8E528002FFEE8 /* Signup.h in Headers */,
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
 				CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */,
+				1C414BE01A79F35D00C448A4 /* SUnit.h in Headers */,
 				1CD1D54C1A660B7A00C030E9 /* NotificationPreferenceListRequest.h in Headers */,
 				1CD1D55A1A660B7A00C030E9 /* SFINotificationUser.h in Headers */,
 				CE2EA25919D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h in Headers */,
@@ -952,19 +978,18 @@
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
-				1C2350C8195132B500F97EA7 /* KeyChainWrapper.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
 				CEA605B71A113E4E008380D3 /* DynamicNotificationPreferenceList.h in Headers */,
 				1C3270E61A243B28007202C1 /* SFIWirelessSetting.h in Headers */,
-				1CA35362194ED4410042D429 /* SFIOfflineDataManager.h in Headers */,
-				1DF0303A77013C449B86C26B /* SUnit.h in Headers */,
+				1C414BC61A79F02600C448A4 /* ZHDatabase.h in Headers */,
 				1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */,
 				1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */,
 				1DF03ED7951D970D55780A5B /* SFIXmlWriter.h in Headers */,
 				1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */,
 				1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */,
+				1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1133,8 +1158,10 @@
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				22A76D461791339B0099CD8F /* LogoutResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
+				1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */,
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
 				1CD1D5591A660B7A00C030E9 /* SFINotificationDevice.m in Sources */,
+				1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
 				CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */,
@@ -1143,14 +1170,13 @@
 				CE5EB5CB17E722BD00985636 /* AlmondListResponse.m in Sources */,
 				22A76D4A1791347D0099CD8F /* AffiliationUserComplete.m in Sources */,
 				CE5EB63A17E852E500985636 /* SFIDevice.m in Sources */,
+				1C414BDF1A79F35D00C448A4 /* SingleTon.m in Sources */,
 				CE91317219C9A2F900D94876 /* ChangePasswordResponse.m in Sources */,
 				1C3270E71A243B28007202C1 /* SFIWirelessSetting.m in Sources */,
-				1CA35363194ED4410042D429 /* SFIOfflineDataManager.m in Sources */,
 				CE7F218519CC012C008AD4FB /* AlmondAffiliationData.m in Sources */,
 				22A76D4E179136B80099CD8F /* CommandParser.m in Sources */,
 				CE5EB5C717E7204000985636 /* AlmondListRequest.m in Sources */,
 				CE466A581823C2E800E55DF9 /* ValidateAccountRequest.m in Sources */,
-				2204C20B179428B200B05F17 /* SingleTon.m in Sources */,
 				1CD1D5571A660B7A00C030E9 /* NotificationRegistrationResponse.m in Sources */,
 				2204C20F1794349400B05F17 /* GenericCommand.m in Sources */,
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
@@ -1167,6 +1193,7 @@
 				22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */,
 				CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
+				1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */,
 				1CD1D54D1A660B7A00C030E9 /* NotificationPreferenceListRequest.m in Sources */,
 				CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */,
 				CE5EB64A17E86D2200985636 /* DeviceListResponse.m in Sources */,
@@ -1181,12 +1208,13 @@
 				1CD1D54B1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
 				CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */,
-				1C2350C9195132B500F97EA7 /* KeyChainWrapper.m in Sources */,
+				1C414BC91A79F02600C448A4 /* ZHDatabaseStatement.m in Sources */,
 				1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */,
 				CE6DC94617EC60C2006F48C4 /* MobileCommandRequest.m in Sources */,
 				CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */,
 				CEAD85AE19CACE43006D1048 /* UpdateUserProfileRequest.m in Sources */,
 				CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */,
+				1C414BE11A79F35D00C448A4 /* SUnit.m in Sources */,
 				1CD1D5551A660B7A00C030E9 /* NotificationRegistration.m in Sources */,
 				22FAE88917A8E528002FFEE8 /* Signup.m in Sources */,
 				1CD1D5511A660B7A00C030E9 /* NotificationPreferenceResponse.m in Sources */,
@@ -1196,12 +1224,12 @@
 				CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */,
 				CE2EA25A19D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
-				1DF0352850B972F9D28F2BD0 /* SUnit.m in Sources */,
 				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
 				1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */,
 				1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */,
 				1DF03FF5727F64CF4EDF5625 /* SFIXmlWriter.m in Sources */,
 				1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */,
+				1DF03FFBF6EF6243078A2329 /* DatabaseStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
