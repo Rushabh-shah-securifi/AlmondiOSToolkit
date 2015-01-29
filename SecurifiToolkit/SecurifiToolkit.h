@@ -54,7 +54,6 @@
 #import <SecurifiToolkit/SensorChangeResponse.h>
 
 #import <SecurifiToolkit/DynamicAlmondNameChangeResponse.h>
-#import <SecurifiToolkit/SFIOfflineDataManager.h>
 #import <SecurifiToolkit/UserProfileRequest.h>
 #import <SecurifiToolkit/UserProfileResponse.h>
 #import <SecurifiToolkit/BaseCommandRequest.h>
@@ -131,6 +130,9 @@ extern NSString *const kSFIDidDeregisterForNotifications;
 
 // Notification posted when deregistration for notifications failed
 extern NSString *const kSFIDidFailToDeregisterForNotifications;
+
+// Notification posted when a Push/Cloud notification has arrived
+extern NSString *const kSFINotificationDidStore;
 
 // Preferences for device notifications have changed; payload is Almond MAC address
 extern NSString *const kSFINotificationPreferencesDidChange;
@@ -262,6 +264,13 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // kSFINotificationPreferenceChangeActionAdd;
 // kSFINotificationPreferenceChangeActionDelete;
 - (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action;
+
+- (void)storePushNotification:(SFINotification *)notification;
+
+// an array of SFINotification
+- (NSArray *)notifications;
+
+- (void)markNotificationViewed:(SFINotification *)notification;
 
 @end
  

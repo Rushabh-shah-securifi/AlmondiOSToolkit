@@ -9,18 +9,28 @@
 // Represents a single notification
 @interface SFINotification : NSObject <NSCopying, NSCoding>
 
+@property(nonatomic) long notificationId;
+@property(nonatomic, copy) NSString *almondMAC;
 @property(nonatomic) NSTimeInterval time;
 @property(nonatomic) sfi_id deviceId;
-@property(nonatomic) NSString *deviceName;
+@property(nonatomic, copy) NSString *deviceName;
 @property(nonatomic) SFIDeviceType deviceType;
 @property(nonatomic) sfi_id valueIndex;
 @property(nonatomic) SFIDevicePropertyType valueType;
-@property(nonatomic) NSString *value;
+@property(nonatomic, copy) NSString *value; // device value
+@property(nonatomic, copy) NSString *message;
+@property(nonatomic) BOOL viewed;
+
++ (instancetype)parseJson:(NSData*)data;
+
++ (instancetype)parsePayload:(NSDictionary*)payload;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
 
 - (id)copyWithZone:(NSZone *)zone;
+
+- (NSString *)description;
 
 @end

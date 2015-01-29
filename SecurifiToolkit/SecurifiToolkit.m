@@ -20,6 +20,8 @@
 #import "DynamicNotificationPreferenceList.h"
 #import "SFIXmlWriter.h"
 #import "SFINotificationUser.h"
+#import "SFIOfflineDataManager.h"
+#import "DatabaseStore.h"
 #import "NotificationRegistration.h"
 #import "NotificationDeleteRegistrationRequest.h"
 #import "NotificationPreferenceListRequest.h"
@@ -52,6 +54,7 @@ NSString *const kSFIDidRegisterForNotifications = @"kSFIDidRegisterForNotificati
 NSString *const kSFIDidFailToRegisterForNotifications = @"kSFIDidFailToRegisterForNotifications";
 NSString *const kSFIDidDeregisterForNotifications = @"kSFIDidDeregisterForNotifications";
 NSString *const kSFIDidFailToDeregisterForNotifications = @"kSFIDidFailToDeregisterForNotifications";
+NSString *const kSFINotificationDidStore = @"kSFINotificationDidStore";
 NSString *const kSFINotificationPreferencesDidChange = @"kSFINotificationPreferencesDidChange";
 
 NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
@@ -234,6 +237,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) SecurifiConfigurator *config;
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
+@property(nonatomic, readonly) DatabaseStore *notificationsStore;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
@@ -267,6 +271,8 @@ static SecurifiToolkit *singleton = nil;
 
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
+        _notificationsStore = [DatabaseStore new];
+        [_notificationsStore setup];
 
         // default; do not change
         [self setupReachability:config.productionCloudHost];
@@ -1828,6 +1834,21 @@ static SecurifiToolkit *singleton = nil;
     // Update offline storage
     [self.dataManager writeNotificationList:cloudNotificationPrefList currentMAC:currentMAC];
     [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
+}
+
+#pragma mark - Notification access
+
+- (void)storePushNotification:(SFINotification *)notification {
+    [self.notificationsStore storeNotification:notification];
+    [self postNotification:kSFINotificationDidStore data:nil];
+}
+
+- (NSArray *)notifications {
+    return [self.notificationsStore fetchNotifications:100];
+}
+
+- (void)markNotificationViewed:(SFINotification *)notification {
+    [self.notificationsStore markViewed:notification];
 }
 
 @end
