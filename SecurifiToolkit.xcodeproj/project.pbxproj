@@ -47,6 +47,8 @@
 		1C414BE11A79F35D00C448A4 /* SUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BDD1A79F35D00C448A4 /* SUnit.m */; };
 		1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BE31A79F39600C448A4 /* KeyChainWrapper.h */; };
 		1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */; };
+		1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C414BEB1A7B625400C448A4 /* NSDate+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */; };
 		1C75820C19B028F70074C601 /* Scoreboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C75820A19B028F70074C601 /* Scoreboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C75820D19B028F70074C601 /* Scoreboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C75820B19B028F70074C601 /* Scoreboard.m */; };
 		1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */; };
@@ -284,6 +286,8 @@
 		1C414BDD1A79F35D00C448A4 /* SUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUnit.m; sourceTree = "<group>"; };
 		1C414BE31A79F39600C448A4 /* KeyChainWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyChainWrapper.h; sourceTree = "<group>"; };
 		1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainWrapper.m; sourceTree = "<group>"; };
+		1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Convenience.h"; sourceTree = "<group>"; };
+		1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Convenience.m"; sourceTree = "<group>"; };
 		1C75820A19B028F70074C601 /* Scoreboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scoreboard.h; sourceTree = "<group>"; };
 		1C75820B19B028F70074C601 /* Scoreboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scoreboard.m; sourceTree = "<group>"; };
 		1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationRequest.h; sourceTree = "<group>"; };
@@ -561,6 +565,15 @@
 			path = keychain;
 			sourceTree = "<group>";
 		};
+		1C414BE71A7B625400C448A4 /* AppKit */ = {
+			isa = PBXGroup;
+			children = (
+				1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */,
+				1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */,
+			);
+			path = AppKit;
+			sourceTree = "<group>";
+		};
 		1C75820919B028F70074C601 /* Stats */ = {
 			isa = PBXGroup;
 			children = (
@@ -653,6 +666,7 @@
 		221185BF178D371200EE23ED /* SecurifiToolkit */ = {
 			isa = PBXGroup;
 			children = (
+				1C414BE71A7B625400C448A4 /* AppKit */,
 				CE7EA7DB18978910005DCBA3 /* Base64 */,
 				1C414BC11A79F02600C448A4 /* Db */,
 				CE539F8B17FAD3F900640820 /* Logs */,
@@ -954,6 +968,7 @@
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
 				1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */,
 				1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */,
+				1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */,
 				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
 				CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */,
 				CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */,
@@ -1206,6 +1221,7 @@
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				1CD1D54B1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.m in Sources */,
+				1C414BEB1A7B625400C448A4 /* NSDate+Convenience.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
 				CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */,
 				1C414BC91A79F02600C448A4 /* ZHDatabaseStatement.m in Sources */,

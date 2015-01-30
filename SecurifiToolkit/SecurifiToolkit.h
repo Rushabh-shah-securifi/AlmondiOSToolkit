@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #import <SecurifiToolkit/SecurifiTypes.h>
+#import <SecurifiToolkit/NSDate+Convenience.h>
 
 #import <SecurifiToolkit/SecurifiConfigurator.h>
 #import <SecurifiToolkit/GenericCommand.h>

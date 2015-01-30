@@ -8,6 +8,7 @@
 #import "SFINotification.h"
 #import "ZHDatabaseStatement.h"
 #import "SFIDeviceKnownValues.h"
+#import "NSDate+Convenience.h"
 
 #define MAX_NOTIFICATIONS 100
 
@@ -189,9 +190,7 @@ create index notifications_mac on notifications (mac, time);
 
     // Make bucket time as of midnight of that day
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:notification.time];
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *dateComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:date];
-    NSDate *midnight = [gregorian dateFromComponents:dateComponents];
+    NSDate *midnight = [date dateAtMidnight];
     NSTimeInterval midnightTimeInterval = midnight.timeIntervalSince1970;
 
     @synchronized (stmt) {
