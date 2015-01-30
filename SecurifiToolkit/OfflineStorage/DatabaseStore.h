@@ -27,6 +27,8 @@
 
 - (void)deleteNotificationsForAlmond:(NSString *)almondMAC;
 
+- (void)purgeAll;
+
 - (void)markViewed:(SFINotification *)notification;
 
 @end

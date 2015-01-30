@@ -723,9 +723,16 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (void)tearDownLoginSession {
-    [self removeCurrentAlmond];
     [self clearSecCredentials];
+    [self purgeStoredData];
+}
+
+- (void)purgeStoredData {
+    [self removeCurrentAlmond];
     [self.dataManager purgeAll];
+    if (self.configuration.enableNotifications) {
+        [self.notificationsStore purgeAll];
+    }
 }
 
 - (void)onLoginResponse:(NSNotification *)notification {
@@ -1457,6 +1464,9 @@ static SecurifiToolkit *singleton = nil;
     NSArray *newAlmondList = @[];
     for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
         newAlmondList = [self.dataManager deleteAlmond:deleted];
+        if (self.config.enableNotifications) {
+            [self.notificationsStore deleteNotificationsForAlmond:deleted.almondplusMAC];
+        }
     }
 
     // Ensure Current Almond is consistent with new list
@@ -1507,8 +1517,7 @@ static SecurifiToolkit *singleton = nil;
 - (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
     // Manage the "Current selected Almond" value
     if (almondList.count == 0) {
-        [self removeCurrentAlmond];
-        [self.dataManager purgeAll];
+        [self purgeStoredData];
         return nil;
     }
     else if (almondList.count == 1) {

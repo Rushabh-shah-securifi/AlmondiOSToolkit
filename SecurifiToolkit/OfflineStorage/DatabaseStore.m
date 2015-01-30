@@ -166,6 +166,10 @@ create index notifications_mac on notifications (mac, time);
     [stmt execute];
 }
 
+- (void)purgeAll {
+    [self.db execute:@"delete from notifications"];
+}
+
 - (void)markViewed:(SFINotification *)notification {
     if (!notification) {
         return;
