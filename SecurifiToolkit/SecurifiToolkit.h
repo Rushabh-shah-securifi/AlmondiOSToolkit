@@ -265,12 +265,24 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // kSFINotificationPreferenceChangeActionDelete;
 - (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action;
 
+// Stores a notification record that originally entered the system as an Apple Push Notification
 - (void)storePushNotification:(SFINotification *)notification;
 
-// an array of SFINotification
+// an array of all SFINotification, newest to oldest
 - (NSArray *)notifications;
 
 - (void)markNotificationViewed:(SFINotification *)notification;
+
+- (NSInteger)countUnviewedNotifications;
+
+// bucket == day of notification; return count of notifications on that day
+- (NSInteger)countNotificationsForBucket:(NSDate *)bucket;
+
+// returns an array of NSDates, newest to oldest. Dates are normalized to midnight of a day for which there are notifications.
+- (NSArray *)fetchDateBuckets:(int)limit;
+
+// bucket == day of notification; return notifications on that day up to the specified limit; ordered newest to oldest
+- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket limit:(int)limit;
 
 @end
  

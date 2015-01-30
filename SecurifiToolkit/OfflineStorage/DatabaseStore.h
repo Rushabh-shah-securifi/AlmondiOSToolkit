@@ -10,16 +10,22 @@
 
 @interface DatabaseStore : NSObject
 
-//todo delete notifications on removal of almond
-//todo auto-group notifications by date
-
 - (void)setup;
 
 - (void)storeNotification:(SFINotification *)notification;
 
 - (NSInteger)countUnviewedNotifications;
 
+- (NSInteger)countNotificationsForBucket:(NSDate *)date;
+
+// returns an array of NSDates, newest to oldest. Dates are normalized to midnight of a day for which there are notifications.
+- (NSArray *)fetchDateBuckets:(int)limit;
+
 - (NSArray *)fetchNotifications:(int)limit;
+
+- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket limit:(int)limit;
+
+- (void)deleteNotificationsForAlmond:(NSString *)almondMAC;
 
 - (void)markViewed:(SFINotification *)notification;
 

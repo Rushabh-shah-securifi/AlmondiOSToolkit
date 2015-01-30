@@ -9,6 +9,8 @@
 
 @implementation SFINotification
 
+@dynamic message;
+
 /*
 mac             => mac
 users           => users
@@ -66,22 +68,23 @@ Value           => indexvalue
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
+        self.notificationId = [coder decodeIntForKey:@"self.notificationId"];
         self.almondMAC = [coder decodeObjectForKey:@"self.almondMAC"];
         self.time = [coder decodeDoubleForKey:@"self.time"];
         self.deviceId = (sfi_id) [coder decodeInt64ForKey:@"self.deviceId"];
         self.deviceName = [coder decodeObjectForKey:@"self.deviceName"];
-        self.deviceType = (SFIDeviceType)
-        [coder decodeIntForKey:@"self.deviceType"];
+        self.deviceType = (SFIDeviceType) [coder decodeIntForKey:@"self.deviceType"];
         self.valueIndex = (sfi_id) [coder decodeInt64ForKey:@"self.valueIndex"];
-        self.valueType = (SFIDevicePropertyType)
-        [coder decodeIntForKey:@"self.valueType"];
+        self.valueType = (SFIDevicePropertyType) [coder decodeIntForKey:@"self.valueType"];
         self.value = [coder decodeObjectForKey:@"self.value"];
+        self.viewed = [coder decodeBoolForKey:@"self.viewed"];
     }
 
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInt:self.notificationId forKey:@"self.notificationId"];
     [coder encodeObject:self.almondMAC forKey:@"self.almondMAC"];
     [coder encodeDouble:self.time forKey:@"self.time"];
     [coder encodeInt64:self.deviceId forKey:@"self.deviceId"];
@@ -90,12 +93,14 @@ Value           => indexvalue
     [coder encodeInt64:self.valueIndex forKey:@"self.valueIndex"];
     [coder encodeInt:self.valueType forKey:@"self.valueType"];
     [coder encodeObject:self.value forKey:@"self.value"];
+    [coder encodeBool:self.viewed forKey:@"self.viewed"];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
     SFINotification *copy = (SFINotification *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
+        copy.notificationId = self.notificationId;
         copy.almondMAC = self.almondMAC;
         copy.time = self.time;
         copy.deviceId = self.deviceId;
@@ -104,6 +109,7 @@ Value           => indexvalue
         copy.valueIndex = self.valueIndex;
         copy.valueType = self.valueType;
         copy.value = self.value;
+        copy.viewed = self.viewed;
     }
 
     return copy;
@@ -125,5 +131,9 @@ Value           => indexvalue
     return description;
 }
 
+- (NSString *)message {
+    //todo synthesize an actual message
+    return [NSString stringWithFormat:@"%@: %@", self.deviceName, self.value];
+}
 
 @end

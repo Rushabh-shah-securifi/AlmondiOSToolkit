@@ -271,8 +271,11 @@ static SecurifiToolkit *singleton = nil;
 
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
-        _notificationsStore = [DatabaseStore new];
-        [_notificationsStore setup];
+
+        if (config.enableNotifications) {
+            _notificationsStore = [DatabaseStore new];
+            [_notificationsStore setup];
+        }
 
         // default; do not change
         [self setupReachability:config.productionCloudHost];
@@ -1839,16 +1842,53 @@ static SecurifiToolkit *singleton = nil;
 #pragma mark - Notification access
 
 - (void)storePushNotification:(SFINotification *)notification {
+    if (!self.config.enableNotifications) {
+        return;
+    }
     [self.notificationsStore storeNotification:notification];
     [self postNotification:kSFINotificationDidStore data:nil];
 }
 
 - (NSArray *)notifications {
+    if (!self.config.enableNotifications) {
+        return [NSArray array];
+    }
     return [self.notificationsStore fetchNotifications:100];
 }
 
 - (void)markNotificationViewed:(SFINotification *)notification {
+    if (!self.config.enableNotifications) {
+        return;
+    }
     [self.notificationsStore markViewed:notification];
+}
+
+- (NSInteger)countUnviewedNotifications {
+    if (!self.config.enableNotifications) {
+        return 0;
+    }
+    return [self.notificationsStore countUnviewedNotifications];
+}
+
+- (NSInteger)countNotificationsForBucket:(NSDate *)bucket {
+    if (!self.config.enableNotifications) {
+        return 0;
+    }
+    return [self.notificationsStore countNotificationsForBucket:bucket];
+}
+
+- (NSArray *)fetchDateBuckets:(int)limit {
+    if (!self.config.enableNotifications) {
+        return [NSArray array];
+    }
+    return [self.notificationsStore fetchDateBuckets:limit];
+}
+
+- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket limit:(int)limit {
+    if (!self.config.enableNotifications) {
+        return [NSArray array];
+    }
+    return [self.notificationsStore fetchNotificationsForBucket:bucket limit:limit];
 }
 
 @end

@@ -29,6 +29,7 @@ create table notifications (
     id integer primary key,
     mac varchar(24),
     users varchar(128),
+    date_bucket double,
     time double,
     data text,
     deviceid integer,
@@ -36,7 +37,6 @@ create table notifications (
     value_index integer,
     value_indexname varchar(256),
     indexvalue varchar(20),
-    message text,
     viewed integer
 );
 
@@ -48,6 +48,9 @@ create index notifications_mac on notifications (mac, time);
 @interface DatabaseStore ()
 @property(nonatomic, readonly) ZHDatabase *db;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
+@property(nonatomic, readonly) ZHDatabaseStatement *fetch_date_buckets;
+@property(nonatomic, readonly) ZHDatabaseStatement *count_for_date_bucket;
+@property(nonatomic, readonly) ZHDatabaseStatement *fetch_recs_for_date_buckets;
 @property(nonatomic, readonly) ZHDatabaseStatement *mark_viewed_notification;
 @end
 
@@ -60,16 +63,21 @@ create index notifications_mac on notifications (mac, time);
     _db = [[ZHDatabase alloc] initWithPath:db_path];
 
     if (!exists) {
-        [self.db execute:@"create table notifications (id integer primary key, mac varchar(24), users varchar(128), time double, data text, deviceid integer, devicename varchar(256), value_index integer, value_indexname varchar(256), indexvalue varchar(20), message text, viewed integer);"];
+        [self.db execute:@"create table notifications (id integer primary key, mac varchar(24), users varchar(128), date_bucket double, time double, data text, deviceid integer, devicename varchar(256), value_index integer, value_indexname varchar(256), indexvalue varchar(20), viewed integer);"];
+        [self.db execute:@"create index notifications_bucket on notifications (date_bucket, time);"];
         [self.db execute:@"create index notifications_time on notifications (time);"];
         [self.db execute:@"create index notifications_mac on notifications (mac, time);"];
+        [self.db execute:@"create index notifications_mac_bucket on notifications (mac, date_bucket, time);"];
     }
 
-    _insert_notification = [self.db newStatement:@"insert into notifications (mac, users, time, data, deviceid, devicename, value_index, value_indexname, indexvalue, message, viewed) values (?,?,?,?,?,?,?,?,?,?,?)"];
+    _insert_notification = [self.db newStatement:@"insert into notifications (mac, users, date_bucket, time, data, deviceid, devicename, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?)"];
+    _fetch_date_buckets = [self.db newStatement:@"select distinct(date_bucket) from notifications order by time desc limit ?"];
+    _count_for_date_bucket = [self.db newStatement:@"select count(*) from notifications where date_bucket=?"];
+    _fetch_recs_for_date_buckets = [self.db newStatement:@"select id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue from notifications where date_bucket=? order by time desc limit ?"];
     _mark_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where id=?"];
 }
 
-- (void)storeNotification:(SFINotification*)notification {
+- (void)storeNotification:(SFINotification *)notification {
     if (!notification) {
         return;
     }
@@ -82,10 +90,46 @@ create index notifications_mac on notifications (mac, time);
     return [self.db executeReturnInteger:@"select count(*) from notifications where viewed=0"];
 }
 
-- (NSArray*)fetchNotifications:(int)limit {
+- (NSInteger)countNotificationsForBucket:(NSDate *)date {
+    if (date == nil) {
+        return 0;
+    }
+
+    ZHDatabaseStatement *stmt = self.count_for_date_bucket;
+
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextTimeInterval:date.timeIntervalSince1970];
+        NSInteger value = stmt.executeReturnInteger;
+        [stmt reset];
+        return value;
+    }
+}
+
+- (NSArray *)fetchDateBuckets:(int)limit {
+    ZHDatabaseStatement *stmt = self.fetch_date_buckets;
+    NSMutableArray *results = [NSMutableArray new];
+
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextInteger:limit];
+
+        while ([stmt step]) {
+            NSTimeInterval interval = stmt.stepNextTimeInterval;
+            NSDate *date = [NSDate dateWithTimeIntervalSince1970:interval];
+            [results addObject:date];
+        }
+
+        [stmt reset];
+    }
+
+    return results;
+}
+
+- (NSArray *)fetchNotifications:(int)limit {
     ZHDatabaseStatement *stmt = [self.db newStatement:@"select id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue from notifications order by time desc limit ?"];
     [stmt bindNextInteger:limit];
-    
+
     NSMutableArray *results = [NSMutableArray array];
     while ([stmt step]) {
         SFINotification *obj = [self readRecord:stmt];
@@ -94,6 +138,31 @@ create index notifications_mac on notifications (mac, time);
 
     [stmt reset];
     return results;
+}
+
+- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket limit:(int)limit {
+    ZHDatabaseStatement *stmt = self.fetch_recs_for_date_buckets;
+
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextTimeInterval:bucket.timeIntervalSince1970];
+        [stmt bindNextInteger:limit];
+
+        NSMutableArray *results = [NSMutableArray array];
+        while ([stmt step]) {
+            SFINotification *obj = [self readRecord:stmt];
+            [results addObject:obj];
+        }
+
+        [stmt reset];
+        return results;
+    }
+}
+
+- (void)deleteNotificationsForAlmond:(NSString *)almondMAC {
+    ZHDatabaseStatement *stmt = [self.db newStatement:@"delete from notifications where mac=?"];
+    [stmt bindNextText:almondMAC];
+    [stmt execute];
 }
 
 - (void)markViewed:(SFINotification *)notification {
@@ -118,11 +187,19 @@ create index notifications_mac on notifications (mac, time);
 
     NSString *valueType = [SFIDeviceKnownValues propertyTypeToName:notification.valueType];
 
+    // Make bucket time as of midnight of that day
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:notification.time];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSDateComponents *dateComponents = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:date];
+    NSDate *midnight = [gregorian dateFromComponents:dateComponents];
+    NSTimeInterval midnightTimeInterval = midnight.timeIntervalSince1970;
+
     @synchronized (stmt) {
         [stmt reset];
         [stmt bindNextText:notification.almondMAC];
         [stmt bindNextText:@""]; // users
-        [stmt bindNextTimeInterval:notification.time];
+        [stmt bindNextTimeInterval:midnightTimeInterval]; // bucket
+        [stmt bindNextTimeInterval:notification.time]; // full-time
         [stmt bindNextText:@""]; // data
         [stmt bindNextInteger:notification.deviceId];
         [stmt bindNextText:notification.deviceName];
@@ -131,7 +208,6 @@ create index notifications_mac on notifications (mac, time);
         [stmt bindNextText:valueType];
 
         [stmt bindNextText:notification.value];
-        [stmt bindNextText:notification.message];
         [stmt bindNextBool:NO]; // viewed
 
         BOOL success = [stmt execute];
@@ -158,7 +234,6 @@ create index notifications_mac on notifications (mac, time);
     obj.valueType = [SFIDeviceKnownValues nameToPropertyType:valueTypeName];
 
     obj.value = stmt.stepNextString;
-    obj.message = stmt.stepNextString;
     obj.viewed = stmt.stepNextBool;
 
     return obj;
@@ -179,7 +254,7 @@ create index notifications_mac on notifications (mac, time);
     return dbPath;
 }
 
-- (BOOL)fileExists:(NSString*)filePath {
+- (BOOL)fileExists:(NSString *)filePath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     return [fileManager fileExistsAtPath:filePath];
 }
