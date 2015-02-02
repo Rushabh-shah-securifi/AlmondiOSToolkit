@@ -774,12 +774,14 @@ static SecurifiToolkit *singleton = nil;
 - (void)onLogoutAllResponse:(NSNotification *)notification {
     NSDictionary *info = notification.userInfo;
     LoginResponse *res = info[@"data"];
+
     if (res.isSuccessful) {
         DLog(@"SDK received success on Logout All");
         [self tearDownLoginSession];
         [self tearDownNetworkSingleton];
-        [self postNotification:kSFIDidLogoutAllNotification data:nil];
     }
+
+    [self postNotification:kSFIDidLogoutAllNotification data:res];
 }
 
 - (void)onDeleteAccountResponse:(NSNotification *)notification {
