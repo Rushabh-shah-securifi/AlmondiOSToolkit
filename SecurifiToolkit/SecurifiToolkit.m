@@ -55,6 +55,7 @@ NSString *const kSFIDidFailToRegisterForNotifications = @"kSFIDidFailToRegisterF
 NSString *const kSFIDidDeregisterForNotifications = @"kSFIDidDeregisterForNotifications";
 NSString *const kSFIDidFailToDeregisterForNotifications = @"kSFIDidFailToDeregisterForNotifications";
 NSString *const kSFINotificationDidStore = @"kSFINotificationDidStore";
+NSString *const kSFINotificationDidMarkViewed = @"kSFINotificationDidMarkViewed";
 NSString *const kSFINotificationPreferencesDidChange = @"kSFINotificationPreferencesDidChange";
 
 NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
@@ -1872,6 +1873,7 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
     [self.notificationsStore markViewed:notification];
+    [self postNotification:kSFINotificationDidMarkViewed data:nil];
 }
 
 - (NSInteger)countUnviewedNotifications {

@@ -134,6 +134,7 @@ extern NSString *const kSFIDidFailToDeregisterForNotifications;
 
 // Notification posted when a Push/Cloud notification has arrived
 extern NSString *const kSFINotificationDidStore;
+extern NSString *const kSFINotificationDidMarkViewed;
 
 // Preferences for device notifications have changed; payload is Almond MAC address
 extern NSString *const kSFINotificationPreferencesDidChange;
