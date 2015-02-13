@@ -156,10 +156,10 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
             return [NSString stringWithFormat:@"GENERIC_COMMAND_RESPONSE_%d", type];
         case CommandType_GENERIC_COMMAND_NOTIFICATION:
             return [NSString stringWithFormat:@"GENERIC_COMMAND_NOTIFICATION_%d", type];
-        case CommandType_SENSOR_CHANGE_REQUEST:
-            return [NSString stringWithFormat:@"SENSOR_CHANGE_REQUEST_%d", type];
-        case CommandType_SENSOR_CHANGE_RESPONSE:
-            return [NSString stringWithFormat:@"SENSOR_CHANGE_RESPONSE_%d", type];
+//        case CommandType_SENSOR_CHANGE_REQUEST:
+//            return [NSString stringWithFormat:@"SENSOR_CHANGE_REQUEST_%d", type];
+//        case CommandType_SENSOR_CHANGE_RESPONSE:
+//            return [NSString stringWithFormat:@"SENSOR_CHANGE_RESPONSE_%d", type];
         case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST:
             return [NSString stringWithFormat:@"DEVICE_DATA_FORCED_UPDATE_REQUEST_%d", type];
         case CommandType_ALMOND_NAME_CHANGE_REQUEST:
@@ -238,7 +238,8 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) SecurifiConfigurator *config;
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
-@property(nonatomic, readonly) DatabaseStore *notificationsStore;
+@property(nonatomic, readonly) DatabaseStore *databaseStore;
+@property(nonatomic, readonly) id <SFINotificationStore> notificationsStore;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
@@ -274,8 +275,9 @@ static SecurifiToolkit *singleton = nil;
         _dataManager = [SFIOfflineDataManager new];
 
         if (config.enableNotifications) {
-            _notificationsStore = [DatabaseStore new];
-            [_notificationsStore setup];
+            _databaseStore = [DatabaseStore new];
+            [_databaseStore setup];
+            _notificationsStore = [_databaseStore newStore];
         }
 
         // default; do not change
@@ -732,7 +734,7 @@ static SecurifiToolkit *singleton = nil;
     [self removeCurrentAlmond];
     [self.dataManager purgeAll];
     if (self.configuration.enableNotifications) {
-        [self.notificationsStore purgeAll];
+        [self.databaseStore purgeAll];
     }
 }
 
@@ -1163,16 +1165,16 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-    NotificationPreferences *notificationPrefChange = [NotificationPreferences new];
-    notificationPrefChange.action = action;
-    notificationPrefChange.almondMAC = almondMAC;
-    notificationPrefChange.userID = [self loginEmail];
-    notificationPrefChange.preferenceCount = (int) [deviceList count];
-    notificationPrefChange.notificationDeviceList = deviceList;
+    NotificationPreferences *prefChange = [NotificationPreferences new];
+    prefChange.action = action;
+    prefChange.almondMAC = almondMAC;
+    prefChange.userID = [self loginEmail];
+    prefChange.preferenceCount = (int) [deviceList count];
+    prefChange.notificationDeviceList = deviceList;
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
-    cmd.command = notificationPrefChange;
+    cmd.command = prefChange;
 
     [self asyncSendToCloud:cmd];
 }
@@ -1468,7 +1470,7 @@ static SecurifiToolkit *singleton = nil;
     for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
         newAlmondList = [self.dataManager deleteAlmond:deleted];
         if (self.config.enableNotifications) {
-            [self.notificationsStore deleteNotificationsForAlmond:deleted.almondplusMAC];
+            [self.databaseStore deleteNotificationsForAlmond:deleted.almondplusMAC];
         }
     }
 
@@ -1857,7 +1859,7 @@ static SecurifiToolkit *singleton = nil;
     if (!self.config.enableNotifications) {
         return;
     }
-    [self.notificationsStore storeNotification:notification];
+    [self.databaseStore storeNotification:notification];
     [self postNotification:kSFINotificationDidStore data:nil];
 }
 
@@ -1883,25 +1885,8 @@ static SecurifiToolkit *singleton = nil;
     return [self.notificationsStore countUnviewedNotifications];
 }
 
-- (NSInteger)countNotificationsForBucket:(NSDate *)bucket {
-    if (!self.config.enableNotifications) {
-        return 0;
-    }
-    return [self.notificationsStore countNotificationsForBucket:bucket];
-}
-
-- (NSArray *)fetchDateBuckets:(int)limit {
-    if (!self.config.enableNotifications) {
-        return [NSArray array];
-    }
-    return [self.notificationsStore fetchDateBuckets:limit];
-}
-
-- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket limit:(int)limit {
-    if (!self.config.enableNotifications) {
-        return [NSArray array];
-    }
-    return [self.notificationsStore fetchNotificationsForBucket:bucket limit:limit];
+- (id <SFINotificationStore>)newNotificationStore {
+    return [self.databaseStore newStore];
 }
 
 @end

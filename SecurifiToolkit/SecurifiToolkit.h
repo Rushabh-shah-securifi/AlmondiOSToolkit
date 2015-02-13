@@ -88,6 +88,7 @@
 //#import <SecurifiToolkit/NotificationPreferenceResponse.h>
 #import <SecurifiToolkit/SFINotificationDevice.h>
 #import <SecurifiToolkit/SFINotification.h>
+#import <SecurifiToolkit/SFINotificationStore.h>
 
 @class SecurifiConfigurator;
 
@@ -277,14 +278,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (NSInteger)countUnviewedNotifications;
 
-// bucket == day of notification; return count of notifications on that day
-- (NSInteger)countNotificationsForBucket:(NSDate *)bucket;
-
-// returns an array of NSDates, newest to oldest. Dates are normalized to midnight of a day for which there are notifications.
-- (NSArray *)fetchDateBuckets:(int)limit;
-
-// bucket == day of notification; return notifications on that day up to the specified limit; ordered newest to oldest
-- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket limit:(int)limit;
+- (id <SFINotificationStore>)newNotificationStore;
 
 @end
  
