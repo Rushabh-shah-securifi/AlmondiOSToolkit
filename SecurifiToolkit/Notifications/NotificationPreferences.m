@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Nirav Uchat. All rights reserved.
 //
 
+#import "BaseCommandRequest.h"
 #import "NotificationPreferences.h"
 #import "SFIXmlWriter.h"
 #import "SFINotificationDevice.h"
