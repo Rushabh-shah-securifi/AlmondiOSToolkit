@@ -1837,19 +1837,19 @@ static SecurifiToolkit *singleton = nil;
     // Get the email id of current user
     NSString *loggedInUser = [self loginEmail];
 
-    //Get the notification list of that current user from offline storage
+    // Get the notification list of that current user from offline storage
     NSMutableArray *notificationPrefUserList = obj.notificationUserList;
 
-    NSArray *cloudNotificationPrefList = obj.notificationUserList;
+    NSArray *notificationList = obj.notificationUserList;
     for (SFINotificationUser *currentUser in notificationPrefUserList) {
         if ([currentUser.userID isEqualToString:loggedInUser]) {
-            cloudNotificationPrefList = currentUser.notificationDeviceList;
+            notificationList = currentUser.notificationDeviceList;
             break;
         }
     }
 
     // Update offline storage
-    [self.dataManager writeNotificationList:cloudNotificationPrefList currentMAC:currentMAC];
+    [self.dataManager writeNotificationList:notificationList currentMAC:currentMAC];
     [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
 }
 

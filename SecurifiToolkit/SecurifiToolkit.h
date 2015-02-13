@@ -78,14 +78,6 @@
 #import <SecurifiToolkit/SFIWirelessSummary.h>
 #import <SecurifiToolkit/SFIWirelessUsers.h>
 
-//#import <SecurifiToolkit/NotificationRegistration.h>
-//#import <SecurifiToolkit/NotificationRegistrationResponse.h>
-//#import <SecurifiToolkit/NotificationDeleteRegistrationRequest.h>
-//#import <SecurifiToolkit/NotificationDeleteRegistrationResponse.h>
-//#import <SecurifiToolkit/NotificationPreferenceListRequest.h>
-//#import <SecurifiToolkit/NotificationPreferenceListResponse.h>
-//#import <SecurifiToolkit/NotificationPreferences.h>
-//#import <SecurifiToolkit/NotificationPreferenceResponse.h>
 #import <SecurifiToolkit/SFINotificationDevice.h>
 #import <SecurifiToolkit/SFINotification.h>
 #import <SecurifiToolkit/SFINotificationStore.h>
