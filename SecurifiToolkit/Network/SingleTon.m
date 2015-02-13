@@ -613,9 +613,6 @@
                                             break;
                                         }
 
-                                            //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
-                                            //Push Notification - START
-                                            /*
                                         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:{
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:temp.command];
@@ -644,8 +641,7 @@
                                             [self postData:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                             */
-                                            //Push Notification - END
+
                                         default:
                                             break;
                                     }
@@ -1122,13 +1118,13 @@
                 case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
                 case CommandType_NOTIFICATION_REGISTRATION:
                 case CommandType_NOTIFICATION_DEREGISTRATION:
+                case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
                 case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST: {
                     id <SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
                     break;
                 }
                 case CommandType_ALMOND_NAME_CHANGE_REQUEST:
-                case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
                     id <SecurifiCommand> cmd = obj.command;
                     //Send as Command 61
