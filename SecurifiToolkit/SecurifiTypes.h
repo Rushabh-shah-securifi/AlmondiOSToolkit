@@ -129,6 +129,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
 };
 
 typedef NS_ENUM(unsigned int, SFINotificationMode) {
+    SFINotificationMode_off                     = 0,
     SFINotificationMode_always                  = 1,
     SFINotificationMode_home                    = 2,
     SFINotificationMode_away                    = 3,
