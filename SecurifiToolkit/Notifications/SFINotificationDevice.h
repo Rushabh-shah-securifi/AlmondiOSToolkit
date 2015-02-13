@@ -7,11 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiTypes.h"
 
+/**
+* Represents a notification preference setting for a device value index (property) for a specific device.
+* A device having multiple properties will be managed by multiple instances of this class, one for each property.
+*/
 @interface SFINotificationDevice : NSObject
-@property(nonatomic) unsigned int deviceID;
+@property(nonatomic) sfi_id deviceID;
 @property(nonatomic) unsigned int valueIndex;
-@property(nonatomic) unsigned int notificationMode;
+@property(nonatomic) SFINotificationMode notificationMode;
 
 - (id)initWithCoder:(NSCoder *)coder;
 

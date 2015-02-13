@@ -9,12 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "SecurifiTypes.h"
 
-typedef NS_ENUM(unsigned int, SFINotificationMode) {
-    SFINotificationMode_always                  = 1,
-    SFINotificationMode_home                    = 2,
-    SFINotificationMode_away                    = 3,
-};
-
 @class SFIDeviceValue;
 @class SFIDeviceKnownValues;
 

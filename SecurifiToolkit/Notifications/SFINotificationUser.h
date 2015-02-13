@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface SFINotificationUser : NSObject <NSCoding, NSCopying>
+
 @property(nonatomic, copy) NSString *userID;
 @property(nonatomic) int preferenceCount;
 @property(nonatomic, copy) NSArray *notificationDeviceList; // instances of SFINotificationDevice

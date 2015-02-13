@@ -12,11 +12,11 @@
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
-        self.deviceID = (unsigned int)[coder decodeIntForKey:@"self.deviceID"];
+        self.deviceID = (sfi_id) [coder decodeIntForKey:@"self.deviceID"];
         self.valueIndex = (unsigned int) [coder decodeIntForKey:@"self.valueIndex"];
-        self.notificationMode = (unsigned int) [coder decodeIntegerForKey:@"self.notificationMode"];
+        self.notificationMode = (SFINotificationMode) (unsigned int) [coder decodeIntegerForKey:@"self.notificationMode"];
     }
-    
+
     return self;
 }
 
@@ -37,13 +37,13 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     SFINotificationDevice *copy = (SFINotificationDevice *) [[[self class] allocWithZone:zone] init];
-    
+
     if (copy != nil) {
         copy.deviceID = self.deviceID;
         copy.valueIndex = self.valueIndex;
         copy.notificationMode = self.notificationMode;
     }
-    
+
     return copy;
 }
 @end
