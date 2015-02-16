@@ -545,8 +545,11 @@
                                             [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command commandType:commandType];
                                             break;
                                         }
+                                        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
+                                            [self postDataDynamic:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER data:temp.command commandType:commandType];
+                                            break;
+                                        }
 
-                                            //PY 150914 - Account Settings
                                         case CommandType_USER_PROFILE_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:USER_PROFILE_NOTIFIER data:temp.command];
@@ -601,6 +604,12 @@
                                             break;
                                         }
 
+                                        case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:commandType];
+                                            [self postData:ALMOND_MODE_CHANGE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+
                                         case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
@@ -613,9 +622,6 @@
                                             break;
                                         }
 
-                                            //TODO: PY121214 - Uncomment later when Push Notification is implemented on cloud
-                                            //Push Notification - START
-                                            /*
                                         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:{
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:temp.command];
@@ -644,8 +650,7 @@
                                             [self postData:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                             */
-                                            //Push Notification - END
+
                                         default:
                                             break;
                                     }
@@ -981,7 +986,7 @@
 
     dispatch_queue_t queue = self.initializationQueue;
     BOOL waitForInit = NO;
-    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit];
+    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:5];
 }
 
 - (BOOL)submitCommand:(GenericCommand *)command {
@@ -1010,13 +1015,13 @@
             break;
     }
 
-    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit];
+    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:0];
 }
 
 // we manage two different queues, one for initializing the network, and one for normal network operation.
 // this mechanism allows the initialization logic to be determined by the toolkit as responses are returned.
 // when initializing, the normal command queue blocks on the network_initialized_latch semaphore
-- (BOOL)internalSubmitCommand:(GenericCommand *)command queue:(dispatch_queue_t)queue waitForNetworkInitializedLatch:(BOOL)waitForNetworkInitializedLatch {
+- (BOOL)internalSubmitCommand:(GenericCommand *)command queue:(dispatch_queue_t)queue waitForNetworkInitializedLatch:(BOOL)waitForNetworkInitializedLatch waitAtMostSecs:(int)waitAtMostSecs {
     if (self.networkShutdown) {
         DLog(@"SubmitCommand failed: network is shutdown");
         return NO;
@@ -1058,7 +1063,7 @@
 
         SLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
 
-        int const waitAtMostSecs = 5;
+//        int const waitAtMostSecs = 1;
         [unit waitForResponse:waitAtMostSecs];
 
         SLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
@@ -1122,13 +1127,16 @@
                 case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
                 case CommandType_NOTIFICATION_REGISTRATION:
                 case CommandType_NOTIFICATION_DEREGISTRATION:
+                case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
                 case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST: {
                     id <SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
                     break;
                 }
+
+                // Commands that transfer in Command 61 container
                 case CommandType_ALMOND_NAME_CHANGE_REQUEST:
-                case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
+                case CommandType_ALMOND_MODE_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
                     id <SecurifiCommand> cmd = obj.command;
                     //Send as Command 61
@@ -1136,6 +1144,7 @@
                     commandPayload = [cmd toXml];
                     break;
                 }
+
                 case CommandType_LOGOUT_COMMAND: {
                     commandPayload = LOGOUT_REQUEST_XML;
                     break;
