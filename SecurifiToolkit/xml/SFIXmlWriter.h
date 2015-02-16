@@ -9,6 +9,7 @@
 
 // <elementName>text</elementName>
 - (void)addElement:(NSString *)elementName text:(NSString*)text;
+- (void)addElement:(NSString *)elementName intValue:(NSInteger)value;
 
 // <elementName....
 - (void)startElement:(NSString *)elementName;

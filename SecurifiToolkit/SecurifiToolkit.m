@@ -29,6 +29,9 @@
 #import "NotificationRegistrationResponse.h"
 #import "NotificationDeleteRegistrationResponse.h"
 #import "NotificationPreferences.h"
+#import "AlmondModeChangeRequest.h"
+#import "AlmondModeChangeResponse.h"
+#import "DynamicAlmondModeChange.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -47,6 +50,8 @@ NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
 NSString *const kSFIDidChangeCurrentAlmond = @"kSFIDidChangeCurrentAlmond";
 NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
+NSString *const kSFIDidCompleteAlmondModeChangeRequest = @"kSFIDidCompleteAlmondChangeRequest";
+NSString *const kSFIAlmondModeDidChange = @"kSFIAlmondModeDidChange";
 NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
 NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
@@ -166,6 +171,10 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
             return [NSString stringWithFormat:@"ALMOND_NAME_CHANGE_REQUEST_%d", type];
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
             return [NSString stringWithFormat:@"ALMOND_NAME_CHANGE_RESPONSE_%d", type];
+        case CommandType_ALMOND_MODE_CHANGE_REQUEST:
+            return [NSString stringWithFormat:@"ALMOND_MODE_CHANGE_REQUEST_%d", type];
+        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:
+            return [NSString stringWithFormat:@"ALMOND_MODE_CHANGE_RESPONSE_%d", type];
         case CommandType_CHANGE_PASSWORD_REQUEST:
             return [NSString stringWithFormat:@"CHANGE_PASSWORD_REQUEST_%d", type];
         case CommandType_CHANGE_PASSWORD_RESPONSE:
@@ -315,6 +324,9 @@ static SecurifiToolkit *singleton = nil;
             [center addObserver:self selector:@selector(onNotificationDeregistrationResponseCallback:) name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+
+            [center addObserver:self selector:@selector(onAlmondModeChangeCompletion:) name:ALMOND_MODE_CHANGE_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onAlmondModeChange:) name:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER object:nil];
         }
     }
 
@@ -349,6 +361,7 @@ static SecurifiToolkit *singleton = nil;
         [center removeObserver:self name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
         [center removeObserver:self name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
         [center removeObserver:self name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+        [center removeObserver:self name:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER object:nil];
     }
 }
 
@@ -1158,6 +1171,25 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
+- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMAC mode:(SFIAlmondNotificationMode)newMode {
+    if (almondMAC == nil) {
+        SLog(@"asyncRequestAlmondModeChange : almond MAC is nil");
+        return 0;
+    }
+
+    AlmondModeChangeRequest *req = [AlmondModeChangeRequest new];
+    req.almondMAC = almondMAC;
+    req.mode = newMode;
+    req.userId = [self loginEmail];
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
+    cmd.command = req;
+
+    [self asyncSendToCloud:cmd];
+
+    return req.correlationId;
+}
 
 - (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action {
     if (almondMAC == nil) {
@@ -1887,6 +1919,39 @@ static SecurifiToolkit *singleton = nil;
 
 - (id <SFINotificationStore>)newNotificationStore {
     return [self.databaseStore newStore];
+}
+
+#pragma mark - Almond mode change
+
+- (void)onAlmondModeChangeCompletion:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+//    AlmondModeChangeResponse *res = [data valueForKey:@"data"];
+    NSString *notification  = kSFIDidCompleteAlmondModeChangeRequest;
+    [self postNotification:notification data:nil];
+}
+
+- (void)onAlmondModeChange:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    DynamicAlmondModeChange *res = [data valueForKey:@"data"];
+    if (res == nil) {
+        return;
+    }
+
+    if (!res.success) {
+        return;
+    }
+
+    [self postNotification:kSFIAlmondModeDidChange data:res];
 }
 
 @end

@@ -81,6 +81,7 @@
 #import <SecurifiToolkit/SFINotificationDevice.h>
 #import <SecurifiToolkit/SFINotification.h>
 #import <SecurifiToolkit/SFINotificationStore.h>
+#import <SecurifiToolkit/SFIAlmondMode.h>
 
 @class SecurifiConfigurator;
 
@@ -103,6 +104,13 @@ extern NSString *const kSFIDidUpdateAlmondList;
 
 // Notification posted when an Almond's name has changed
 extern NSString *const kSFIDidChangeAlmondName;
+
+// Notification posted when a request for an Almond mode change has completed
+extern NSString *const kSFIDidCompleteAlmondModeChangeRequest;
+
+// Notification posted when an Almond Mode has changed;
+// payload contains an instance of SFIAlmondMode
+extern NSString *const kSFIAlmondModeDidChange;
 
 // Notification posted when a device has been added or removed. Does not post on changes to attributes like device names.
 extern NSString *const kSFIDidChangeDeviceList;
@@ -254,6 +262,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken;
 - (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
+
+// Send a command to change the notification mode for the specific almond
+- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMAC mode:(SFIAlmondNotificationMode)newMode;
 
 // Send a command to configure notifications for the specified devices. Supported actions are:
 // kSFINotificationPreferenceChangeActionAdd;

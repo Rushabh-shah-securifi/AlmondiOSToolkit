@@ -128,6 +128,13 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_USER_CODE,
 };
 
+// Per almond "mode" setting indicating
+typedef NS_ENUM(unsigned int, SFIAlmondNotificationMode) {
+    SFIAlmondNotificationMode_home              = 2,
+    SFIAlmondNotificationMode_away              = 3,
+};
+
+// Per device notification preferences
 typedef NS_ENUM(unsigned int, SFINotificationMode) {
     SFINotificationMode_off                     = 0,
     SFINotificationMode_always                  = 1,

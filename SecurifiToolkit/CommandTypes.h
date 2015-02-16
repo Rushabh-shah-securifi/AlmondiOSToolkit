@@ -38,6 +38,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DYNAMIC_ALMOND_DELETE                   = 84,
     CommandType_DYNAMIC_ALMOND_NAME_CHANGE              = 85,
     CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST    = 87,
+    CommandType_DYNAMIC_ALMOND_MODE_CHANGE              = 89,
 
     CommandType_LOGIN_TEMPPASS_COMMAND                  = 101,
     CommandType_CLOUD_SANITY                            = 102,
@@ -49,6 +50,8 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_GENERIC_COMMAND_REQUEST                 = 201,
     CommandType_GENERIC_COMMAND_RESPONSE                = 204,
     CommandType_GENERIC_COMMAND_NOTIFICATION            = 205,
+    CommandType_NOTIFICATION_PREF_CHANGE_REQUEST        = 300,
+    CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE       = 301,
     CommandType_SENSOR_CHANGE_REQUEST                   = 301,
     CommandType_SENSOR_CHANGE_RESPONSE                  = 304,
 
@@ -82,6 +85,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_NOTIFICATION_REGISTRATION_RESPONSE      = 282,
     CommandType_NOTIFICATION_DEREGISTRATION             = 283,
     CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE    = 284,
-    CommandType_NOTIFICATION_PREF_CHANGE_REQUEST        = 300,
-    CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE       = 301,
+
+    CommandType_ALMOND_MODE_CHANGE_REQUEST              = 635,  // 61 (635)
+    CommandType_ALMOND_MODE_CHANGE_RESPONSE             = 638,  // 64 (638)
 };

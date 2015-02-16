@@ -50,6 +50,8 @@
 #import "NotificationPreferenceResponse.h"
 #import "SFINotificationUser.h"
 #import "SFINotificationDevice.h"
+#import "AlmondModeChangeResponse.h"
+#import "DynamicAlmondModeChange.h"
 
 #pragma mark Constants
 
@@ -139,8 +141,12 @@ static const char *kName_SensorChangeResponse =             "SensorChangeRespons
 //PY 250214 - LogoutResponse
 static const char *kName_LogoutResponse =                   "LogoutResponse";
 
-//PY 280214 - DynamicAlmondNameChange
 static const char *kName_DynamicAlmondNameChange =          "DynamicAlmondNameChange";
+static const char *kName_DynamicAlmondModeChange =          "DynamicAlmondMode";
+
+// Almond settings
+static const char *kName_AlmondMode =                       "AlmondMode";
+static const char *kName_AlmondModeSetBy =                  "ModeSetBy";
 
 //PY 150914 - Account Settings
 static const char *kName_UserProfileResponse =              "UserProfileResponse";
@@ -163,6 +169,7 @@ static const char *kName_UnlinkAlmondResponse =             "UnlinkAlmondRespons
 static const char *kName_UserInviteResponse =               "UserInviteResponse";
 static const char *kName_DeleteSecondaryUserResponse =      "DeleteSecondaryUserResponse";
 static const char *kName_AlmondNameChangeResponse =         "AlmondNameChangeResponse";
+static const char *kName_AlmondModeChangeResponse =         "AlmondModeChangeResponse";
 static const char *kName_MeAsSecondaryUserResponse =        "MeAsSecondaryUserResponse";
 static const char *kName_OwnerEmailID =                     "OwnerEmailID";
 static const char *kName_AName =                            "AlmondName";
@@ -246,6 +253,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
 @property(nonatomic) BOOL storingCharacters;
 @property(nonatomic) NSMutableData *characterBuffer;
 @property(nonatomic) BOOL parsingCommand;
+@property(nonatomic) BOOL parsingCurrentTmpMACValue;
 @property(nonatomic) CommandType commandType;
 @property(nonatomic) CommandType storingCommandType;
 @property(nonatomic) id command;
@@ -304,6 +312,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:
         case CommandType_USER_PROFILE_RESPONSE:
         case CommandType_CHANGE_PASSWORD_RESPONSE:
         case CommandType_DELETE_ACCOUNT_RESPONSE:
@@ -313,6 +322,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_USER_INVITE_RESPONSE:
         case CommandType_DELETE_SECONDARY_USER_RESPONSE:
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
+        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:
         case CommandType_ME_AS_SECONDARY_USER_RESPONSE:
         case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:
@@ -400,7 +410,13 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
             [parser.command setIsSuccessful:0];
         }
         parser.parsingCommand = YES;
-    } else if (prefix == NULL && !strncmp((const char *)localname, kName_SanityResponse, kLength_MaxTag))
+    }
+    else if (!strncmp((const char *) localname, kName_AlmondplusMAC, kLength_MaxTag) && !parser.parsingCommand) {
+        // almond mac provided outside a command envelope <root><AlmondplusMAC>....
+        parser.parsingCurrentTmpMACValue = YES;
+        parser.storingCharacters = YES;
+    }
+    else if (prefix == NULL && !strncmp((const char *)localname, kName_SanityResponse, kLength_MaxTag))
     {
         SanityResponse *sanityResponse = [[SanityResponse alloc]init];
         parser.command = sanityResponse;
@@ -1138,6 +1154,27 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_DYNAMIC_ALMOND_NAME_CHANGE;
     }
+    else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicAlmondModeChange, kLength_MaxTag)){
+        DynamicAlmondModeChange *req = [DynamicAlmondModeChange new];
+
+        if (parser.currentTmpMACValue != nil) {
+            req.almondMAC = parser.currentTmpMACValue;
+            parser.currentTmpMACValue = nil;
+        }
+
+        const char *begin = (const char *)attributes[0 + 3];
+        const char *end = (const char *)attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+
+        req.success = !strncmp((const char *) attributes[0], k_Success, 8) && !strncmp(val, k_True, 5);
+
+        parser.command = req;
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_DYNAMIC_ALMOND_MODE_CHANGE;
+    }
     //PY150914 - User Profile Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_UserProfileResponse, kLength_MaxTag)){
         UserProfileResponse *userProfileResponse = [[UserProfileResponse alloc]init];
@@ -1370,7 +1407,28 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_ALMOND_NAME_CHANGE_RESPONSE;
     }
-    
+    else if (prefix == NULL && !strncmp((const char *) localname, kName_AlmondModeChangeResponse, kLength_MaxTag)) {
+        AlmondModeChangeResponse *response = [AlmondModeChangeResponse new];
+
+        const char *begin = (const char *) attributes[0 + 3];
+        const char *end = (const char *) attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+
+        if (!strncmp((const char *) attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)) {
+            response.success = YES;
+        }
+        else {
+            response.success = NO;
+        }
+
+        parser.command = response;
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_ALMOND_MODE_CHANGE_RESPONSE;
+    }
+
     //PY230914 - Me As Secondary Almond User Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_MeAsSecondaryUserResponse, kLength_MaxTag)){
         MeAsSecondaryUserResponse *meAsSecodaryResponse = [[MeAsSecondaryUserResponse alloc]init];
@@ -1691,9 +1749,11 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
                                                            || (!strncmp((const char *)localname, kName_Users,kLength_MaxTag))
                                                            || (!strncmp((const char *)localname, kName_User,kLength_MaxTag))
                                                            || (!strncmp((const char *)localname, kName_Preference,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_AlmondMode,kLength_MaxTag))
+                                                           || (!strncmp((const char *)localname, kName_AlmondModeSetBy,kLength_MaxTag))
                                                           )  ))
     {
-        //// NSLog(@"Storing Character for : %s",localname);
+//        NSLog(@"Storing Character for : %s",localname);
         parser.storingCharacters = YES;
     }else{
         // [SNLog Log:@"Method Name: %s NOT Storing Character for %s",__PRETTY_FUNCTION__, localname];
@@ -1709,6 +1769,22 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
  */
 static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar __unused *URI) {
     CommandParser *parser = (__bridge CommandParser *)ctx;
+//    if (parser.parsingCurrentTmpMACValue && !parser.parsingCommand) {
+//        NSString *almond_mac = [parser currentString];
+//        parser.currentTmpMACValue = (almond_mac.length > 0) ? almond_mac : nil;
+//        parser.parsingCurrentTmpMACValue = NO;
+//        return;
+//    }
+
+    if (!strncmp((const char *) localname, kName_AlmondplusMAC, kLength_MaxTag) && !parser.parsingCommand) {
+        // almond mac provided outside a command envelope <root><AlmondplusMAC>....
+        NSString *almond_mac = [parser currentString];
+        parser.currentTmpMACValue = (almond_mac.length > 0) ? almond_mac : nil;
+        parser.parsingCurrentTmpMACValue = NO;
+        return;
+    }
+
+
     if (parser.parsingCommand == NO) return;
     //// NSLog(@"Prefix in endElementSAX : %s",prefix);
     //// NSLog(@"LocalName in endElementSAX : %s",localname);
@@ -2329,7 +2405,28 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.commandType = CommandType_DYNAMIC_ALMOND_NAME_CHANGE;
             parser.parsingCommand = NO;
         }
-        
+
+        else if (!strncmp((const char *)localname, kName_AlmondMode, kLength_MaxTag)
+            && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_MODE_CHANGE))
+        {
+            NSString *almond_mode = [parser currentString];
+            NSInteger value = [almond_mode intValue];
+            SFIAlmondNotificationMode mode = (SFIAlmondNotificationMode) value;
+
+            [parser.command setMode:mode];
+        }
+        else if (!strncmp((const char *)localname, kName_AlmondModeSetBy, kLength_MaxTag)
+            && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_MODE_CHANGE))
+        {
+            NSString *modeSetBy = [parser currentString];
+            [parser.command setUserId:modeSetBy];
+        }
+
+        else if (!strncmp((const char *)localname, kName_DynamicAlmondModeChange, kLength_MaxTag)) {
+            parser.commandType = CommandType_DYNAMIC_ALMOND_MODE_CHANGE;
+            parser.parsingCommand = NO;
+        }
+
         //PY 150914 - Account Settings - BEGIN
         else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_USER_PROFILE_RESPONSE))
@@ -2560,7 +2657,13 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.parsingCommand = NO;
         }
         //PY 220914 - Almond Name Change Response - END
-        
+
+        // Almond mode change
+        else if (!strncmp((const char *)localname, kName_AlmondModeChangeResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_ALMOND_MODE_CHANGE_RESPONSE;
+            parser.parsingCommand = NO;
+        }
+
         //PY 230914 - Me As Secondary Almond User Response  - BEGIN
         else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))

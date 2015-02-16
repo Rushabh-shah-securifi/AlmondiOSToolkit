@@ -33,6 +33,11 @@
     [self.writer writeEndElement];
 }
 
+- (void)addElement:(NSString *)elementName intValue:(NSInteger)value {
+    NSString *str = [NSString stringWithFormat:@"%li", (long) value];
+    [self addElement:elementName text:str];
+}
+
 - (void)startElement:(NSString *)elementName {
     elementName = [self stringOrEmpty:elementName];
     [self.writer writeStartElement:elementName];
