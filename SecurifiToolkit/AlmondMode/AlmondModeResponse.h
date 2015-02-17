@@ -8,11 +8,14 @@
 #import "SFIAlmondModeRef.h"
 
 
-@interface DynamicAlmondModeChange : NSObject <SFIAlmondModeRef>
+@interface AlmondModeResponse : NSObject <SFIAlmondModeRef>
 
 @property(nonatomic) BOOL success;
 @property(nonatomic, copy) NSString *almondMAC;
 @property(nonatomic, copy) NSString *userId;  // change made by logged in user
 @property(nonatomic) SFIAlmondMode mode;
+
+@property(nonatomic) int reasonCode;
+@property(nonatomic, copy) NSString *reason;
 
 @end

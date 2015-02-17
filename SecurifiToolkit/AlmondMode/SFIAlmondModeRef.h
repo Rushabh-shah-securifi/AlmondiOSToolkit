@@ -7,7 +7,7 @@
 #import "SecurifiTypes.h"
 
 // Structure containing information about an update to an Almond's Mode setting.
-@protocol SFIAlmondMode <NSObject>
+@protocol SFIAlmondModeRef <NSObject>
 
 // The Almond identified by the MAC value, whose mode setting changed
 - (NSString *)almondMAC;
@@ -16,6 +16,6 @@
 - (NSString *)userId;  // change made by logged in user
 
 // The new mode setting
-- (SFIAlmondNotificationMode)mode;
+- (SFIAlmondMode)mode;
 
 @end

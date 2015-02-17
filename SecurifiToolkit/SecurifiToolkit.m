@@ -30,8 +30,9 @@
 #import "NotificationDeleteRegistrationResponse.h"
 #import "NotificationPreferences.h"
 #import "AlmondModeChangeRequest.h"
-#import "AlmondModeChangeResponse.h"
 #import "DynamicAlmondModeChange.h"
+#import "AlmondModeRequest.h"
+#import "AlmondModeResponse.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -233,6 +234,14 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
             return [NSString stringWithFormat:@"NOTIFICATION_PREFERENCE_LIST_REQUEST_%d", type];
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
             return [NSString stringWithFormat:@"NOTIFICATION_PREFERENCE_LIST_RESPONSE_%d", type];
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:
+            return [NSString stringWithFormat:@"DYNAMIC_ALMOND_MODE_CHANGE_%d", type];
+        case CommandType_SENSOR_CHANGE_RESPONSE:
+            return [NSString stringWithFormat:@"SENSOR_CHANGE_RESPONSE_%d", type];
+        case CommandType_ALMOND_MODE_REQUEST:
+            return [NSString stringWithFormat:@"ALMOND_MODE_REQUEST_%d", type];
+        case CommandType_ALMOND_MODE_RESPONSE:
+            return [NSString stringWithFormat:@"ALMOND_MODE_RESPONSE_%d", type];
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -326,7 +335,8 @@ static SecurifiToolkit *singleton = nil;
             [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
 
             [center addObserver:self selector:@selector(onAlmondModeChangeCompletion:) name:ALMOND_MODE_CHANGE_NOTIFIER object:nil];
-            [center addObserver:self selector:@selector(onAlmondModeChange:) name:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onAlmondModeResponse:) name:ALMOND_MODE_RESPONSE_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onDynamicAlmondModeChange:) name:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER object:nil];
         }
     }
 
@@ -588,6 +598,8 @@ static SecurifiToolkit *singleton = nil;
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
                 [block_self internalInitializeCloud:socket command:cmd];
             }
+
+            [block_self tryRequestAlmondMode:mac];
         }
 
         [socket markCloudInitialized];
@@ -861,6 +873,12 @@ static SecurifiToolkit *singleton = nil;
     // 3. sending it now will stimulate connection establishment and sending the command prior to other normal-bring up
     // commands will cause the connection to fail IF the currently selected almond is no longer linked to the account.
     SingleTon *singleton = self.networkSingleton;
+
+    if (singleton == nil) {
+        DLog(@"%s: network is down; not sending request for hash or mode: %@", __PRETTY_FUNCTION__, mac);
+        return;
+    }
+
     if (![singleton wasHashFetchedForAlmond:mac]) {
         [singleton markHashFetchedForAlmond:mac];
 
@@ -871,6 +889,9 @@ static SecurifiToolkit *singleton = nil;
     else {
         DLog(@"%s: hash already checked on this connection for current almond: %@", __PRETTY_FUNCTION__, mac);
     }
+
+    // Fetch the Almond Mode
+    [self tryRequestAlmondMode:mac];
 }
 
 - (SFIAlmondPlus *)currentAlmond {
@@ -1171,7 +1192,7 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMAC mode:(SFIAlmondNotificationMode)newMode {
+- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMAC mode:(SFIAlmondMode)newMode {
     if (almondMAC == nil) {
         SLog(@"asyncRequestAlmondModeChange : almond MAC is nil");
         return 0;
@@ -1189,6 +1210,43 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 
     return req.correlationId;
+}
+
+- (SFIAlmondMode)modeForAlmond:(NSString *)almondMac {
+    return [self tryCachedAlmondModeValue:almondMac];
+
+}
+
+- (SFIAlmondMode)tryCachedAlmondModeValue:(NSString *)almondMac {
+    SingleTon *singleTon = self.networkSingleton;
+    if (singleTon) {
+        return [singleTon almondMode:almondMac];
+    }
+
+    return SFIAlmondMode_unknown;
+}
+
+// Checks whether a Mode has already been fetched for the almond, and if so, fails quietly.
+// Otherwise, it requests the mode information.
+- (void)tryRequestAlmondMode:(NSString*)almondMac {
+    if (almondMac == nil) {
+        return;
+    }
+    
+    SFIAlmondMode mode = [self tryCachedAlmondModeValue:almondMac];
+    if (mode != SFIAlmondMode_unknown) {
+        // a valid value already exists
+        return;
+    }
+
+    AlmondModeRequest *req = [AlmondModeRequest new];
+    req.almondMAC = almondMac;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_ALMOND_MODE_REQUEST;
+    cmd.command = req;
+
+    [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action {
@@ -1935,7 +1993,27 @@ static SecurifiToolkit *singleton = nil;
     [self postNotification:notification data:nil];
 }
 
-- (void)onAlmondModeChange:(id)sender {
+- (void)onAlmondModeResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    AlmondModeResponse *res = [data valueForKey:@"data"];
+    if (res == nil) {
+        return;
+    }
+
+    if (!res.success) {
+        return;
+    }
+
+    [self.networkSingleton markModeForAlmond:res.almondMAC mode:res.mode];
+    [self postNotification:kSFIAlmondModeDidChange data:res];
+}
+
+- (void)onDynamicAlmondModeChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -1951,6 +2029,7 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
+    [self.networkSingleton markModeForAlmond:res.almondMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }
 

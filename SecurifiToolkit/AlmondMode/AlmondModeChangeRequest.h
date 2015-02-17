@@ -12,7 +12,7 @@
 
 @property(nonatomic, copy) NSString *almondMAC;
 @property(nonatomic, copy) NSString *userId;  // change made by logged in user
-@property(nonatomic) SFIAlmondNotificationMode mode;
+@property(nonatomic) SFIAlmondMode mode;
 
 - (NSString *)toXml;
 

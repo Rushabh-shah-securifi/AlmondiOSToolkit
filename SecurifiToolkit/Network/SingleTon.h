@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "CommandTypes.h"
+#import "SecurifiTypes.h"
 
 typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
     SDKCloudStatusUninitialized = 1,
@@ -94,5 +95,11 @@ typedef NS_ENUM(NSUInteger, SDKCloudStatus) {
 // Tests whether a Device Values List was requested already.
 // TRUE if requested. FALSE otherwise.
 - (BOOL)wasDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac;
+
+- (void)markModeForAlmond:(NSString*)aAlmondMac mode:(SFIAlmondMode)mode;
+
+- (SFIAlmondMode)almondMode:(NSString*)aAlmondMac;
+
+- (void)clearAlmondMode:(NSString*)aAlmondMac;
 
 @end

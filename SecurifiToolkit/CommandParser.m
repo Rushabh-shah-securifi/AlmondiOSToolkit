@@ -52,6 +52,7 @@
 #import "SFINotificationDevice.h"
 #import "AlmondModeChangeResponse.h"
 #import "DynamicAlmondModeChange.h"
+#import "AlmondModeResponse.h"
 
 #pragma mark Constants
 
@@ -142,7 +143,10 @@ static const char *kName_SensorChangeResponse =             "SensorChangeRespons
 static const char *kName_LogoutResponse =                   "LogoutResponse";
 
 static const char *kName_DynamicAlmondNameChange =          "DynamicAlmondNameChange";
+
 static const char *kName_DynamicAlmondModeChange =          "DynamicAlmondMode";
+static const char *kName_AlmondModeResponse =               "AlmondModeResponse";
+static const char *kName_AlmondModeChangeResponse =         "AlmondModeChangeResponse";
 
 // Almond settings
 static const char *kName_AlmondMode =                       "AlmondMode";
@@ -169,7 +173,6 @@ static const char *kName_UnlinkAlmondResponse =             "UnlinkAlmondRespons
 static const char *kName_UserInviteResponse =               "UserInviteResponse";
 static const char *kName_DeleteSecondaryUserResponse =      "DeleteSecondaryUserResponse";
 static const char *kName_AlmondNameChangeResponse =         "AlmondNameChangeResponse";
-static const char *kName_AlmondModeChangeResponse =         "AlmondModeChangeResponse";
 static const char *kName_MeAsSecondaryUserResponse =        "MeAsSecondaryUserResponse";
 static const char *kName_OwnerEmailID =                     "OwnerEmailID";
 static const char *kName_AName =                            "AlmondName";
@@ -322,6 +325,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_USER_INVITE_RESPONSE:
         case CommandType_DELETE_SECONDARY_USER_RESPONSE:
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
+        case CommandType_ALMOND_MODE_RESPONSE:
         case CommandType_ALMOND_MODE_CHANGE_RESPONSE:
         case CommandType_ME_AS_SECONDARY_USER_RESPONSE:
         case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:
@@ -585,12 +589,8 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
 
-
-        if (!strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)){
-            [parser.command setIsSuccessful:YES];
-        }else{
-            [parser.command setIsSuccessful:NO];
-        }
+        BOOL success = !strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5);
+        [parser.command setIsSuccessful:success];
 
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_DEVICE_DATA_HASH_RESPONSE;
@@ -1417,16 +1417,32 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         strncpy(val, begin, vlen);
         val[vlen] = '\0';
 
-        if (!strncmp((const char *) attributes[0], k_Success, 8) && !strncmp(val, k_True, 5)) {
-            response.success = YES;
-        }
-        else {
-            response.success = NO;
-        }
+        response.success = !strncmp((const char *) attributes[0], k_Success, 8) && !strncmp(val, k_True, 5);
 
         parser.command = response;
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_ALMOND_MODE_CHANGE_RESPONSE;
+    }
+    else if (prefix == NULL && !strncmp((const char *) localname, kName_AlmondModeResponse, kLength_MaxTag)) {
+        AlmondModeResponse *res = [AlmondModeResponse new];
+
+        if (parser.currentTmpMACValue != nil) {
+            res.almondMAC = parser.currentTmpMACValue;
+            parser.currentTmpMACValue = nil;
+        }
+
+        const char *begin = (const char *) attributes[0 + 3];
+        const char *end = (const char *) attributes[0 + 4];
+        long vlen = end - begin;
+        char val[vlen + 1];
+        strncpy(val, begin, vlen);
+        val[vlen] = '\0';
+
+        res.success = !strncmp((const char *) attributes[0], k_Success, 8) && !strncmp(val, k_True, 5);
+
+        parser.command = res;
+        parser.parsingCommand = YES;
+        parser.storingCommandType = CommandType_ALMOND_MODE_RESPONSE;
     }
 
     //PY230914 - Me As Secondary Almond User Response
@@ -2411,7 +2427,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         {
             NSString *almond_mode = [parser currentString];
             NSInteger value = [almond_mode intValue];
-            SFIAlmondNotificationMode mode = (SFIAlmondNotificationMode) value;
+            SFIAlmondMode mode = (SFIAlmondMode) value;
 
             [parser.command setMode:mode];
         }
@@ -2424,6 +2440,27 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
 
         else if (!strncmp((const char *)localname, kName_DynamicAlmondModeChange, kLength_MaxTag)) {
             parser.commandType = CommandType_DYNAMIC_ALMOND_MODE_CHANGE;
+            parser.parsingCommand = NO;
+        }
+
+        else if (!strncmp((const char *)localname, kName_AlmondMode, kLength_MaxTag)
+            && (parser.storingCommandType == CommandType_ALMOND_MODE_RESPONSE))
+        {
+            NSString *almond_mode = [parser currentString];
+            NSInteger value = [almond_mode intValue];
+            SFIAlmondMode mode = (SFIAlmondMode) value;
+
+            [parser.command setMode:mode];
+        }
+        else if (!strncmp((const char *)localname, kName_AlmondModeSetBy, kLength_MaxTag)
+            && (parser.storingCommandType == CommandType_ALMOND_MODE_RESPONSE))
+        {
+            NSString *modeSetBy = [parser currentString];
+            [parser.command setUserId:modeSetBy];
+        }
+
+        else if (!strncmp((const char *)localname, kName_AlmondModeResponse, kLength_MaxTag)) {
+            parser.commandType = CommandType_ALMOND_MODE_RESPONSE;
             parser.parsingCommand = NO;
         }
 

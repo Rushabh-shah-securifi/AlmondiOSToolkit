@@ -3,10 +3,9 @@
 // Copyright (c) 2015 Nirav Uchat. All rights reserved.
 //
 
-#import "SFIAlmondMode.h"
+#import "AlmondModeResponse.h"
 
 
-@implementation SFIAlmondMode {
+@implementation AlmondModeResponse
 
-}
 @end

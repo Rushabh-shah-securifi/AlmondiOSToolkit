@@ -42,6 +42,9 @@
 @property(nonatomic, readonly) NSObject *willFetchDeviceListFlagSyncLocker;
 @property(nonatomic, readonly) NSMutableSet *willFetchDeviceListFlag;
 
+@property(nonatomic, readonly) NSObject *almondModeSynLocker;
+@property(nonatomic, readonly) NSMutableDictionary *almondModeTable;
+
 @end
 
 @implementation SingleTon
@@ -76,6 +79,9 @@
 
         _willFetchDeviceListFlagSyncLocker = [NSObject new];
         _willFetchDeviceListFlag = [NSMutableSet new];
+
+        _almondModeSynLocker = [NSObject new];
+        _almondModeTable = [NSMutableDictionary new];
     }
 
     return self;
@@ -610,6 +616,12 @@
                                             break;
                                         }
 
+                                        case CommandType_ALMOND_MODE_RESPONSE: {
+                                            [self tryMarkUnitCompletion:YES responseType:commandType];
+                                            [self postData:ALMOND_MODE_RESPONSE_NOTIFIER data:temp.command];
+                                            break;
+                                        }
+
                                         case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
@@ -622,25 +634,25 @@
                                             break;
                                         }
 
-                                        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:{
+                                        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:temp.command];
                                             break;
                                         }
-                                            
-                                        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:{
+
+                                        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:NOTIFICATION_DEREGISTRATION_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:{
+                                        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER data:temp.command];
                                             break;
                                         }
 
-                                        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:{
+                                        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
                                             [self tryMarkUnitCompletion:YES responseType:commandType];
                                             [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:temp.command];
                                             break;
@@ -933,6 +945,44 @@
     }
 }
 
+- (void)markModeForAlmond:(NSString *)aAlmondMac mode:(SFIAlmondMode)mode {
+    if (aAlmondMac == nil) {
+        return;
+    }
+
+    NSNumber *num = @(mode);
+    @synchronized (self.almondModeSynLocker) {
+        self.almondModeTable[aAlmondMac] = num;
+    }
+}
+
+- (SFIAlmondMode)almondMode:(NSString *)aAlmondMac {
+    if (aAlmondMac == nil) {
+        return SFIAlmondMode_unknown;
+    }
+
+    @synchronized (self.almondModeSynLocker) {
+        NSNumber *num = self.almondModeTable[aAlmondMac];
+
+        if (num == nil) {
+            return SFIAlmondMode_unknown;
+        }
+
+        return (SFIAlmondMode) [num intValue];
+    }
+}
+
+- (void)clearAlmondMode:(NSString *)aAlmondMac {
+    if (aAlmondMac == nil) {
+        return;
+    }
+
+    @synchronized (self.almondModeSynLocker) {
+        [self.almondModeTable removeObjectForKey:aAlmondMac];
+    }
+}
+
+
 #pragma mark - Command submission
 
 - (NSInteger)nextUnitCounter {
@@ -1128,13 +1178,14 @@
                 case CommandType_NOTIFICATION_REGISTRATION:
                 case CommandType_NOTIFICATION_DEREGISTRATION:
                 case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
-                case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST: {
+                case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
+                case CommandType_ALMOND_MODE_REQUEST: {
                     id <SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
                     break;
                 }
 
-                // Commands that transfer in Command 61 container
+                    // Commands that transfer in Command 61 container
                 case CommandType_ALMOND_NAME_CHANGE_REQUEST:
                 case CommandType_ALMOND_MODE_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
@@ -1219,7 +1270,8 @@
                 return YES;
             }
 
-            socket_failure_handler: {
+            socket_failure_handler:
+            {
                 DLog(@"Socket failure handler invoked");
 
                 socket.isLoggedIn = NO;

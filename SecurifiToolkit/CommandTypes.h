@@ -86,6 +86,9 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_NOTIFICATION_DEREGISTRATION             = 283,
     CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE    = 284,
 
+    CommandType_ALMOND_MODE_REQUEST                     = 151,
+    CommandType_ALMOND_MODE_RESPONSE                    = 152,
+
     CommandType_ALMOND_MODE_CHANGE_REQUEST              = 635,  // 61 (635)
     CommandType_ALMOND_MODE_CHANGE_RESPONSE             = 638,  // 64 (638)
 };
