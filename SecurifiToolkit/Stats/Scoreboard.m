@@ -27,7 +27,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    Scoreboard *copy = [[[self class] allocWithZone:zone] init];
+    Scoreboard *copy = (Scoreboard *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy->_created = _created;

@@ -18,5 +18,7 @@
 
 - (NSString *)formattedDateString;
 
+- (NSString *)formattedDateTimeString;
+
 - (NSString *)formattedStringUsingFormat:(NSString *)dateFormat;
 @end
