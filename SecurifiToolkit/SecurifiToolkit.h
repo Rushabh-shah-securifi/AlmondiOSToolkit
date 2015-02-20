@@ -155,6 +155,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Changes take effect on next connection attempt. Use closeConnection to force a connection change.
 @property(nonatomic) BOOL useProductionCloud;
 
++ (BOOL)isInitialized;
+
 + (void)initialize:(SecurifiConfigurator *)config;
 
 + (instancetype)sharedInstance;

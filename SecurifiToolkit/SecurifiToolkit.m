@@ -272,6 +272,10 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 static SecurifiToolkit *singleton = nil;
 
++ (BOOL)isInitialized {
+    return singleton != nil;
+}
+
 + (void)initialize:(SecurifiConfigurator *)config {
     static dispatch_once_t once_predicate;
 
