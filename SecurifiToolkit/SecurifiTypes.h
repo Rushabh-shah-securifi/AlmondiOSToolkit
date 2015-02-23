@@ -58,6 +58,8 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_BinaryPowerSwitch_45          = 45,
     SFIDeviceType_HueLamp_48                    = 48,
     SFIDeviceType_SecurifiSmartSwitch_50        = 50,
+
+    SFIDeviceType_count                         = 50, // always set to the last value; assumes sequence is continuous
 };
 
 typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
@@ -126,6 +128,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING,
     SFIDevicePropertyType_TOLERANCE,
     SFIDevicePropertyType_USER_CODE,
+
+    SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 
 // Per almond "mode" setting indicating
