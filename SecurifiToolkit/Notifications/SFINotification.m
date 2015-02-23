@@ -9,8 +9,6 @@
 
 @implementation SFINotification
 
-@dynamic message;
-
 /*
 mac             => mac
 users           => users
@@ -125,15 +123,9 @@ Value           => indexvalue
     [description appendFormat:@", self.valueIndex=%u", self.valueIndex];
     [description appendFormat:@", self.valueType=%d", self.valueType];
     [description appendFormat:@", self.value=%@", self.value];
-    [description appendFormat:@", self.message=%@", self.message];
     [description appendFormat:@", self.viewed=%d", self.viewed];
     [description appendString:@">"];
     return description;
-}
-
-- (NSString *)message {
-    //todo synthesize an actual message
-    return [NSString stringWithFormat:@"%@: %@", self.deviceName, self.value];
 }
 
 @end

@@ -18,7 +18,6 @@
 @property(nonatomic) sfi_id valueIndex;
 @property(nonatomic) SFIDevicePropertyType valueType;
 @property(nonatomic, copy) NSString *value; // device value
-@property(nonatomic, readonly) NSString *message;
 @property(nonatomic) BOOL viewed;
 
 + (instancetype)parseJson:(NSData*)data;
