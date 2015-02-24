@@ -59,7 +59,7 @@
         case SFIDeviceType_BinaryPowerSwitch_45:return @"45_BinaryPowerSwitch";
         case SFIDeviceType_HueLamp_48:return @"48_HueLamp";
         case SFIDeviceType_SecurifiSmartSwitch_50:return @"50_SecurifiSmartSwitch";
-        default: return nil;
+        default: return [NSString stringWithFormat:@"%d_UnknownDevice", type];
     }
 }
 

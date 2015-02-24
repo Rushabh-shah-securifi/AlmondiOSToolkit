@@ -12,8 +12,8 @@
 @property(nonatomic) long notificationId;
 @property(nonatomic, copy) NSString *almondMAC;
 @property(nonatomic) NSTimeInterval time;
-@property(nonatomic) sfi_id deviceId;
 @property(nonatomic, copy) NSString *deviceName;
+@property(nonatomic) sfi_id deviceId;
 @property(nonatomic) SFIDeviceType deviceType;
 @property(nonatomic) sfi_id valueIndex;
 @property(nonatomic) SFIDevicePropertyType valueType;
