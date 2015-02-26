@@ -78,7 +78,7 @@
         }
 
         case SFIDeviceType_Alarm_6:
-        case SFIDeviceType_FloodSensor_37:
+        case SFIDeviceType_SmokeDetector_36:
         case SFIDeviceType_MoistureSensor_40: {
             return SFIDevicePropertyType_BASIC;
         }
@@ -109,6 +109,7 @@
         }
 
         case SFIDeviceType_BinarySensor_3:
+        case SFIDeviceType_FloodSensor_37:
         case SFIDeviceType_ShockSensor_38:
         case SFIDeviceType_DoorSensor_39:
         case SFIDeviceType_MovementSensor_41:
@@ -135,7 +136,6 @@
         case SFIDeviceType_FlowSensor_31:
         case SFIDeviceType_ColorDimmableLight_32:
         case SFIDeviceType_HAPump_33:
-        case SFIDeviceType_SmokeDetector_36:
         case SFIDeviceType_MultiSwitch_43:
         default: {
             return SFIDevicePropertyType_STATE;
