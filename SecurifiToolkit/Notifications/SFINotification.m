@@ -66,7 +66,7 @@ Value           => indexvalue
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
-        self.notificationId = [coder decodeIntForKey:@"self.notificationId"];
+        self.notificationId = (long) [coder decodeInt64ForKey:@"self.notificationId"];
         self.almondMAC = [coder decodeObjectForKey:@"self.almondMAC"];
         self.time = [coder decodeDoubleForKey:@"self.time"];
         self.deviceId = (sfi_id) [coder decodeInt64ForKey:@"self.deviceId"];
@@ -82,7 +82,7 @@ Value           => indexvalue
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeInt:self.notificationId forKey:@"self.notificationId"];
+    [coder encodeInt64:self.notificationId forKey:@"self.notificationId"];
     [coder encodeObject:self.almondMAC forKey:@"self.almondMAC"];
     [coder encodeDouble:self.time forKey:@"self.time"];
     [coder encodeInt64:self.deviceId forKey:@"self.deviceId"];

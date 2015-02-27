@@ -29,4 +29,6 @@
 
 - (void)markViewed:(SFINotification *)notification;
 
+- (void)markDeleted:(SFINotification *)notification;
+
 @end

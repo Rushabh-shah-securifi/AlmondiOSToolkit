@@ -16,6 +16,7 @@
 @property(nonatomic, readonly) ZHDatabaseStatement *count_for_date_bucket;
 @property(nonatomic, readonly) ZHDatabaseStatement *fetch_recs_for_date_buckets;
 @property(nonatomic, readonly) ZHDatabaseStatement *mark_viewed_notification;
+@property(nonatomic, readonly) ZHDatabaseStatement *delete_notification;
 @end
 
 @implementation NotificationStoreImpl
@@ -28,6 +29,7 @@
         _count_for_date_bucket = [self.db newStatement:@"select count(*) from notifications where date_bucket=?"];
         _fetch_recs_for_date_buckets = [self.db newStatement:@"select id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where date_bucket=? order by time desc limit ? offset ?"];
         _mark_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where id=?"];
+        _delete_notification = [self.db newStatement:@"delete from notifications where id=?"];
     }
     return self;
 }
@@ -134,6 +136,19 @@
     ZHDatabaseStatement *stmt = self.mark_viewed_notification;
     @synchronized (stmt) {
         [stmt bindNextBool:YES];
+        [stmt bindNextInteger:notification.notificationId];
+        [stmt execute];
+        [stmt reset];
+    }
+}
+
+- (void)markDeleted:(SFINotification *)notification {
+    if (!notification) {
+        return;
+    }
+
+    ZHDatabaseStatement *stmt = self.delete_notification;
+    @synchronized (stmt) {
         [stmt bindNextInteger:notification.notificationId];
         [stmt execute];
         [stmt reset];
