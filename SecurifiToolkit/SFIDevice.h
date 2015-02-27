@@ -48,7 +48,7 @@
 - (BOOL)isBinaryStateSwitchable;
 
 // Indicates whether the device has notification preference on
-- (BOOL)isNotificationEnabled;
+- (BOOL)checkNotificationEnabled;
 
 
 

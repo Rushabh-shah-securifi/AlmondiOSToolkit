@@ -334,24 +334,4 @@
     return [values.value boolValue];
 }
 
-- (BOOL)isNotificationEnabled {
-    //Read from offline data
-    NSArray *notificationList = [[SecurifiToolkit sharedInstance] notificationPrefList:self.almondMAC];
-
-    sfi_id device_id = self.deviceID;
-
-    //Check if current device ID is in the notification list
-    for (SFINotificationDevice *currentDevice in notificationList) {
-        if (currentDevice.deviceID == device_id) {
-            //Set the notification mode for that notification preference
-            SFINotificationMode mode = currentDevice.notificationMode;
-            self.notificationMode = mode;
-            return mode != SFINotificationMode_off;
-        }
-    }
-
-    self.notificationMode = SFINotificationMode_off;
-    return false;
-}
-
 @end
