@@ -81,7 +81,7 @@
 #import <SecurifiToolkit/SFINotificationDevice.h>
 #import <SecurifiToolkit/SFINotification.h>
 #import <SecurifiToolkit/SFINotificationStore.h>
-#import "SFIAlmondModeRef.h"
+#import <SecurifiToolkit/SFIAlmondModeRef.h>
 
 @class SecurifiConfigurator;
 

@@ -44,6 +44,7 @@
 #define SEC_USER_ID                                         @"com.securifi.userid"
 #define SEC_IS_ACCOUNT_ACTIVATED                            @"com.securifi.isActivated"
 #define SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT          @"com.securifi.minsRemaining"
+#define SEC_APN_TOKEN                                       @"com.securifi.apntoken"
 
 NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
 NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
@@ -1152,6 +1153,15 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
+    if ([self isSecApnTokenRegistered]) {
+        NSString *oldToken = [self secRegisteredApnToken];
+        if ([deviceToken isEqualToString:oldToken]) {
+            // already registered
+            return;
+        }
+    }
+    [self setSecRegisteredApnToken:deviceToken];
+
     NotificationRegistration *notificationRegister = [NotificationRegistration new];
     notificationRegister.regID = deviceToken;
     notificationRegister.platform = @"iOS";
@@ -1327,6 +1337,7 @@ static SecurifiToolkit *singleton = nil;
     [KeyChainWrapper removeEntryForUserEmail:SEC_EMAIL forService:SEC_SERVICE_NAME];
     [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
     [KeyChainWrapper removeEntryForUserEmail:SEC_USER_ID forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_APN_TOKEN forService:SEC_SERVICE_NAME];
 }
 
 - (BOOL)hasSecPassword {
@@ -1392,6 +1403,21 @@ static SecurifiToolkit *singleton = nil;
     else {
         [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:minsRemaining forService:SEC_SERVICE_NAME];
     }
+}
+
+- (BOOL)isSecApnTokenRegistered {
+    return [KeyChainWrapper isEntryStoredForUserEmail:SEC_APN_TOKEN forService:SEC_SERVICE_NAME];
+}
+
+- (NSString*)secRegisteredApnToken {
+    return [KeyChainWrapper retrieveEntryForUser:SEC_APN_TOKEN forService:SEC_SERVICE_NAME];
+}
+
+- (void)setSecRegisteredApnToken:(NSString*)token {
+    if (token == nil) {
+        return;
+    }
+    [KeyChainWrapper createEntryForUser:SEC_APN_TOKEN entryValue:token forService:SEC_SERVICE_NAME];
 }
 
 #pragma mark - SingleTon management
