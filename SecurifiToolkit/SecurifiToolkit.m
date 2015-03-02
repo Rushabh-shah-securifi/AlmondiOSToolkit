@@ -273,16 +273,16 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 static SecurifiToolkit *singleton = nil;
 
-+ (BOOL)isInitialized {
-    return singleton != nil;
-}
-
 + (void)initialize:(SecurifiConfigurator *)config {
     static dispatch_once_t once_predicate;
 
     dispatch_once(&once_predicate, ^{
         singleton = [[SecurifiToolkit alloc] initWithConfig:config];
     });
+}
+
++ (BOOL)isInitialized {
+    return singleton != nil;
 }
 
 + (instancetype)sharedInstance {
@@ -711,6 +711,8 @@ static SecurifiToolkit *singleton = nil;
     }
 
     if (self.isCloudOnline) {
+        [self asyncRequestDeregisterForNotification];
+
         GenericCommand *cmd = [GenericCommand new];
         cmd.commandType = CommandType_LOGOUT_COMMAND;
         cmd.command = nil;
@@ -1078,13 +1080,13 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (void)asyncRequestChangeAlmondName:(NSString *)changedAlmondName almondMAC:(NSString *)almondMAC {
-    AlmondNameChange *nameChange = [AlmondNameChange new];
-    nameChange.almondMAC = almondMAC;
-    nameChange.changedAlmondName = changedAlmondName;
+    AlmondNameChange *req = [AlmondNameChange new];
+    req.almondMAC = almondMAC;
+    req.changedAlmondName = changedAlmondName;
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ALMOND_NAME_CHANGE_REQUEST;
-    cmd.command = nameChange;
+    cmd.command = req;
 
     [self asyncSendToCloud:cmd];
 }
@@ -1162,30 +1164,36 @@ static SecurifiToolkit *singleton = nil;
     }
     [self setSecRegisteredApnToken:deviceToken];
 
-    NotificationRegistration *notificationRegister = [NotificationRegistration new];
-    notificationRegister.regID = deviceToken;
-    notificationRegister.platform = @"iOS";
+    NotificationRegistration *req = [NotificationRegistration new];
+    req.regID = deviceToken;
+    req.platform = @"iOS";
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_REGISTRATION;
-    cmd.command = notificationRegister;
+    cmd.command = req;
 
     [self asyncSendToCloud:cmd];
 }
 
-- (void)asyncRequestDeregisterForNotification:(NSString *)deviceToken {
+- (void)asyncRequestDeregisterForNotification {
+    if (![self isSecApnTokenRegistered]) {
+        SLog(@"asyncRequestRegisterForNotification : no device token to deregister");
+        return;
+    }
+
+    NSString *deviceToken = [self secRegisteredApnToken];
     if (deviceToken == nil) {
         SLog(@"asyncRequestRegisterForNotification : device toke is nil");
         return;
     }
 
-    NotificationDeleteRegistrationRequest *notificationDeregister = [NotificationDeleteRegistrationRequest new];
-    notificationDeregister.regID = deviceToken;
-    notificationDeregister.platform = @"iOS";
+    NotificationDeleteRegistrationRequest *req = [NotificationDeleteRegistrationRequest new];
+    req.regID = deviceToken;
+    req.platform = @"iOS";
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_DEREGISTRATION;
-    cmd.command = notificationDeregister;
+    cmd.command = req;
 
     [self asyncSendToCloud:cmd];
 }
@@ -1196,12 +1204,12 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-    NotificationPreferenceListRequest *notificationPrefList = [NotificationPreferenceListRequest new];
-    notificationPrefList.almondplusMAC = almondMAC;
+    NotificationPreferenceListRequest *req = [NotificationPreferenceListRequest new];
+    req.almondplusMAC = almondMAC;
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST;
-    cmd.command = notificationPrefList;
+    cmd.command = req;
 
     [self asyncSendToCloud:cmd];
 }
@@ -1269,16 +1277,16 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-    NotificationPreferences *prefChange = [NotificationPreferences new];
-    prefChange.action = action;
-    prefChange.almondMAC = almondMAC;
-    prefChange.userID = [self loginEmail];
-    prefChange.preferenceCount = (int) [deviceList count];
-    prefChange.notificationDeviceList = deviceList;
+    NotificationPreferences *req = [NotificationPreferences new];
+    req.action = action;
+    req.almondMAC = almondMAC;
+    req.userID = [self loginEmail];
+    req.preferenceCount = (int) [deviceList count];
+    req.notificationDeviceList = deviceList;
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
-    cmd.command = prefChange;
+    cmd.command = req;
 
     [self asyncSendToCloud:cmd];
 }
@@ -1293,13 +1301,13 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (GenericCommand *)makeTempPassLoginCommand {
-    LoginTempPass *cmd = [LoginTempPass new];
-    cmd.UserID = [self secUserId];
-    cmd.TempPass = [self secPassword];
+    LoginTempPass *req = [LoginTempPass new];
+    req.UserID = [self secUserId];
+    req.TempPass = [self secPassword];
 
     GenericCommand *command = [GenericCommand new];
     command.commandType = CommandType_LOGIN_COMMAND; // use Login command type
-    command.command = cmd;
+    command.command = req;
 
     return command;
 }
@@ -1312,12 +1320,12 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (GenericCommand *)makeDeviceHashCommand:(NSString *)almondMac {
-    DeviceDataHashRequest *deviceHashCommand = [DeviceDataHashRequest new];
-    deviceHashCommand.almondMAC = almondMac;
+    DeviceDataHashRequest *req = [DeviceDataHashRequest new];
+    req.almondMAC = almondMac;
 
     GenericCommand *command = [GenericCommand new];
     command.commandType = CommandType_DEVICE_DATA_HASH;
-    command.command = deviceHashCommand;
+    command.command = req;
 
     return command;
 }

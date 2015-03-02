@@ -262,7 +262,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)deviceMAC;
 
 - (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
-- (void)asyncRequestDeregisterForNotification:(NSString*)deviceToken;
+
 - (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
 
 // Send a command to change the notification mode for the specific almond
