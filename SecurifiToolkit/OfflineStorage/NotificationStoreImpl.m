@@ -16,6 +16,7 @@
 @property(nonatomic, readonly) ZHDatabaseStatement *count_for_date_bucket;
 @property(nonatomic, readonly) ZHDatabaseStatement *fetch_recs_for_date_buckets;
 @property(nonatomic, readonly) ZHDatabaseStatement *mark_viewed_notification;
+@property(nonatomic, readonly) ZHDatabaseStatement *mark_all_viewed_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *delete_notification;
 @end
 
@@ -29,6 +30,7 @@
         _count_for_date_bucket = [self.db newStatement:@"select count(*) from notifications where date_bucket=?"];
         _fetch_recs_for_date_buckets = [self.db newStatement:@"select id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where date_bucket=? order by time desc limit ? offset ?"];
         _mark_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where id=?"];
+        _mark_all_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where time <= ?"];
         _delete_notification = [self.db newStatement:@"delete from notifications where id=?"];
     }
     return self;
@@ -88,25 +90,6 @@
     return results;
 }
 
-- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket start:(NSUInteger)start limit:(NSUInteger)limit {
-    ZHDatabaseStatement *stmt = self.fetch_recs_for_date_buckets;
-
-    @synchronized (stmt) {
-        [stmt bindNextTimeInterval:bucket.timeIntervalSince1970];
-        [stmt bindNextInteger:limit];
-        [stmt bindNextInteger:start];
-
-        NSMutableArray *results = [NSMutableArray array];
-        while ([stmt step]) {
-            SFINotification *obj = [self readRecord:stmt];
-            [results addObject:obj];
-        }
-
-        [stmt reset];
-        return results;
-    }
-}
-
 - (SFINotification *)fetchNotificationForBucket:(NSDate *)bucket index:(NSUInteger)pos {
     ZHDatabaseStatement *stmt = self.fetch_recs_for_date_buckets;
 
@@ -141,6 +124,21 @@
         [stmt reset];
     }
 }
+
+- (void)markAllViewedTo:(SFINotification *)notification {
+    if (!notification) {
+        return;
+    }
+
+    ZHDatabaseStatement *stmt = self.mark_all_viewed_notification;
+    @synchronized (stmt) {
+        [stmt bindNextBool:YES];
+        [stmt bindNextTimeInterval:notification.time];
+        [stmt execute];
+        [stmt reset];
+    }
+}
+
 
 - (void)markDeleted:(SFINotification *)notification {
     if (!notification) {

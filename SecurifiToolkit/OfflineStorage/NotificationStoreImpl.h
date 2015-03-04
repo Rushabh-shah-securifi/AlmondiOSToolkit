@@ -6,7 +6,6 @@
 #import <Foundation/Foundation.h>
 #import "SFINotificationStore.h"
 
-@class ZHDatabaseStatement;
 @class ZHDatabase;
 
 

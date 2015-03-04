@@ -21,13 +21,12 @@
 // fetch up to the specified number of most recent notifications
 - (NSArray *)fetchNotifications:(NSUInteger)limit;
 
-// this is the preferred way to fetch notifications
-// retrieves the specified number of notifications starting at the specified index, in the specified time bucket
-- (NSArray *)fetchNotificationsForBucket:(NSDate *)bucket start:(NSUInteger)start limit:(NSUInteger)limit;
-
 - (SFINotification *)fetchNotificationForBucket:(NSDate *)bucket index:(NSUInteger)pos;
 
 - (void)markViewed:(SFINotification *)notification;
+
+// marks all notifications up to and including the one as viewed
+- (void)markAllViewedTo:(SFINotification *)notification;
 
 - (void)markDeleted:(SFINotification *)notification;
 
