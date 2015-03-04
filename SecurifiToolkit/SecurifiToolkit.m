@@ -33,6 +33,7 @@
 #import "DynamicAlmondModeChange.h"
 #import "AlmondModeRequest.h"
 #import "AlmondModeResponse.h"
+#import "AlmondModeChangeResponse.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -265,6 +266,11 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property(nonatomic, weak) SingleTon *networkSingleton;
 @property(atomic) BOOL isShutdown;
+
+// a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
+// update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
+// dynamic update to inform us of actual new state.
+@property(nonatomic, strong) AlmondModeChangeRequest *pendingAlmondModeChange;
 @end
 
 @implementation SecurifiToolkit
@@ -1225,6 +1231,8 @@ static SecurifiToolkit *singleton = nil;
     req.mode = newMode;
     req.userId = [self loginEmail];
 
+    self.pendingAlmondModeChange = req;
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
     cmd.command = req;
@@ -2026,7 +2034,17 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-//    AlmondModeChangeResponse *res = [data valueForKey:@"data"];
+    AlmondModeChangeResponse *res = [data valueForKey:@"data"];
+    if (!res.success) {
+        return;
+    }
+
+    AlmondModeChangeRequest *req = self.pendingAlmondModeChange;
+    if (req) {
+        [self.networkSingleton markModeForAlmond:req.almondMAC mode:req.mode];
+        self.pendingAlmondModeChange = nil;
+    }
+
     NSString *notification  = kSFIDidCompleteAlmondModeChangeRequest;
     [self postNotification:notification data:nil];
 }

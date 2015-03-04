@@ -84,6 +84,7 @@
 #import <SecurifiToolkit/SFIAlmondModeRef.h>
 
 @class SecurifiConfigurator;
+@class AlmondModeChangeRequest;
 
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.

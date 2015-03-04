@@ -968,7 +968,7 @@
             return SFIAlmondMode_unknown;
         }
 
-        return (SFIAlmondMode) [num intValue];
+        return (SFIAlmondMode) [num unsignedIntValue];
     }
 }
 
