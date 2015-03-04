@@ -40,7 +40,7 @@
         case SFIDeviceType_LightSensor_25:return @"25_LightSensor";
         case SFIDeviceType_WindowCovering_26:return @"26_WindowCovering";
         case SFIDeviceType_TemperatureSensor_27:return @"27_TemperatureSensor";
-        case SFIDeviceType_SimpleMetering_28:return @"28_SimpleMetering";
+        case SFIDeviceType_ZigbeeDoorLock_28:return @"28_ZigbeeDoorLock";
         case SFIDeviceType_ColorControl_29:return @"29_ColorControl";
         case SFIDeviceType_PressureSensor_30:return @"30_PressureSensor";
         case SFIDeviceType_FlowSensor_31:return @"31_FlowSensor";
@@ -130,7 +130,7 @@
         case SFIDeviceType_LightSensor_25:
         case SFIDeviceType_WindowCovering_26:
         case SFIDeviceType_TemperatureSensor_27:
-        case SFIDeviceType_SimpleMetering_28:
+        case SFIDeviceType_ZigbeeDoorLock_28:
         case SFIDeviceType_ColorControl_29:
         case SFIDeviceType_PressureSensor_30:
         case SFIDeviceType_FlowSensor_31:

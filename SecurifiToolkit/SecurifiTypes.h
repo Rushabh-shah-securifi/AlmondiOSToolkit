@@ -39,7 +39,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_LightSensor_25                = 25,
     SFIDeviceType_WindowCovering_26             = 26,
     SFIDeviceType_TemperatureSensor_27          = 27,
-    SFIDeviceType_SimpleMetering_28             = 28,
+    SFIDeviceType_ZigbeeDoorLock_28             = 28,
     SFIDeviceType_ColorControl_29               = 29,
     SFIDeviceType_PressureSensor_30             = 30,
     SFIDeviceType_FlowSensor_31                 = 31,
