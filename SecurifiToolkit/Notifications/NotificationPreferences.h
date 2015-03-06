@@ -16,7 +16,7 @@
 @property(nonatomic, copy) NSString *almondMAC;
 @property(nonatomic) int preferenceCount;
 @property(nonatomic, copy) NSString *userID;
-@property(nonatomic) NSArray *notificationDeviceList;
+@property(nonatomic) NSArray *notificationDeviceList; // a list of SFINotificationDevice
 @property(nonatomic, copy) NSString *internalIndex;
 
 - (NSString *)toXml;

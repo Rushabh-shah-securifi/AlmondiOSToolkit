@@ -26,4 +26,10 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
+// Combines the two lists of SFINotificationDevice
++ (NSArray *)addNotificationDevices:(NSArray *)devicesToAdd to:(NSArray *)devicesList;
+
+// Removes the devices from the list of SFINotificationDevice
++ (NSArray *)removeNotificationDevices:(NSArray *)devicesToRemove from:(NSArray *)devicesList;
+
 @end

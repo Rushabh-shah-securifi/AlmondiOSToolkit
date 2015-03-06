@@ -34,6 +34,7 @@
 #import "AlmondModeRequest.h"
 #import "AlmondModeResponse.h"
 #import "AlmondModeChangeResponse.h"
+#import "NotificationPreferenceResponse.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -271,6 +272,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 // update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
 // dynamic update to inform us of actual new state.
 @property(nonatomic, strong) AlmondModeChangeRequest *pendingAlmondModeChange;
+@property(nonatomic, strong) NotificationPreferences *pendingNotificationPreferenceChange;
 @end
 
 @implementation SecurifiToolkit
@@ -344,6 +346,8 @@ static SecurifiToolkit *singleton = nil;
             [center addObserver:self selector:@selector(onNotificationDeregistrationResponseCallback:) name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+
+            [center addObserver:self selector:@selector(onDeviceNotificationPreferenceChangeResponseCallback:) name:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER object:nil];
 
             [center addObserver:self selector:@selector(onAlmondModeChangeCompletion:) name:ALMOND_MODE_CHANGE_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onAlmondModeResponse:) name:ALMOND_MODE_RESPONSE_NOTIFIER object:nil];
@@ -1291,7 +1295,9 @@ static SecurifiToolkit *singleton = nil;
     req.userID = [self loginEmail];
     req.preferenceCount = (int) [deviceList count];
     req.notificationDeviceList = deviceList;
-
+    
+    self.pendingNotificationPreferenceChange = req;
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
     cmd.command = req;
@@ -1910,6 +1916,50 @@ static SecurifiToolkit *singleton = nil;
 
 
 #pragma mark - Notification Preference List
+
+- (void)onDeviceNotificationPreferenceChangeResponseCallback:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    NotificationPreferenceResponse *res = data[@"data"];
+    if (!res.isSuccessful) {
+        return;
+    }
+
+    NotificationPreferences *req = self.pendingNotificationPreferenceChange;
+    if (!req) {
+        return;
+    }
+
+    int res_correlationId = res.internalIndex.intValue;
+    if (res_correlationId != req.correlationId) {
+        return;
+    }
+
+    NSString *almondMac = req.almondMAC;
+    NSArray *currentPrefs = [self notificationPrefList:almondMac];
+    
+    NSArray *newPrefs;
+    if ([req.action isEqualToString:kSFINotificationPreferenceChangeActionAdd]) {
+        newPrefs = [SFINotificationDevice addNotificationDevices:req.notificationDeviceList to:currentPrefs];
+    }
+    else if ([req.action isEqualToString:kSFINotificationPreferenceChangeActionDelete]) {
+        newPrefs = [SFINotificationDevice removeNotificationDevices:req.notificationDeviceList from:currentPrefs];
+    }
+    else {
+        NSLog(@"Unable to process NotificationPreferenceResponse: action is not recognized, action:'%@'", req.action);
+        self.pendingNotificationPreferenceChange = nil;
+        return;
+    }
+
+    [self.dataManager writeNotificationList:newPrefs currentMAC:almondMac];
+
+    self.pendingNotificationPreferenceChange = nil;
+    [self postNotification:kSFINotificationPreferencesDidChange data:almondMac];
+}
 
 - (void)onNotificationRegistrationResponseCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;

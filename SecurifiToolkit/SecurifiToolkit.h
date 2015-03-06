@@ -85,6 +85,7 @@
 
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
+@class NotificationPreferences;
 
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
@@ -214,7 +215,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Fetch the locally stored values for the Almond's devices
 - (NSArray*)deviceValuesList:(NSString*)almondMac;
 
-// Fetch the locally stored values for the Almond's notification
+// Fetch the locally stored values for the Almond's notification preferences
 - (NSArray *)notificationPrefList:(NSString *)almondMac;
 
 // Send a command to the cloud requesting a device list for the specified Almond
