@@ -909,6 +909,9 @@ static SecurifiToolkit *singleton = nil;
 
     // Fetch the Almond Mode
     [self tryRequestAlmondMode:mac];
+
+    // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
+    [self asyncRequestNotificationPreferenceList:mac];
 }
 
 - (SFIAlmondPlus *)currentAlmond {
