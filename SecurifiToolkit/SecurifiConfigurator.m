@@ -25,13 +25,14 @@
         self.enableCertificateValidation = NO;
         self.certificateFileName = CLOUD_CERT_FILENAME; // file must be named "cert.der". But leave off the file extension in the config.
         self.enableNotifications = NO;
+        self.enableRouterWirelessControl = YES;
     }
 
     return self;
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    SecurifiConfigurator *copy = [[[self class] allocWithZone:zone] init];
+    SecurifiConfigurator *copy = (SecurifiConfigurator *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy.enableScoreboard = self.enableScoreboard;
@@ -41,6 +42,7 @@
         copy.enableCertificateValidation = self.enableCertificateValidation;
         copy.certificateFileName = self.certificateFileName;
         copy.enableNotifications = self.enableNotifications;
+        copy.enableRouterWirelessControl = self.enableRouterWirelessControl;
     }
 
     return copy;

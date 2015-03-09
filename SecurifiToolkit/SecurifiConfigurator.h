@@ -27,6 +27,9 @@
 // Controls whether the app is configured for push and cloud notifications. Default is NO.
 @property(nonatomic) BOOL enableNotifications;
 
+// Controls whether the app allows the user to enable/disable a SSID on the router tab
+@property(nonatomic) BOOL enableRouterWirelessControl;
+
 - (id)copyWithZone:(NSZone *)zone;
 
 @end
