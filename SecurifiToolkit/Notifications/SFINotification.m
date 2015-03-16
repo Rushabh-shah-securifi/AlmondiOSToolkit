@@ -60,6 +60,9 @@ Value           => indexvalue
     obj.valueType = [SFIDeviceKnownValues nameToPropertyType:payload[@"indexname"]];
     obj.value = payload[@"indexvalue"];
 
+    str = payload[@"counter"];
+    obj.debugCounter = str.integerValue;
+
     return obj;
 }
 
@@ -76,6 +79,7 @@ Value           => indexvalue
         self.valueType = (SFIDevicePropertyType) [coder decodeIntForKey:@"self.valueType"];
         self.value = [coder decodeObjectForKey:@"self.value"];
         self.viewed = [coder decodeBoolForKey:@"self.viewed"];
+        self.debugCounter = (long) [coder decodeInt64ForKey:@"self.debugCounter"];
     }
 
     return self;
@@ -92,6 +96,7 @@ Value           => indexvalue
     [coder encodeInt:self.valueType forKey:@"self.valueType"];
     [coder encodeObject:self.value forKey:@"self.value"];
     [coder encodeBool:self.viewed forKey:@"self.viewed"];
+    [coder encodeInt64:self.valueIndex forKey:@"self.debugCounter"];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -108,6 +113,7 @@ Value           => indexvalue
         copy.valueType = self.valueType;
         copy.value = self.value;
         copy.viewed = self.viewed;
+        copy.debugCounter = self.debugCounter;
     }
 
     return copy;
@@ -124,6 +130,7 @@ Value           => indexvalue
     [description appendFormat:@", self.valueType=%d", self.valueType];
     [description appendFormat:@", self.value=%@", self.value];
     [description appendFormat:@", self.viewed=%d", self.viewed];
+    [description appendFormat:@", self.debugCounter=%li", self.debugCounter];
     [description appendString:@">"];
     return description;
 }

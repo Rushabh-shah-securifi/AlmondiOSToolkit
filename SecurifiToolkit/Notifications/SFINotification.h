@@ -20,6 +20,8 @@
 @property(nonatomic, copy) NSString *value; // device value
 @property(nonatomic) BOOL viewed;
 
+@property(nonatomic) long debugCounter;
+
 + (instancetype)parseJson:(NSData*)data;
 
 + (instancetype)parsePayload:(NSDictionary*)payload;
