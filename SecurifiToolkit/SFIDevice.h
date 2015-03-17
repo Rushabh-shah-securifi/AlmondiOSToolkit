@@ -47,11 +47,6 @@
 // Indicates whether the device has a binary "on/off" (or "open/closed" or so on) state that can be toggled.
 - (BOOL)isBinaryStateSwitchable;
 
-// Indicates whether the device has notification preference on
-- (BOOL)checkNotificationEnabled;
-
-
-
 // Toggles the device state, returning the new state values.
 // Returns nil if the device does not support switching state or when the value is missing and cannot be determined.
 // Caller may test whether the device supports this capability by calling isBinaryStateSwitchable
