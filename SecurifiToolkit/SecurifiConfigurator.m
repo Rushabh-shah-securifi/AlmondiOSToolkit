@@ -9,8 +9,8 @@
 #import "SecurifiConfigurator.h"
 
 #define CLOUD_PROD_SERVER   @"cloud.securifi.com"
-#define CLOUD_DEV_SERVER    @"ec2-23-20-197-230.compute-1.amazonaws.com"
-//@"clouddev.securifi.com"
+//#define CLOUD_DEV_SERVER    @"ec2-23-20-197-230.compute-1.amazonaws.com"
+#define CLOUD_DEV_SERVER    @"clouddev.securifi.com"
 #define CLOUD_SERVER_PORT   1028
 #define CLOUD_CERT_FILENAME @"cert"
 
