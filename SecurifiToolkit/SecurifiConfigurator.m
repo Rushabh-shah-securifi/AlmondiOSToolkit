@@ -9,7 +9,8 @@
 #import "SecurifiConfigurator.h"
 
 #define CLOUD_PROD_SERVER   @"cloud.securifi.com"
-#define CLOUD_DEV_SERVER    @"clouddev.securifi.com"
+#define CLOUD_DEV_SERVER    @"ec2-23-20-197-230.compute-1.amazonaws.com"
+//@"clouddev.securifi.com"
 #define CLOUD_SERVER_PORT   1028
 #define CLOUD_CERT_FILENAME @"cert"
 
@@ -25,6 +26,7 @@
         self.enableCertificateValidation = NO;
         self.certificateFileName = CLOUD_CERT_FILENAME; // file must be named "cert.der". But leave off the file extension in the config.
         self.enableNotifications = NO;
+        self.enableNotificationsDebugLogging = NO;
         self.enableRouterWirelessControl = YES;
     }
 
@@ -42,6 +44,7 @@
         copy.enableCertificateValidation = self.enableCertificateValidation;
         copy.certificateFileName = self.certificateFileName;
         copy.enableNotifications = self.enableNotifications;
+        copy.enableNotificationsDebugLogging = self.enableNotificationsDebugLogging;
         copy.enableRouterWirelessControl = self.enableRouterWirelessControl;
     }
 
