@@ -60,8 +60,16 @@ Value           => indexvalue
     obj.valueType = [SFIDeviceKnownValues nameToPropertyType:payload[@"indexname"]];
     obj.value = payload[@"indexvalue"];
 
+    // protect against errant or missing values in payload
     str = payload[@"counter"];
-    obj.debugCounter = str.integerValue;
+    @try {
+        if (str.length > 0) {
+            obj.debugCounter = str.integerValue;
+        }
+    }
+    @catch (NSException *e) {
+        NSLog(@"Exception while parsing debug counter, str:'%@', e:%@", str, e.description);
+    }
 
     return obj;
 }
@@ -117,6 +125,10 @@ Value           => indexvalue
     }
 
     return copy;
+}
+
+- (void)setDebugDeviceName {
+    self.deviceName = [NSString stringWithFormat:@"%@-%li", self.deviceName, self.debugCounter];
 }
 
 - (NSString *)description {

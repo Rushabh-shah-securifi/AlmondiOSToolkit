@@ -34,4 +34,8 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
+// Used to alter the device name by appending the debugCounter value; useful for testing and debugging to track
+// sequences of notifications
+- (void)setDebugDeviceName;
+
 @end
