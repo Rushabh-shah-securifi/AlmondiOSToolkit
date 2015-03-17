@@ -61,14 +61,15 @@ Value           => indexvalue
     obj.value = payload[@"indexvalue"];
 
     // protect against errant or missing values in payload
-    str = payload[@"counter"];
-    @try {
-        if (str.length > 0) {
-            obj.debugCounter = str.integerValue;
+    id counter = payload[@"counter"];
+    if (counter) {
+        @try {
+            NSNumber *num = counter;
+            obj.debugCounter = num.longValue;
         }
-    }
-    @catch (NSException *e) {
-        NSLog(@"Exception while parsing debug counter, str:'%@', e:%@", str, e.description);
+        @catch (NSException *e) {
+            NSLog(@"Exception while parsing debug counter, value:'%@', e:%@", counter, e.description);
+        }
     }
 
     return obj;
