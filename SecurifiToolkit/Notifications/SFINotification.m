@@ -129,7 +129,11 @@ Value           => indexvalue
 }
 
 - (void)setDebugDeviceName {
-    self.deviceName = [NSString stringWithFormat:@"%@-%li", self.deviceName, self.debugCounter];
+    long counter = self.debugCounter;
+    if (counter == 0) {
+        return;
+    }
+    self.deviceName = [NSString stringWithFormat:@"%@-%li", self.deviceName, counter];
 }
 
 - (NSString *)description {
