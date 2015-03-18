@@ -56,6 +56,10 @@
 
 - (void)markRuntTimeSinceLastVacuum;
 
+// Makes a live backup of the database, writing it to the specified filePath.
+// This function copies 5 database pages, then unlocks the database and sleeps for 250 ms, then repeats the
+// process until the entire database is backed up.
+// Returns YES if successful
 - (BOOL)copyTo:(NSString *)filePath;
 
 @end
