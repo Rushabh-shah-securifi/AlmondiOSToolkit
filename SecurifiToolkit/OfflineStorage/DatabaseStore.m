@@ -77,13 +77,14 @@ create index notifications_mac on notifications (mac, time);
     return [[NotificationStoreImpl alloc] initWithDb:self.db];
 }
 
-- (void)storeNotification:(SFINotification *)notification {
+- (BOOL)storeNotification:(SFINotification *)notification {
     if (!notification) {
-        return;
+        return NO;
     }
 
-    [self insertRecord:notification];
+    BOOL success = [self insertRecord:notification];
     [self trimRecords:MAX_NOTIFICATIONS];
+    return success;
 }
 
 
@@ -99,7 +100,7 @@ create index notifications_mac on notifications (mac, time);
 
 #pragma mark - Private methods
 
-- (void)insertRecord:(SFINotification *)notification {
+- (BOOL)insertRecord:(SFINotification *)notification {
     ZHDatabaseStatement *stmt = self.insert_notification;
 
     NSString *valueType = [SFIDeviceKnownValues propertyTypeToName:notification.valueType];
@@ -133,6 +134,8 @@ create index notifications_mac on notifications (mac, time);
         }
 
         [stmt reset];
+
+        return success;
     }
 }
 

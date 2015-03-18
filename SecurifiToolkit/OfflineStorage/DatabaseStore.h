@@ -15,7 +15,7 @@
 
 - (id<SFINotificationStore>)newStore;
 
-- (void)storeNotification:(SFINotification *)notification;
+- (BOOL)storeNotification:(SFINotification *)notification;
 
 - (void)deleteNotificationsForAlmond:(NSString *)almondMAC;
 

@@ -1265,11 +1265,11 @@ static SecurifiToolkit *singleton = nil;
 
 // Checks whether a Mode has already been fetched for the almond, and if so, fails quietly.
 // Otherwise, it requests the mode information.
-- (void)tryRequestAlmondMode:(NSString*)almondMac {
+- (void)tryRequestAlmondMode:(NSString *)almondMac {
     if (almondMac == nil) {
         return;
     }
-    
+
     SFIAlmondMode mode = [self tryCachedAlmondModeValue:almondMac];
     if (mode != SFIAlmondMode_unknown) {
         // a valid value already exists
@@ -1298,9 +1298,9 @@ static SecurifiToolkit *singleton = nil;
     req.userID = [self loginEmail];
     req.preferenceCount = (int) [deviceList count];
     req.notificationDeviceList = deviceList;
-    
+
     self.pendingNotificationPreferenceChange = req;
-    
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
     cmd.command = req;
@@ -1434,11 +1434,11 @@ static SecurifiToolkit *singleton = nil;
     return [KeyChainWrapper isEntryStoredForUserEmail:SEC_APN_TOKEN forService:SEC_SERVICE_NAME];
 }
 
-- (NSString*)secRegisteredApnToken {
+- (NSString *)secRegisteredApnToken {
     return [KeyChainWrapper retrieveEntryForUser:SEC_APN_TOKEN forService:SEC_SERVICE_NAME];
 }
 
-- (void)setSecRegisteredApnToken:(NSString*)token {
+- (void)setSecRegisteredApnToken:(NSString *)token {
     if (token == nil) {
         return;
     }
@@ -1944,7 +1944,7 @@ static SecurifiToolkit *singleton = nil;
 
     NSString *almondMac = req.almondMAC;
     NSArray *currentPrefs = [self notificationPrefList:almondMac];
-    
+
     NSArray *newPrefs;
     if ([req.action isEqualToString:kSFINotificationPreferenceChangeActionAdd]) {
         newPrefs = [SFINotificationDevice addNotificationDevices:req.notificationDeviceList to:currentPrefs];
@@ -2044,12 +2044,17 @@ static SecurifiToolkit *singleton = nil;
 
 #pragma mark - Notification access
 
-- (void)storePushNotification:(SFINotification *)notification {
+- (BOOL)storePushNotification:(SFINotification *)notification {
     if (!self.config.enableNotifications) {
-        return;
+        return NO;
     }
-    [self.databaseStore storeNotification:notification];
-    [self postNotification:kSFINotificationDidStore data:nil];
+
+    BOOL success = [self.databaseStore storeNotification:notification];
+    if (success) {
+        [self postNotification:kSFINotificationDidStore data:nil];
+    }
+
+    return success;
 }
 
 - (NSArray *)notifications {
@@ -2098,7 +2103,7 @@ static SecurifiToolkit *singleton = nil;
         self.pendingAlmondModeChange = nil;
     }
 
-    NSString *notification  = kSFIDidCompleteAlmondModeChangeRequest;
+    NSString *notification = kSFIDidCompleteAlmondModeChangeRequest;
     [self postNotification:notification data:nil];
 }
 

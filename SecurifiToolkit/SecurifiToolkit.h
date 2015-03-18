@@ -278,7 +278,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action;
 
 // Stores a notification record that originally entered the system as an Apple Push Notification
-- (void)storePushNotification:(SFINotification *)notification;
+- (BOOL)storePushNotification:(SFINotification *)notification;
 
 // an array of all SFINotification, newest to oldest
 - (NSArray *)notifications;

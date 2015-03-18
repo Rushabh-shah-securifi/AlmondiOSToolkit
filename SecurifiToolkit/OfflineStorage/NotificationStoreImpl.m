@@ -153,6 +153,10 @@
     }
 }
 
+- (void)deleteAllNotifications {
+    [self.db execute:@"delete from notifications"];
+}
+
 //id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue
 - (SFINotification *)readRecord:(ZHDatabaseStatement *)stmt {
     SFINotification *obj = [SFINotification new];

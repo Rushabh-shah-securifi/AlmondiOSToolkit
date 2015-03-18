@@ -30,4 +30,6 @@
 
 - (void)markDeleted:(SFINotification *)notification;
 
+- (void)deleteAllNotifications;
+
 @end
