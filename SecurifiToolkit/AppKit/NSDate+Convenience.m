@@ -57,7 +57,7 @@
                                                   toDate:toDate
                                                  options:0];
     NSInteger days = [components day];
-    return days;
+    return (int) days;
 }
 
 - (NSString *)formattedDateString {

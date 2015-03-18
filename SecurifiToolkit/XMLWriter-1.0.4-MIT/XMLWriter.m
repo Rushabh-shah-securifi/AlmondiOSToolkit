@@ -26,6 +26,8 @@
 
 #import "XMLWriter.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCLegacyObjCLiteralInspection"
 #define NSBOOL(_X_) ((_X_) ? (id)kCFBooleanTrue : (id)kCFBooleanFalse)
 
 @interface XMLWriter (UtilityMethods)
@@ -54,8 +56,8 @@ static NSString *const XML_NAMESPACE_URI = @"http://www.w3.org/XML/1998/namespac
 static NSString *const XML_NAMESPACE_URI_PREFIX = @"xml";
 static NSString *const XMLNS_NAMESPACE_URI = @"http://www.w3.org/2000/xmlns/";
 static NSString *const XMLNS_NAMESPACE_URI_PREFIX = @"xmlns";
-static NSString *const XSI_NAMESPACE_URI = @"http://www.w3.org/2001/XMLSchema/";
-static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
+//static NSString *const XSI_NAMESPACE_URI = @"http://www.w3.org/2001/XMLSchema/";
+//static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 
 @implementation XMLWriter
 
@@ -101,7 +103,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		[namespaceCounts addObject:previousCount];
 	} else {
 		// the count has changed, save the it
-		NSNumber* count = [NSNumber numberWithInt:[namespaceURIs count]];
+		NSNumber* count = [NSNumber numberWithUnsignedInteger:[namespaceURIs count]];
 	
 		[namespaceCounts addObject:count];
 	}
@@ -567,7 +569,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 	
 	if (characters) {
 		// main flow
-		[self writeEscapeCharacters:characters length:[value length]];
+		[self writeEscapeCharacters:characters length:(int)[value length]];
 	} else {
 		// we need to read/copy the characters for some reason, from the docs of CFStringGetCharactersPtr:
 		// A pointer to a buffer of Unicode character or NULL if the internal storage of the CFString does not allow this to be returned efficiently.
@@ -587,7 +589,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 			if(count + 256 < [value length]) {
 				length = 256;
 			} else {
-				length = [value length] - count;
+				length = ((int)[value length]) - count;
 			}
 			
 			[value getCharacters:[data mutableBytes] range:NSMakeRange(count, length)];
@@ -760,3 +762,5 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 @end
+
+#pragma clang diagnostic pop
