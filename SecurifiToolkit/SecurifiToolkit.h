@@ -289,5 +289,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (id <SFINotificationStore>)newNotificationStore;
 
+- (BOOL)copyNotificationStoreTo:(NSString*)filePath;
+
 @end
  

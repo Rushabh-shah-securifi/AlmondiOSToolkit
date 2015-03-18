@@ -98,6 +98,10 @@ create index notifications_mac on notifications (mac, time);
     [self.db execute:@"delete from notifications"];
 }
 
+- (BOOL)copyDatabaseTo:(NSString *)filePath {
+    return [self.db copyTo:filePath];
+}
+
 #pragma mark - Private methods
 
 - (BOOL)insertRecord:(SFINotification *)notification {

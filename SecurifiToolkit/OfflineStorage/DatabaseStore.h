@@ -21,4 +21,6 @@
 
 - (void)purgeAll;
 
+- (BOOL)copyDatabaseTo:(NSString*)filePath;
+
 @end

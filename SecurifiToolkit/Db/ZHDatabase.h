@@ -56,4 +56,6 @@
 
 - (void)markRuntTimeSinceLastVacuum;
 
+- (BOOL)copyTo:(NSString *)filePath;
+
 @end

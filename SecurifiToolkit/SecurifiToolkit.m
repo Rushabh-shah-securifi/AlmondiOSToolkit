@@ -2083,6 +2083,13 @@ static SecurifiToolkit *singleton = nil;
     return [self.databaseStore newStore];
 }
 
+- (BOOL)copyNotificationStoreTo:(NSString *)filePath {
+    if (!self.config.enableNotifications) {
+        return NO;
+    }
+    return [self.databaseStore copyDatabaseTo:filePath];
+}
+
 #pragma mark - Almond mode change
 
 - (void)onAlmondModeChangeCompletion:(id)sender {
