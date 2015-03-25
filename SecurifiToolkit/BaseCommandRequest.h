@@ -10,10 +10,16 @@
 
 @interface BaseCommandRequest : NSObject
 
+// property for tracking when this request was made; can be used for expiring it
+@property(nonatomic, readonly) NSDate *created;
+
 @property(nonatomic, readonly) sfi_id correlationId;
 
 - (instancetype)init;
 
 - (void)addMobileInternalIndexElement:(SFIXmlWriter *)writer;
+
+// can be used to determine whether the request should be expired
+- (BOOL)shouldExpireAfterSeconds:(NSTimeInterval)timeOutSecsAfterCreation;
 
 @end

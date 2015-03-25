@@ -8,6 +8,7 @@
 
 @implementation NotificationListRequest
 
+
 - (NSString *)toXml {
     SFIXmlWriter *writer = [SFIXmlWriter new];
 
