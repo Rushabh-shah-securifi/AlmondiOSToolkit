@@ -1,6 +1,6 @@
 //
 // Created by Matthew Sinclair-Day on 1/29/15.
-// Copyright (c) 2015 Nirav Uchat. All rights reserved.
+// Copyright (c) 2015 Securifi Ltd. All rights reserved.
 //
 
 #import "DatabaseStore.h"
@@ -13,8 +13,6 @@
 #import "NotificationStoreImpl.h"
 
 #define MAX_NOTIFICATIONS 1000
-
-#define DEF_SYNC_POINT @"last_syncpoint"
 
 /*
 
@@ -55,6 +53,9 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_metadata;
+@property(nonatomic, readonly) ZHDatabaseStatement *insert_syncpoint;
+@property(nonatomic, readonly) ZHDatabaseStatement *delete_syncpoint;
+@property(nonatomic, readonly) ZHDatabaseStatement *read_syncpoint;
 @end
 
 @implementation DatabaseStore
@@ -77,11 +78,21 @@ create index notifications_mac on notifications (mac, time);
         [self.db execute:@"drop table if exists notifications_meta"];
         [self.db execute:@"create table notifications_meta (meta_key varchar(128) primary key, meta_value varchar(128), updated double);"];
         [self.db execute:@"create index notifications_meta_key on notifications_meta (meta_key);"];
+
+        // a queue of sync points pending processing
+        [self.db execute:@"drop table if exists notifications_syncpoints"];
+        [self.db execute:@"create table notifications_syncpoints (syncpoint varchar(128) primary key, created double);"];
+        [self.db execute:@"create index notifications_syncpoints_syncpoint on notifications_syncpoints (syncpoint);"];
+        [self.db execute:@"create index notifications_syncpoints_created on notifications_syncpoints (created);"];
     }
 
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _read_metadata = [self.db newStatement:@"select meta_value, updated from notifications_meta where meta_key=?"];
     _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value, updated) values (?,?,?);"];
+
+    _insert_syncpoint = [self.db newStatement:@"insert into notifications_syncpoints (syncpoint, created) values (?,?)"];
+    _delete_syncpoint = [self.db newStatement:@"delete from notifications_syncpoints where syncpoint=?"];
+    _read_syncpoint = [self.db newStatement:@"select syncpoint from notifications_syncpoints order by created desc limit 1"];
 }
 
 - (id <SFINotificationStore>)newStore {
@@ -104,7 +115,7 @@ create index notifications_mac on notifications (mac, time);
     [stmt execute];
 }
 
-- (void)purgeAll {
+- (void)purgeAllNotifications {
     [self.db execute:@"delete from notifications"];
 }
 
@@ -174,18 +185,70 @@ create index notifications_mac on notifications (mac, time);
     return [fileManager fileExistsAtPath:filePath];
 }
 
-- (BOOL)storeNotifications:(NSArray *)notifications newSyncPoint:(NSString *)syncPoint {
+- (BOOL)storeNotifications:(NSArray *)notifications syncPoint:(NSString *)syncPoint {
     for (SFINotification *n in notifications) {
         [self insertRecord:n];
     }
 
-    [self setMetaData:syncPoint forKey:DEF_SYNC_POINT];
-    
+    [self removeSyncPoint:syncPoint];
     return YES;
 }
 
-- (NSString *)lastSyncPoint {
-    return [self getMetaValue:DEF_SYNC_POINT];
+- (NSInteger)countTrackedSyncPoints {
+    return [self.db executeReturnInteger:@"select count(*) from notifications_syncpoints"];
+}
+
+- (NSString *)nextTrackedSyncPoint {
+    ZHDatabaseStatement *stmt = self.read_syncpoint;
+
+    @synchronized (stmt) {
+        [stmt reset];
+
+        NSString *next;
+        if ([stmt step]) {
+            next = [stmt stepNextString];
+        }
+
+        [stmt reset];
+        return next;
+    }
+}
+
+- (void)removeSyncPoint:(NSString *)pageState {
+    if (![self ensureDefinedSyncPoint:pageState]) {
+        return;
+    }
+
+    ZHDatabaseStatement *stmt = self.delete_syncpoint;
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextText:pageState];
+
+        [stmt execute];
+        [stmt reset];
+    }
+}
+
+- (void)trackSyncPoint:(NSString *)pageState {
+    if (![self ensureDefinedSyncPoint:pageState]) {
+        return;
+    }
+
+    NSDate *date = [NSDate date];
+    NSTimeInterval now = date.timeIntervalSince1970;
+
+    ZHDatabaseStatement *stmt = self.insert_syncpoint;
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextText:pageState];
+        [stmt bindNextTimeInterval:now];
+        [stmt execute];
+        [stmt reset];
+    }
+}
+
+- (BOOL)ensureDefinedSyncPoint:(NSString *)syncPoint {
+    return syncPoint.length > 0 && ![syncPoint isEqualToString:@"undefined"];
 }
 
 - (NSString *)getMetaValue:(NSString *)metaKey {
