@@ -94,5 +94,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
 
     CommandType_NOTIFICATIONS_SYNC_REQUEST              = 800,
     CommandType_NOTIFICATIONS_SYNC_RESPONSE             = 801,
+    CommandType_NOTIFICATIONS_COUNT_REQUEST             = 802,
+    CommandType_NOTIFICATIONS_COUNT_RESPONSE            = 803,
 
 };

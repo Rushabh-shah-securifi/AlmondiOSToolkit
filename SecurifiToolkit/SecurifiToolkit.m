@@ -37,6 +37,8 @@
 #import "NotificationPreferenceResponse.h"
 #import "NotificationListRequest.h"
 #import "NotificationListResponse.h"
+#import "NotificationCountRequest.h"
+#import "NotificationCountResponse.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -284,6 +286,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 // tracks only "refresh" request to get new ones
 @property(nonatomic, strong) NotificationListRequest *pendingRefreshNotificationsRequest;
+@property(nonatomic, strong) NotificationCountRequest *pendingNotificationCountRequest;
 @end
 
 @implementation SecurifiToolkit
@@ -365,6 +368,7 @@ static SecurifiToolkit *singleton = nil;
             [center addObserver:self selector:@selector(onDynamicAlmondModeChange:) name:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER object:nil];
 
             [center addObserver:self selector:@selector(onNotificationListSyncResponse:) name:NOTIFICATION_LIST_SYNC_RESPONSE_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onNotificationCountResponse:) name:NOTIFICATION_COUNT_RESPONSE_NOTIFIER object:nil];
         }
     }
 
@@ -2072,6 +2076,30 @@ static SecurifiToolkit *singleton = nil;
     }
 }
 
+- (void)onNotificationCountResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    NSLog(@"onNotificationCountResponse: clearing request tracking");
+    self.pendingNotificationCountRequest = nil;
+
+    NotificationCountResponse *res = data[@"data"];
+    if (res.error) {
+        NSLog(@"onNotificationCountResponse: error response");
+        return;
+    }
+
+    // Store the notifications and stop tracking the pageState that they were associated with
+    DatabaseStore *store = self.databaseStore;
+    [store storeBadgeCount:res.badgeCount];
+
+    //todo post something
+//    [self postNotification:kSFINotificationDidStore data:nil];
+}
+
 #pragma mark - Notification access
 
 - (BOOL)storePushNotification:(SFINotification *)notification {
@@ -2137,6 +2165,29 @@ static SecurifiToolkit *singleton = nil;
     }
 
     [self internalAsyncFetchNotifications:nil];
+}
+
+- (void)tryFetchNotificationCount {
+    if (!self.config.enableNotifications) {
+        return;
+    }
+
+    NotificationCountRequest *pending = self.pendingNotificationCountRequest;
+    if (pending) {
+        if (![pending shouldExpireAfterSeconds:5]) {
+            // give the request 5 seconds to complete
+            NSLog(@"tryFetchNotificationCount: fail fast; already fetching latest count");
+            return;
+        }
+    }
+
+    NotificationCountRequest *req = [NotificationCountRequest new];
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATIONS_COUNT_REQUEST;
+    cmd.command = req;
+
+    [self asyncSendToCloud:cmd];
 }
 
 // Sends a request for notifications

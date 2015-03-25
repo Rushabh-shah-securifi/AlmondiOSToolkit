@@ -295,5 +295,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Synchronizes the on-board Notifications database with the cloud
 - (void)tryRefreshNotifications;
 
+- (void)tryFetchNotificationCount;
+
 @end
  
