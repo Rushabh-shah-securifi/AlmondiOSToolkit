@@ -81,9 +81,11 @@ int backupDb(
         // Open the database
         if (sqlite3_open([databasePath UTF8String], &_database) != SQLITE_OK) {
             // Even though the open failed, call close to properly clean up resources.
+            char const *err_msg = sqlite3_errmsg(_database);
             sqlite3_close(_database);
-            NSAssert2(0, @"Failed to open database from '%@', with message '%s'.", databasePath, sqlite3_errmsg(_database));
+            NSAssert2(0, @"Failed to open database from '%@', with message '%s'.", databasePath, err_msg);
             // Additional error handling, as appropriate...
+            _database = nil;
         }
     }
 
@@ -92,6 +94,7 @@ int backupDb(
 
 - (void)dealloc {
     sqlite3_close(_database);
+    _database = nil;
 }
 
 - (void)attachToDb:(NSString *)attachDbPath alias:(NSString *)dbAlias {
