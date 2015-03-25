@@ -15,6 +15,10 @@ command 800
  */
 @interface NotificationListRequest : BaseCommandRequest <SecurifiCommand>
 
+// the page state to request or nil
 @property(nonatomic, copy) NSString *pageState;
+
+// an opaque token attached to the request and parroted back in the response
+@property(nonatomic, copy) NSString *requestId;
 
 @end

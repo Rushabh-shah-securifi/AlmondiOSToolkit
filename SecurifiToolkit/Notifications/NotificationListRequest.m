@@ -14,8 +14,7 @@
     [writer startElement:@"root"];
 
     [writer addElement:@"PageState" text:self.pageState];
-
-    [self addMobileInternalIndexElement:writer];
+    [writer addElement:@"RequestId" text:self.requestId];
 
     [writer endElement];
 

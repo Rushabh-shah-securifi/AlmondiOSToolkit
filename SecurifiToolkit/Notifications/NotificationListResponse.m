@@ -38,6 +38,7 @@
 
     NotificationListResponse *obj = [NotificationListResponse new];
     obj->_pageState = payload[@"pageState"];
+    obj->_requestId = payload[@"requestId"];
     obj->_notifications = parsed;
 
     return obj;

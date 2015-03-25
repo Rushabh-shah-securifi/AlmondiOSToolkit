@@ -10,6 +10,10 @@
 @interface NotificationListResponse : NSObject
 
 @property(nonatomic, readonly) NSString *pageState;
+
+// an opaque token attached to the request and parroted back in the response
+@property(nonatomic, readonly) NSString *requestId;
+
 @property(nonatomic, readonly) NSArray *notifications; // a list of SFINotification
 
 - (BOOL)isPageStateDefined;
