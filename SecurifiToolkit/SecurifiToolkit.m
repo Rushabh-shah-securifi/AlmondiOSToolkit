@@ -281,6 +281,9 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 // dynamic update to inform us of actual new state.
 @property(nonatomic, strong) AlmondModeChangeRequest *pendingAlmondModeChange;
 @property(nonatomic, strong) NotificationPreferences *pendingNotificationPreferenceChange;
+
+// tracks only "refresh" request to get new ones
+@property(nonatomic, strong) NotificationListRequest *pendingRefreshNotificationsRequest;
 @end
 
 @implementation SecurifiToolkit
@@ -1454,6 +1457,9 @@ static SecurifiToolkit *singleton = nil;
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
 
+    self.pendingAlmondModeChange = nil;
+    self.pendingNotificationPreferenceChange = nil;
+    self.pendingRefreshNotificationsRequest = nil;
     self.networkSingleton = nil;
 
     NSLog(@"Finished tear down of network");
@@ -2033,10 +2039,17 @@ static SecurifiToolkit *singleton = nil;
     }
 
     NotificationListResponse *res = data[@"data"];
-    DatabaseStore *store = self.databaseStore;
+    NSString *requestId = res.requestId;
+
+    if (requestId == nil) {
+        NSLog(@"asyncRefreshNotifications: clearing refresh request tracking");
+        self.pendingRefreshNotificationsRequest = nil;
+    }
 
     // Store the notifications and stop tracking the pageState that they were associated with
-    BOOL success = [store storeNotifications:res.notifications syncPoint:res.requestId];
+    DatabaseStore *store = self.databaseStore;
+
+    BOOL success = [store storeNotifications:res.notifications syncPoint:requestId];
     if (!success) {
         NSLog(@"Failed to store notifications: %@", res.notifications);
         return;
@@ -2112,11 +2125,15 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
+    if (self.pendingRefreshNotificationsRequest) {
+        NSLog(@"asyncRefreshNotifications: fail fast; already fetching latest");
+        return;
+    }
+
     [self internalAsyncFetchNotifications:nil];
 }
 
-// this method sends a request to fetch the latest notifications; 
-// it does not handle the case of fetching older ones 
+// Sends a request for notifications
 // pagestate can be nil or a defined page state. The page state also becomes an correlation ID that is parroted back in the
 // response. This allows the system to track responses and ensure page states are always serviced, even across app sessions.
 - (void)internalAsyncFetchNotifications:(NSString*)pageState {
@@ -2131,6 +2148,12 @@ static SecurifiToolkit *singleton = nil;
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATIONS_SYNC_REQUEST;
     cmd.command = req;
+
+    // nil indicates request is for "refresh; get latest" request
+    if (pageState == nil) {
+        NSLog(@"asyncRefreshNotifications: tracking refresh request");
+        self.pendingRefreshNotificationsRequest = req;
+    }
 
     [self asyncSendToCloud:cmd];
 }
