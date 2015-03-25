@@ -759,7 +759,7 @@ static SecurifiToolkit *singleton = nil;
     [self removeCurrentAlmond];
     [self.dataManager purgeAll];
     if (self.configuration.enableNotifications) {
-        [self.databaseStore purgeAll];
+        [self.databaseStore purgeAllNotifications];
     }
 }
 
@@ -2033,19 +2033,27 @@ static SecurifiToolkit *singleton = nil;
     }
 
     NotificationListResponse *res = data[@"data"];
+    DatabaseStore *store = self.databaseStore;
 
-    BOOL success = [self.databaseStore storeNotifications:res.notifications newSyncPoint:res.pageState];
-    if (success) {
-        [self postNotification:kSFINotificationDidStore data:nil];
+    // Store the notifications and stop tracking the pageState that they were associated with
+    BOOL success = [store storeNotifications:res.notifications syncPoint:res.requestId];
+    if (!success) {
+        NSLog(@"Failed to store notifications: %@", res.notifications);
+        return;
+    }
 
-        // keep syncing until the count is zero
-        if (res.isPageStateDefined) {
-            // nothing to do
-            // "if in response pageState is missing it means that database has no older notifications hence don’t request anything."
-            if (res.notifications.count > 0) {
-                [self asyncNotifications];
-            }
-        }
+    // Let the world know there are new notifications
+    [self postNotification:kSFINotificationDidStore data:nil];
+
+    // Keep syncing until page state is no longer provided
+    if (res.isPageStateDefined) {
+        // There are more pages to fetch
+        NSString *nextPageState = res.pageState;
+
+        // Keep track of this page state until the response has been processed
+        [store trackSyncPoint:nextPageState];
+
+        [self internalAsyncFetchNotifications:nextPageState];
     }
 }
 
@@ -2097,13 +2105,28 @@ static SecurifiToolkit *singleton = nil;
     return [self.databaseStore copyDatabaseTo:filePath];
 }
 
-- (void)asyncNotifications {
+// this method sends a request to fetch the latest notifications; 
+// it does not handle the case of fetching older ones 
+- (void)asyncRefreshNotifications {
+    if (!self.config.enableNotifications) {
+        return;
+    }
+
+    [self internalAsyncFetchNotifications:nil];
+}
+
+// this method sends a request to fetch the latest notifications; 
+// it does not handle the case of fetching older ones 
+// pagestate can be nil or a defined page state. The page state also becomes an correlation ID that is parroted back in the
+// response. This allows the system to track responses and ensure page states are always serviced, even across app sessions.
+- (void)internalAsyncFetchNotifications:(NSString*)pageState {
     if (!self.config.enableNotifications) {
         return;
     }
 
     NotificationListRequest *req = [NotificationListRequest new];
-    req.pageState = self.databaseStore.lastSyncPoint;
+    req.pageState = pageState;
+    req.requestId = pageState;
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATIONS_SYNC_REQUEST;

@@ -293,7 +293,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (BOOL)copyNotificationStoreTo:(NSString*)filePath;
 
 // Synchronizes the on-board Notifications database with the cloud
-- (void)asyncNotifications;
+- (void)asyncRefreshNotifications;
 
 @end
  
