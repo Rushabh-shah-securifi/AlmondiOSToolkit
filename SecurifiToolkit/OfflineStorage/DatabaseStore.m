@@ -14,6 +14,8 @@
 
 #define MAX_NOTIFICATIONS 1000
 
+#define DEF_SYNC_POINT @"last_syncpoint"
+
 /*
 
 mac             => mac
@@ -51,26 +53,35 @@ create index notifications_mac on notifications (mac, time);
 @interface DatabaseStore ()
 @property(nonatomic, readonly) ZHDatabase *db;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
+@property(nonatomic, readonly) ZHDatabaseStatement *read_metadata;
+@property(nonatomic, readonly) ZHDatabaseStatement *insert_metadata;
 @end
 
 @implementation DatabaseStore
 
 - (void)setup {
-    NSString *db_path = [self databaseInDocumentsFolderPath:@"toolkit_store.db"];
+    NSString *db_path = [self databaseInDocumentsFolderPath:@"toolkit_notifications.db"];
     BOOL exists = [self fileExists:db_path];
 
     _db = [[ZHDatabase alloc] initWithPath:db_path];
 
     if (!exists) {
         [self.db execute:@"drop table if exists notifications"];
-        [self.db execute:@"create table notifications (id integer primary key, mac varchar(24), users varchar(128), date_bucket double, time double, data text, deviceid integer, devicename varchar(256), devicetype integer, value_index integer, value_indexname varchar(256), indexvalue varchar(20), viewed integer);"];
+        [self.db execute:@"create table notifications (id integer primary key, external_id varchar(128) unique not null, mac varchar(24), users varchar(128), date_bucket double, time double, data text, deviceid integer, devicename varchar(256), devicetype integer, value_index integer, value_indexname varchar(256), indexvalue varchar(20), viewed integer);"];
         [self.db execute:@"create index notifications_bucket on notifications (date_bucket, time);"];
         [self.db execute:@"create index notifications_time on notifications (time);"];
         [self.db execute:@"create index notifications_mac on notifications (mac, time);"];
         [self.db execute:@"create index notifications_mac_bucket on notifications (mac, date_bucket, time);"];
+
+        // a table for holding key-value pairs (schema version, last sync state, etc.)
+        [self.db execute:@"drop table if exists notifications_meta"];
+        [self.db execute:@"create table notifications_meta (meta_key varchar(128) primary key, meta_value varchar(128), updated double);"];
+        [self.db execute:@"create index notifications_meta_key on notifications_meta (meta_key);"];
     }
 
-    _insert_notification = [self.db newStatement:@"insert into notifications (mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?)"];
+    _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
+    _read_metadata = [self.db newStatement:@"select meta_value, updated from notifications_meta where meta_key=?"];
+    _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value, updated) values (?,?,?);"];
 }
 
 - (id <SFINotificationStore>)newStore {
@@ -86,7 +97,6 @@ create index notifications_mac on notifications (mac, time);
     [self trimRecords:MAX_NOTIFICATIONS];
     return success;
 }
-
 
 - (void)deleteNotificationsForAlmond:(NSString *)almondMAC {
     ZHDatabaseStatement *stmt = [self.db newStatement:@"delete from notifications where mac=?"];
@@ -116,6 +126,7 @@ create index notifications_mac on notifications (mac, time);
 
     @synchronized (stmt) {
         [stmt reset];
+        [stmt bindNextText:notification.externalId]; // external ID is unique across all records
         [stmt bindNextText:notification.almondMAC];
         [stmt bindNextText:@""]; // users
         [stmt bindNextTimeInterval:midnightTimeInterval]; // date_bucket
@@ -161,6 +172,57 @@ create index notifications_mac on notifications (mac, time);
 - (BOOL)fileExists:(NSString *)filePath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     return [fileManager fileExistsAtPath:filePath];
+}
+
+- (BOOL)storeNotifications:(NSArray *)notifications newSyncPoint:(NSString *)syncPoint {
+    for (SFINotification *n in notifications) {
+        [self insertRecord:n];
+    }
+
+    [self setMetaData:syncPoint forKey:DEF_SYNC_POINT];
+    
+    return YES;
+}
+
+- (NSString *)lastSyncPoint {
+    return [self getMetaValue:DEF_SYNC_POINT];
+}
+
+- (NSString *)getMetaValue:(NSString *)metaKey {
+    ZHDatabaseStatement *stmt = self.read_metadata;
+
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextText:metaKey];
+
+        NSString *syncPoint;
+        if (stmt.step) {
+            syncPoint = stmt.stepNextString;
+        }
+
+        [stmt reset];
+        return (syncPoint.length == 0) ? nil : syncPoint;
+    }
+}
+
+- (void)setMetaData:(NSString *)value forKey:(NSString *)key {
+    NSDate *date = [NSDate date];
+    NSTimeInterval now = date.timeIntervalSince1970;
+
+    ZHDatabaseStatement *stmt = self.insert_metadata;
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextText:key];
+        [stmt bindNextText:value];
+        [stmt bindNextTimeInterval:now];
+
+        BOOL success = [stmt execute];
+        if (!success) {
+            NSLog(@"Failed to insert notification metadata into database, key:%@, value:%@, updated:%f", key, value, now);
+        }
+
+        [stmt reset];
+    }
 }
 
 @end

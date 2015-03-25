@@ -23,4 +23,9 @@
 
 - (BOOL)copyDatabaseTo:(NSString*)filePath;
 
+- (BOOL)storeNotifications:(NSArray *)notifications newSyncPoint:(NSString *)syncPoint;
+
+// will be nil when no sync has been done
+- (NSString*)lastSyncPoint;
+
 @end

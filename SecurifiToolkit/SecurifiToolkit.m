@@ -35,6 +35,8 @@
 #import "AlmondModeResponse.h"
 #import "AlmondModeChangeResponse.h"
 #import "NotificationPreferenceResponse.h"
+#import "NotificationListRequest.h"
+#import "NotificationListResponse.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -245,6 +247,12 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
             return [NSString stringWithFormat:@"ALMOND_MODE_REQUEST_%d", type];
         case CommandType_ALMOND_MODE_RESPONSE:
             return [NSString stringWithFormat:@"ALMOND_MODE_RESPONSE_%d", type];
+
+        case CommandType_NOTIFICATIONS_SYNC_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_SYNC_REQUEST_%d", type];
+        case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_SYNC_RESPONSE_%d", type];
+
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -345,13 +353,15 @@ static SecurifiToolkit *singleton = nil;
             [center addObserver:self selector:@selector(onNotificationRegistrationResponseCallback:) name:NOTIFICATION_REGISTRATION_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onNotificationDeregistrationResponseCallback:) name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
-            [center addObserver:self selector:@selector(onDynamicNotificationListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
+            [center addObserver:self selector:@selector(onDynamicNotificationPrefListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
 
             [center addObserver:self selector:@selector(onDeviceNotificationPreferenceChangeResponseCallback:) name:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER object:nil];
 
             [center addObserver:self selector:@selector(onAlmondModeChangeCompletion:) name:ALMOND_MODE_CHANGE_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onAlmondModeResponse:) name:ALMOND_MODE_RESPONSE_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onDynamicAlmondModeChange:) name:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER object:nil];
+
+            [center addObserver:self selector:@selector(onNotificationListSyncResponse:) name:NOTIFICATION_LIST_SYNC_RESPONSE_NOTIFIER object:nil];
         }
     }
 
@@ -360,34 +370,7 @@ static SecurifiToolkit *singleton = nil;
 
 - (void)dealloc {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-
-    [center removeObserver:self name:kSFIReachabilityChangedNotification object:nil];
-
-    [center removeObserver:self name:LOGIN_NOTIFIER object:nil];
-    [center removeObserver:self name:LOGOUT_NOTIFIER object:nil];
-    [center removeObserver:self name:LOGOUT_ALL_NOTIFIER object:nil];
-    [center removeObserver:self name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
-
-    [center removeObserver:self name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
-    [center removeObserver:self name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
-    [center removeObserver:self name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
-
-    [center removeObserver:self name:DYNAMIC_DEVICE_DATA_NOTIFIER object:nil];
-    [center removeObserver:self name:DEVICE_DATA_NOTIFIER object:nil];
-
-    [center removeObserver:self name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
-    [center removeObserver:self name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
-
-    [center removeObserver:self name:ALMOND_LIST_NOTIFIER object:nil];
-    [center removeObserver:self name:DEVICEDATA_HASH_NOTIFIER object:nil];
-
-    if (self.config.enableNotifications) {
-        [center removeObserver:self name:NOTIFICATION_REGISTRATION_NOTIFIER object:nil];
-        [center removeObserver:self name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
-        [center removeObserver:self name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
-        [center removeObserver:self name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
-        [center removeObserver:self name:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER object:nil];
-    }
+    [center removeObserver:self];
 }
 
 #pragma mark - SDK state
@@ -2009,7 +1992,7 @@ static SecurifiToolkit *singleton = nil;
     }
 }
 
-- (void)onDynamicNotificationListChange:(id)sender {
+- (void)onDynamicNotificationPrefListChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -2040,6 +2023,30 @@ static SecurifiToolkit *singleton = nil;
     // Update offline storage
     [self.dataManager writeNotificationList:notificationList currentMAC:currentMAC];
     [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
+}
+
+- (void)onNotificationListSyncResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    NotificationListResponse *res = data[@"data"];
+
+    BOOL success = [self.databaseStore storeNotifications:res.notifications newSyncPoint:res.pageState];
+    if (success) {
+        [self postNotification:kSFINotificationDidStore data:nil];
+
+        // keep syncing until the count is zero
+        if (res.isPageStateDefined) {
+            // nothing to do
+            // "if in response pageState is missing it means that database has no older notifications hence don’t request anything."
+            if (res.notifications.count > 0) {
+                [self asyncNotifications];
+            }
+        }
+    }
 }
 
 #pragma mark - Notification access
@@ -2088,6 +2095,21 @@ static SecurifiToolkit *singleton = nil;
         return NO;
     }
     return [self.databaseStore copyDatabaseTo:filePath];
+}
+
+- (void)asyncNotifications {
+    if (!self.config.enableNotifications) {
+        return;
+    }
+
+    NotificationListRequest *req = [NotificationListRequest new];
+    req.pageState = self.databaseStore.lastSyncPoint;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATIONS_SYNC_REQUEST;
+    cmd.command = req;
+
+    [self asyncSendToCloud:cmd];
 }
 
 #pragma mark - Almond mode change

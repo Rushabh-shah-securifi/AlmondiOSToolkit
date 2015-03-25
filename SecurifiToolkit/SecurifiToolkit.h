@@ -289,7 +289,11 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (id <SFINotificationStore>)newNotificationStore;
 
+// makes a copy of the notifications database; used for debugging
 - (BOOL)copyNotificationStoreTo:(NSString*)filePath;
+
+// Synchronizes the on-board Notifications database with the cloud
+- (void)asyncNotifications;
 
 @end
  
