@@ -51,6 +51,7 @@ create index notifications_mac on notifications (mac, time);
 @interface DatabaseStore ()
 @property(nonatomic, readonly) ZHDatabase *db;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
+@property(nonatomic, readonly) ZHDatabaseStatement *count_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_syncpoint;
@@ -65,7 +66,7 @@ create index notifications_mac on notifications (mac, time);
     BOOL exists = [self fileExists:db_path];
 
     _db = [[ZHDatabase alloc] initWithPath:db_path];
-
+    exists = NO;
     if (!exists) {
         [self.db execute:@"drop table if exists notifications"];
         [self.db execute:@"create table notifications (id integer primary key, external_id varchar(128) unique not null, mac varchar(24), users varchar(128), date_bucket double, time double, data text, deviceid integer, devicename varchar(256), devicetype integer, value_index integer, value_indexname varchar(256), indexvalue varchar(20), viewed integer);"];
@@ -73,6 +74,7 @@ create index notifications_mac on notifications (mac, time);
         [self.db execute:@"create index notifications_time on notifications (time);"];
         [self.db execute:@"create index notifications_mac on notifications (mac, time);"];
         [self.db execute:@"create index notifications_mac_bucket on notifications (mac, date_bucket, time);"];
+        [self.db execute:@"create index notifications_external_id on notifications (external_id);"];
 
         // a table for holding key-value pairs (schema version, last sync state, etc.)
         [self.db execute:@"drop table if exists notifications_meta"];
@@ -87,6 +89,7 @@ create index notifications_mac on notifications (mac, time);
     }
 
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
+    _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
     _read_metadata = [self.db newStatement:@"select meta_value, updated from notifications_meta where meta_key=?"];
     _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value, updated) values (?,?,?);"];
 
@@ -126,6 +129,15 @@ create index notifications_mac on notifications (mac, time);
 #pragma mark - Private methods
 
 - (BOOL)insertRecord:(SFINotification *)notification {
+    if (!notification) {
+        return NO;
+    }
+
+    BOOL exists = [self notificationExists:notification];
+    if (exists) {
+        return YES;
+    }
+
     ZHDatabaseStatement *stmt = self.insert_notification;
 
     NSString *valueType = [SFIDeviceKnownValues propertyTypeToName:notification.valueType];
@@ -162,6 +174,27 @@ create index notifications_mac on notifications (mac, time);
         [stmt reset];
 
         return success;
+    }
+}
+
+- (BOOL)notificationExists:(SFINotification*)notification {
+    NSString *externalId = notification.externalId;
+    if (!externalId) {
+        return NO;
+    }
+
+    ZHDatabaseStatement *stmt = self.count_notification;
+    @synchronized (stmt ) {
+        [stmt reset];
+        [stmt bindNextText:externalId];
+
+        NSInteger count = 0;
+        if ([stmt step]) {
+            count = [stmt stepNextInteger];
+        }
+
+        [stmt reset];
+        return count > 0;        
     }
 }
 
