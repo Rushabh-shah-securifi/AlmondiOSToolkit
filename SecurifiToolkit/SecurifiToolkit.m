@@ -603,6 +603,8 @@ static SecurifiToolkit *singleton = nil;
             [block_self tryRequestAlmondMode:mac];
         }
 
+        [block_self tryRefreshNotifications];
+
         [socket markCloudInitialized];
     });
 }
@@ -2120,14 +2122,18 @@ static SecurifiToolkit *singleton = nil;
 
 // this method sends a request to fetch the latest notifications; 
 // it does not handle the case of fetching older ones 
-- (void)asyncRefreshNotifications {
+- (void)tryRefreshNotifications {
     if (!self.config.enableNotifications) {
         return;
     }
 
-    if (self.pendingRefreshNotificationsRequest) {
-        NSLog(@"asyncRefreshNotifications: fail fast; already fetching latest");
-        return;
+    NotificationListRequest *pending = self.pendingRefreshNotificationsRequest;
+    if (pending) {
+        if (![pending shouldExpireAfterSeconds:5]) {
+            // give the request 5 seconds to complete
+            NSLog(@"asyncRefreshNotifications: fail fast; already fetching latest");
+            return;
+        }
     }
 
     [self internalAsyncFetchNotifications:nil];
