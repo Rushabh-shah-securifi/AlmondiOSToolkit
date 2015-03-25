@@ -9,7 +9,8 @@
 // Represents a single notification
 @interface SFINotification : NSObject <NSCopying, NSCoding>
 
-@property(nonatomic) long notificationId;
+@property(nonatomic) long notificationId;   // the ID value as stored and referenced in the on-device db
+@property(nonatomic, copy) NSString *externalId;  // the ID value as stored and referenced in the cloud db
 @property(nonatomic, copy) NSString *almondMAC;
 @property(nonatomic) NSTimeInterval time;
 @property(nonatomic, copy) NSString *deviceName;
