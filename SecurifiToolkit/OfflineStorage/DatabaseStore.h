@@ -41,4 +41,8 @@
 // The sync point is removed on calling -(BOOL)storeNotifications:syncPoint:
 - (void)trackSyncPoint:(NSString *)pageState;
 
+- (void)storeBadgeCount:(NSInteger)count;
+
+- (NSInteger)badgeCount;
+
 @end

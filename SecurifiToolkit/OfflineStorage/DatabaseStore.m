@@ -13,6 +13,7 @@
 #import "NotificationStoreImpl.h"
 
 #define MAX_NOTIFICATIONS 1000
+#define KEY_BADGE_COUNT @"badge_count"
 
 /*
 
@@ -66,7 +67,7 @@ create index notifications_mac on notifications (mac, time);
     BOOL exists = [self fileExists:db_path];
 
     _db = [[ZHDatabase alloc] initWithPath:db_path];
-    exists = NO;
+//    exists = NO;
     if (!exists) {
         [self.db execute:@"drop table if exists notifications"];
         [self.db execute:@"create table notifications (id integer primary key, external_id varchar(128) unique not null, mac varchar(24), users varchar(128), date_bucket double, time double, data text, deviceid integer, devicename varchar(256), devicetype integer, value_index integer, value_indexname varchar(256), indexvalue varchar(20), viewed integer);"];
@@ -78,7 +79,7 @@ create index notifications_mac on notifications (mac, time);
 
         // a table for holding key-value pairs (schema version, last sync state, etc.)
         [self.db execute:@"drop table if exists notifications_meta"];
-        [self.db execute:@"create table notifications_meta (meta_key varchar(128) primary key, meta_value varchar(128), updated double);"];
+        [self.db execute:@"create table notifications_meta (meta_key varchar(128) primary key, meta_value_str varchar(128), meta_value_int integer, updated double);"];
         [self.db execute:@"create index notifications_meta_key on notifications_meta (meta_key);"];
 
         // a queue of sync points pending processing
@@ -90,8 +91,8 @@ create index notifications_mac on notifications (mac, time);
 
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
-    _read_metadata = [self.db newStatement:@"select meta_value, updated from notifications_meta where meta_key=?"];
-    _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value, updated) values (?,?,?);"];
+    _read_metadata = [self.db newStatement:@"select meta_value_str, meta_value_int, updated from notifications_meta where meta_key=?"];
+    _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value_str, meta_value_int, updated) values (?,?,?,?);"];
 
     _insert_syncpoint = [self.db newStatement:@"insert into notifications_syncpoints (syncpoint, created) values (?,?)"];
     _delete_syncpoint = [self.db newStatement:@"delete from notifications_syncpoints where syncpoint=?"];
@@ -284,7 +285,7 @@ create index notifications_mac on notifications (mac, time);
     return syncPoint.length > 0 && ![syncPoint isEqualToString:@"undefined"];
 }
 
-- (NSString *)getMetaValue:(NSString *)metaKey {
+- (NSString *)getMetaValueString:(NSString *)metaKey {
     ZHDatabaseStatement *stmt = self.read_metadata;
 
     @synchronized (stmt) {
@@ -301,7 +302,25 @@ create index notifications_mac on notifications (mac, time);
     }
 }
 
-- (void)setMetaData:(NSString *)value forKey:(NSString *)key {
+- (NSInteger)getMetaValueInt:(NSString *)metaKey {
+    ZHDatabaseStatement *stmt = self.read_metadata;
+
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextText:metaKey];
+
+        NSInteger value = 0;
+        if (stmt.step) {
+            stmt.stepNextString;
+            value = stmt.stepNextInteger;
+        }
+
+        [stmt reset];
+        return value;
+    }
+}
+
+- (void)setMetaData:(NSString *)strValue intValue:(NSInteger)intValue forKey:(NSString *)key {
     NSDate *date = [NSDate date];
     NSTimeInterval now = date.timeIntervalSince1970;
 
@@ -309,16 +328,26 @@ create index notifications_mac on notifications (mac, time);
     @synchronized (stmt) {
         [stmt reset];
         [stmt bindNextText:key];
-        [stmt bindNextText:value];
+        [stmt bindNextText:strValue];
+        [stmt bindNextInteger:intValue];
         [stmt bindNextTimeInterval:now];
 
         BOOL success = [stmt execute];
         if (!success) {
-            NSLog(@"Failed to insert notification metadata into database, key:%@, value:%@, updated:%f", key, value, now);
+            NSLog(@"Failed to insert notification metadata into database, key:%@, str value:%@, int value:%li, updated:%f", key, strValue, (long) intValue, now);
         }
 
         [stmt reset];
     }
 }
+
+- (void)storeBadgeCount:(NSInteger)count {
+    [self setMetaData:@"" intValue:count forKey:KEY_BADGE_COUNT];
+}
+
+- (NSInteger)badgeCount {
+    return [self getMetaValueInt:KEY_BADGE_COUNT];
+}
+
 
 @end

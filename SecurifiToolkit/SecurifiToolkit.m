@@ -69,6 +69,7 @@ NSString *const kSFIDidDeregisterForNotifications = @"kSFIDidDeregisterForNotifi
 NSString *const kSFIDidFailToDeregisterForNotifications = @"kSFIDidFailToDeregisterForNotifications";
 NSString *const kSFINotificationDidStore = @"kSFINotificationDidStore";
 NSString *const kSFINotificationDidMarkViewed = @"kSFINotificationDidMarkViewed";
+NSString *const kSFINotificationBadgeCountDidChange = @"kSFINotificationBadgeCountDidChange";
 NSString *const kSFINotificationPreferencesDidChange = @"kSFINotificationPreferencesDidChange";
 
 NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
@@ -2096,8 +2097,7 @@ static SecurifiToolkit *singleton = nil;
     DatabaseStore *store = self.databaseStore;
     [store storeBadgeCount:res.badgeCount];
 
-    //todo post something
-//    [self postNotification:kSFINotificationDidStore data:nil];
+    [self postNotification:kSFINotificationBadgeCountDidChange data:nil];
 }
 
 #pragma mark - Notification access
@@ -2189,6 +2189,15 @@ static SecurifiToolkit *singleton = nil;
 
     [self asyncSendToCloud:cmd];
 }
+
+- (NSInteger)notificationsBadgeCount {
+    if (!self.config.enableNotifications) {
+        return 0;
+    }
+
+    return self.databaseStore.badgeCount;
+}
+
 
 // Sends a request for notifications
 // pagestate can be nil or a defined page state. The page state also becomes an correlation ID that is parroted back in the
