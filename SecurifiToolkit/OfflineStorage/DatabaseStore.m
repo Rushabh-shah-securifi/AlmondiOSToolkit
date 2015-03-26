@@ -136,7 +136,7 @@ create index notifications_mac on notifications (mac, time);
 
     BOOL exists = [self notificationExists:notification];
     if (exists) {
-        return YES;
+        return NO;
     }
 
     ZHDatabaseStatement *stmt = self.insert_notification;
@@ -219,13 +219,19 @@ create index notifications_mac on notifications (mac, time);
     return [fileManager fileExistsAtPath:filePath];
 }
 
-- (BOOL)storeNotifications:(NSArray *)notifications syncPoint:(NSString *)syncPoint {
+- (NSInteger)storeNotifications:(NSArray *)notifications syncPoint:(NSString *)syncPoint {
+    NSInteger count = 0;
+
     for (SFINotification *n in notifications) {
-        [self insertRecord:n];
+        BOOL stored = [self insertRecord:n];
+        if (!stored) {
+            break;
+        }
+        count++;
     }
 
     [self removeSyncPoint:syncPoint];
-    return YES;
+    return count;
 }
 
 - (NSInteger)countTrackedSyncPoints {

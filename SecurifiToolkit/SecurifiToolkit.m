@@ -2048,22 +2048,43 @@ static SecurifiToolkit *singleton = nil;
     NotificationListResponse *res = data[@"data"];
     NSString *requestId = res.requestId;
 
-    if (requestId == nil) {
+    DLog(@"asyncRefreshNotifications: recevied request id:'%@'", requestId);
+
+    if (requestId.length == 0) {
         NSLog(@"asyncRefreshNotifications: clearing refresh request tracking");
         self.pendingRefreshNotificationsRequest = nil;
     }
 
     // Store the notifications and stop tracking the pageState that they were associated with
+    //
+    // As implemented, iteration will continue until a duplicate notification is detected. This procedure
+    // ensures that if the system is missing some notifications, it will catch up eventually.
+    // Notifications are delivered newest to oldest, making it likely all new ones are fetched in the first call.
     DatabaseStore *store = self.databaseStore;
 
-    BOOL success = [store storeNotifications:res.notifications syncPoint:requestId];
-    if (!success) {
-        NSLog(@"Failed to store notifications: %@", res.notifications);
+    NSInteger storedCount = [store storeNotifications:res.notifications syncPoint:requestId];
+    NSUInteger totalCount = res.notifications.count;
+    BOOL allStored = (storedCount == totalCount);
+
+    if (allStored) {
+        DLog(@"asyncRefreshNotifications: stored:%li", (long) totalCount);
+    }
+    else {
+        DLog(@"asyncRefreshNotifications: stored partial notifications:%li of %li", (long)storedCount, (long) totalCount);
+    }
+
+    if (storedCount == 0) {
+        // if nothing stored, then no need to tell the world
         return;
     }
 
     // Let the world know there are new notifications
     [self postNotification:kSFINotificationDidStore data:nil];
+
+    if (!allStored) {
+        // nothing more to do
+        return;
+    }
 
     // Keep syncing until page state is no longer provided
     if (res.isPageStateDefined) {
@@ -2098,6 +2119,10 @@ static SecurifiToolkit *singleton = nil;
     [store storeBadgeCount:res.badgeCount];
 
     [self postNotification:kSFINotificationBadgeCountDidChange data:nil];
+
+    if (res.badgeCount > 0) {
+        [self tryRefreshNotifications];
+    }
 }
 
 #pragma mark - Notification access

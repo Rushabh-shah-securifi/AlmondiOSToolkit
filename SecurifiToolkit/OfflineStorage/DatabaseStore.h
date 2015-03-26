@@ -28,7 +28,9 @@
 
 // Called to store the notifications that were fetched using the specified sync point token
 // The notifications are stored and the sync point is purged from the tracking table
-- (BOOL)storeNotifications:(NSArray *)notifications syncPoint:(NSString *)syncPoint;
+// Returns number actually stored; the process stops on finding the first duplicate.
+// The caller can compare the count with the total payload to determine whether to continue fetching.
+- (NSInteger)storeNotifications:(NSArray *)notifications syncPoint:(NSString *)syncPoint;
 
 // Returns number of sync points being tracked pending download
 - (NSInteger)countTrackedSyncPoints;
