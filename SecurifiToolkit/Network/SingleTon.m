@@ -10,6 +10,8 @@
 #import <SecurifiToolkit/SecurifiToolkit.h>
 #import "Commandparser.h"
 #import "SUnit.h"
+#import "NotificationListResponse.h"
+#import "NotificationCountResponse.h"
 
 @interface SingleTon ()
 @property(nonatomic, readonly) NSObject *syncLocker;
@@ -27,7 +29,6 @@
 
 @property(nonatomic) SecCertificateRef certificate;
 @property(nonatomic) BOOL certificateTrusted;
-@property(nonatomic) unsigned int command;
 @property(nonatomic, readonly) NSMutableData *partialData;
 @property(nonatomic) BOOL networkShutdown;
 @property(nonatomic) BOOL networkUpNoticePosted;
@@ -334,17 +335,30 @@
 }
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
+    /*
+        sinclair 24 Mar 2015
+        some notes from 'reverse engineering' the wire format...
+
+        1. stream is continuous one of command responses.
+        2. the cloud sends some data in chunks that will be delivered to this handler over multiple calls.
+        3. we cumulate all bytes/chunks looking for the structures of a single command response and isolate that run
+        4. a command response data stream is delimited into a [payload length][command type]<root>[payload]</root> segments
+        5. <root> and </root> are literal values and serve as a common "envelope" wrapping either XML or JSON payloads
+        6. payload length segment is stored in the first 4 bytes
+        7. command type is stored in the next 4 bytes
+        8. the command type is an unsigned int value that can be used to determine whether the payload is XML or JSON
+     */
+
     if (!self.partialData) {
         _partialData = [[NSMutableData alloc] init];
     }
 
-    NSString *endTagString = @"</root>";
-    NSData *endTag = [endTagString dataUsingEncoding:NSUTF8StringEncoding];
-
     NSString *startTagString = @"<root>";
     NSData *startTag = [startTagString dataUsingEncoding:NSUTF8StringEncoding];
 
-    // NSLog(@"stream event %i", streamEvent);
+    NSString *endTagString = @"</root>";
+    NSData *endTag = [endTagString dataUsingEncoding:NSUTF8StringEncoding];
+
     switch (streamEvent) {
         case NSStreamEventOpenCompleted: {
             break;
@@ -352,348 +366,105 @@
 
         case NSStreamEventHasBytesAvailable:
             if (theStream == self.inputStream) {
+                // Multiple response payloads in one callback is possible
                 while (!self.networkShutdown && [self.inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
-                    NSInteger len;
 
-                    //Multiple entry in one callback possible
-                    len = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
-                    if (len > 0) {
-
-                        //[SNLog Log:@"%s: Response Length : %d",__PRETTY_FUNCTION__,len];
-                        //If current stream has </root>
-                        //1. Get NSRange and prepare command
-                        //2. If command has partial command add it to mutableData object
-                        //3. It mutable object has some data append new received Data to it
-                        //4. repeat this procedure for newly created mutableData
-
+                    NSInteger bufferLength = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
+                    if (bufferLength > 0) {
                         //Append received data to partial buffer
-                        [self.partialData appendBytes:&inputBuffer[0] length:(NSUInteger) len];
+                        [self.partialData appendBytes:&inputBuffer[0] length:(NSUInteger) bufferLength];
 
-                        //Initialize range
+                        // Range of current data buffer
                         NSRange endTagRange = NSMakeRange(0, [self.partialData length]);
-                        int count = 0;
-
-                        //NOT NEEDED- Convert received buffer to NSMutableData
-                        //[totalReceivedData appendBytes:&inputBuffer[0] length:len];
-
                         while (endTagRange.location != NSNotFound) {
                             endTagRange = [self.partialData rangeOfData:endTag options:0 range:endTagRange];
-                            if (endTagRange.location != NSNotFound) {
-                                //// NSLog(@"endTag Location: %i, Length: %i",endTagRange.location,endTagRange.length);
 
-                                //Look for <root> tag in [0 to endTag]
+                            if (endTagRange.location != NSNotFound) {
+                                // Look for <root> tag in [0 to endTag]
                                 NSRange startTagRange = NSMakeRange(0, endTagRange.location);
 
                                 startTagRange = [self.partialData rangeOfData:startTag options:0 range:startTagRange];
 
                                 if (startTagRange.location == NSNotFound) {
-                                    // [SNLog Log:@"%s: Serious error !!! should not come here// Invalid command /// without startRootTag", __PRETTY_FUNCTION__];
+                                    NSLog(@"%s: Serious error !!! should not come here// Invalid command /// without startRootTag", __PRETTY_FUNCTION__);
                                 }
                                 else {
-                                    [self.partialData getBytes:&_command range:NSMakeRange(4, 4)];
-                                    DLog(@"%s: Response Received: %d TIME => %f ", __PRETTY_FUNCTION__, NSSwapBigIntToHost(self.command), CFAbsoluteTimeGetCurrent());
+/*
+                                    unsigned int payloadLength;
+                                    NSRange payloadLengthRange = NSMakeRange(0, 4);
+                                    [self.partialData getBytes:&payloadLength range:payloadLengthRange];
+                                    payloadLength = NSSwapBigIntToHost(payloadLength);
+                                    NSLog(@"Payload is %i bytes long", payloadLength);
+*/
 
-                                    self.command = NSSwapBigIntToHost(self.command);
-                                    // [SNLog Log:@"%s: Command Again: %d", __PRETTY_FUNCTION__,command];
-                                    CommandParser *tempObj = [[CommandParser alloc] init];
-                                    GenericCommand *temp = nil;
+                                    unsigned int commandType;
+                                    NSRange commandTypeRange = NSMakeRange(4, 4);
+                                    [self.partialData getBytes:&commandType range:commandTypeRange];
+                                    commandType = NSSwapBigIntToHost(commandType);
+                                    DLog(@"%s: Response Received: %d TIME => %f ", __PRETTY_FUNCTION__, commandType, CFAbsoluteTimeGetCurrent());
 
-                                    //Send single command data to parseXML rather than complete buffer
-                                    NSRange xmlParserRange = {startTagRange.location, (endTagRange.location + endTagRange.length - 8)};
-                                    NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
+                                    // Process a single command response at a time
+                                    id responsePayload = nil;
 
-                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    // these are the only command responses so far that uses a JSON payload; we special case them for now
+                                    if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE || commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE) {
+                                        // we only want the JSON wrapped inside the <root></root> pair
+                                        NSUInteger start_loc = startTagRange.location + startTagRange.length;
+                                        NSRange jsonParseRange = NSMakeRange(start_loc, endTagRange.location - start_loc);
+                                        NSData *buffer = [self.partialData subdataWithRange:jsonParseRange];
+                                        DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
-                                    temp = (GenericCommand *) [tempObj parseXML:buffer];
+                                        if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE) {
+                                            responsePayload = [NotificationListResponse parseJson:buffer];
+                                        }
+                                        else {
+                                            responsePayload = [NotificationCountResponse parseJson:buffer];
+                                        }
+                                    }
+                                    else {
+                                        NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
+                                        NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
+                                        DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
-                                    //Remove 8 bytes from received command
+                                        CommandParser *parser = [CommandParser new];
+                                        GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
+                                        responsePayload = temp.command;
+
+                                        // important to pull command type from the parsed payload because the underlying
+                                        // command that we dispatch on can be different than the "container" carrying it
+                                        commandType = temp.commandType;
+                                    }
+
+                                    // Remove 8 bytes from received command
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
 
                                     // Tell the world the connection is up and running
                                     [self tryPostNetworkUpNotification];
 
-                                    const CommandType commandType = temp.commandType;
-                                    switch (commandType) {
-                                        case CommandType_LOGIN_RESPONSE: {
-                                            LoginResponse *obj = (LoginResponse *) temp.command;
-                                            [self markLoggedInState:obj.isSuccessful];
-                                            [self tryMarkUnitCompletion:obj.isSuccessful responseType:commandType];
-                                            [self postData:LOGIN_NOTIFIER data:obj];
-                                            break;
-                                        }
-
-                                        case CommandType_SIGNUP_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:SIGN_UP_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_KEEP_ALIVE: {
-                                            break;
-                                        }
-
-                                        case CommandType_CLOUD_SANITY_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            break;
-                                        }
-
-                                        case CommandType_LOGOUT_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:LOGOUT_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_LOGOUT_ALL_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:LOGOUT_ALL_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_AFFILIATION_USER_COMPLETE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:AFFILIATION_COMPLETE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-                                            //                                        case AFFILIATION_CODE_RESPONSE:
-                                            //                                        {
-                                            //                                            // [SNLog Log:@"%s: Received Affiliation Code", __PRETTY_FUNCTION__];
-                                            //                                            AffiliationUserRequest *obj = (AffiliationUserRequest *)temp.command;
-                                            //
-                                            //                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-                                            //
-                                            //                                            [[NSNotificationCenter defaultCenter] postNotificationName:AFFILIATION_CODE_NOTIFIER object:self userInfo:data];
-                                            //                                            tempObj=nil;
-                                            //                                            temp=nil;
-                                            //                                        }
-                                            //                                            break;
-                                        case CommandType_ALMOND_LIST_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:ALMOND_LIST_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_DEVICE_DATA_HASH_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:DEVICEDATA_HASH_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_DEVICE_DATA_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:DEVICE_DATA_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:DEVICE_VALUE_LIST_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-                                        case CommandType_MOBILE_COMMAND_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:MOBILE_COMMAND_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-                                        case CommandType_DYNAMIC_DEVICE_DATA: {
-                                            [self postDataDynamic:DYNAMIC_DEVICE_DATA_NOTIFIER data:temp.command commandType:commandType];
-                                            break;
-                                        }
-                                        case CommandType_DYNAMIC_DEVICE_VALUE_LIST: {
-                                            [self postDataDynamic:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER data:temp.command commandType:commandType];
-                                            break;
-                                        }
-                                        case CommandType_GENERIC_COMMAND_RESPONSE: {
-                                            GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
-                                            NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
-                                            obj.decodedData = decodedData;
-
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
-                                            break;
-                                        }
-                                        case CommandType_GENERIC_COMMAND_NOTIFICATION: {
-                                            GenericCommandResponse *obj = (GenericCommandResponse *) temp.command;
-
-                                            //Decode using Base64
-                                            NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
-                                            obj.decodedData = decodedData;
-
-//                                            [self tryMarkUnitCompletion:YES responseType:GENERIC_COMMAND_NOTIFICATION];
-                                            [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:obj];
-
-                                            break;
-                                        }
-                                        case CommandType_VALIDATE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:VALIDATE_RESPONSE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-                                        case CommandType_RESET_PASSWORD_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:RESET_PWD_RESPONSE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-                                        case CommandType_DYNAMIC_ALMOND_ADD: {
-                                            [self postDataDynamic:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:temp.command commandType:commandType];
-                                            break;
-                                        }
-                                        case CommandType_DYNAMIC_ALMOND_DELETE: {
-                                            [self postDataDynamic:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:temp.command commandType:commandType];
-                                            break;
-                                        }
-                                        case CommandType_SENSOR_CHANGE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:SENSOR_CHANGE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-                                        case CommandType_DYNAMIC_ALMOND_NAME_CHANGE: {
-                                            [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:temp.command commandType:commandType];
-                                            break;
-                                        }
-                                        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
-                                            [self postDataDynamic:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER data:temp.command commandType:commandType];
-                                            break;
-                                        }
-
-                                        case CommandType_USER_PROFILE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:USER_PROFILE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_CHANGE_PASSWORD_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:CHANGE_PWD_RESPONSE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_DELETE_ACCOUNT_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_UPDATE_USER_PROFILE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:UPDATE_USER_PROFILE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:ALMOND_AFFILIATION_DATA_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_UNLINK_ALMOND_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:UNLINK_ALMOND_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_USER_INVITE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:USER_INVITE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_DELETE_SECONDARY_USER_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:DELETE_SECONDARY_USER_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_ALMOND_NAME_CHANGE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:ALMOND_NAME_CHANGE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:ALMOND_MODE_CHANGE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_ALMOND_MODE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:ALMOND_MODE_RESPONSE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:NOTIFICATION_DEREGISTRATION_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-                                        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE: {
-                                            [self tryMarkUnitCompletion:YES responseType:commandType];
-                                            [self postData:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER data:temp.command];
-                                            break;
-                                        }
-
-                                        default:
-                                            break;
-                                    }
+                                    [self dispatchResponse:responsePayload commandType:(CommandType) commandType];
 
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location + endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
 
-                                    //Regenerate NSRange
+                                    // Regenerate NSRange
                                     endTagRange = NSMakeRange(0, [self.partialData length]);
                                 }
-                                count++;
-                            }
-                            else {
-                                // [SNLog Log:@"%s: Number of Command Processed  : %d", __PRETTY_FUNCTION__,count];
-                                //At this point paritalBuffer will have unffinised command data
                             }
                         }
                     }
                 }
+
+                break;
             }
-            break;
 
-        case NSStreamEventErrorOccurred:
-            //Cleanup stream -- taken from EventEndEncountered
-            //We should create new object of singleton class
-            //if (theStream == outputStream && [outputStream streamStatus] == NSStreamStatusError)
-
+        case NSStreamEventErrorOccurred: {
             if (theStream == self.outputStream) {
                 NSLog(@"Output stream error: %@", theStream.streamError.localizedDescription);
                 [self shutdown];
             }
+
             break;
+        }
 
         case NSStreamEventHasSpaceAvailable: {
             // Evaluate the SSL connection
@@ -719,10 +490,274 @@
         }
 
         default: {
-//                [SNLog Log:@"%s: Unknown event", __PRETTY_FUNCTION__];
+            DLog(@"%s: Unhandled event: %il", __PRETTY_FUNCTION__, (NSInteger)streamEvent);
         }
     }
+}
 
+- (void)dispatchResponse:(id)payload commandType:(CommandType)commandType {
+    switch (commandType) {
+        case CommandType_LOGIN_RESPONSE: {
+            LoginResponse *obj = (LoginResponse *) payload;
+            [self markLoggedInState:obj.isSuccessful];
+            [self tryMarkUnitCompletion:obj.isSuccessful responseType:commandType];
+            [self postData:LOGIN_NOTIFIER data:obj];
+            break;
+        }
+
+        case CommandType_SIGNUP_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:SIGN_UP_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_KEEP_ALIVE: {
+            break;
+        }
+
+        case CommandType_CLOUD_SANITY_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            break;
+        }
+
+        case CommandType_LOGOUT_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:LOGOUT_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_LOGOUT_ALL_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:LOGOUT_ALL_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_AFFILIATION_USER_COMPLETE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:AFFILIATION_COMPLETE_NOTIFIER data:payload];
+            break;
+        }
+            //                                        case AFFILIATION_CODE_RESPONSE:
+            //                                        {
+            //                                            // [SNLog Log:@"%s: Received Affiliation Code", __PRETTY_FUNCTION__];
+            //                                            AffiliationUserRequest *obj = (AffiliationUserRequest *)temp.command;
+            //
+            //                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
+            //
+            //                                            [[NSNotificationCenter defaultCenter] postNotificationName:AFFILIATION_CODE_NOTIFIER object:self userInfo:data];
+            //                                            tempObj=nil;
+            //                                            temp=nil;
+            //                                        }
+            //                                            break;
+        case CommandType_ALMOND_LIST_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ALMOND_LIST_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_DEVICE_DATA_HASH_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DEVICEDATA_HASH_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_DEVICE_DATA_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DEVICE_DATA_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DEVICE_VALUE_LIST_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_MOBILE_COMMAND_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:MOBILE_COMMAND_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_DYNAMIC_DEVICE_DATA: {
+            [self postDataDynamic:DYNAMIC_DEVICE_DATA_NOTIFIER data:payload commandType:commandType];
+            break;
+        }
+        case CommandType_DYNAMIC_DEVICE_VALUE_LIST: {
+            [self postDataDynamic:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER data:payload commandType:commandType];
+            break;
+        }
+        case CommandType_GENERIC_COMMAND_RESPONSE: {
+            GenericCommandResponse *obj = (GenericCommandResponse *) payload;
+            NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
+            obj.decodedData = decodedData;
+
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
+            break;
+        }
+        case CommandType_GENERIC_COMMAND_NOTIFICATION: {
+            GenericCommandResponse *obj = (GenericCommandResponse *) payload;
+
+            //Decode using Base64
+            NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
+            obj.decodedData = decodedData;
+
+//                                            [self tryMarkUnitCompletion:YES responseType:GENERIC_COMMAND_NOTIFICATION];
+            [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:obj];
+
+            break;
+        }
+        case CommandType_VALIDATE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:VALIDATE_RESPONSE_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_RESET_PASSWORD_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:RESET_PWD_RESPONSE_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_DYNAMIC_ALMOND_ADD: {
+            [self postDataDynamic:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:payload commandType:commandType];
+            break;
+        }
+        case CommandType_DYNAMIC_ALMOND_DELETE: {
+            [self postDataDynamic:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:payload commandType:commandType];
+            break;
+        }
+        case CommandType_SENSOR_CHANGE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:SENSOR_CHANGE_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_DYNAMIC_ALMOND_NAME_CHANGE: {
+            [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:payload commandType:commandType];
+            break;
+        }
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
+            [self postDataDynamic:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER data:payload commandType:commandType];
+            break;
+        }
+
+        case CommandType_USER_PROFILE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:USER_PROFILE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_CHANGE_PASSWORD_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:CHANGE_PWD_RESPONSE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_DELETE_ACCOUNT_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_UPDATE_USER_PROFILE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:UPDATE_USER_PROFILE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ALMOND_AFFILIATION_DATA_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_UNLINK_ALMOND_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:UNLINK_ALMOND_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_USER_INVITE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:USER_INVITE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_DELETE_SECONDARY_USER_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DELETE_SECONDARY_USER_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_ALMOND_NAME_CHANGE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ALMOND_NAME_CHANGE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ALMOND_MODE_CHANGE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_ALMOND_MODE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ALMOND_MODE_RESPONSE_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DEREGISTRATION_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER data:payload];
+            break;
+        }
+
+        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_NOTIFICATIONS_SYNC_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_LIST_SYNC_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_NOTIFICATIONS_COUNT_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_COUNT_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+
+        default:
+            break;
+    }
 }
 
 - (void)tryPostNetworkUpNotification {
@@ -1179,7 +1214,10 @@
                 case CommandType_NOTIFICATION_DEREGISTRATION:
                 case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
                 case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
-                case CommandType_ALMOND_MODE_REQUEST: {
+                case CommandType_ALMOND_MODE_REQUEST:
+                case CommandType_NOTIFICATIONS_SYNC_REQUEST:
+                case CommandType_NOTIFICATIONS_COUNT_REQUEST:
+                {
                     id <SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
                     break;
