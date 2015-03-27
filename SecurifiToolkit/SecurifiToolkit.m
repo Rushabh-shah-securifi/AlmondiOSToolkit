@@ -2050,6 +2050,7 @@ static SecurifiToolkit *singleton = nil;
 
     DLog(@"asyncRefreshNotifications: recevied request id:'%@'", requestId);
 
+    // Remove the guard preventing more refresh notifications
     if (requestId.length == 0) {
         NSLog(@"asyncRefreshNotifications: clearing refresh request tracking");
         self.pendingRefreshNotificationsRequest = nil;
@@ -2062,6 +2063,7 @@ static SecurifiToolkit *singleton = nil;
     // Notifications are delivered newest to oldest, making it likely all new ones are fetched in the first call.
     DatabaseStore *store = self.databaseStore;
 
+    NSUInteger newCount = res.newCount;
     NSInteger storedCount = [store storeNotifications:res.notifications syncPoint:requestId];
     NSUInteger totalCount = res.notifications.count;
     BOOL allStored = (storedCount == totalCount);
@@ -2074,17 +2076,25 @@ static SecurifiToolkit *singleton = nil;
     }
 
     if (storedCount == 0) {
+        [store storeBadgeCount:newCount];
         // if nothing stored, then no need to tell the world
+        return;
+    }
+
+
+    if (!allStored) {
+        // stopped early
+        // nothing more to do
+        [store storeBadgeCount:newCount];
+
+        // Let the world know there are new notifications
+        [self postNotification:kSFINotificationDidStore data:nil];
+
         return;
     }
 
     // Let the world know there are new notifications
     [self postNotification:kSFINotificationDidStore data:nil];
-
-    if (!allStored) {
-        // nothing more to do
-        return;
-    }
 
     // Keep syncing until page state is no longer provided
     if (res.isPageStateDefined) {

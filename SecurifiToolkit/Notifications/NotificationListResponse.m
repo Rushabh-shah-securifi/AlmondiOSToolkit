@@ -39,6 +39,12 @@
     NotificationListResponse *obj = [NotificationListResponse new];
     obj->_pageState = payload[@"pageState"];
     obj->_requestId = payload[@"requestId"];
+
+    NSString *num = payload[@"badgeCount"];
+    if (num) {
+        obj->_newCount = (NSUInteger) num.integerValue;
+    }
+
     obj->_notifications = parsed;
 
     return obj;

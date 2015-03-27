@@ -53,6 +53,7 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabase *db;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *count_notification;
+@property(nonatomic, readonly) ZHDatabaseStatement *update_unread_count;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_syncpoint;
@@ -91,6 +92,7 @@ create index notifications_mac on notifications (mac, time);
 
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
+    _update_unread_count = [self.db newStatement:@"update notifications set viewed=? where time <= (select time from notifications limit 1 offset ?)"];
     _read_metadata = [self.db newStatement:@"select meta_value_str, meta_value_int, updated from notifications_meta where meta_key=?"];
     _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value_str, meta_value_int, updated) values (?,?,?,?);"];
 
@@ -349,6 +351,14 @@ create index notifications_mac on notifications (mac, time);
 
 - (void)storeBadgeCount:(NSInteger)count {
     [self setMetaData:@"" intValue:count forKey:KEY_BADGE_COUNT];
+
+    ZHDatabaseStatement *stmt = self.update_unread_count;
+    @synchronized (stmt) {
+        [stmt bindNextBool:YES];
+        [stmt bindNextInteger:count];
+        stmt.execute;
+        [stmt reset];
+    }
 }
 
 - (NSInteger)badgeCount {

@@ -16,6 +16,10 @@
 
 @property(nonatomic, readonly) NSArray *notifications; // a list of SFINotification
 
+// value indicating how many "new" notifications there are.
+// Though new records are delivered first, those records may not fill entire page, or fit entirely in the page.
+@property(nonatomic, readonly) NSUInteger newCount;
+
 - (BOOL)isPageStateDefined;
 
 + (instancetype)parseJson:(NSData *)data;
