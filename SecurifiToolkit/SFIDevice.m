@@ -90,7 +90,6 @@
         case SFIDeviceType_GasSensor_15:
         case SFIDeviceType_VibrationOrMovementSensor_17:
         case SFIDeviceType_Keypad_20:
-        case SFIDeviceType_HueLamp_48:
         {
             return SFIDevicePropertyType_STATE;
         }
@@ -103,6 +102,7 @@
         case SFIDeviceType_Siren_42:
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
+        case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
         {
             return SFIDevicePropertyType_SWITCH_BINARY;
