@@ -69,7 +69,9 @@
             return SFIDevicePropertyType_SWITCH_MULTILEVEL;
         }
 
-        case SFIDeviceType_DoorLock_5: {
+        case SFIDeviceType_DoorLock_5:
+        case SFIDeviceType_ZigbeeDoorLock_28:
+        {
             return SFIDevicePropertyType_LOCK_STATE;
         }
 
@@ -79,6 +81,7 @@
 
         case SFIDeviceType_Alarm_6:
         case SFIDeviceType_SmokeDetector_36:
+        case SFIDeviceType_FloodSensor_37:
         case SFIDeviceType_MoistureSensor_40: {
             return SFIDevicePropertyType_BASIC;
         }
@@ -109,7 +112,6 @@
         }
 
         case SFIDeviceType_BinarySensor_3:
-        case SFIDeviceType_FloodSensor_37:
         case SFIDeviceType_ShockSensor_38:
         case SFIDeviceType_DoorSensor_39:
         case SFIDeviceType_MovementSensor_41:
@@ -130,7 +132,6 @@
         case SFIDeviceType_LightSensor_25:
         case SFIDeviceType_WindowCovering_26:
         case SFIDeviceType_TemperatureSensor_27:
-        case SFIDeviceType_ZigbeeDoorLock_28:
         case SFIDeviceType_ColorControl_29:
         case SFIDeviceType_PressureSensor_30:
         case SFIDeviceType_FlowSensor_31:
@@ -164,6 +165,7 @@
         case SFIDeviceType_StandardWarningDevice_21:
         case SFIDeviceType_SmartACSwitch_22:
         case SFIDeviceType_SmartDCSwitch_23:
+        case SFIDeviceType_ZigbeeDoorLock_28:
         case SFIDeviceType_Siren_42:
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
@@ -198,7 +200,9 @@
         }
 
         case SFIDeviceType_DoorLock_5:
-        case SFIDeviceType_Alarm_6: {
+        case SFIDeviceType_Alarm_6:
+        case SFIDeviceType_ZigbeeDoorLock_28:
+        {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
 
             int newValue = (deviceValues.intValue == 0) ? 255 : 0;
@@ -206,9 +210,15 @@
             break;
         }
 
+        case SFIDeviceType_StandardWarningDevice_21: {
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
+            int newValue = (deviceValues.intValue == 0) ? 65535 : 0;
+            [deviceValues setIntValue:newValue];
+            break;
+        }
+
         case SFIDeviceType_BinarySwitch_1:
         case SFIDeviceType_MultiLevelOnOff_4:
-        case SFIDeviceType_StandardWarningDevice_21:
         case SFIDeviceType_SmartACSwitch_22:
         case SFIDeviceType_SmartDCSwitch_23:
         case SFIDeviceType_Siren_42:
