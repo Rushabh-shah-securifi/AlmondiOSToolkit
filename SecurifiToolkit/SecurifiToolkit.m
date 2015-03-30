@@ -52,6 +52,13 @@
 #define SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT          @"com.securifi.minsRemaining"
 #define SEC_APN_TOKEN                                       @"com.securifi.apntoken"
 
+#define GET_WIRELESS_SUMMARY_COMMAND @"<root><AlmondRouterSummary action=\"get\">1</AlmondRouterSummary></root>"
+#define GET_WIRELESS_SETTINGS_COMMAND @"<root><AlmondWirelessSettings action=\"get\">1</AlmondWirelessSettings></root>"
+#define GET_CONNECTED_DEVICE_COMMAND @"<root><AlmondConnectedDevices action=\"get\">1</AlmondConnectedDevices></root>"
+#define GET_BLOCKED_DEVICE_COMMAND @"<root><AlmondBlockedMACs action=\"get\">1</AlmondBlockedMACs></root>"
+#define APPLICATION_ID @"1001"
+
+
 NSString *const kSFIDidCompleteLoginNotification = @"kSFIDidCompleteLoginNotification";
 NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
 NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
@@ -288,6 +295,8 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 // tracks only "refresh" request to get new ones
 @property(nonatomic, strong) NotificationListRequest *pendingRefreshNotificationsRequest;
 @property(nonatomic, strong) NotificationCountRequest *pendingNotificationCountRequest;
+
+@property(nonatomic, strong) BaseCommandRequest *pendingAlmondStateAndSettingsRequest;
 @end
 
 @implementation SecurifiToolkit
@@ -1107,6 +1116,40 @@ static SecurifiToolkit *singleton = nil;
 
 #pragma mark - Almond and router settings
 
+- (void)asyncAlmondStatusAndSettings:(NSString *)almondMac {
+    if (almondMac.length == 0) {
+        return;
+    }
+
+    BaseCommandRequest *pending = self.pendingAlmondStateAndSettingsRequest;
+    if (pending) {
+        if (!pending.isExpired) {
+            return;
+        }
+    }
+    self.pendingAlmondStateAndSettingsRequest = [BaseCommandRequest new];
+
+    // sends a series of requests to fetch all the information at once.
+    // note ordering might be important to the UI layer, which for now receives the response payloads directly
+    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_WIRELESS_SUMMARY_COMMAND];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_WIRELESS_SETTINGS_COMMAND];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_CONNECTED_DEVICE_COMMAND];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_BLOCKED_DEVICE_COMMAND];
+}
+
+- (void)internalRequestAlmondStatusAndSettings:(NSString*)almondMac command:(NSString*)commandPayload {
+    GenericCommandRequest *request = [GenericCommandRequest new];
+    request.almondMAC = almondMac;
+    request.applicationID = APPLICATION_ID;
+    request.data = commandPayload;
+
+    GenericCommand *cmd = [[GenericCommand alloc] init];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = request;
+    
+    [self asyncSendToCloud:cmd];
+}
+
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings {
     GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
     req.almondMAC = almondMAC;
@@ -1467,6 +1510,9 @@ static SecurifiToolkit *singleton = nil;
     self.pendingAlmondModeChange = nil;
     self.pendingNotificationPreferenceChange = nil;
     self.pendingRefreshNotificationsRequest = nil;
+    self.pendingNotificationCountRequest = nil;
+    self.pendingAlmondStateAndSettingsRequest = nil;
+
     self.networkSingleton = nil;
 
     NSLog(@"Finished tear down of network");

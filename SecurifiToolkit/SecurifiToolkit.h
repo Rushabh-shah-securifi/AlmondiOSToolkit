@@ -260,6 +260,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;
 
+// Sends commands directly to the specified Almond, requesting summary and settings information
+- (void)asyncAlmondStatusAndSettings:(NSString*)almondMac;
+
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
 - (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)deviceMAC;
