@@ -123,6 +123,7 @@ create index notifications_mac on notifications (mac, time);
 
 - (void)purgeAllNotifications {
     [self.db execute:@"delete from notifications"];
+    [self.db execute:@"delete from notifications_syncpoints"];
 }
 
 - (BOOL)copyDatabaseTo:(NSString *)filePath {

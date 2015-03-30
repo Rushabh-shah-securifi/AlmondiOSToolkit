@@ -3,7 +3,7 @@
 //  SecurifiToolkit
 //
 //  Created by Nirav Uchat on 7/10/13.
-//  Copyright (c) 2013 Nirav Uchat. All rights reserved.
+//  Copyright (c) 2013 Securifi Ltd. All rights reserved.
 //
 
 #import <SecurifiToolkit/SecurifiToolkit.h>
@@ -1153,7 +1153,7 @@ static SecurifiToolkit *singleton = nil;
     return req.correlationId;
 }
 
-#pragma mark - Notifications
+#pragma mark - Notification Preferences and Almond mode changes
 
 - (void)asyncRequestRegisterForNotification:(NSString *)deviceToken {
     if (deviceToken == nil) {
@@ -1701,7 +1701,7 @@ static SecurifiToolkit *singleton = nil;
     }
 }
 
-#pragma mark - Device Updates
+#pragma mark - Device List Update callbacks
 
 - (void)onDeviceHashResponse:(id)sender {
     NSLog(@"Received Almond hash response");
@@ -1812,7 +1812,7 @@ static SecurifiToolkit *singleton = nil;
     [self postNotification:kSFIDidChangeDeviceList data:mac];
 }
 
-#pragma mark - Device Value Updates
+#pragma mark - Device Value Update callbacks
 
 - (void)onDynamicDeviceValueListChange:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
@@ -1914,7 +1914,7 @@ static SecurifiToolkit *singleton = nil;
 }
 
 
-#pragma mark - Notification Preference List
+#pragma mark - Notification Preference List callbacks
 
 - (void)onDeviceNotificationPreferenceChangeResponseCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
@@ -1935,6 +1935,7 @@ static SecurifiToolkit *singleton = nil;
 
     int res_correlationId = res.internalIndex.intValue;
     if (res_correlationId != req.correlationId) {
+        NSLog(@"Unable to process NotificationPreferenceResponse: correlation IDs do not match, expected:'%u', received:'%@'", req.correlationId, res.internalIndex);
         return;
     }
 
@@ -2052,6 +2053,9 @@ static SecurifiToolkit *singleton = nil;
 
     // Remove the guard preventing more refresh notifications
     if (requestId.length == 0) {
+        // note: we are only tracking "refresh" requests to prevent more than one of them to be processed at a time.
+        // these requests are not the same as "catch up" requests for older sync points that were queued for fetching
+        // but not downloaded; see internalTryProcessNotificationSyncPoints.
         NSLog(@"asyncRefreshNotifications: clearing refresh request tracking");
         self.pendingRefreshNotificationsRequest = nil;
     }
@@ -2077,10 +2081,13 @@ static SecurifiToolkit *singleton = nil;
 
     if (storedCount == 0) {
         [store storeBadgeCount:newCount];
+
+        // check whether there is queued work to be done
+        [self internalTryProcessNotificationSyncPoints];
+
         // if nothing stored, then no need to tell the world
         return;
     }
-
 
     if (!allStored) {
         // stopped early
@@ -2089,6 +2096,9 @@ static SecurifiToolkit *singleton = nil;
 
         // Let the world know there are new notifications
         [self postNotification:kSFINotificationDidStore data:nil];
+
+        // check whether there is queued work to be done
+        [self internalTryProcessNotificationSyncPoints];
 
         return;
     }
@@ -2104,6 +2114,30 @@ static SecurifiToolkit *singleton = nil;
         // Keep track of this page state until the response has been processed
         [store trackSyncPoint:nextPageState];
 
+        [self internalAsyncFetchNotifications:nextPageState];
+    }
+    else {
+        // check whether there is queued work to be done
+        [self internalTryProcessNotificationSyncPoints];
+    }
+}
+
+// Check whether there are page states in the data store that need to be fetched.
+// This could happen when the app is halted or connections break before a previous
+// run completed fetching all pages.
+- (void)internalTryProcessNotificationSyncPoints {
+    DatabaseStore *store = self.databaseStore;
+
+    NSInteger count = store.countTrackedSyncPoints;
+    if (count == 0) {
+        return;
+    }
+
+    DLog(@"internalTryProcessNotificationSyncPoints: queued sync points: %li", (long) count);
+
+    NSString *nextPageState = [store nextTrackedSyncPoint];
+    if (nextPageState.length > 0) {
+        DLog(@"internalTryProcessNotificationSyncPoints: fetching sync point: %@", nextPageState);
         [self internalAsyncFetchNotifications:nextPageState];
     }
 }
@@ -2135,7 +2169,7 @@ static SecurifiToolkit *singleton = nil;
     }
 }
 
-#pragma mark - Notification access
+#pragma mark - Notification access and refresh commands
 
 - (BOOL)storePushNotification:(SFINotification *)notification {
     if (!self.config.enableNotifications) {
@@ -2183,7 +2217,7 @@ static SecurifiToolkit *singleton = nil;
     return [self.databaseStore copyDatabaseTo:filePath];
 }
 
-// this method sends a request to fetch the latest notifications; 
+// this method sends a request to fetch the latest notifications;
 // it does not handle the case of fetching older ones 
 - (void)tryRefreshNotifications {
     if (!self.config.enableNotifications) {
@@ -2192,7 +2226,7 @@ static SecurifiToolkit *singleton = nil;
 
     NotificationListRequest *pending = self.pendingRefreshNotificationsRequest;
     if (pending) {
-        if (![pending shouldExpireAfterSeconds:5]) {
+        if (![pending isExpired]) {
             // give the request 5 seconds to complete
             NSLog(@"asyncRefreshNotifications: fail fast; already fetching latest");
             return;
@@ -2259,7 +2293,7 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-#pragma mark - Almond mode change
+#pragma mark - Almond Mode change callbacks
 
 - (void)onAlmondModeChangeCompletion:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;

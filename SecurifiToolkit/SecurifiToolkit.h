@@ -3,7 +3,7 @@
 //  SecurifiToolkit
 //
 //  Created by Nirav Uchat on 7/10/13.
-//  Copyright (c) 2013 Nirav Uchat. All rights reserved.
+//  Copyright (c) 2013 Securifi Ltd. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -284,6 +284,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // an array of all SFINotification, newest to oldest
 - (NSArray *)notifications;
 
+// Called to
 - (void)markNotificationViewed:(SFINotification *)notification;
 
 - (NSInteger)countUnviewedNotifications;
@@ -293,7 +294,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // makes a copy of the notifications database; used for debugging
 - (BOOL)copyNotificationStoreTo:(NSString*)filePath;
 
-// Synchronizes the on-board Notifications database with the cloud
+// Initiates a process to synchronize the on-board Notifications database with the cloud.
+// If a request is already in flight, this call fails fast and silently.
+// Posts kSFINotificationDidStore when new notifications have been fetched.
 - (void)tryRefreshNotifications;
 
 - (void)tryFetchNotificationCount;

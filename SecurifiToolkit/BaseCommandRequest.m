@@ -31,4 +31,8 @@
     return elapsed >= timeOutSecsAfterCreation;
 }
 
+- (BOOL)isExpired {
+    return [self shouldExpireAfterSeconds:5];
+}
+
 @end

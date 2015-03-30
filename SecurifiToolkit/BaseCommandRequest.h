@@ -22,4 +22,7 @@
 // can be used to determine whether the request should be expired
 - (BOOL)shouldExpireAfterSeconds:(NSTimeInterval)timeOutSecsAfterCreation;
 
+// Called to check against standard expiration time, which is 5 seconds.
+- (BOOL)isExpired;
+
 @end
