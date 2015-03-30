@@ -580,6 +580,10 @@ static SecurifiToolkit *singleton = nil;
     });
 }
 
+- (void)debugUpdateConfiguration:(SecurifiConfigurator *)configurator {
+    _config = configurator.copy;
+}
+
 // Invokes post-connection set-up and login to request updates that had been made while the connection was down
 - (void)asyncInitializeConnection1:(SingleTon *)socket {
     // After successful login, refresh the Almond list and hash values.

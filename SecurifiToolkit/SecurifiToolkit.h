@@ -173,6 +173,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)closeConnection;
 
+- (void)debugUpdateConfiguration:(SecurifiConfigurator *)configurator;
+
 - (void)asyncSendToCloud:(GenericCommand *)command;
 
 // Sends an update to a sensor device property.
