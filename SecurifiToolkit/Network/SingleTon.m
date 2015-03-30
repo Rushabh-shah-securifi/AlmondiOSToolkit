@@ -123,8 +123,9 @@
             [block_self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
             [block_self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
 
+            NSNumber *enableChainValidation = self.config.enableCertificateChainValidation ? @YES : @NO;
             NSDictionary *settings = @{
-                    (__bridge id) kCFStreamSSLValidatesCertificateChain : @YES
+                    (__bridge id) kCFStreamSSLValidatesCertificateChain : enableChainValidation
             };
 
             CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
