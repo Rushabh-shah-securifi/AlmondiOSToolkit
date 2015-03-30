@@ -491,7 +491,7 @@
         }
 
         default: {
-            DLog(@"%s: Unhandled event: %il", __PRETTY_FUNCTION__, (NSInteger)streamEvent);
+            DLog(@"%s: Unhandled event: %li", __PRETTY_FUNCTION__, (long)streamEvent);
         }
     }
 }

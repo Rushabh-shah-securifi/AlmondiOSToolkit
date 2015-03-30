@@ -320,7 +320,7 @@ create index notifications_mac on notifications (mac, time);
 
         NSInteger value = 0;
         if (stmt.step) {
-            stmt.stepNextString;
+            [stmt stepNextString];
             value = stmt.stepNextInteger;
         }
 
@@ -357,7 +357,7 @@ create index notifications_mac on notifications (mac, time);
     @synchronized (stmt) {
         [stmt bindNextBool:YES];
         [stmt bindNextInteger:count];
-        stmt.execute;
+        [stmt execute];
         [stmt reset];
     }
 }
