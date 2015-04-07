@@ -438,11 +438,11 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (BOOL)isAccountActivated {
-    return [[self secIsAccountActivated] boolValue];
+    return [self secIsAccountActivated];
 }
 
 - (int)minsRemainingForUnactivatedAccount {
-    return [[self secMinsRemainingForUnactivatedAccount] intValue];
+    return (int) [self secMinsRemainingForUnactivatedAccount];
 }
 
 - (SDKCloudStatus)getConnectionState {
@@ -753,24 +753,23 @@ static SecurifiToolkit *singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-- (void)storeLoginCredentials:(LoginResponse *)obj {
-    NSString *tempPass = obj.tempPass;
-    NSString *userId = obj.userID;
+- (void)storeLoginCredentials:(LoginResponse *)response {
+    NSString *tempPass = response.tempPass;
+    NSString *userId = response.userID;
 
     [self setSecPassword:tempPass];
     [self setSecUserId:userId];
 
-    //PY: 101014 - Not activated accounts can be accessed for 7 days
-    [self storeAccountActivationCredentials:obj];
-
+    [self storeAccountActivationCredentials:response];
 }
 
-- (void)storeAccountActivationCredentials:(LoginResponse *)obj {
+- (void)storeAccountActivationCredentials:(LoginResponse *)response {
     //PY: 101014 - Not activated accounts can be accessed for 7 days
-    NSString *isAccountActivated = obj.isAccountActivated;
-    NSString *minsRemainingForUnactivatedAccount = obj.minsRemainingForUnactivatedAccount;
-    [self setSecAccountActivationStatus:isAccountActivated];
-    [self setSecMinsRemainingForUnactivatedAccount:minsRemainingForUnactivatedAccount];
+    BOOL activated = response.isAccountActivated;
+    NSUInteger remaining = response.minsRemainingForUnactivatedAccount;
+
+    [self setSecAccountActivationStatus:activated];
+    [self setSecMinsRemainingForUnactivatedAccount:remaining];
 }
 
 - (void)tearDownLoginSession {
@@ -1141,7 +1140,7 @@ static SecurifiToolkit *singleton = nil;
     [self internalRequestAlmondStatusAndSettings:almondMac command:GET_BLOCKED_DEVICE_COMMAND];
 }
 
-- (void)internalRequestAlmondStatusAndSettings:(NSString*)almondMac command:(NSString*)commandPayload {
+- (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(NSString *)commandPayload {
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMac;
     request.applicationID = APPLICATION_ID;
@@ -1150,7 +1149,7 @@ static SecurifiToolkit *singleton = nil;
     GenericCommand *cmd = [[GenericCommand alloc] init];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
-    
+
     [self asyncSendToCloud:cmd];
 }
 
@@ -1403,6 +1402,8 @@ static SecurifiToolkit *singleton = nil;
     [KeyChainWrapper removeEntryForUserEmail:SEC_PWD forService:SEC_SERVICE_NAME];
     [KeyChainWrapper removeEntryForUserEmail:SEC_USER_ID forService:SEC_SERVICE_NAME];
     [KeyChainWrapper removeEntryForUserEmail:SEC_APN_TOKEN forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_IS_ACCOUNT_ACTIVATED forService:SEC_SERVICE_NAME];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT forService:SEC_SERVICE_NAME];
 }
 
 - (BOOL)hasSecPassword {
@@ -1444,30 +1445,32 @@ static SecurifiToolkit *singleton = nil;
 }
 
 //PY: 101014 - Not activated accounts can be accessed for 7 days
-- (NSString *)secIsAccountActivated {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_IS_ACCOUNT_ACTIVATED forService:SEC_SERVICE_NAME];
+- (BOOL)secIsAccountActivated {
+    NSString *value = [KeyChainWrapper retrieveEntryForUser:SEC_IS_ACCOUNT_ACTIVATED forService:SEC_SERVICE_NAME];
+    if (value == nil) {
+        return YES;
+    }
+    return [value boolValue];
 }
 
-- (void)setSecAccountActivationStatus:(NSString *)isActivated {
-    if (isActivated == nil) {
-        [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACTIVATED entryValue:IS_ACCOUNT_ACTIVATED_DEFAULT forService:SEC_SERVICE_NAME];
-    }
-    else {
-        [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACTIVATED entryValue:isActivated forService:SEC_SERVICE_NAME];
-    }
+- (void)setSecAccountActivationStatus:(BOOL)isActivated {
+    NSNumber *num = @(isActivated);
+    [KeyChainWrapper createEntryForUser:SEC_IS_ACCOUNT_ACTIVATED entryValue:[num stringValue] forService:SEC_SERVICE_NAME];
 }
 
-- (NSString *)secMinsRemainingForUnactivatedAccount {
-    return [KeyChainWrapper retrieveEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT forService:SEC_SERVICE_NAME];
+- (NSUInteger)secMinsRemainingForUnactivatedAccount {
+    NSString *value = [KeyChainWrapper retrieveEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT forService:SEC_SERVICE_NAME];
+    if (value.length == 0) {
+        return 0;
+    }
+
+    NSInteger mins = value.integerValue;
+    return (NSUInteger) mins;
 }
 
-- (void)setSecMinsRemainingForUnactivatedAccount:(NSString *)minsRemaining {
-    if (minsRemaining == nil) {
-        [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:MINS_REMAINING_DEFAULT forService:SEC_SERVICE_NAME];
-    }
-    else {
-        [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:minsRemaining forService:SEC_SERVICE_NAME];
-    }
+- (void)setSecMinsRemainingForUnactivatedAccount:(NSUInteger)minsRemaining {
+    NSNumber *num = @(minsRemaining);
+    [KeyChainWrapper createEntryForUser:SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT entryValue:[num stringValue] forService:SEC_SERVICE_NAME];
 }
 
 - (BOOL)isSecApnTokenRegistered {
@@ -2126,7 +2129,7 @@ static SecurifiToolkit *singleton = nil;
         DLog(@"asyncRefreshNotifications: stored:%li", (long) totalCount);
     }
     else {
-        DLog(@"asyncRefreshNotifications: stored partial notifications:%li of %li", (long)storedCount, (long) totalCount);
+        DLog(@"asyncRefreshNotifications: stored partial notifications:%li of %li", (long) storedCount, (long) totalCount);
     }
 
     if (storedCount == 0) {
@@ -2321,7 +2324,7 @@ static SecurifiToolkit *singleton = nil;
 // Sends a request for notifications
 // pagestate can be nil or a defined page state. The page state also becomes an correlation ID that is parroted back in the
 // response. This allows the system to track responses and ensure page states are always serviced, even across app sessions.
-- (void)internalAsyncFetchNotifications:(NSString*)pageState {
+- (void)internalAsyncFetchNotifications:(NSString *)pageState {
     if (!self.config.enableNotifications) {
         return;
     }

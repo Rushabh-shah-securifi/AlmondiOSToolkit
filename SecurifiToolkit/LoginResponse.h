@@ -17,6 +17,7 @@
 @property(nonatomic) int reasonCode;
 
 //PY: 101014 - Not activated accounts can be accessed for 7 days
-@property(nonatomic, copy) NSString *isAccountActivated;    //todo convert this to a BOOL type
-@property(nonatomic, copy) NSString *minsRemainingForUnactivatedAccount; // todo convert this to unsigned int type
+@property(nonatomic, assign) BOOL isAccountActivated;
+@property(nonatomic, assign) NSUInteger minsRemainingForUnactivatedAccount;
+
 @end

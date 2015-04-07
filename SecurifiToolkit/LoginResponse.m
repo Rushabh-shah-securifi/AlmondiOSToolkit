@@ -9,4 +9,15 @@
 #import "LoginResponse.h"
 
 @implementation LoginResponse
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.isAccountActivated = YES;
+        self.minsRemainingForUnactivatedAccount = 0;
+    }
+
+    return self;
+}
+
 @end

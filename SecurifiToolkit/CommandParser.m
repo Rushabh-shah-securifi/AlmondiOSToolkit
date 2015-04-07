@@ -48,7 +48,6 @@
 #import "DynamicNotificationPreferenceList.h"
 #import "NotificationPreferenceListResponse.h"
 #import "NotificationPreferenceResponse.h"
-#import "SFINotificationUser.h"
 #import "SFINotificationDevice.h"
 #import "AlmondModeChangeResponse.h"
 #import "DynamicAlmondModeChange.h"
@@ -1889,12 +1888,21 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_isActivated, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_LOGIN_RESPONSE))
         {
-            [parser.command setIsAccountActivated:[parser currentString]];
+            NSString *string = [parser currentString];
+            BOOL activated = string.boolValue;
+            [parser.command setIsAccountActivated:activated];
         }
         else if (!strncmp((const char *)localname, kName_minsRemaining, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_LOGIN_RESPONSE))
         {
-            [parser.command setMinsRemainingForUnactivatedAccount:[parser currentString]];
+            NSNumberFormatter *formatter = [NSNumberFormatter new];
+            formatter.numberStyle = NSNumberFormatterDecimalStyle;
+
+            NSString *string = [parser currentString];
+            NSNumber *number = [formatter numberFromString:string];
+            NSUInteger value = [number unsignedIntegerValue];
+
+            [parser.command setMinsRemainingForUnactivatedAccount:value];
         }
         
         else if (!strncmp((const char *)localname, kName_LoginResponse, kLength_MaxTag)) {
