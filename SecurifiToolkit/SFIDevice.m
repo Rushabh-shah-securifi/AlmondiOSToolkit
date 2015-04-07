@@ -201,7 +201,6 @@
 
         case SFIDeviceType_DoorLock_5:
         case SFIDeviceType_Alarm_6:
-        case SFIDeviceType_ZigbeeDoorLock_28:
         {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
 
@@ -213,6 +212,14 @@
         case SFIDeviceType_StandardWarningDevice_21: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             int newValue = (deviceValues.intValue == 0) ? 65535 : 0;
+            [deviceValues setIntValue:newValue];
+            break;
+        }
+
+        case SFIDeviceType_ZigbeeDoorLock_28: {
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
+
+            int newValue = (deviceValues.intValue == 0) ? 1 : 0;
             [deviceValues setIntValue:newValue];
             break;
         }
