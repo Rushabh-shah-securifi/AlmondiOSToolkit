@@ -53,12 +53,14 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabase *db;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *count_notification;
+@property(nonatomic, readonly) ZHDatabaseStatement *trim_notifications;
 @property(nonatomic, readonly) ZHDatabaseStatement *update_unread_count;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *delete_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_syncpoint;
+@property(nonatomic, readonly) NSObject *locker;
 @end
 
 @implementation DatabaseStore
@@ -92,13 +94,17 @@ create index notifications_mac on notifications (mac, time);
 
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
+    _trim_notifications = [self.db newStatement:@"delete from notifications where id in (select id from notifications order by time desc limit 1 offset ?)"];
     _update_unread_count = [self.db newStatement:@"update notifications set viewed=? where time <= (select time from notifications limit 1 offset ?)"];
+
     _read_metadata = [self.db newStatement:@"select meta_value_str, meta_value_int, updated from notifications_meta where meta_key=?"];
     _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value_str, meta_value_int, updated) values (?,?,?,?);"];
 
     _insert_syncpoint = [self.db newStatement:@"insert into notifications_syncpoints (syncpoint, created) values (?,?)"];
     _delete_syncpoint = [self.db newStatement:@"delete from notifications_syncpoints where syncpoint=?"];
     _read_syncpoint = [self.db newStatement:@"select syncpoint from notifications_syncpoints order by created desc limit 1"];
+
+    _locker = [NSObject new];
 }
 
 - (id <SFINotificationStore>)newStore {
@@ -116,14 +122,18 @@ create index notifications_mac on notifications (mac, time);
 }
 
 - (void)deleteNotificationsForAlmond:(NSString *)almondMAC {
-    ZHDatabaseStatement *stmt = [self.db newStatement:@"delete from notifications where mac=?"];
-    [stmt bindNextText:almondMAC];
-    [stmt execute];
+    @synchronized (self.locker) {
+        ZHDatabaseStatement *stmt = [self.db newStatement:@"delete from notifications where mac=?"];
+        [stmt bindNextText:almondMAC];
+        [stmt execute];
+    }
 }
 
 - (void)purgeAllNotifications {
-    [self.db execute:@"delete from notifications"];
-    [self.db execute:@"delete from notifications_syncpoints"];
+    @synchronized (self.locker) {
+        [self.db execute:@"delete from notifications"];
+        [self.db execute:@"delete from notifications_syncpoints"];
+    }
 }
 
 - (BOOL)copyDatabaseTo:(NSString *)filePath {
@@ -142,8 +152,6 @@ create index notifications_mac on notifications (mac, time);
         return NO;
     }
 
-    ZHDatabaseStatement *stmt = self.insert_notification;
-
     NSString *valueType = [SFIDeviceKnownValues propertyTypeToName:notification.valueType];
 
     // Make bucket time as of midnight of that day
@@ -151,6 +159,7 @@ create index notifications_mac on notifications (mac, time);
     NSDate *midnight = [date dateAtMidnight];
     NSTimeInterval midnightTimeInterval = midnight.timeIntervalSince1970;
 
+    ZHDatabaseStatement *stmt = self.insert_notification;
     @synchronized (stmt) {
         [stmt reset];
         [stmt bindNextText:notification.externalId]; // external ID is unique across all records
@@ -174,8 +183,6 @@ create index notifications_mac on notifications (mac, time);
         if (!success) {
             NSLog(@"Failed to insert notification into database, obj:%@", notification);
         }
-
-        [stmt reset];
 
         return success;
     }
@@ -204,8 +211,12 @@ create index notifications_mac on notifications (mac, time);
 
 // deletes any records past the limit number, keeping the database bounded. oldest records are deleted first.
 - (void)trimRecords:(int)limit {
-    NSString *sql = [NSString stringWithFormat:@"delete from notifications where id in (select id from notifications order by time desc limit 1 offset %d)", limit];
-    [self.db execute:sql];
+    ZHDatabaseStatement *stmt = self.trim_notifications;
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextInteger:limit];
+        [stmt execute];
+    }
 }
 
 #pragma mark - File system utilities
@@ -266,9 +277,7 @@ create index notifications_mac on notifications (mac, time);
     @synchronized (stmt) {
         [stmt reset];
         [stmt bindNextText:pageState];
-
         [stmt execute];
-        [stmt reset];
     }
 }
 
@@ -286,7 +295,6 @@ create index notifications_mac on notifications (mac, time);
         [stmt bindNextText:pageState];
         [stmt bindNextTimeInterval:now];
         [stmt execute];
-        [stmt reset];
     }
 }
 
@@ -295,9 +303,9 @@ create index notifications_mac on notifications (mac, time);
 }
 
 - (NSString *)getMetaValueString:(NSString *)metaKey {
-    ZHDatabaseStatement *stmt = self.read_metadata;
+    @synchronized (self.locker) {
+        ZHDatabaseStatement *stmt = self.read_metadata;
 
-    @synchronized (stmt) {
         [stmt reset];
         [stmt bindNextText:metaKey];
 
@@ -315,7 +323,6 @@ create index notifications_mac on notifications (mac, time);
     ZHDatabaseStatement *stmt = self.read_metadata;
 
     @synchronized (stmt) {
-        [stmt reset];
         [stmt bindNextText:metaKey];
 
         NSInteger value = 0;
@@ -345,8 +352,6 @@ create index notifications_mac on notifications (mac, time);
         if (!success) {
             NSLog(@"Failed to insert notification metadata into database, key:%@, str value:%@, int value:%li, updated:%f", key, strValue, (long) intValue, now);
         }
-
-        [stmt reset];
     }
 }
 
@@ -358,7 +363,6 @@ create index notifications_mac on notifications (mac, time);
         [stmt bindNextBool:YES];
         [stmt bindNextInteger:count];
         [stmt execute];
-        [stmt reset];
     }
 }
 
