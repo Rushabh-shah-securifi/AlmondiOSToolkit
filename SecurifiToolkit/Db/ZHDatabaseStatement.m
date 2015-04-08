@@ -64,12 +64,18 @@
 
 - (void)bindNextInteger:(NSInteger)value {
     int pos = [self nextBinding];
-    sqlite3_bind_int(self.stmt, pos, (int) value);
+    int rc = sqlite3_bind_int(self.stmt, pos, (int) value);
+    if (rc != SQLITE_OK) {
+        [self checkErrors:rc];
+    }
 }
 
 - (void)bindNextDouble:(double)value {
     int pos = [self nextBinding];
-    sqlite3_bind_double(self.stmt, pos, value);
+    int rc = sqlite3_bind_double(self.stmt, pos, value);
+    if (rc != SQLITE_OK) {
+        [self checkErrors:rc];
+    }
 }
 
 - (void)bindNextBool:(BOOL)value {
@@ -79,12 +85,18 @@
 
 - (void)bindNextTimeInterval:(NSTimeInterval)value {
     int pos = [self nextBinding];
-    sqlite3_bind_double(self.stmt, pos, value);
+    int rc = sqlite3_bind_double(self.stmt, pos, value);
+    if (rc != SQLITE_OK) {
+        [self checkErrors:rc];
+    }
 }
 
 - (void)bindNextText:(NSString *)value {
     int pos = [self nextBinding];
-    sqlite3_bind_text(self.stmt, pos, [value UTF8String], -1, SQLITE_TRANSIENT);
+    int rc = sqlite3_bind_text(self.stmt, pos, [value UTF8String], -1, SQLITE_TRANSIENT);
+    if (rc != SQLITE_OK) {
+        [self checkErrors:rc];
+    }
 }
 
 - (void)bindNextTextEncode:(NSString *)value {
@@ -95,8 +107,14 @@
 - (BOOL)execute {
     [self resetStep];
     int rc = sqlite3_step(self.stmt);
+
+    BOOL success = (rc == SQLITE_DONE);
+    if (!success) {
+        [self checkErrors:rc];
+    }
+
     [self reset];
-    return (rc == SQLITE_DONE);
+    return success;
 }
 
 - (NSArray *)executeReturnArray {
@@ -132,7 +150,13 @@
 
 - (BOOL)step {
     [self resetStep];
-    return (sqlite3_step(self.stmt) == SQLITE_ROW);
+    int rc = sqlite3_step(self.stmt);
+    BOOL success = (rc == SQLITE_ROW);
+    BOOL done = (rc == SQLITE_DONE);
+    if (!success && !done) {
+        [self checkErrors:rc];
+    }
+    return success;
 }
 
 - (NSInteger)stepNextInteger {
@@ -192,5 +216,11 @@
     self.currentStep = -1; // stepping is zero based unless binding which is 1 based...
 }
 
+- (void)checkErrors:(int)rc {
+    sqlite3 *db = self.database.database;
+    int ext_result_code = sqlite3_extended_errcode(db);
+    const char *msg = sqlite3_errmsg(db);
+    NSLog(@"Error: %d (%d) : failed executing '%@' with message '%s'.", rc, ext_result_code, self.sql, msg);
+}
 
 @end
