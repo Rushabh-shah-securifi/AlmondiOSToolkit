@@ -1,6 +1,6 @@
 //
 // Created by Matthew Sinclair-Day on 2/11/15.
-// Copyright (c) 2015 Nirav Uchat. All rights reserved.
+// Copyright (c) 2015 Securifi Ltd. All rights reserved.
 //
 
 #import "NotificationStoreImpl.h"
@@ -12,6 +12,7 @@
 
 @interface NotificationStoreImpl ()
 @property(nonatomic, readonly) ZHDatabase *db;
+@property(nonatomic, readonly) ZHDatabaseStatement *fetch_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *fetch_date_buckets;
 @property(nonatomic, readonly) ZHDatabaseStatement *count_for_date_bucket;
 @property(nonatomic, readonly) ZHDatabaseStatement *fetch_recs_for_date_buckets;
@@ -26,6 +27,7 @@
     self = [super init];
     if (self) {
         _db = db;
+        _fetch_notification = [self.db newStatement:@"select id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue from notifications order by time desc limit ?"];
         _fetch_date_buckets = [self.db newStatement:@"select distinct(date_bucket) from notifications order by time desc limit ?"];
         _count_for_date_bucket = [self.db newStatement:@"select count(*) from notifications where date_bucket=?"];
         _fetch_recs_for_date_buckets = [self.db newStatement:@"select id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where date_bucket=? order by time desc limit ? offset ?"];
@@ -50,9 +52,7 @@
     @synchronized (stmt) {
         [stmt reset];
         [stmt bindNextTimeInterval:date.timeIntervalSince1970];
-        NSInteger value = stmt.executeReturnInteger;
-        [stmt reset];
-        return (NSUInteger) value;
+        return (NSUInteger) [stmt executeReturnInteger];
     }
 }
 
@@ -71,29 +71,33 @@
         }
 
         [stmt reset];
+        return results;
     }
-
-    return results;
 }
 
 - (NSArray *)fetchNotifications:(NSUInteger)limit {
-    ZHDatabaseStatement *stmt = [self.db newStatement:@"select id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue from notifications order by time desc limit ?"];
-    [stmt bindNextInteger:limit];
+    ZHDatabaseStatement *stmt = self.fetch_notification;
 
-    NSMutableArray *results = [NSMutableArray array];
-    while ([stmt step]) {
-        SFINotification *obj = [self readRecord:stmt];
-        [results addObject:obj];
+    @synchronized (stmt) {
+        [stmt reset];
+        [stmt bindNextInteger:limit];
+
+        NSMutableArray *results = [NSMutableArray array];
+        while ([stmt step]) {
+            SFINotification *obj = [self readRecord:stmt];
+            [results addObject:obj];
+        }
+
+        [stmt reset];
+        return results;
     }
-
-    [stmt reset];
-    return results;
 }
 
 - (SFINotification *)fetchNotificationForBucket:(NSDate *)bucket index:(NSUInteger)pos {
     ZHDatabaseStatement *stmt = self.fetch_recs_for_date_buckets;
 
     @synchronized (stmt) {
+        [stmt reset];
         [stmt bindNextTimeInterval:bucket.timeIntervalSince1970];
         [stmt bindNextInteger:1];
         [stmt bindNextInteger:pos];
@@ -118,10 +122,10 @@
 
     ZHDatabaseStatement *stmt = self.mark_viewed_notification;
     @synchronized (stmt) {
+        [stmt reset];
         [stmt bindNextBool:YES];
         [stmt bindNextInteger:notification.notificationId];
         [stmt execute];
-        [stmt reset];
     }
 }
 
@@ -132,10 +136,10 @@
 
     ZHDatabaseStatement *stmt = self.mark_all_viewed_notification;
     @synchronized (stmt) {
+        [stmt reset];
         [stmt bindNextBool:YES];
         [stmt bindNextTimeInterval:notification.time];
         [stmt execute];
-        [stmt reset];
     }
 }
 
@@ -147,9 +151,9 @@
 
     ZHDatabaseStatement *stmt = self.delete_notification;
     @synchronized (stmt) {
+        [stmt reset];
         [stmt bindNextInteger:notification.notificationId];
         [stmt execute];
-        [stmt reset];
     }
 }
 
