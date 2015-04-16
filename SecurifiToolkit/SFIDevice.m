@@ -101,6 +101,7 @@
         case SFIDeviceType_MultiLevelOnOff_4:
         case SFIDeviceType_SmartACSwitch_22:
         case SFIDeviceType_SmartDCSwitch_23:
+        case SFIDeviceType_ColorDimmableLight_32:
         case SFIDeviceType_Shade_34:
         case SFIDeviceType_Siren_42:
         case SFIDeviceType_UnknownOnOffModule_44:
@@ -135,7 +136,6 @@
         case SFIDeviceType_ColorControl_29:
         case SFIDeviceType_PressureSensor_30:
         case SFIDeviceType_FlowSensor_31:
-        case SFIDeviceType_ColorDimmableLight_32:
         case SFIDeviceType_HAPump_33:
         case SFIDeviceType_MultiSwitch_43:
         default: {
@@ -166,6 +166,7 @@
         case SFIDeviceType_SmartACSwitch_22:
         case SFIDeviceType_SmartDCSwitch_23:
         case SFIDeviceType_ZigbeeDoorLock_28:
+        case SFIDeviceType_ColorDimmableLight_32:
         case SFIDeviceType_Siren_42:
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
