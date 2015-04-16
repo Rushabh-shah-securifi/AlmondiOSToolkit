@@ -9,4 +9,16 @@
 #import "GenericCommandResponse.h"
 
 @implementation GenericCommandResponse
+
+- (NSData *)decodedData {
+    NSString *data = self.genericData;
+    if (data) {
+        NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:data options:0];
+        return decodedData;
+    }
+    else {
+        return [NSData data];
+    }
+}
+
 @end

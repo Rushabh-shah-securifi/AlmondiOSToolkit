@@ -15,6 +15,10 @@
 @property(nonatomic, copy) NSString *reason;
 @property(nonatomic, copy) NSString *almondMAC;
 @property(nonatomic, copy) NSString *applicationID;
+
 @property(nonatomic, copy) NSString *genericData;
-@property(nonatomic, copy) NSData *decodedData;
+
+// Decodes the generic data. If the generic data is nil, returns an empty non-null NSData
+@property(nonatomic, readonly) NSData *decodedData;
+
 @end

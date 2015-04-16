@@ -588,23 +588,13 @@
         }
         case CommandType_GENERIC_COMMAND_RESPONSE: {
             GenericCommandResponse *obj = (GenericCommandResponse *) payload;
-            NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
-            obj.decodedData = decodedData;
-
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
             break;
         }
         case CommandType_GENERIC_COMMAND_NOTIFICATION: {
-            GenericCommandResponse *obj = (GenericCommandResponse *) payload;
-
-            //Decode using Base64
-            NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:obj.genericData options:0];
-            obj.decodedData = decodedData;
-
 //                                            [self tryMarkUnitCompletion:YES responseType:GENERIC_COMMAND_NOTIFICATION];
-            [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:obj];
-
+            [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:payload];
             break;
         }
         case CommandType_VALIDATE_RESPONSE: {
