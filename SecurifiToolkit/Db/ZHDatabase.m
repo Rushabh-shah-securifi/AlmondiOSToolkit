@@ -78,6 +78,11 @@ int backupDb(
     self = [super init];
     if (self) {
         databasePath = [aPathToDb copy];
+
+        if (sqlite3_threadsafe() == 0) {
+            NSAssert(0,@"sqlite must be compiled with mutex support; it is not threadsafe.");
+        }
+
         // Open the database
         if (sqlite3_open([databasePath UTF8String], &_database) != SQLITE_OK) {
             // Even though the open failed, call close to properly clean up resources.
@@ -93,8 +98,10 @@ int backupDb(
 }
 
 - (void)dealloc {
-    sqlite3_close(_database);
-    _database = nil;
+    if (_database) {
+        sqlite3_close(_database);
+        _database = nil;
+    }
 }
 
 - (void)attachToDb:(NSString *)attachDbPath alias:(NSString *)dbAlias {
@@ -203,21 +210,26 @@ int callback(void *dbPtr, int argCount, char **argVector, char **azColName) {
     char *zErrMsg = 0;
     int rc;
 
+    char const *sql = [aSqlToExecute UTF8String];
+
     if (callbackYesNo) {
-        rc = sqlite3_exec(self.database, [aSqlToExecute UTF8String], callback, (__bridge void *)(self), &zErrMsg);
+        rc = sqlite3_exec(self.database, sql, callback, (__bridge void *)(self), &zErrMsg);
     }
     else {
-        rc = sqlite3_exec(self.database, [aSqlToExecute UTF8String], NULL, NULL, &zErrMsg);
+        rc = sqlite3_exec(self.database, sql, NULL, NULL, &zErrMsg);
     }
 
     if (rc == SQLITE_OK) {
         return YES;
     }
 
-    NSLog(@"Failed to execute sql %@ with message '%s'", aSqlToExecute, zErrMsg);
-    /* This will free zErrMsg if assigned */
     if (zErrMsg) {
+        /* This will free zErrMsg if assigned */
+        NSLog(@"Failed to execute statmenet, rc:%d, message:'%s', sql:'%@'", rc, zErrMsg, aSqlToExecute);
         sqlite3_free(zErrMsg);
+    }
+    else {
+        NSLog(@"Failed to execute statmenet, rc:%d, sql:'%@'", rc, aSqlToExecute);
     }
 
     return NO;
@@ -233,11 +245,18 @@ int callback(void *dbPtr, int argCount, char **argVector, char **azColName) {
 }
 
 - (BOOL)copyTo:(NSString*)filePath {
-    if (!filePath) {
+    filePath = [filePath copy];
+
+    if (filePath.length == 0) {
         return NO;
     }
-    char const *fileName = [filePath UTF8String];
-    int result = backupDb(self.database, fileName, nil);
+
+    __block int result = 0;
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^() {
+        char const *fileName = [filePath UTF8String];
+        result = backupDb(self.database, fileName, nil);
+    });
+
     return result == SQLITE_OK;
 }
 
@@ -266,18 +285,18 @@ int backupDb(
         sqlite3 *pDb,               /* Database to back up */
         const char *zFilename,      /* Name of file to back up to */
         void(*xProgress)(int, int)  /* Progress function to invoke */
-){
+) {
     int rc;                     /* Function return code */
     sqlite3 *pFile;             /* Database connection opened on zFilename */
     sqlite3_backup *pBackup;    /* Backup handle used to copy data */
 
     /* Open the database file identified by zFilename. */
     rc = sqlite3_open(zFilename, &pFile);
-    if( rc==SQLITE_OK ){
+    if (rc == SQLITE_OK) {
 
         /* Open the sqlite3_backup object used to accomplish the transfer */
         pBackup = sqlite3_backup_init(pFile, "main", pDb, "main");
-        if( pBackup ){
+        if (pBackup) {
 
             /* Each iteration of this loop copies 5 database pages from database
             ** pDb to the backup database. If the return value of backup_step()
@@ -291,20 +310,20 @@ int backupDb(
                             sqlite3_backup_pagecount(pBackup)
                     );
                 }
-                if( rc==SQLITE_OK || rc==SQLITE_BUSY || rc==SQLITE_LOCKED ){
+                if (rc == SQLITE_OK || rc == SQLITE_BUSY || rc == SQLITE_LOCKED) {
                     sqlite3_sleep(250);
                 }
-            } while( rc==SQLITE_OK || rc==SQLITE_BUSY || rc==SQLITE_LOCKED );
+            } while (rc == SQLITE_OK || rc == SQLITE_BUSY || rc == SQLITE_LOCKED);
 
             /* Release resources allocated by backup_init(). */
-            (void)sqlite3_backup_finish(pBackup);
+            (void) sqlite3_backup_finish(pBackup);
         }
         rc = sqlite3_errcode(pFile);
     }
 
     /* Close the database connection opened on database file zFilename
     ** and return the result of this function. */
-    (void)sqlite3_close(pFile);
+    (void) sqlite3_close(pFile);
     return rc;
 }
 

@@ -26,6 +26,8 @@
     if (self) {
         _stmt = nil;
         self.sql = aSqlExpression;
+        self.database = aDatabase;
+
         int result_code = sqlite3_prepare_v2(aDatabase.database, [self.sql UTF8String], -1, &_stmt, NULL);
         if (result_code != SQLITE_OK) {
             int ext_result_code = sqlite3_extended_errcode(aDatabase.database);
@@ -36,8 +38,6 @@
 
         [self resetBinding];
         [self resetStep];
-
-        self.database = aDatabase;
     }
 
     return self;
@@ -49,8 +49,6 @@
         sqlite3_finalize(_stmt);
         _stmt = nil;
     }
-
-
 }
 
 #pragma mark -
@@ -218,6 +216,10 @@
 
 - (void)checkErrors:(int)rc {
     sqlite3 *db = self.database.database;
+    if (!db) {
+        return;
+    }
+
     int ext_result_code = sqlite3_extended_errcode(db);
     const char *msg = sqlite3_errmsg(db);
     NSLog(@"Error: %d (%d) : failed executing '%@' with message '%s'.", rc, ext_result_code, self.sql, msg);
