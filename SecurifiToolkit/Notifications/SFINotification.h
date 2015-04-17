@@ -27,16 +27,16 @@
 
 + (instancetype)parsePayload:(NSDictionary*)payload;
 
+// Used to alter the device name by appending the debugCounter value; useful for testing and debugging to track
+// sequences of notifications. This alteration can be done prior to persisting the notification.
+- (void)setDebugDeviceName;
+
 - (NSString *)description;
+
+- (id)copyWithZone:(NSZone *)zone;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
-
-- (id)copyWithZone:(NSZone *)zone;
-
-// Used to alter the device name by appending the debugCounter value; useful for testing and debugging to track
-// sequences of notifications
-- (void)setDebugDeviceName;
 
 @end

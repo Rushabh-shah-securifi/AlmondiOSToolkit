@@ -78,34 +78,36 @@ Value           => indexvalue
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
-        self.notificationId = (long) [coder decodeInt64ForKey:@"self.notificationId"];
+        self.notificationId = [coder decodeIntForKey:@"self.notificationId"];
+        self.externalId = [coder decodeObjectForKey:@"self.externalId"];
         self.almondMAC = [coder decodeObjectForKey:@"self.almondMAC"];
         self.time = [coder decodeDoubleForKey:@"self.time"];
-        self.deviceId = (sfi_id) [coder decodeInt64ForKey:@"self.deviceId"];
         self.deviceName = [coder decodeObjectForKey:@"self.deviceName"];
+        self.deviceId = (sfi_id) [coder decodeInt64ForKey:@"self.deviceId"];
         self.deviceType = (SFIDeviceType) [coder decodeIntForKey:@"self.deviceType"];
         self.valueIndex = (sfi_id) [coder decodeInt64ForKey:@"self.valueIndex"];
         self.valueType = (SFIDevicePropertyType) [coder decodeIntForKey:@"self.valueType"];
         self.value = [coder decodeObjectForKey:@"self.value"];
         self.viewed = [coder decodeBoolForKey:@"self.viewed"];
-        self.debugCounter = (long) [coder decodeInt64ForKey:@"self.debugCounter"];
+        self.debugCounter = [coder decodeIntForKey:@"self.debugCounter"];
     }
 
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeInt64:self.notificationId forKey:@"self.notificationId"];
+    [coder encodeInt:self.notificationId forKey:@"self.notificationId"];
+    [coder encodeObject:self.externalId forKey:@"self.externalId"];
     [coder encodeObject:self.almondMAC forKey:@"self.almondMAC"];
     [coder encodeDouble:self.time forKey:@"self.time"];
-    [coder encodeInt64:self.deviceId forKey:@"self.deviceId"];
     [coder encodeObject:self.deviceName forKey:@"self.deviceName"];
+    [coder encodeInt64:self.deviceId forKey:@"self.deviceId"];
     [coder encodeInt:self.deviceType forKey:@"self.deviceType"];
     [coder encodeInt64:self.valueIndex forKey:@"self.valueIndex"];
     [coder encodeInt:self.valueType forKey:@"self.valueType"];
     [coder encodeObject:self.value forKey:@"self.value"];
     [coder encodeBool:self.viewed forKey:@"self.viewed"];
-    [coder encodeInt64:self.valueIndex forKey:@"self.debugCounter"];
+    [coder encodeInt:self.debugCounter forKey:@"self.debugCounter"];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -113,10 +115,11 @@ Value           => indexvalue
 
     if (copy != nil) {
         copy.notificationId = self.notificationId;
+        copy.externalId = self.externalId;
         copy.almondMAC = self.almondMAC;
         copy.time = self.time;
-        copy.deviceId = self.deviceId;
         copy.deviceName = self.deviceName;
+        copy.deviceId = self.deviceId;
         copy.deviceType = self.deviceType;
         copy.valueIndex = self.valueIndex;
         copy.valueType = self.valueType;
@@ -128,6 +131,7 @@ Value           => indexvalue
     return copy;
 }
 
+
 - (void)setDebugDeviceName {
     long counter = self.debugCounter;
     if (counter == 0) {
@@ -138,10 +142,12 @@ Value           => indexvalue
 
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
-    [description appendFormat:@"self.almondMAC=%@", self.almondMAC];
+    [description appendFormat:@"self.notificationId=%li", self.notificationId];
+    [description appendFormat:@", self.externalId=%@", self.externalId];
+    [description appendFormat:@", self.almondMAC=%@", self.almondMAC];
     [description appendFormat:@", self.time=%f", self.time];
-    [description appendFormat:@", self.deviceId=%u", self.deviceId];
     [description appendFormat:@", self.deviceName=%@", self.deviceName];
+    [description appendFormat:@", self.deviceId=%u", self.deviceId];
     [description appendFormat:@", self.deviceType=%d", self.deviceType];
     [description appendFormat:@", self.valueIndex=%u", self.valueIndex];
     [description appendFormat:@", self.valueType=%d", self.valueType];
@@ -151,5 +157,6 @@ Value           => indexvalue
     [description appendString:@">"];
     return description;
 }
+
 
 @end
