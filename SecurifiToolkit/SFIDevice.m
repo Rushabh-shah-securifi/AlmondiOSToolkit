@@ -356,38 +356,37 @@
     // Note side-effect on this instance
     self.notificationMode = mode;
 
-    // Create list of indexes for device values for that particular device.
-    // Notification will be sent for all the devices known values.
-    // One preference setting for all device properties.
-    NSMutableArray *notificationSettings = [[NSMutableArray alloc] init];
+    // When changing mode, we have to set the preference for each index and send the list to the cloud.
+    // Notification will be sent for all changes to the devices known values; one preference setting for each device property.
+    // It seems like the cloud could provide a simple API for doing this work for us.
+    //
+    // The list of indexes whose preference setting has to be changed
+    NSArray *deviceValuesList;
 
-    // special case these two: we only toggle the setting for the main state index
-    // otherwise the notifications will be too many
     if (self.deviceID == SFIDeviceType_SmartACSwitch_22 || self.deviceID == SFIDeviceType_SecurifiSmartSwitch_50) {
-        SFIDevicePropertyType type = self.statePropertyType;
-        SFIDeviceKnownValues *deviceValue = [value knownValuesForProperty:type];
+        // Special case these two: we only toggle the setting for the main state index
+        // otherwise the notifications will be too many
+        SFIDeviceKnownValues *deviceValue = [value knownValuesForProperty:self.statePropertyType];
+        deviceValuesList = @[deviceValue];
+    }
+    else {
+        // General case: change all indexes
+        deviceValuesList = [value knownDevicesValues];
+    }
 
+    // The list of preference settings
+    NSMutableArray *settings = [[NSMutableArray alloc] init];
+
+    for (SFIDeviceKnownValues *deviceValue in deviceValuesList) {
         SFINotificationDevice *notificationDevice = [[SFINotificationDevice alloc] init];
         notificationDevice.deviceID = self.deviceID;
         notificationDevice.notificationMode = self.notificationMode;
         notificationDevice.valueIndex = deviceValue.index;
 
-        [notificationSettings addObject:notificationDevice];
-    }
-    else {
-        NSArray *deviceValuesList = [value knownDevicesValues];
-
-        for (SFIDeviceKnownValues *deviceValue in deviceValuesList) {
-            SFINotificationDevice *notificationDevice = [[SFINotificationDevice alloc] init];
-            notificationDevice.deviceID = self.deviceID;
-            notificationDevice.notificationMode = self.notificationMode;
-            notificationDevice.valueIndex = deviceValue.index;
-
-            [notificationSettings addObject:notificationDevice];
-        }
+        [settings addObject:notificationDevice];
     }
 
-    return notificationSettings;
+    return settings;
 }
 
 @end
