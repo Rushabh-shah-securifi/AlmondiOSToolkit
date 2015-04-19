@@ -352,4 +352,42 @@
     return [values.value boolValue];
 }
 
+- (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(SFIDeviceValue *)value {
+    // Note side-effect on this instance
+    self.notificationMode = mode;
+
+    // Create list of indexes for device values for that particular device.
+    // Notification will be sent for all the devices known values.
+    // One preference setting for all device properties.
+    NSMutableArray *notificationSettings = [[NSMutableArray alloc] init];
+
+    // special case these two: we only toggle the setting for the main state index
+    // otherwise the notifications will be too many
+    if (self.deviceID == SFIDeviceType_SmartACSwitch_22 || self.deviceID == SFIDeviceType_SecurifiSmartSwitch_50) {
+        SFIDevicePropertyType type = self.statePropertyType;
+        SFIDeviceKnownValues *deviceValue = [value knownValuesForProperty:type];
+
+        SFINotificationDevice *notificationDevice = [[SFINotificationDevice alloc] init];
+        notificationDevice.deviceID = self.deviceID;
+        notificationDevice.notificationMode = self.notificationMode;
+        notificationDevice.valueIndex = deviceValue.index;
+
+        [notificationSettings addObject:notificationDevice];
+    }
+    else {
+        NSArray *deviceValuesList = [value knownDevicesValues];
+
+        for (SFIDeviceKnownValues *deviceValue in deviceValuesList) {
+            SFINotificationDevice *notificationDevice = [[SFINotificationDevice alloc] init];
+            notificationDevice.deviceID = self.deviceID;
+            notificationDevice.notificationMode = self.notificationMode;
+            notificationDevice.valueIndex = deviceValue.index;
+
+            [notificationSettings addObject:notificationDevice];
+        }
+    }
+
+    return notificationSettings;
+}
+
 @end

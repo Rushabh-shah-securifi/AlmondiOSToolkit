@@ -52,6 +52,10 @@
 // Caller may test whether the device supports this capability by calling isBinaryStateSwitchable
 - (SFIDeviceKnownValues*)switchBinaryState:(SFIDeviceValue *)value;
 
+// Updates this instances notificationMode and generates SFINotificationDevice values that can be
+// sent to the cloud to communicate this mode change.
+- (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(SFIDeviceValue *)value;
+
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
