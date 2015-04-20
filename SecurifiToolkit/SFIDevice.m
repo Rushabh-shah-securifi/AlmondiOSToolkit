@@ -250,9 +250,21 @@
     return deviceValues; // can be nil
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.notificationMode = SFINotificationMode_unknown;
+    }
+
+    return self;
+}
+
+
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
+        self.notificationMode = SFINotificationMode_unknown;
+
         self.deviceID = (unsigned int) [coder decodeIntForKey:@"self.deviceID"];
         self.deviceName = [coder decodeObjectForKey:@"self.deviceName"];
         self.OZWNode = [coder decodeObjectForKey:@"self.OZWNode"];
@@ -353,6 +365,11 @@
 }
 
 - (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(SFIDeviceValue *)value {
+    if (mode == SFINotificationMode_unknown) {
+        NSLog(@"updateNotificationMode: illegal mode 'SFINotificationMode_unknown'; ignoring change");
+        return @[];
+    }
+
     // Note side-effect on this instance
     self.notificationMode = mode;
 

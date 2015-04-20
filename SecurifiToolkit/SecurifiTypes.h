@@ -140,7 +140,8 @@ typedef NS_ENUM(unsigned int, SFIAlmondMode) {
 };
 
 // Per device notification preferences
-typedef NS_ENUM(unsigned int, SFINotificationMode) {
+typedef NS_ENUM(int, SFINotificationMode) {
+    SFINotificationMode_unknown                 = -1,
     SFINotificationMode_off                     = 0,
     SFINotificationMode_always                  = 1,
     SFINotificationMode_home                    = 2,
