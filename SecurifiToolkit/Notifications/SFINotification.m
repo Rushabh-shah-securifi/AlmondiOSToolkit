@@ -80,7 +80,7 @@ Value           => indexvalue
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
-        self.notificationId = [coder decodeIntForKey:@"self.notificationId"];
+        self.notificationId = (long) [coder decodeInt64ForKey:@"self.notificationId"];
         self.externalId = [coder decodeObjectForKey:@"self.externalId"];
         self.almondMAC = [coder decodeObjectForKey:@"self.almondMAC"];
         self.time = [coder decodeDoubleForKey:@"self.time"];
@@ -91,14 +91,14 @@ Value           => indexvalue
         self.valueType = (SFIDevicePropertyType) [coder decodeIntForKey:@"self.valueType"];
         self.value = [coder decodeObjectForKey:@"self.value"];
         self.viewed = [coder decodeBoolForKey:@"self.viewed"];
-        self.debugCounter = [coder decodeIntForKey:@"self.debugCounter"];
+        self.debugCounter = (long) [coder decodeInt64ForKey:@"self.debugCounter"];
     }
 
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeInt:self.notificationId forKey:@"self.notificationId"];
+    [coder encodeInt64:self.notificationId forKey:@"self.notificationId"];
     [coder encodeObject:self.externalId forKey:@"self.externalId"];
     [coder encodeObject:self.almondMAC forKey:@"self.almondMAC"];
     [coder encodeDouble:self.time forKey:@"self.time"];
@@ -109,7 +109,7 @@ Value           => indexvalue
     [coder encodeInt:self.valueType forKey:@"self.valueType"];
     [coder encodeObject:self.value forKey:@"self.value"];
     [coder encodeBool:self.viewed forKey:@"self.viewed"];
-    [coder encodeInt:self.debugCounter forKey:@"self.debugCounter"];
+    [coder encodeInt64:self.debugCounter forKey:@"self.debugCounter"];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
