@@ -39,7 +39,7 @@
 // executes the statement and steps through the results, capturing a single string value per step
 - (NSArray *)executeReturnArray;
 
-- (NSInteger)executeReturnInteger;
+- (long)executeReturnInteger;
 
 - (BOOL)executeReturnBool;
 
@@ -49,7 +49,7 @@
 
 // step to the next column in the result set row, expecting an integer type
 // returns 0 when a record is not found
-- (NSInteger)stepNextInteger;
+- (long)stepNextInteger;
 
 - (double)stepNextDouble;
 
