@@ -73,7 +73,7 @@
     dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.fetch_date_buckets;
         [stmt reset];
-        [stmt bindNextInteger:limit];
+        [stmt bindNextInteger:(ZHDatabase_int) limit];
 
         while ([stmt step]) {
             NSTimeInterval interval = stmt.stepNextTimeInterval;
@@ -93,7 +93,7 @@
     dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.fetch_notification;
         [stmt reset];
-        [stmt bindNextInteger:limit];
+        [stmt bindNextInteger:(ZHDatabase_int) limit];
 
         while ([stmt step]) {
             SFINotification *obj = [self readRecord:stmt];
@@ -114,7 +114,7 @@
         [stmt reset];
         [stmt bindNextTimeInterval:bucket.timeIntervalSince1970];
         [stmt bindNextInteger:1];
-        [stmt bindNextInteger:pos];
+        [stmt bindNextInteger:(ZHDatabase_int) pos];
 
         if (![stmt step]) {
             [stmt reset];
