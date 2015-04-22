@@ -54,6 +54,7 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *count_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *trim_notifications;
+@property(nonatomic, readonly) ZHDatabaseStatement *delete_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *update_unread_count;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_metadata;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_metadata;
@@ -61,6 +62,7 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabaseStatement *delete_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_syncpoint;
 @property(nonatomic, readonly) NSObject *locker;
+@property(nonatomic, readonly) dispatch_queue_t queue;
 @end
 
 @implementation DatabaseStore
@@ -96,6 +98,7 @@ create index notifications_mac on notifications (mac, time);
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
     _trim_notifications = [self.db newStatement:@"delete from notifications where id in (select id from notifications order by time desc limit 1 offset ?)"];
     _update_unread_count = [self.db newStatement:@"update notifications set viewed=? where time <= (select time from notifications limit 1 offset ?)"];
+    _delete_notification = [self.db newStatement:@"delete from notifications where mac=?"];
 
     _read_metadata = [self.db newStatement:@"select meta_value_str, meta_value_int, updated from notifications_meta where meta_key=?"];
     _insert_metadata = [self.db newStatement:@"insert or replace into notifications_meta (meta_key, meta_value_str, meta_value_int, updated) values (?,?,?,?);"];
@@ -104,11 +107,17 @@ create index notifications_mac on notifications (mac, time);
     _delete_syncpoint = [self.db newStatement:@"delete from notifications_syncpoints where syncpoint=?"];
     _read_syncpoint = [self.db newStatement:@"select syncpoint from notifications_syncpoints order by created desc limit 1"];
 
-    _locker = [NSObject new];
+    _queue = dispatch_queue_create("DatabaseStore", DISPATCH_QUEUE_SERIAL);
 }
 
 - (id <SFINotificationStore>)newStore {
-    return [[NotificationStoreImpl alloc] initWithDb:self.db];
+    __block NotificationStoreImpl *n;
+
+    dispatch_sync(self.queue, ^() {
+        n = [[NotificationStoreImpl alloc] initWithDb:self.db queue:self.queue];
+    });
+
+    return n;
 }
 
 - (BOOL)storeNotification:(SFINotification *)notification {
@@ -122,22 +131,27 @@ create index notifications_mac on notifications (mac, time);
 }
 
 - (void)deleteNotificationsForAlmond:(NSString *)almondMAC {
-    @synchronized (self.locker) {
-        ZHDatabaseStatement *stmt = [self.db newStatement:@"delete from notifications where mac=?"];
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.delete_notification;
+        [stmt reset];
         [stmt bindNextText:almondMAC];
         [stmt execute];
-    }
+    });
 }
 
 - (void)purgeAllNotifications {
-    @synchronized (self.locker) {
+    dispatch_sync(self.queue, ^() {
         [self.db execute:@"delete from notifications"];
         [self.db execute:@"delete from notifications_syncpoints"];
-    }
+    });
 }
 
 - (BOOL)copyDatabaseTo:(NSString *)filePath {
-    return [self.db copyTo:filePath];
+    __block BOOL success;
+    dispatch_sync(self.queue, ^() {
+        success = [self.db copyTo:filePath];
+    });
+    return success;
 }
 
 #pragma mark - Private methods
@@ -159,8 +173,9 @@ create index notifications_mac on notifications (mac, time);
     NSDate *midnight = [date dateAtMidnight];
     NSTimeInterval midnightTimeInterval = midnight.timeIntervalSince1970;
 
-    ZHDatabaseStatement *stmt = self.insert_notification;
-    @synchronized (stmt) {
+    __block BOOL success;
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.insert_notification;
         [stmt reset];
         [stmt bindNextText:notification.externalId]; // external ID is unique across all records
         [stmt bindNextText:notification.almondMAC];
@@ -179,13 +194,13 @@ create index notifications_mac on notifications (mac, time);
 
         [stmt bindNextBool:NO]; // viewed
 
-        BOOL success = [stmt execute];
+        success = [stmt execute];
         if (!success) {
             NSLog(@"Failed to insert notification into database, obj:%@", notification);
         }
+    });
 
-        return success;
-    }
+    return success;
 }
 
 - (BOOL)notificationExists:(SFINotification*)notification {
@@ -194,29 +209,31 @@ create index notifications_mac on notifications (mac, time);
         return NO;
     }
 
-    ZHDatabaseStatement *stmt = self.count_notification;
-    @synchronized (stmt ) {
+    __block long count = 0;
+
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.count_notification;
         [stmt reset];
         [stmt bindNextText:externalId];
 
-        NSInteger count = 0;
         if ([stmt step]) {
             count = [stmt stepNextInteger];
         }
 
         [stmt reset];
-        return count > 0;        
-    }
+    });
+
+    return count > 0;
 }
 
 // deletes any records past the limit number, keeping the database bounded. oldest records are deleted first.
 - (void)trimRecords:(int)limit {
-    ZHDatabaseStatement *stmt = self.trim_notifications;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.trim_notifications;
         [stmt reset];
         [stmt bindNextInteger:limit];
         [stmt execute];
-    }
+    });
 }
 
 #pragma mark - File system utilities
@@ -249,23 +266,30 @@ create index notifications_mac on notifications (mac, time);
 }
 
 - (NSInteger)countTrackedSyncPoints {
-    return [self.db executeReturnInteger:@"select count(*) from notifications_syncpoints"];
+    __block NSInteger count;
+
+    dispatch_sync(self.queue , ^() {
+        count = [self.db executeReturnInteger:@"select count(*) from notifications_syncpoints"];
+    });
+
+    return count;
 }
 
 - (NSString *)nextTrackedSyncPoint {
-    ZHDatabaseStatement *stmt = self.read_syncpoint;
+    __block NSString *next;
 
-    @synchronized (stmt) {
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.read_syncpoint;
         [stmt reset];
 
-        NSString *next;
         if ([stmt step]) {
             next = [stmt stepNextString];
         }
 
         [stmt reset];
-        return next;
-    }
+    });
+
+    return next;
 }
 
 - (void)removeSyncPoint:(NSString *)pageState {
@@ -273,12 +297,12 @@ create index notifications_mac on notifications (mac, time);
         return;
     }
 
-    ZHDatabaseStatement *stmt = self.delete_syncpoint;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.delete_syncpoint;
         [stmt reset];
         [stmt bindNextText:pageState];
         [stmt execute];
-    }
+    });
 }
 
 - (void)trackSyncPoint:(NSString *)pageState {
@@ -289,13 +313,13 @@ create index notifications_mac on notifications (mac, time);
     NSDate *date = [NSDate date];
     NSTimeInterval now = date.timeIntervalSince1970;
 
-    ZHDatabaseStatement *stmt = self.insert_syncpoint;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.insert_syncpoint;
         [stmt reset];
         [stmt bindNextText:pageState];
         [stmt bindNextTimeInterval:now];
         [stmt execute];
-    }
+    });
 }
 
 - (BOOL)ensureDefinedSyncPoint:(NSString *)syncPoint {
@@ -303,7 +327,9 @@ create index notifications_mac on notifications (mac, time);
 }
 
 - (NSString *)getMetaValueString:(NSString *)metaKey {
-    @synchronized (self.locker) {
+    __block NSString *value;
+
+    dispatch_sync(self.queue , ^() {
         ZHDatabaseStatement *stmt = self.read_metadata;
 
         [stmt reset];
@@ -315,33 +341,37 @@ create index notifications_mac on notifications (mac, time);
         }
 
         [stmt reset];
-        return (syncPoint.length == 0) ? nil : syncPoint;
-    }
+        value = (syncPoint.length == 0) ? nil : syncPoint;
+    });
+
+    return value;
 }
 
 - (NSInteger)getMetaValueInt:(NSString *)metaKey {
-    ZHDatabaseStatement *stmt = self.read_metadata;
+    __block NSInteger value = 0;
 
-    @synchronized (stmt) {
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.read_metadata;
+
         [stmt bindNextText:metaKey];
 
-        NSInteger value = 0;
         if (stmt.step) {
             [stmt stepNextString];
             value = stmt.stepNextInteger;
         }
 
         [stmt reset];
-        return value;
-    }
+    });
+
+    return value;
 }
 
 - (void)setMetaData:(NSString *)strValue intValue:(NSInteger)intValue forKey:(NSString *)key {
     NSDate *date = [NSDate date];
     NSTimeInterval now = date.timeIntervalSince1970;
 
-    ZHDatabaseStatement *stmt = self.insert_metadata;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.insert_metadata;
         [stmt reset];
         [stmt bindNextText:key];
         [stmt bindNextText:strValue];
@@ -352,18 +382,18 @@ create index notifications_mac on notifications (mac, time);
         if (!success) {
             NSLog(@"Failed to insert notification metadata into database, key:%@, str value:%@, int value:%li, updated:%f", key, strValue, (long) intValue, now);
         }
-    }
+    });
 }
 
 - (void)storeBadgeCount:(NSInteger)count {
     [self setMetaData:@"" intValue:count forKey:KEY_BADGE_COUNT];
 
-    ZHDatabaseStatement *stmt = self.update_unread_count;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.update_unread_count;
         [stmt bindNextBool:YES];
         [stmt bindNextInteger:count];
         [stmt execute];
-    }
+    });
 }
 
 - (NSInteger)badgeCount {

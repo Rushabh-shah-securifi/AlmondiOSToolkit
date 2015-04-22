@@ -43,8 +43,6 @@ Value           => indexvalue
 
     NSString *str;
 
-    obj.externalId = payload[@"id"];
-
     str = payload[@"time"];
     obj.time = str.longLongValue;
 

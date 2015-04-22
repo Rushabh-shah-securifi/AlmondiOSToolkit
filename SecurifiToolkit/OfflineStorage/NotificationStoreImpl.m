@@ -19,27 +19,35 @@
 @property(nonatomic, readonly) ZHDatabaseStatement *mark_viewed_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *mark_all_viewed_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *delete_notification;
+@property(nonatomic, readonly) dispatch_queue_t queue;
 @end
 
 @implementation NotificationStoreImpl
 
-- (instancetype)initWithDb:(ZHDatabase *)db {
+- (instancetype)initWithDb:(ZHDatabase *)db queue:(dispatch_queue_t)queue {
     self = [super init];
     if (self) {
         _db = db;
-        _fetch_notification = [self.db newStatement:@"select id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue from notifications order by time desc limit ?"];
+        _fetch_notification = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue from notifications order by time desc limit ?"];
         _fetch_date_buckets = [self.db newStatement:@"select distinct(date_bucket) from notifications order by time desc limit ?"];
         _count_for_date_bucket = [self.db newStatement:@"select count(*) from notifications where date_bucket=?"];
-        _fetch_recs_for_date_buckets = [self.db newStatement:@"select id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where date_bucket=? order by time desc limit ? offset ?"];
+        _fetch_recs_for_date_buckets = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where date_bucket=? order by time desc limit ? offset ?"];
         _mark_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where id=?"];
         _mark_all_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where time <= ?"];
         _delete_notification = [self.db newStatement:@"delete from notifications where id=?"];
+        _queue = queue;
     }
     return self;
 }
 
 - (NSUInteger)countUnviewedNotifications {
-    return (NSUInteger) [self.db executeReturnInteger:@"select count(*) from notifications where viewed=0"];
+    __block NSUInteger count;
+
+    dispatch_sync(self.queue, ^() {
+        count = (NSUInteger) [self.db executeReturnInteger:@"select count(*) from notifications where viewed=0"];
+    });
+
+    return count;
 }
 
 - (NSUInteger)countNotificationsForBucket:(NSDate *)date {
@@ -47,20 +55,23 @@
         return 0;
     }
 
-    ZHDatabaseStatement *stmt = self.count_for_date_bucket;
+    __block NSUInteger count;
 
-    @synchronized (stmt) {
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.count_for_date_bucket;
         [stmt reset];
         [stmt bindNextTimeInterval:date.timeIntervalSince1970];
-        return (NSUInteger) [stmt executeReturnInteger];
-    }
+        count = (NSUInteger) [stmt executeReturnInteger];
+    });
+
+    return count;
 }
 
 - (NSArray *)fetchDateBuckets:(NSUInteger)limit {
-    ZHDatabaseStatement *stmt = self.fetch_date_buckets;
-    NSMutableArray *results = [NSMutableArray new];
+    __block NSMutableArray *results = [NSMutableArray new];
 
-    @synchronized (stmt) {
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.fetch_date_buckets;
         [stmt reset];
         [stmt bindNextInteger:limit];
 
@@ -71,32 +82,35 @@
         }
 
         [stmt reset];
-        return results;
-    }
+    });
+
+    return results;
 }
 
 - (NSArray *)fetchNotifications:(NSUInteger)limit {
-    ZHDatabaseStatement *stmt = self.fetch_notification;
+    __block NSMutableArray *results = [NSMutableArray array];
 
-    @synchronized (stmt) {
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.fetch_notification;
         [stmt reset];
         [stmt bindNextInteger:limit];
 
-        NSMutableArray *results = [NSMutableArray array];
         while ([stmt step]) {
             SFINotification *obj = [self readRecord:stmt];
             [results addObject:obj];
         }
 
         [stmt reset];
-        return results;
-    }
+    });
+
+    return results;
 }
 
 - (SFINotification *)fetchNotificationForBucket:(NSDate *)bucket index:(NSUInteger)pos {
-    ZHDatabaseStatement *stmt = self.fetch_recs_for_date_buckets;
+    __block SFINotification *obj;
 
-    @synchronized (stmt) {
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.fetch_recs_for_date_buckets;
         [stmt reset];
         [stmt bindNextTimeInterval:bucket.timeIntervalSince1970];
         [stmt bindNextInteger:1];
@@ -104,14 +118,14 @@
 
         if (![stmt step]) {
             [stmt reset];
-            return nil;
+            return;
         }
 
-        SFINotification *obj = [self readRecord:stmt];
+        obj = [self readRecord:stmt];
         [stmt reset];
+    });
 
-        return obj;
-    }
+    return obj;
 }
 
 
@@ -120,13 +134,13 @@
         return;
     }
 
-    ZHDatabaseStatement *stmt = self.mark_viewed_notification;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.mark_viewed_notification;
         [stmt reset];
         [stmt bindNextBool:YES];
         [stmt bindNextInteger:notification.notificationId];
         [stmt execute];
-    }
+    });
 }
 
 - (void)markAllViewedTo:(SFINotification *)notification {
@@ -134,13 +148,13 @@
         return;
     }
 
-    ZHDatabaseStatement *stmt = self.mark_all_viewed_notification;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.mark_all_viewed_notification;
         [stmt reset];
         [stmt bindNextBool:YES];
         [stmt bindNextTimeInterval:notification.time];
         [stmt execute];
-    }
+    });
 }
 
 
@@ -149,16 +163,18 @@
         return;
     }
 
-    ZHDatabaseStatement *stmt = self.delete_notification;
-    @synchronized (stmt) {
+    dispatch_sync(self.queue, ^() {
+        ZHDatabaseStatement *stmt = self.delete_notification;
         [stmt reset];
         [stmt bindNextInteger:notification.notificationId];
         [stmt execute];
-    }
+    });
 }
 
 - (void)deleteAllNotifications {
-    [self.db execute:@"delete from notifications"];
+    dispatch_sync(self.queue, ^() {
+        [self.db execute:@"delete from notifications"];
+    });
 }
 
 //id, mac, time, deviceid, devicename, value_index, value_indexname, indexvalue
@@ -166,6 +182,7 @@
     SFINotification *obj = [SFINotification new];
 
     obj.notificationId = stmt.stepNextInteger; // id
+    obj.externalId = stmt.stepNextString; // cloud's primary key
     obj.almondMAC = stmt.stepNextString; // mac
     obj.time = stmt.stepNextTimeInterval; // time
 

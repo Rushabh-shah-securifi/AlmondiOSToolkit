@@ -11,6 +11,6 @@
 
 @interface NotificationStoreImpl : NSObject <SFINotificationStore>
 
-- (instancetype)initWithDb:(ZHDatabase *)db;
+- (instancetype)initWithDb:(ZHDatabase *)db queue:(dispatch_queue_t)queue;
 
 @end
