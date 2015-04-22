@@ -330,8 +330,10 @@ static SecurifiToolkit *singleton = nil;
         _dataManager = [SFIOfflineDataManager new];
 
         if (config.enableNotifications) {
-            _databaseStore = [DatabaseStore new];
-            [_databaseStore setup];
+            DatabaseStore *store = [DatabaseStore new];
+            [store setup];
+
+            _databaseStore = store;
             _notificationsStore = [_databaseStore newStore];
         }
 
