@@ -61,7 +61,6 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *delete_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_syncpoint;
-@property(nonatomic, readonly) NSObject *locker;
 @property(nonatomic, readonly) dispatch_queue_t queue;
 @end
 
@@ -96,7 +95,7 @@ create index notifications_mac on notifications (mac, time);
 
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
-    _trim_notifications = [self.db newStatement:@"delete from notifications where id in (select id from notifications order by time desc limit 1 offset ?)"];
+    _trim_notifications = [self.db newStatement:@"delete from notifications where id in (select id from notifications order by time desc limit ? offset ?)"];
     _update_unread_count = [self.db newStatement:@"update notifications set viewed=? where time <= (select time from notifications limit 1 offset ?)"];
     _delete_notification = [self.db newStatement:@"delete from notifications where mac=?"];
 
@@ -126,7 +125,7 @@ create index notifications_mac on notifications (mac, time);
     }
 
     BOOL success = [self insertRecord:notification];
-    [self trimRecords:MAX_NOTIFICATIONS];
+    [self trimRecords:1];
     return success;
 }
 
@@ -184,11 +183,11 @@ create index notifications_mac on notifications (mac, time);
         [stmt bindNextTimeInterval:notification.time]; // time
         [stmt bindNextText:@""]; // data
 
-        [stmt bindNextInteger:notification.deviceId]; // deviceid
+        [stmt bindNextInteger:(ZHDatabase_int) notification.deviceId]; // deviceid
         [stmt bindNextText:notification.deviceName]; // devicename
         [stmt bindNextInteger:notification.deviceType]; // devicetype
 
-        [stmt bindNextInteger:notification.valueIndex]; // value_index
+        [stmt bindNextInteger:(ZHDatabase_int) notification.valueIndex]; // value_index
         [stmt bindNextText:valueType];  // value_indexname
         [stmt bindNextText:notification.value]; // indexvalue
 
@@ -226,12 +225,14 @@ create index notifications_mac on notifications (mac, time);
     return count > 0;
 }
 
-// deletes any records past the limit number, keeping the database bounded. oldest records are deleted first.
-- (void)trimRecords:(int)limit {
+// deletes up to numToDelete records number past the default offset. oldest records are deleted first.
+// this keeps the database bounded
+- (void)trimRecords:(int)numToDelete {
     dispatch_sync(self.queue , ^() {
         ZHDatabaseStatement *stmt = self.trim_notifications;
         [stmt reset];
-        [stmt bindNextInteger:limit];
+        [stmt bindNextInteger:numToDelete];
+        [stmt bindNextInteger:MAX_NOTIFICATIONS];
         [stmt execute];
     });
 }
@@ -260,6 +261,9 @@ create index notifications_mac on notifications (mac, time);
         }
         count++;
     }
+
+    // keep the database tidy
+    [self trimRecords:notifications.count];
 
     [self removeSyncPoint:syncPoint];
     return count;
@@ -347,8 +351,8 @@ create index notifications_mac on notifications (mac, time);
     return value;
 }
 
-- (NSInteger)getMetaValueInt:(NSString *)metaKey {
-    __block NSInteger value = 0;
+- (long)getMetaValueInt:(NSString *)metaKey {
+    __block long value = 0;
 
     dispatch_sync(self.queue , ^() {
         ZHDatabaseStatement *stmt = self.read_metadata;
