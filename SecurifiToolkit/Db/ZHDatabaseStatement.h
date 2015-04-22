@@ -10,6 +10,8 @@
 #import "ZHDatabase.h"
 #import <sqlite3.h>
 
+typedef long ZHDatabase_int;
+
 // Represents a prepared statement
 //
 @interface ZHDatabaseStatement : NSObject
@@ -20,7 +22,7 @@
 - (void)reset;
 
 // bind an integer in the next column
-- (void)bindNextInteger:(NSInteger)aValue;
+- (void)bindNextInteger:(ZHDatabase_int)aValue;
 
 - (void)bindNextDouble:(double)value;
 
@@ -39,7 +41,7 @@
 // executes the statement and steps through the results, capturing a single string value per step
 - (NSArray *)executeReturnArray;
 
-- (long)executeReturnInteger;
+- (ZHDatabase_int)executeReturnInteger;
 
 - (BOOL)executeReturnBool;
 
@@ -49,7 +51,7 @@
 
 // step to the next column in the result set row, expecting an integer type
 // returns 0 when a record is not found
-- (long)stepNextInteger;
+- (ZHDatabase_int)stepNextInteger;
 
 - (double)stepNextDouble;
 

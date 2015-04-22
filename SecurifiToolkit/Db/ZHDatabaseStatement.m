@@ -60,9 +60,9 @@
     sqlite3_reset(self.stmt);
 }
 
-- (void)bindNextInteger:(NSInteger)value {
+- (void)bindNextInteger:(ZHDatabase_int)value {
     int pos = [self nextBinding];
-    int rc = sqlite3_bind_int64(self.stmt, pos, (long) value);
+    int rc = sqlite3_bind_int64(self.stmt, pos, value);
     if (rc != SQLITE_OK) {
         [self checkErrors:rc];
     }
@@ -127,8 +127,8 @@
     return result;
 }
 
-- (long)executeReturnInteger {
-    long count = 0;
+- (ZHDatabase_int)executeReturnInteger {
+    ZHDatabase_int count = 0;
     if ([self step]) {
         count = [self stepNextInteger];
     }
@@ -157,7 +157,7 @@
     return success;
 }
 
-- (long)stepNextInteger {
+- (ZHDatabase_int)stepNextInteger {
     return [self stepInteger:[self nextStep]];
 }
 
@@ -181,8 +181,8 @@
     return sqlite3_column_double(self.stmt, (int) pos);
 }
 
-- (long)stepInteger:(NSInteger)pos {
-    return (long) sqlite3_column_int64(self.stmt, (int) pos);
+- (ZHDatabase_int)stepInteger:(NSInteger)pos {
+    return (ZHDatabase_int) sqlite3_column_int64(self.stmt, (int) pos);
 }
 
 - (NSString *)stepString:(NSInteger)pos {
