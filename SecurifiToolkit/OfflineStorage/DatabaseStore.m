@@ -263,7 +263,7 @@ create index notifications_mac on notifications (mac, time);
     }
 
     // keep the database tidy
-    [self trimRecords:notifications.count];
+    [self trimRecords:(int) notifications.count];
 
     [self removeSyncPoint:syncPoint];
     return count;
