@@ -10,12 +10,21 @@
 
 @implementation SFINotificationDevice
 
-- (id)initWithCoder:(NSCoder *)coder {
+- (instancetype)init {
     self = [super init];
+    if (self) {
+        self.notificationMode = SFINotificationMode_unknown;
+    }
+
+    return self;
+}
+
+- (id)initWithCoder:(NSCoder *)coder {
+    self = [self init];
     if (self) {
         self.deviceID = (sfi_id) [coder decodeIntForKey:@"self.deviceID"];
         self.valueIndex = (unsigned int) [coder decodeIntForKey:@"self.valueIndex"];
-        self.notificationMode = (SFINotificationMode) (unsigned int) [coder decodeIntegerForKey:@"self.notificationMode"];
+        self.notificationMode = (SFINotificationMode) (int) [coder decodeIntegerForKey:@"self.notificationMode"];
     }
 
     return self;
