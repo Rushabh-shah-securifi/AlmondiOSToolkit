@@ -977,6 +977,8 @@ static SecurifiToolkit *singleton = nil;
 
     [self.networkSingleton markDeviceValuesFetchedForAlmond:almondMac];
     [self asyncSendToCloud:cmd];
+
+    [self asyncRequestNotificationPreferenceList:almondMac];
 }
 
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
@@ -986,6 +988,8 @@ static SecurifiToolkit *singleton = nil;
 
     [self.networkSingleton markDeviceValuesFetchedForAlmond:almondMac];
     [self asyncRequestDeviceValueList:almondMac];
+    [self asyncRequestNotificationPreferenceList:almondMac];
+
     return YES;
 }
 
