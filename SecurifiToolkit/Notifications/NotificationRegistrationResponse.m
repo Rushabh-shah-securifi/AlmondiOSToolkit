@@ -9,4 +9,15 @@
 #import "NotificationRegistrationResponse.h"
 
 @implementation NotificationRegistrationResponse
+
+- (NotificationRegistrationResponseType)responseType {
+    if (self.isSuccessful) {
+        return NotificationRegistrationResponseType_success;
+    }
+    if (self.reasonCode == 3) {
+        return NotificationRegistrationResponseType_alreadyRegistered;
+    }
+    return NotificationRegistrationResponseType_failedToRegister;
+}
+
 @end

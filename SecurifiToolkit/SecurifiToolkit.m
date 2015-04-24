@@ -2024,7 +2024,21 @@ static SecurifiToolkit *singleton = nil;
     }
 
     NotificationRegistrationResponse *obj = (NotificationRegistrationResponse *) [data valueForKey:@"data"];
-    NSString *notification = obj.isSuccessful ? kSFIDidRegisterForNotifications : kSFIDidFailToRegisterForNotifications;
+
+    NSString *notification;
+    switch (obj.responseType) {
+        case NotificationRegistrationResponseType_success:
+            notification = kSFIDidRegisterForNotifications;
+            break;
+        case NotificationRegistrationResponseType_alreadyRegistered:
+            notification = kSFIDidRegisterForNotifications;
+            break;
+        case NotificationRegistrationResponseType_failedToRegister:
+        default:
+            notification = kSFIDidFailToRegisterForNotifications;
+            break;
+    }
+
     [self postNotification:notification data:nil];
 }
 
