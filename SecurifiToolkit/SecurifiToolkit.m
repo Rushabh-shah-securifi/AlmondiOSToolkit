@@ -2161,12 +2161,14 @@ static SecurifiToolkit *singleton = nil;
 
     // Set viewed state:
     // for new notifications...
-    NSRange newNotificationRange = NSMakeRange(0, newCount);
+    NSUInteger rangeEnd = newCount > totalCount ? totalCount : newCount;
+    NSRange newNotificationRange = NSMakeRange(0, rangeEnd);
     for (SFINotification *notification in [notificationsToStore subarrayWithRange:newNotificationRange]) {
         notification.viewed = NO;
     }
     // for old notifications...
-    NSRange oldNotificationRange = NSMakeRange(newCount, totalCount - newCount);
+    NSUInteger rangeEnd_final = totalCount - rangeEnd;
+    NSRange oldNotificationRange = NSMakeRange(rangeEnd, rangeEnd_final);
     for (SFINotification *notification in [notificationsToStore subarrayWithRange:oldNotificationRange]) {
         notification.viewed = YES;
     }
