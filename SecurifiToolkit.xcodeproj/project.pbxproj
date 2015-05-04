@@ -77,16 +77,20 @@
 		1CFBB5501A257D1900438B5F /* SecurifiConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */; };
 		1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03066782B488103FE1232 /* DynamicAlmondModeChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03048BDC4DD3CB8D3B224 /* DynamicAlmondModeChange.m */; };
+		1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F977E6A78507A5D7714 /* NotificationClearCountRequest.m */; };
 		1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0329C5A1F03EC60478DC4 /* AlmondModeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03CEAC18088B30D7961FF /* AlmondModeRequest.m */; };
 		1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03322D3DC410824316347 /* SFINotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03895670DA1C15314D2F8 /* SFINotification.m */; };
+		1DF033F86547E8B8555F3561 /* NotificationClearCountResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0302CDB8965A050AD9FE6 /* NotificationClearCountResponse.m */; };
 		1DF035420555D20D2F38BC1A /* NotificationCountResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF030ADDC3DE8F3592D6848 /* NotificationCountResponse.h */; };
+		1DF0358CCF266F1666C24215 /* NotificationClearCountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF031D70C5A2A701F6BF0F5 /* NotificationClearCountRequest.h */; };
 		1DF0360F76B7FDD43B761465 /* NotificationListResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CBFFB839D0CCE8BCB80 /* NotificationListResponse.h */; };
 		1DF036470B9395C15C0C6DE9 /* SFIAlmondModeRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03B4F919594612F230FCE /* SFIAlmondModeRef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF036CF40181B113E42E1D3 /* NotificationCountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0386BB4B3FAC65DD9B13B /* NotificationCountRequest.h */; };
 		1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF034243877C8131B0AE8FE /* XMLWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03230F1B32E197753B9B3 /* DatabaseStore.h */; };
+		1DF0371747228122D3121E75 /* NotificationClearCountResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03BE5F618AF7F2A8BC094 /* NotificationClearCountResponse.h */; };
 		1DF037531EF66D6AA5504BD5 /* NotificationStoreImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF032AE63C201A59489980F /* NotificationStoreImpl.h */; };
 		1DF03753A9285273865B06F1 /* AlmondModeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03706AD1D324848D38018 /* AlmondModeResponse.h */; };
 		1DF037CAB07B19208BC80642 /* AlmondModeChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03FE0AE2F686D9B9567D2 /* AlmondModeChangeResponse.m */; };
@@ -336,10 +340,12 @@
 		1CE67A301A91D7670004E68C /* AlmondModeChangeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondModeChangeRequest.m; sourceTree = "<group>"; };
 		1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiConfigurator.h; sourceTree = "<group>"; };
 		1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurifiConfigurator.m; sourceTree = "<group>"; };
+		1DF0302CDB8965A050AD9FE6 /* NotificationClearCountResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationClearCountResponse.m; sourceTree = "<group>"; };
 		1DF03048BDC4DD3CB8D3B224 /* DynamicAlmondModeChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicAlmondModeChange.m; sourceTree = "<group>"; };
 		1DF030ADDC3DE8F3592D6848 /* NotificationCountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCountResponse.h; sourceTree = "<group>"; };
 		1DF031525512886EC02E8E6E /* NotificationCountResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationCountResponse.m; sourceTree = "<group>"; };
 		1DF031C3F506A877A179EEEE /* AlmondModeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondModeResponse.m; sourceTree = "<group>"; };
+		1DF031D70C5A2A701F6BF0F5 /* NotificationClearCountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationClearCountRequest.h; sourceTree = "<group>"; };
 		1DF03230F1B32E197753B9B3 /* DatabaseStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatabaseStore.h; sourceTree = "<group>"; };
 		1DF032AE63C201A59489980F /* NotificationStoreImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationStoreImpl.h; sourceTree = "<group>"; };
 		1DF03322D3DC410824316347 /* SFINotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotification.h; sourceTree = "<group>"; };
@@ -359,6 +365,7 @@
 		1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCommandRequest.m; sourceTree = "<group>"; };
 		1DF03B0459C4363665236FA1 /* SFIXmlWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIXmlWriter.m; sourceTree = "<group>"; };
 		1DF03B4F919594612F230FCE /* SFIAlmondModeRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIAlmondModeRef.h; sourceTree = "<group>"; };
+		1DF03BE5F618AF7F2A8BC094 /* NotificationClearCountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationClearCountResponse.h; sourceTree = "<group>"; };
 		1DF03C2A0526E007E2895002 /* NotificationListResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationListResponse.m; sourceTree = "<group>"; };
 		1DF03CB16EDB103AB5B43224 /* SFIXmlWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIXmlWriter.h; sourceTree = "<group>"; };
 		1DF03CBFFB839D0CCE8BCB80 /* NotificationListResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationListResponse.h; sourceTree = "<group>"; };
@@ -367,6 +374,7 @@
 		1DF03D1CB4599BCCF5F3A4D6 /* NotificationListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationListRequest.h; sourceTree = "<group>"; };
 		1DF03F966C294C431498AE05 /* DynamicAlmondModeChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicAlmondModeChange.h; sourceTree = "<group>"; };
 		1DF03F975AE4915FC041E2D3 /* DatabaseStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DatabaseStore.m; sourceTree = "<group>"; };
+		1DF03F977E6A78507A5D7714 /* NotificationClearCountRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationClearCountRequest.m; sourceTree = "<group>"; };
 		1DF03FE0AE2F686D9B9567D2 /* AlmondModeChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondModeChangeResponse.m; sourceTree = "<group>"; };
 		22011C9C179543E80019D5A4 /* Login.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Login.h; sourceTree = "<group>"; };
 		22011C9D179543E80019D5A4 /* Login.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Login.m; sourceTree = "<group>"; };
@@ -663,6 +671,10 @@
 				1DF0386BB4B3FAC65DD9B13B /* NotificationCountRequest.h */,
 				1DF031525512886EC02E8E6E /* NotificationCountResponse.m */,
 				1DF030ADDC3DE8F3592D6848 /* NotificationCountResponse.h */,
+				1DF03F977E6A78507A5D7714 /* NotificationClearCountRequest.m */,
+				1DF031D70C5A2A701F6BF0F5 /* NotificationClearCountRequest.h */,
+				1DF0302CDB8965A050AD9FE6 /* NotificationClearCountResponse.m */,
+				1DF03BE5F618AF7F2A8BC094 /* NotificationClearCountResponse.h */,
 			);
 			path = Notifications;
 			sourceTree = "<group>";
@@ -1091,6 +1103,8 @@
 				1DF037D75654FB77C8A4DFA3 /* NotificationListRequest.h in Headers */,
 				1DF036CF40181B113E42E1D3 /* NotificationCountRequest.h in Headers */,
 				1DF035420555D20D2F38BC1A /* NotificationCountResponse.h in Headers */,
+				1DF0358CCF266F1666C24215 /* NotificationClearCountRequest.h in Headers */,
+				1DF0371747228122D3121E75 /* NotificationClearCountResponse.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1342,6 +1356,8 @@
 				1DF03CA0928047DC7842F144 /* NotificationListRequest.m in Sources */,
 				1DF03D5707598F4315C494FC /* NotificationCountRequest.m in Sources */,
 				1DF03CBA2B45BFB97D3A8E79 /* NotificationCountResponse.m in Sources */,
+				1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */,
+				1DF033F86547E8B8555F3561 /* NotificationClearCountResponse.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -39,6 +39,7 @@
 #import "NotificationListResponse.h"
 #import "NotificationCountRequest.h"
 #import "NotificationCountResponse.h"
+#import "NotificationClearCountResponse.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -263,6 +264,15 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
         case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
             return [NSString stringWithFormat:@"NOTIFICATIONS_SYNC_RESPONSE_%d", type];
 
+        case CommandType_NOTIFICATIONS_COUNT_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_COUNT_REQUEST_%d", type];
+        case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_COUNT_RESPONSE_%d", type];
+        case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_CLEAR_COUNT_REQUEST_%d", type];
+        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_CLEAR_COUNT_RESPONSE_%d", type];
+
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -381,6 +391,8 @@ static SecurifiToolkit *singleton = nil;
 
             [center addObserver:self selector:@selector(onNotificationListSyncResponse:) name:NOTIFICATION_LIST_SYNC_RESPONSE_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onNotificationCountResponse:) name:NOTIFICATION_COUNT_RESPONSE_NOTIFIER object:nil];
+
+            [center addObserver:self selector:@selector(onNotificationClearCountResponse:) name:NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER object:nil];
         }
     }
 
@@ -2242,6 +2254,25 @@ static SecurifiToolkit *singleton = nil;
     }
 }
 
+- (void)onNotificationClearCountResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    NSLog(@"onNotificationClearCountResponse: clearing request tracking");
+    self.pendingNotificationCountRequest = nil;
+
+    NotificationClearCountResponse *res = data[@"data"];
+    if (res.error) {
+        NSLog(@"onNotificationClearCountResponse: error response");
+    }
+    else {
+        DLog(@"onNotificationClearCountResponse: success");
+    }
+}
+
 #pragma mark - Notification access and refresh commands
 
 - (BOOL)storePushNotification:(SFINotification *)notification {
@@ -2262,14 +2293,6 @@ static SecurifiToolkit *singleton = nil;
         return [NSArray array];
     }
     return [self.notificationsStore fetchNotifications:100];
-}
-
-- (void)markNotificationViewed:(SFINotification *)notification {
-    if (!self.config.enableNotifications) {
-        return;
-    }
-    [self.notificationsStore markViewed:notification];
-    [self postNotification:kSFINotificationDidMarkViewed data:nil];
 }
 
 - (NSInteger)countUnviewedNotifications {

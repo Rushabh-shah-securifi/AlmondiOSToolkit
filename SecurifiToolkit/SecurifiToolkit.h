@@ -289,9 +289,6 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // an array of all SFINotification, newest to oldest
 - (NSArray *)notifications;
 
-// Called to
-- (void)markNotificationViewed:(SFINotification *)notification;
-
 - (NSInteger)countUnviewedNotifications;
 
 - (id <SFINotificationStore>)newNotificationStore;

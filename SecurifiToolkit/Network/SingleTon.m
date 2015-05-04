@@ -12,6 +12,7 @@
 #import "SUnit.h"
 #import "NotificationListResponse.h"
 #import "NotificationCountResponse.h"
+#import "NotificationClearCountResponse.h"
 
 @interface SingleTon ()
 @property(nonatomic, readonly) NSObject *syncLocker;
@@ -409,7 +410,7 @@
                                     id responsePayload = nil;
 
                                     // these are the only command responses so far that uses a JSON payload; we special case them for now
-                                    if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE || commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE) {
+                                    if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE || commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE || commandType == CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE) {
                                         // we only want the JSON wrapped inside the <root></root> pair
                                         NSUInteger start_loc = startTagRange.location + startTagRange.length;
                                         NSRange jsonParseRange = NSMakeRange(start_loc, endTagRange.location - start_loc);
@@ -419,8 +420,11 @@
                                         if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE) {
                                             responsePayload = [NotificationListResponse parseJson:buffer];
                                         }
-                                        else {
+                                        else if (commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE) {
                                             responsePayload = [NotificationCountResponse parseJson:buffer];
+                                        }
+                                        else {
+                                            responsePayload = [NotificationClearCountResponse parseJson:buffer];
                                         }
                                     }
                                     else {
@@ -743,6 +747,11 @@
         case CommandType_NOTIFICATIONS_COUNT_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_COUNT_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER data:payload];
             break;
         };
 
@@ -1208,6 +1217,7 @@
                 case CommandType_ALMOND_MODE_REQUEST:
                 case CommandType_NOTIFICATIONS_SYNC_REQUEST:
                 case CommandType_NOTIFICATIONS_COUNT_REQUEST:
+                case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST:
                 {
                     id <SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
