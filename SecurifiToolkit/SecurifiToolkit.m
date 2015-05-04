@@ -40,6 +40,7 @@
 #import "NotificationCountRequest.h"
 #import "NotificationCountResponse.h"
 #import "NotificationClearCountResponse.h"
+#import "NotificationClearCountRequest.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -305,6 +306,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 // tracks only "refresh" request to get new ones
 @property(nonatomic, strong) NotificationListRequest *pendingRefreshNotificationsRequest;
 @property(nonatomic, strong) NotificationCountRequest *pendingNotificationCountRequest;
+@property(nonatomic, strong) NotificationClearCountRequest *pendingClearNotificationCountRequest;
 
 @property(nonatomic, strong) BaseCommandRequest *pendingAlmondStateAndSettingsRequest;
 @end
@@ -1536,6 +1538,7 @@ static SecurifiToolkit *singleton = nil;
     self.pendingNotificationPreferenceChange = nil;
     self.pendingRefreshNotificationsRequest = nil;
     self.pendingNotificationCountRequest = nil;
+    self.pendingClearNotificationCountRequest = nil;
     self.pendingAlmondStateAndSettingsRequest = nil;
 
     self.networkSingleton = nil;
@@ -2153,8 +2156,22 @@ static SecurifiToolkit *singleton = nil;
     DatabaseStore *store = self.databaseStore;
 
     NSUInteger newCount = res.newCount;
-    NSInteger storedCount = [store storeNotifications:res.notifications syncPoint:requestId];
-    NSUInteger totalCount = res.notifications.count;
+    NSArray *notificationsToStore = res.notifications;
+    NSUInteger totalCount = notificationsToStore.count;
+
+    // Set viewed state:
+    // for new notifications...
+    NSRange newNotificationRange = NSMakeRange(0, newCount);
+    for (SFINotification *notification in [notificationsToStore subarrayWithRange:newNotificationRange]) {
+        notification.viewed = NO;
+    }
+    // for old notifications...
+    NSRange oldNotificationRange = NSMakeRange(newCount, totalCount - newCount);
+    for (SFINotification *notification in [notificationsToStore subarrayWithRange:oldNotificationRange]) {
+        notification.viewed = YES;
+    }
+
+    NSInteger storedCount = [store storeNotifications:notificationsToStore syncPoint:requestId];
     BOOL allStored = (storedCount == totalCount);
 
     if (allStored) {
@@ -2165,7 +2182,7 @@ static SecurifiToolkit *singleton = nil;
     }
 
     if (storedCount == 0) {
-        [store storeBadgeCount:newCount];
+        [self setNotificationsBadgeCount:newCount];
 
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
@@ -2177,7 +2194,7 @@ static SecurifiToolkit *singleton = nil;
     if (!allStored) {
         // stopped early
         // nothing more to do
-        [store storeBadgeCount:newCount];
+        [self setNotificationsBadgeCount:newCount];
 
         // Let the world know there are new notifications
         [self postNotification:kSFINotificationDidStore data:nil];
@@ -2244,10 +2261,7 @@ static SecurifiToolkit *singleton = nil;
     }
 
     // Store the notifications and stop tracking the pageState that they were associated with
-    DatabaseStore *store = self.databaseStore;
-    [store storeBadgeCount:res.badgeCount];
-
-    [self postNotification:kSFINotificationBadgeCountDidChange data:nil];
+    [self setNotificationsBadgeCount:res.badgeCount];
 
     if (res.badgeCount > 0) {
         [self tryRefreshNotifications];
@@ -2347,9 +2361,39 @@ static SecurifiToolkit *singleton = nil;
     }
 
     NotificationCountRequest *req = [NotificationCountRequest new];
+    self.pendingNotificationCountRequest = req;
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATIONS_COUNT_REQUEST;
+    cmd.command = req;
+
+    [self asyncSendToCloud:cmd];
+}
+
+// sends a command to clear the notification count
+- (void)tryClearNotificationCount {
+    if (!self.config.enableNotifications) {
+        return;
+    }
+
+    NotificationClearCountRequest *pending = self.pendingClearNotificationCountRequest;
+    if (pending) {
+        if (![pending shouldExpireAfterSeconds:5]) {
+            // give the request 5 seconds to complete
+            NSLog(@"tryClearNotificationCount: fail fast; already fetching latest count");
+            return;
+        }
+    }
+
+    // reset count internally
+    [self setNotificationsBadgeCount:0];
+
+    // send the command to the cloud
+    NotificationClearCountRequest *req = [NotificationClearCountRequest new];
+    self.pendingClearNotificationCountRequest = req;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = req.commandType;
     cmd.command = req;
 
     [self asyncSendToCloud:cmd];
@@ -2361,6 +2405,15 @@ static SecurifiToolkit *singleton = nil;
     }
 
     return self.databaseStore.badgeCount;
+}
+
+- (void)setNotificationsBadgeCount:(NSInteger)count {
+    if (!self.config.enableNotifications) {
+        return;
+    }
+
+    [self.databaseStore storeBadgeCount:count];
+    [self postNotification:kSFINotificationBadgeCountDidChange data:nil];
 }
 
 

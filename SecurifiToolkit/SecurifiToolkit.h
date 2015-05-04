@@ -303,7 +303,10 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)tryFetchNotificationCount;
 
+- (void)tryClearNotificationCount;
+
 - (NSInteger)notificationsBadgeCount;
+- (void)setNotificationsBadgeCount:(NSInteger)count;
 
 @end
  

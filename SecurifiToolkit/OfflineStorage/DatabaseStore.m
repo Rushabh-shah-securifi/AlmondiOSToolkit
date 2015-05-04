@@ -191,7 +191,7 @@ create index notifications_mac on notifications (mac, time);
         [stmt bindNextText:valueType];  // value_indexname
         [stmt bindNextText:notification.value]; // indexvalue
 
-        [stmt bindNextBool:NO]; // viewed
+        [stmt bindNextBool:notification.viewed]; // normally, this is NO for new notifications, but caller can control this
 
         success = [stmt execute];
         if (!success) {
