@@ -96,7 +96,7 @@ create index notifications_mac on notifications (mac, time);
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
     _trim_notifications = [self.db newStatement:@"delete from notifications where id in (select id from notifications order by time desc limit ? offset ?)"];
-    _update_unread_count = [self.db newStatement:@"update notifications set viewed=? where time <= (select time from notifications limit 1 offset ?)"];
+    _update_unread_count = [self.db newStatement:@"update notifications set viewed=? where time <= (select time from notifications order by time desc limit 1 offset ?)"];
     _delete_notification = [self.db newStatement:@"delete from notifications where mac=?"];
 
     _read_metadata = [self.db newStatement:@"select meta_value_str, meta_value_int, updated from notifications_meta where meta_key=?"];
