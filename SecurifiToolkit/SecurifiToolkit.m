@@ -2221,6 +2221,8 @@ static SecurifiToolkit *singleton = nil;
         [self internalAsyncFetchNotifications:nextPageState];
     }
     else {
+        [self setNotificationsBadgeCount:newCount];
+
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
     }
