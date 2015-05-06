@@ -1683,8 +1683,16 @@ static SecurifiToolkit *singleton = nil;
 
     NSArray *newAlmondList = @[];
     for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
+        // remove cached data about the Almond and sensors
         newAlmondList = [self.dataManager deleteAlmond:deleted];
+
         if (self.config.enableNotifications) {
+            // clear out Notification settings
+            SingleTon *singleTon = self.networkSingleton;
+            if (singleTon) {
+                [self.networkSingleton clearAlmondMode:deleted.almondplusMAC];
+            }
+
             [self.databaseStore deleteNotificationsForAlmond:deleted.almondplusMAC];
         }
     }
