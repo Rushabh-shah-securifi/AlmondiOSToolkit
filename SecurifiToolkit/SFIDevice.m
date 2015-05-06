@@ -120,6 +120,10 @@
             return SFIDevicePropertyType_SENSOR_BINARY;
         }
 
+        case SFIDeviceType_OccupancySensor_24: {
+            return SFIDevicePropertyType_OCCUPANCY;
+        };
+
         // Not implemented devices
         case SFIDeviceType_UnknownDevice_0:
         case SFIDeviceType_Thermostat_7:
@@ -129,7 +133,6 @@
         case SFIDeviceType_PersonalEmergencyDevice_16:
         case SFIDeviceType_RemoteControl_18:
         case SFIDeviceType_KeyFob_19:
-        case SFIDeviceType_OccupancySensor_24:
         case SFIDeviceType_LightSensor_25:
         case SFIDeviceType_WindowCovering_26:
         case SFIDeviceType_TemperatureSensor_27:
