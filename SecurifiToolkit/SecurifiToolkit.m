@@ -960,7 +960,7 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (NSArray *)notificationPrefList:(NSString *)almondMac {
-    return [self.dataManager readNotificationList:almondMac];
+    return [self.dataManager readNotificationPreferenceList:almondMac];
 }
 
 #pragma mark - Device and Device Value Management
@@ -2029,7 +2029,7 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-    [self.dataManager writeNotificationList:newPrefs currentMAC:almondMac];
+    [self.dataManager writeNotificationPreferenceList:newPrefs currentMAC:almondMac];
 
     self.pendingNotificationPreferenceChange = nil;
     [self postNotification:kSFINotificationPreferencesDidChange data:almondMac];
@@ -2089,7 +2089,7 @@ static SecurifiToolkit *singleton = nil;
 
     if ([obj.notificationDeviceList count] != 0) {
         // Update offline storage
-        [self.dataManager writeNotificationList:obj.notificationDeviceList currentMAC:currentMAC];
+        [self.dataManager writeNotificationPreferenceList:obj.notificationDeviceList currentMAC:currentMAC];
         [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
     }
 }
@@ -2123,7 +2123,7 @@ static SecurifiToolkit *singleton = nil;
     }
 
     // Update offline storage
-    [self.dataManager writeNotificationList:notificationList currentMAC:currentMAC];
+    [self.dataManager writeNotificationPreferenceList:notificationList currentMAC:currentMAC];
     [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
 }
 

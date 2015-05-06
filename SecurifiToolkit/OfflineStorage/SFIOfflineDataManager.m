@@ -121,6 +121,7 @@
         [self deleteHashForAlmond:mac];
         [self deleteDeviceDataForAlmond:mac];
         [self deleteDeviceValueForAlmond:mac];
+        [self deleteNotificationPreferenceList:mac];
 
         return newAlmondList;
     }
@@ -234,7 +235,7 @@
 
 
 // Write Notification Preference List for the current MAC to offline storage
-- (void)writeNotificationList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC {
+- (void)writeNotificationPreferenceList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC {
     @synchronized (self.notification_syncLocker) {
         NSString *filePath = self.notificationPreferenceListFp;
         
@@ -253,7 +254,7 @@
 }
 
 // Read Notification Preference List for the current MAC from offline storage
-- (NSArray *)readNotificationList:(NSString *)strCurrentMAC {
+- (NSArray *)readNotificationPreferenceList:(NSString *)strCurrentMAC {
     @synchronized (self.notification_syncLocker) {
         NSString *filePath = self.notificationPreferenceListFp;
         
@@ -267,6 +268,24 @@
     }
 }
 
+// Read Notification Preference List for the current MAC from offline storage
+- (void)deleteNotificationPreferenceList:(NSString *)strCurrentMAC {
+    if (strCurrentMAC == nil) {
+        return;
+    }
+
+    @synchronized (self.notification_syncLocker) {
+        NSString *filePath = self.notificationPreferenceListFp;
+
+        NSMutableDictionary *dictNotificationList = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        [dictNotificationList removeObjectForKey:strCurrentMAC];
+
+        BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictNotificationList toFile:filePath];
+        if (!didWriteSuccessful) {
+            NSLog(@"Failed to write notification list");
+        }
+    }
+}
 
 + (BOOL)deleteFile:(NSString *)fileName {
     NSFileManager *fileManager = [NSFileManager defaultManager];

@@ -28,9 +28,9 @@
 
 - (NSArray *)readDeviceValueList:(NSString *)strCurrentMAC;
 
-- (void)writeNotificationList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC;
+- (void)writeNotificationPreferenceList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC;
 
-- (NSArray *)readNotificationList:(NSString *)strCurrentMAC;
+- (NSArray *)readNotificationPreferenceList:(NSString *)strCurrentMAC;
 
 - (void)purgeAll;
 
