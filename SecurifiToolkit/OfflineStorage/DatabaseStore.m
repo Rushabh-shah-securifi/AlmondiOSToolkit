@@ -89,7 +89,6 @@ create index notifications_mac on notifications (mac, time);
         // a queue of sync points pending processing
         [self.db execute:@"drop table if exists notifications_syncpoints"];
         [self.db execute:@"create table notifications_syncpoints (syncpoint varchar(128) primary key, created double);"];
-        [self.db execute:@"create index notifications_syncpoints_syncpoint on notifications_syncpoints (syncpoint);"];
         [self.db execute:@"create index notifications_syncpoints_created on notifications_syncpoints (created);"];
     }
 
