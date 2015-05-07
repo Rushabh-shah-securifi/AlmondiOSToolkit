@@ -61,6 +61,7 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *delete_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *read_syncpoint;
+@property(nonatomic, readonly) ZHDatabaseStatement *exists_syncpoint;
 @property(nonatomic, readonly) dispatch_queue_t queue;
 @end
 
@@ -104,6 +105,7 @@ create index notifications_mac on notifications (mac, time);
     _insert_syncpoint = [self.db newStatement:@"insert into notifications_syncpoints (syncpoint, created) values (?,?)"];
     _delete_syncpoint = [self.db newStatement:@"delete from notifications_syncpoints where syncpoint=?"];
     _read_syncpoint = [self.db newStatement:@"select syncpoint from notifications_syncpoints order by created desc limit 1"];
+    _exists_syncpoint = [self.db newStatement:@"select count(*) from notifications_syncpoints where syncpoint=?"];
 
     _queue = dispatch_queue_create("DatabaseStore", DISPATCH_QUEUE_SERIAL);
 }
@@ -323,6 +325,23 @@ create index notifications_mac on notifications (mac, time);
         [stmt bindNextTimeInterval:now];
         [stmt execute];
     });
+}
+
+- (BOOL)isTrackedSyncPoint:(NSString *)pageState {
+    if (![self ensureDefinedSyncPoint:pageState]) {
+        return NO;
+    }
+
+    __block BOOL exists;
+    dispatch_sync(self.queue , ^() {
+        ZHDatabaseStatement *stmt = self.exists_syncpoint;
+        [stmt reset];
+        [stmt bindNextText:pageState];
+        ZHDatabase_int count = [stmt executeReturnInteger];
+        exists = (count != 0);
+    });
+
+    return exists;
 }
 
 - (BOOL)ensureDefinedSyncPoint:(NSString *)syncPoint {

@@ -7,6 +7,7 @@
 //
 
 #import <SecurifiToolkit/SecurifiToolkit.h>
+#import <UIKit/UIKit.h>
 #import "SingleTon.h"
 #import "LoginTempPass.h"
 #import "KeyChainWrapper.h"
@@ -2223,10 +2224,22 @@ static SecurifiToolkit *singleton = nil;
         // There are more pages to fetch
         NSString *nextPageState = res.pageState;
 
-        // Keep track of this page state until the response has been processed
-        [store trackSyncPoint:nextPageState];
+        // Guard against bug in Cloud sending back same page state, causing us to go into infinite loop
+        // requesting the same page over and over.
+        BOOL alreadyTracked = [store isTrackedSyncPoint:nextPageState];
+        if (alreadyTracked) {
+            // remove the state and halt further processing
+            [store removeSyncPoint:nextPageState];
 
-        [self internalAsyncFetchNotifications:nextPageState];
+            NSLog(@"Already tracking sync point; halting further processing: %@", nextPageState);
+        }
+        else {
+            // Keep track of this page state until the response has been processed
+            [store trackSyncPoint:nextPageState];
+
+            // and try to download it now
+            [self internalAsyncFetchNotifications:nextPageState];
+        }
     }
     else {
         [self setNotificationsBadgeCount:newCount];

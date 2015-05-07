@@ -39,9 +39,16 @@
 // will be nil when there are no sync points being tracked
 - (NSString*)nextTrackedSyncPoint;
 
+// Removed the sybc point from the tracking table
+- (void)removeSyncPoint:(NSString *)pageState;
+
 // Enqueue a sync point for tracking until its notifications can be fetched.
 // The sync point is removed on calling -(BOOL)storeNotifications:syncPoint:
 - (void)trackSyncPoint:(NSString *)pageState;
+
+// Indicates whether the sync point is already tracked
+// Can be used for higher-level control logic to validate page state data returned from the cloud.
+- (BOOL)isTrackedSyncPoint:(NSString *)pageState;
 
 - (void)storeBadgeCount:(NSInteger)count;
 
