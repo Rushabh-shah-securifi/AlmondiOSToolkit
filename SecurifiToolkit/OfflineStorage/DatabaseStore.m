@@ -143,6 +143,7 @@ create index notifications_mac on notifications (mac, time);
     dispatch_sync(self.queue, ^() {
         [self.db execute:@"delete from notifications"];
         [self.db execute:@"delete from notifications_syncpoints"];
+        [self.db execute:@"delete from notifications_meta"];
     });
 }
 
