@@ -51,7 +51,7 @@
 
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
-            NSLog(@"Giving up on waiting for response. Timeout reached: %@", self);
+            DLog(@"Giving up on waiting for response. Timeout reached: %@", self);
             break;
         }
     }
