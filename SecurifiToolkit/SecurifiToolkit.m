@@ -7,7 +7,6 @@
 //
 
 #import <SecurifiToolkit/SecurifiToolkit.h>
-#import <UIKit/UIKit.h>
 #import "SingleTon.h"
 #import "LoginTempPass.h"
 #import "KeyChainWrapper.h"
@@ -2359,6 +2358,10 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
+    if (!self.isLoggedIn) {
+        return;
+    }
+
     NotificationListRequest *pending = self.pendingRefreshNotificationsRequest;
     if (pending) {
         if (![pending isExpired]) {
@@ -2434,6 +2437,10 @@ static SecurifiToolkit *singleton = nil;
 
 - (void)setNotificationsBadgeCount:(NSInteger)count {
     if (!self.config.enableNotifications) {
+        return;
+    }
+
+    if (!self.isLoggedIn) {
         return;
     }
 
