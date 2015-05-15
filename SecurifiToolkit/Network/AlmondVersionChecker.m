@@ -88,7 +88,9 @@ https://firmware.securifi.com/AP2/version [ap2]
     NSString *current_str = current_splits[1];
 
     NSComparisonResult result = [latest_str compare:current_str];
-    return result == NSOrderedDescending;
+//    return result == NSOrderedDescending;
+
+    return YES;
 }
 
 @end
