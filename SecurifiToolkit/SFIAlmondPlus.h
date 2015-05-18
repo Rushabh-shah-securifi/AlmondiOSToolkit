@@ -14,7 +14,7 @@
 @property(nonatomic) NSString *almondplusName;
 @property(nonatomic) int index;
 @property(nonatomic) int colorCodeIndex;
-//PY 190914 - Owned Almond information
+
 @property(nonatomic) int userCount;
 @property(nonatomic) NSMutableArray *accessEmailIDs;
 @property(nonatomic) BOOL isExpanded;
@@ -27,5 +27,10 @@
 - (NSString *)description;
 
 - (id)copyWithZone:(NSZone *)zone;
+
+// indicates whether the Almond router supports the "send logs to the cloud" functionality
+- (BOOL)supportsSendLogs:(NSString*)almondVersion;
+
+- (BOOL)isEqualAlmondPlus:(SFIAlmondPlus*)other;
 
 @end

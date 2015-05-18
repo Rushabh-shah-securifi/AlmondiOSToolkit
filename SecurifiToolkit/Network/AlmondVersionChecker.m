@@ -32,11 +32,8 @@
                     return;
                 }
 
-                if (![self isNewerVersion:latestVersion currentVersion:currentVersion]) {
-                    return;
-                }
-
-                [self.delegate versionCheckerDidFindNewerVersion:almond currentVersion:currentVersion latestVersion:latestVersion];
+                AlmondVersionCheckerResult result = [AlmondVersionChecker compareVersions:latestVersion currentVersion:currentVersion];
+                [self.delegate versionCheckerDidQueryVersion:almond result:result currentVersion:currentVersion latestVersion:latestVersion];
             }];
 
     [task resume];
@@ -72,25 +69,33 @@ https://firmware.securifi.com/AP2/version [ap2]
     }
 }
 
-- (BOOL)isNewerVersion:(NSString *)latest currentVersion:(NSString *)current {
-    if (!latest || !current) {
-        return NO;
++ (AlmondVersionCheckerResult)compareVersions:(NSString *)latestVersion currentVersion:(NSString *)currentVersion {
+    if (!latestVersion || !currentVersion) {
+        return AlmondVersionCheckerResult_cannotCompare;
     }
 
-    NSArray *latest_splits = [latest componentsSeparatedByString:@"-"];
-    NSArray *current_splits = [current componentsSeparatedByString:@"-"];
+    NSArray *latest_splits = [latestVersion componentsSeparatedByString:@"-"];
+    NSArray *current_splits = [currentVersion componentsSeparatedByString:@"-"];
 
     if (latest_splits.count < 2 || current_splits.count < 2) {
-        return NO;
+        return AlmondVersionCheckerResult_cannotCompare;
     }
 
     NSString *latest_str = latest_splits[1];
     NSString *current_str = current_splits[1];
 
     NSComparisonResult result = [latest_str compare:current_str];
-//    return result == NSOrderedDescending;
 
-    return YES;
+    switch (result) {
+        case NSOrderedAscending:
+            return AlmondVersionCheckerResult_currentNewerThanLatest;
+        case NSOrderedSame:
+            return AlmondVersionCheckerResult_currentSameAsLatest;
+        case NSOrderedDescending:
+            return AlmondVersionCheckerResult_currentOlderThanLatest;
+        default:
+            return AlmondVersionCheckerResult_cannotCompare;
+    }
 }
 
 @end

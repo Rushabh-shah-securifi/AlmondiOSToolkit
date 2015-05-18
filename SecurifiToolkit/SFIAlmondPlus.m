@@ -7,6 +7,7 @@
 //
 
 #import "SFIAlmondPlus.h"
+#import "AlmondVersionChecker.h"
 
 @implementation SFIAlmondPlus
 
@@ -32,7 +33,7 @@
     [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
     [coder encodeInt:self.index forKey:@"self.index"];
     [coder encodeInt:self.colorCodeIndex forKey:@"self.colorCodeIndex"];
-    
+
     //PY 190914 - Owned Almond information
     [coder encodeInt:self.userCount forKey:@"self.userCount"];
     [coder encodeObject:self.accessEmailIDs forKey:@"self.accessEmailIDs"];
@@ -71,5 +72,48 @@
     return copy;
 }
 
+- (BOOL)supportsSendLogs:(NSString *)almondVersion {
+    if (!almondVersion) {
+        return NO;
+    }
+
+    almondVersion = [almondVersion uppercaseString];
+
+    /*
+    The Almond  versions that support send logs are
+    R087 for v2
+    R073 for almond+
+    for cox we are not supporting it.
+     */
+
+    AlmondVersionCheckerResult result = AlmondVersionCheckerResult_cannotCompare;
+    if ([almondVersion hasPrefix:@"AL2-"]) {
+        result = [AlmondVersionChecker compareVersions:almondVersion currentVersion:@"AL2-R087"];
+    }
+    else if ([almondVersion hasPrefix:@"AP2-"]) {
+        result = [AlmondVersionChecker compareVersions:almondVersion currentVersion:@"AP2-R073"];
+    }
+
+    return (result == AlmondVersionCheckerResult_currentSameAsLatest) || (result == AlmondVersionCheckerResult_currentOlderThanLatest);
+
+}
+
+- (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other {
+    if (!other) {
+        return NO;
+    }
+
+    if (self == other) {
+        return YES;
+    }
+
+    NSString *this_mac = self.almondplusMAC;
+    NSString *other_mac = other.almondplusMAC;
+    if (!this_mac || !other_mac) {
+        return NO;
+    }
+    
+    return [this_mac isEqualToString:other_mac];
+}
 
 @end

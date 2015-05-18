@@ -7,9 +7,19 @@
 
 @class SFIAlmondPlus;
 
+typedef NS_ENUM(unsigned int, AlmondVersionCheckerResult) {
+    AlmondVersionCheckerResult_cannotCompare,
+    AlmondVersionCheckerResult_currentSameAsLatest,
+    AlmondVersionCheckerResult_currentOlderThanLatest,
+    AlmondVersionCheckerResult_currentNewerThanLatest,
+};
+
 @protocol AlmondVersionCheckerDelegate
 
-- (void)versionCheckerDidFindNewerVersion:(SFIAlmondPlus *)almond currentVersion:(NSString *)currentVersion latestVersion:(NSString *)latestAlmondVersion;
+- (void)versionCheckerDidQueryVersion:(SFIAlmondPlus *)almond
+                               result:(enum AlmondVersionCheckerResult)result
+                       currentVersion:(NSString *)currentVersion
+                        latestVersion:(NSString *)latestAlmondVersion;
 
 @end
 
@@ -18,5 +28,7 @@
 @property(weak) id <AlmondVersionCheckerDelegate> delegate;
 
 - (void)asyncCheckLatestVersion:(SFIAlmondPlus *)almond currentVersion:(NSString *)currentVersion;
+
++ (AlmondVersionCheckerResult)compareVersions:(NSString *)latestVersion currentVersion:(NSString *)currentVersion;
 
 @end
