@@ -1042,6 +1042,40 @@ static SecurifiToolkit *singleton = nil;
     return request.correlationId;
 }
 
+/*
+<root>
+	<GenericCommandRequest>
+		<AlmondplusMAC>251176214925585</AlmondplusMAC>
+		<ApplicationID>1001</ApplicationID>
+		<MobileInternalIndex>1</MobileInternalIndex>
+		<Data>
+		[Base64Encoded]
+		<root><SendLogs><Reason>Unable to get notification</Reason></SendLogs></root>[Base64Encoded]
+		</Data>
+	</GenericCommandRequest>
+</root>
+ */
+- (sfi_id)asyncSendAlmondLogs:(NSString *)almondMAC problemDescription:(NSString*)description {
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+    [writer startElement:@"root"];
+    [writer startElement:@"SendLogs"];
+    [writer addElement:@"Reason" text:description];
+    [writer endElement];;
+    [writer endElement];;
+
+    GenericCommandRequest *request = [GenericCommandRequest new];
+    request.almondMAC = almondMAC;
+    request.data = [writer toString];
+
+    GenericCommand *cmd = [[GenericCommand alloc] init];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = request;
+
+    [self asyncSendToCloud:cmd];
+
+    return request.correlationId;
+}
+
 #pragma mark - Account related commands
 
 - (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd {

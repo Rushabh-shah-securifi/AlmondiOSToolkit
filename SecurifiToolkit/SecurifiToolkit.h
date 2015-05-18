@@ -83,6 +83,8 @@
 #import <SecurifiToolkit/SFINotificationStore.h>
 #import <SecurifiToolkit/SFIAlmondModeRef.h>
 
+#import <SecurifiToolkit/AlmondVersionChecker.h>
+
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
 @class NotificationPreferences;
@@ -236,6 +238,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // Issues a command to the specified Almond router to reboot itself
 - (sfi_id)asyncRebootAlmond:(NSString*)almondMAC;
+
+- (sfi_id)asyncSendAlmondLogs:(NSString *)almondMAC problemDescription:(NSString *)description;
 
 //PY 150914 - Accounts
 // Send a command to the cloud requesting to change the password for cloud account
