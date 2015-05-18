@@ -80,7 +80,6 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_UNLINK_ALMOND_REQUEST                   = 269,
     CommandType_UNLINK_ALMOND_RESPONSE                  = 270,
     
-    //PY 071114 - Notification
     CommandType_NOTIFICATION_REGISTRATION               = 281,
     CommandType_NOTIFICATION_REGISTRATION_RESPONSE      = 282,
     CommandType_NOTIFICATION_DEREGISTRATION             = 283,
