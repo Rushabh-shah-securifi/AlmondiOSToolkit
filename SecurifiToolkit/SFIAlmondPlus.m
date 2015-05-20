@@ -95,7 +95,6 @@
     }
 
     return (result == AlmondVersionCheckerResult_currentSameAsLatest) || (result == AlmondVersionCheckerResult_currentOlderThanLatest);
-
 }
 
 - (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other {
