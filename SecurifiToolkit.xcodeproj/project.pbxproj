@@ -97,7 +97,7 @@
 		1DF037CAB07B19208BC80642 /* AlmondModeChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03FE0AE2F686D9B9567D2 /* AlmondModeChangeResponse.m */; };
 		1DF037D75654FB77C8A4DFA3 /* NotificationListRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03D1CB4599BCCF5F3A4D6 /* NotificationListRequest.h */; };
 		1DF038D75AEE3E0335A71E1F /* NotificationStoreImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF036BCA9C9243024CE5DC3 /* NotificationStoreImpl.m */; };
-		1DF038EAE9E89CD9BFFC13C7 /* AlmondVersionChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03FD4D648CEA9DD9511CA /* AlmondVersionChecker.h */; };
+		1DF038EAE9E89CD9BFFC13C7 /* AlmondVersionChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03FD4D648CEA9DD9511CA /* AlmondVersionChecker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */; };
 		1DF03C118A1C313783C2A754 /* AlmondModeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF031C3F506A877A179EEEE /* AlmondModeResponse.m */; };
 		1DF03C47AF435E83A3F273D1 /* AlmondModeRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF035CF619945E1C34866DB /* AlmondModeRequest.h */; };
