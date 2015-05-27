@@ -64,22 +64,24 @@ create index notifications_mac on notifications (mac, time);
 @property(nonatomic, readonly) ZHDatabaseStatement *read_syncpoint;
 @property(nonatomic, readonly) ZHDatabaseStatement *exists_syncpoint;
 @property(nonatomic, readonly) dispatch_queue_t queue;
+@property(nonatomic, readonly) BOOL trimRecords;
 @end
 
 @implementation DatabaseStore
 
 + (instancetype)notificationsDatabase {
-    return [[DatabaseStore alloc] initWithDbFilename:@"toolkit_notifications.db"];
+    return [[DatabaseStore alloc] initWithDbFilename:@"toolkit_notifications.db" trimRecords:YES];
 }
 
 + (instancetype)deviceLogsDatabase {
-    return [[DatabaseStore alloc] initWithDbFilename:@"toolkit_devicelogs.db"];
+    return [[DatabaseStore alloc] initWithDbFilename:@"toolkit_devicelogs.db" trimRecords:NO];
 }
 
-- (instancetype)initWithDbFilename:(NSString *)dbFilename {
+- (instancetype)initWithDbFilename:(NSString *)dbFilename trimRecords:(BOOL)trimRecords {
     self = [super init];
     if (self) {
         _dbFilename = [dbFilename copy];
+        _trimRecords = trimRecords;
         [self setup];
     }
 
@@ -251,6 +253,10 @@ create index notifications_mac on notifications (mac, time);
 // deletes up to numToDelete records number past the default offset. oldest records are deleted first.
 // this keeps the database bounded
 - (void)trimRecords:(int)numToDelete {
+    if (!self.trimRecords) {
+        return;
+    }
+
     dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.trim_notifications;
         [stmt reset];
