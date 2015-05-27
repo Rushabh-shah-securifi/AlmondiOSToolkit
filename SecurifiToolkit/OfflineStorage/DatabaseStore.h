@@ -4,27 +4,35 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiTypes.h"
 
 @class SFINotification;
 @protocol SFINotificationStore;
+@protocol SFIDeviceLogStoreDelegate;
+@protocol SFIDeviceLogStore;
 
 
 @interface DatabaseStore : NSObject
 
-- (void)setup;
+// Returns the standard database for storing Notifications
++ (instancetype)notificationsDatabase;
 
-- (id<SFINotificationStore>)newStore;
+// Returns the standard database for storing device log records
+// A single database can be used to store records for any number of devices
++ (instancetype)deviceLogsDatabase;
 
-- (BOOL)storeNotification:(SFINotification *)notification;
+- (id <SFINotificationStore>)newNotificationStore;
+
+- (id <SFIDeviceLogStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId delegate:(id<SFIDeviceLogStoreDelegate>)delegate;
 
 // Removes all notifications associated with the specified Almond MAC; called when an Almond is detached from the account
 - (void)deleteNotificationsForAlmond:(NSString *)almondMAC;
 
-// Remove all notifications ; does not affect tracked sync points
-- (void)purgeAllNotifications;
+// Remove all notifications and syncpoints
+- (void)purgeAll;
 
 // Clones the underlying database to the specified file path
-- (BOOL)copyDatabaseTo:(NSString*)filePath;
+- (BOOL)copyDatabaseTo:(NSString *)filePath;
 
 // Called to store the notifications that were fetched using the specified sync point token
 // The notifications are stored and the sync point is purged from the tracking table
@@ -37,7 +45,7 @@
 
 // Get the next sync point whose notifications need to be fetched
 // will be nil when there are no sync points being tracked
-- (NSString*)nextTrackedSyncPoint;
+- (NSString *)nextTrackedSyncPoint;
 
 // Removed the sybc point from the tracking table
 - (void)removeSyncPoint:(NSString *)pageState;

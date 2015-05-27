@@ -50,6 +50,7 @@ create index notifications_mac on notifications (mac, time);
  */
 
 @interface DatabaseStore ()
+@property(nonatomic, readonly) NSString *dbFilename;
 @property(nonatomic, readonly) ZHDatabase *db;
 @property(nonatomic, readonly) ZHDatabaseStatement *insert_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *count_notification;
@@ -67,8 +68,26 @@ create index notifications_mac on notifications (mac, time);
 
 @implementation DatabaseStore
 
++ (instancetype)notificationsDatabase {
+    return [[DatabaseStore alloc] initWithDbFilename:@"toolkit_notifications.db"];
+}
+
++ (instancetype)deviceLogsDatabase {
+    return [[DatabaseStore alloc] initWithDbFilename:@"toolkit_devicelogs.db"];
+}
+
+- (instancetype)initWithDbFilename:(NSString *)dbFilename {
+    self = [super init];
+    if (self) {
+        _dbFilename = [dbFilename copy];
+        [self setup];
+    }
+
+    return self;
+}
+
 - (void)setup {
-    NSString *db_path = [self databaseInDocumentsFolderPath:@"toolkit_notifications.db"];
+    NSString *db_path = [self databaseInDocumentsFolderPath:self.dbFilename];
     BOOL exists = [self fileExists:db_path];
 
     _db = [[ZHDatabase alloc] initWithPath:db_path];
@@ -80,6 +99,7 @@ create index notifications_mac on notifications (mac, time);
         [self.db execute:@"create index notifications_time on notifications (time);"];
         [self.db execute:@"create index notifications_mac on notifications (mac, time);"];
         [self.db execute:@"create index notifications_mac_bucket on notifications (mac, date_bucket, time);"];
+        [self.db execute:@"create index notifications_mac_bucket on notifications (mac, deviceid, date_bucket, time);"];
         [self.db execute:@"create index notifications_external_id on notifications (external_id);"];
 
         // a table for holding key-value pairs (schema version, last sync state, etc.)
@@ -110,7 +130,7 @@ create index notifications_mac on notifications (mac, time);
     _queue = dispatch_queue_create("DatabaseStore", DISPATCH_QUEUE_SERIAL);
 }
 
-- (id <SFINotificationStore>)newStore {
+- (id <SFINotificationStore>)newNotificationStore {
     __block NotificationStoreImpl *n;
 
     dispatch_sync(self.queue, ^() {
@@ -120,14 +140,15 @@ create index notifications_mac on notifications (mac, time);
     return n;
 }
 
-- (BOOL)storeNotification:(SFINotification *)notification {
-    if (!notification) {
-        return NO;
-    }
+- (id <SFIDeviceLogStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId delegate:(id <SFIDeviceLogStoreDelegate>)delegate {
+    __block NotificationStoreImpl *n;
 
-    BOOL success = [self insertRecord:notification];
-    [self trimRecords:1];
-    return success;
+    dispatch_sync(self.queue, ^() {
+        n = [[NotificationStoreImpl alloc] initWithDb:self.db queue:self.queue almondMac:almondMac deviceID:deviceId];
+        n.delegate = delegate;
+    });
+
+    return n;
 }
 
 - (void)deleteNotificationsForAlmond:(NSString *)almondMAC {
@@ -139,7 +160,7 @@ create index notifications_mac on notifications (mac, time);
     });
 }
 
-- (void)purgeAllNotifications {
+- (void)purgeAll {
     dispatch_sync(self.queue, ^() {
         [self.db execute:@"delete from notifications"];
         [self.db execute:@"delete from notifications_syncpoints"];
@@ -204,7 +225,7 @@ create index notifications_mac on notifications (mac, time);
     return success;
 }
 
-- (BOOL)notificationExists:(SFINotification*)notification {
+- (BOOL)notificationExists:(SFINotification *)notification {
     NSString *externalId = notification.externalId;
     if (!externalId) {
         return NO;
@@ -230,7 +251,7 @@ create index notifications_mac on notifications (mac, time);
 // deletes up to numToDelete records number past the default offset. oldest records are deleted first.
 // this keeps the database bounded
 - (void)trimRecords:(int)numToDelete {
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.trim_notifications;
         [stmt reset];
         [stmt bindNextInteger:numToDelete];
@@ -274,7 +295,7 @@ create index notifications_mac on notifications (mac, time);
 - (NSInteger)countTrackedSyncPoints {
     __block NSInteger count;
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         count = [self.db executeReturnInteger:@"select count(*) from notifications_syncpoints"];
     });
 
@@ -284,7 +305,7 @@ create index notifications_mac on notifications (mac, time);
 - (NSString *)nextTrackedSyncPoint {
     __block NSString *next;
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.read_syncpoint;
         [stmt reset];
 
@@ -303,7 +324,7 @@ create index notifications_mac on notifications (mac, time);
         return;
     }
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.delete_syncpoint;
         [stmt reset];
         [stmt bindNextText:pageState];
@@ -319,7 +340,7 @@ create index notifications_mac on notifications (mac, time);
     NSDate *date = [NSDate date];
     NSTimeInterval now = date.timeIntervalSince1970;
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.insert_syncpoint;
         [stmt reset];
         [stmt bindNextText:pageState];
@@ -334,7 +355,7 @@ create index notifications_mac on notifications (mac, time);
     }
 
     __block BOOL exists;
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.exists_syncpoint;
         [stmt reset];
         [stmt bindNextText:pageState];
@@ -352,7 +373,7 @@ create index notifications_mac on notifications (mac, time);
 - (NSString *)getMetaValueString:(NSString *)metaKey {
     __block NSString *value;
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.read_metadata;
 
         [stmt reset];
@@ -373,7 +394,7 @@ create index notifications_mac on notifications (mac, time);
 - (long)getMetaValueInt:(NSString *)metaKey {
     __block long value = 0;
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.read_metadata;
 
         [stmt bindNextText:metaKey];
@@ -393,7 +414,7 @@ create index notifications_mac on notifications (mac, time);
     NSDate *date = [NSDate date];
     NSTimeInterval now = date.timeIntervalSince1970;
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.insert_metadata;
         [stmt reset];
         [stmt bindNextText:key];
@@ -411,7 +432,7 @@ create index notifications_mac on notifications (mac, time);
 - (void)storeBadgeCount:(NSInteger)count {
     [self setMetaData:@"" intValue:count forKey:KEY_BADGE_COUNT];
 
-    dispatch_sync(self.queue , ^() {
+    dispatch_sync(self.queue, ^() {
         ZHDatabaseStatement *stmt = self.update_unread_count;
         [stmt bindNextBool:YES];
         [stmt bindNextInteger:count];
