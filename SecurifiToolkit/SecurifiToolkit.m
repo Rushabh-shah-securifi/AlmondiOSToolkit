@@ -284,11 +284,12 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 // ===============================================================================================
 
-@interface SecurifiToolkit () <SingleTonDelegate>
+@interface SecurifiToolkit () <SingleTonDelegate, SFIDeviceLogStoreDelegate>
 @property(nonatomic, readonly) SecurifiConfigurator *config;
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
-@property(nonatomic, readonly) DatabaseStore *databaseStore;
+@property(nonatomic, readonly) DatabaseStore *notificationsDb;
+@property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
 @property(nonatomic, readonly) id <SFINotificationStore> notificationsStore;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
 @property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
@@ -309,6 +310,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) NotificationClearCountRequest *pendingClearNotificationCountRequest;
 
 @property(nonatomic, strong) BaseCommandRequest *pendingAlmondStateAndSettingsRequest;
+@property(nonatomic, strong) BaseCommandRequest *pendingDeviceLogRequest;
 @end
 
 @implementation SecurifiToolkit
@@ -342,11 +344,16 @@ static SecurifiToolkit *singleton = nil;
         _dataManager = [SFIOfflineDataManager new];
 
         if (config.enableNotifications) {
-            DatabaseStore *store = [DatabaseStore new];
-            [store setup];
+            {
+                DatabaseStore *store = [DatabaseStore notificationsDatabase];
+                _notificationsDb = store;
+                _notificationsStore = [_notificationsDb newNotificationStore];
+            }
 
-            _databaseStore = store;
-            _notificationsStore = [_databaseStore newStore];
+            {
+                DatabaseStore *store = [DatabaseStore deviceLogsDatabase];
+                _deviceLogsDb = store;
+            }
         }
 
         // default; do not change
@@ -395,6 +402,8 @@ static SecurifiToolkit *singleton = nil;
             [center addObserver:self selector:@selector(onNotificationCountResponse:) name:NOTIFICATION_COUNT_RESPONSE_NOTIFIER object:nil];
 
             [center addObserver:self selector:@selector(onNotificationClearCountResponse:) name:NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER object:nil];
+
+            [center addObserver:self selector:@selector(onDeviceLogSyncResponse:) name:DEVICELOG_LIST_SYNC_RESPONSE_NOTIFIER object:nil];
         }
     }
 
@@ -797,7 +806,8 @@ static SecurifiToolkit *singleton = nil;
     [self removeCurrentAlmond];
     [self.dataManager purgeAll];
     if (self.configuration.enableNotifications) {
-        [self.databaseStore purgeAllNotifications];
+        [self.notificationsDb purgeAll];
+        [self.deviceLogsDb purgeAll];
     }
 }
 
@@ -1727,7 +1737,7 @@ static SecurifiToolkit *singleton = nil;
                 [self.networkSingleton clearAlmondMode:deleted.almondplusMAC];
             }
 
-            [self.databaseStore deleteNotificationsForAlmond:deleted.almondplusMAC];
+            [self.notificationsDb deleteNotificationsForAlmond:deleted.almondplusMAC];
         }
     }
 
@@ -2195,7 +2205,7 @@ static SecurifiToolkit *singleton = nil;
     // As implemented, iteration will continue until a duplicate notification is detected. This procedure
     // ensures that if the system is missing some notifications, it will catch up eventually.
     // Notifications are delivered newest to oldest, making it likely all new ones are fetched in the first call.
-    DatabaseStore *store = self.databaseStore;
+    DatabaseStore *store = self.notificationsDb;
 
     NSUInteger newCount = res.newCount;
     NSArray *notificationsToStore = res.notifications;
@@ -2286,7 +2296,7 @@ static SecurifiToolkit *singleton = nil;
 // This could happen when the app is halted or connections break before a previous
 // run completed fetching all pages.
 - (void)internalTryProcessNotificationSyncPoints {
-    DatabaseStore *store = self.databaseStore;
+    DatabaseStore *store = self.notificationsDb;
 
     NSInteger count = store.countTrackedSyncPoints;
     if (count == 0) {
@@ -2347,26 +2357,6 @@ static SecurifiToolkit *singleton = nil;
 
 #pragma mark - Notification access and refresh commands
 
-- (BOOL)storePushNotification:(SFINotification *)notification {
-    if (!self.config.enableNotifications) {
-        return NO;
-    }
-
-    BOOL success = [self.databaseStore storeNotification:notification];
-    if (success) {
-        [self postNotification:kSFINotificationDidStore data:nil];
-    }
-
-    return success;
-}
-
-- (NSArray *)notifications {
-    if (!self.config.enableNotifications) {
-        return [NSArray array];
-    }
-    return [self.notificationsStore fetchNotifications:100];
-}
-
 - (NSInteger)countUnviewedNotifications {
     if (!self.config.enableNotifications) {
         return 0;
@@ -2375,14 +2365,14 @@ static SecurifiToolkit *singleton = nil;
 }
 
 - (id <SFINotificationStore>)newNotificationStore {
-    return [self.databaseStore newStore];
+    return [self.notificationsDb newNotificationStore];
 }
 
 - (BOOL)copyNotificationStoreTo:(NSString *)filePath {
     if (!self.config.enableNotifications) {
         return NO;
     }
-    return [self.databaseStore copyDatabaseTo:filePath];
+    return [self.notificationsDb copyDatabaseTo:filePath];
 }
 
 // this method sends a request to fetch the latest notifications;
@@ -2466,7 +2456,7 @@ static SecurifiToolkit *singleton = nil;
         return 0;
     }
 
-    return self.databaseStore.badgeCount;
+    return self.notificationsDb.badgeCount;
 }
 
 - (void)setNotificationsBadgeCount:(NSInteger)count {
@@ -2478,10 +2468,9 @@ static SecurifiToolkit *singleton = nil;
         return;
     }
 
-    [self.databaseStore storeBadgeCount:count];
+    [self.notificationsDb storeBadgeCount:count];
     [self postNotification:kSFINotificationBadgeCountDidChange data:nil];
 }
-
 
 // Sends a request for notifications
 // pagestate can be nil or a defined page state. The page state also becomes an correlation ID that is parroted back in the
@@ -2570,6 +2559,125 @@ static SecurifiToolkit *singleton = nil;
 
     [self.networkSingleton markModeForAlmond:res.almondMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
+}
+
+#pragma mark - Device Log processing and SFIDeviceLogStoreDelegate methods
+
+- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId {
+    DatabaseStore *db = self.deviceLogsDb;
+    [db purgeAll];
+
+    id <SFIDeviceLogStore> store = [db newDeviceLogStore:almondMac deviceId:deviceId delegate:self];
+    [store ensureFetchNotifications]; // will callback to self (registered as delegate) to load notifications
+
+    self.pendingDeviceLogRequest = nil;
+    return store;
+}
+
+- (void)tryRefreshDeviceLog:(NSString *)almondMac deviceId:(sfi_id)deviceId {
+/*
+Mobile +++++++++>>>>  Cloud 804
+[For the first time send for first logs]
+<root>
+{mac:201243434454, device_id:19, requestId:”dajdasj”’}
+</root>
+[subsequent command]
+<root>
+{mac:201243434454, device_id:19, requestId:”dajdasj”, pageState:”12aaa12eee2eeffb1024”}
+</root>
+ */
+
+    // we store a pseudo command object to track timeouts/guard against multiple requests being sent for device logs
+    BaseCommandRequest *pending = self.pendingDeviceLogRequest;
+    if (pending) {
+        if (![pending isExpired]) {
+            // give the request 5 seconds to complete
+            return;
+        }
+    }
+    self.pendingDeviceLogRequest = [BaseCommandRequest new];
+
+    DatabaseStore *store = self.deviceLogsDb;
+    NSString *pageState = [store nextTrackedSyncPoint];
+
+    NSDictionary *payload = pageState ? @{
+            @"mac" : almondMac,
+            @"device_id" : @(deviceId),
+            @"requestId" : pageState,
+            @"pageState" : pageState,
+    } : @{
+            @"mac" : almondMac,
+            @"device_id" : @(deviceId),
+            @"requestId" : almondMac,
+    };
+
+    [self internalSendJsonCommand:payload commandType:CommandType_DEVICELOG_REQUEST];
+}
+
+- (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore {
+    [self tryRefreshDeviceLog:deviceLogStore.almondMac deviceId:deviceLogStore.deviceID];
+}
+
+- (void)onDeviceLogSyncResponse:(id)sender {
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    NotificationListResponse *res = data[@"data"];
+    NSString *requestId = res.requestId;
+
+    // Store the notifications and stop tracking the pageState that they were associated with
+    DatabaseStore *store = self.deviceLogsDb;
+
+    NSArray *notificationsToStore = res.notifications;
+    for (SFINotification *n in notificationsToStore) {
+        n.viewed = YES;
+    }
+
+    [store storeNotifications:notificationsToStore syncPoint:requestId];
+
+    // Let the world know there are new notifications
+    [self postNotification:kSFINotificationDidStore data:nil];
+
+    // Keep syncing until page state is no longer provided
+    if (res.isPageStateDefined) {
+        // There are more pages to fetch
+        NSString *nextPageState = res.pageState;
+
+        // Guard against bug in Cloud sending back same page state, causing us to go into infinite loop
+        // requesting the same page over and over.
+        BOOL alreadyTracked = [store isTrackedSyncPoint:nextPageState];
+        if (alreadyTracked) {
+            // remove the state and halt further processing
+            [store removeSyncPoint:nextPageState];
+
+            DLog(@"Already tracking sync point; halting further processing: %@", nextPageState);
+        }
+        else {
+            // Keep track of this page state until the response has been processed
+            [store trackSyncPoint:nextPageState];
+        }
+    }
+}
+
+#pragma mark - JSON command helper
+
+- (void)internalSendJsonCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
+    NSError *error;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+
+    if (error) {
+        NSLog(@"internalSendJsonCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
+        return;
+    }
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.command = data;
+    cmd.commandType = commandType;
+
+    [self asyncSendToCloud:cmd];
 }
 
 @end

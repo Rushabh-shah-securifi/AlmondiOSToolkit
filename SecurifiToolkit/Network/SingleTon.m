@@ -409,36 +409,51 @@
                                     // Process a single command response at a time
                                     id responsePayload = nil;
 
-                                    // these are the only command responses so far that uses a JSON payload; we special case them for now
-                                    if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE || commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE || commandType == CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE) {
-                                        // we only want the JSON wrapped inside the <root></root> pair
-                                        NSUInteger start_loc = startTagRange.location + startTagRange.length;
-                                        NSRange jsonParseRange = NSMakeRange(start_loc, endTagRange.location - start_loc);
-                                        NSData *buffer = [self.partialData subdataWithRange:jsonParseRange];
-                                        DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    switch (commandType) {
+                                        // these are the only command responses so far that uses a JSON payload; we special case them for now
+                                        case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
+                                        case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
+                                        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
+                                        case CommandType_DEVICELOG_RESPONSE: {
+                                            // we only want the JSON wrapped inside the <root></root> pair
+                                            NSUInteger start_loc = startTagRange.location + startTagRange.length;
+                                            NSRange jsonParseRange = NSMakeRange(start_loc, endTagRange.location - start_loc);
+                                            NSData *buffer = [self.partialData subdataWithRange:jsonParseRange];
+                                            DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
-                                        if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE) {
-                                            responsePayload = [NotificationListResponse parseJson:buffer];
-                                        }
-                                        else if (commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE) {
-                                            responsePayload = [NotificationCountResponse parseJson:buffer];
-                                        }
-                                        else {
-                                            responsePayload = [NotificationClearCountResponse parseJson:buffer];
-                                        }
-                                    }
-                                    else {
-                                        NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
-                                        NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
-                                        DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                            if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE) {
+                                                responsePayload = [NotificationListResponse parseNotificationsJson:buffer];
+                                            }
+                                            else if (commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE) {
+                                                responsePayload = [NotificationCountResponse parseJson:buffer];
+                                            }
+                                            else if (commandType == CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE) {
+                                                responsePayload = [NotificationClearCountResponse parseJson:buffer];
+                                            }
+                                            else {
+                                                // CommandType_DEVICELOG_RESPONSE
+                                                responsePayload = [NotificationListResponse parseDeviceLogsJson:buffer];
+                                            }
 
-                                        CommandParser *parser = [CommandParser new];
-                                        GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
-                                        responsePayload = temp.command;
+                                            break;
+                                        };
 
-                                        // important to pull command type from the parsed payload because the underlying
-                                        // command that we dispatch on can be different than the "container" carrying it
-                                        commandType = temp.commandType;
+                                        // All others are XML
+                                        default: {
+                                            NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
+                                            NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
+                                            DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+
+                                            CommandParser *parser = [CommandParser new];
+                                            GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
+                                            responsePayload = temp.command;
+
+                                            // important to pull command type from the parsed payload because the underlying
+                                            // command that we dispatch on can be different than the "container" carrying it
+                                            commandType = temp.commandType;
+                                        }
+
+                                        break;
                                     }
 
                                     // Remove 8 bytes from received command
@@ -752,6 +767,11 @@
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_DEVICELOG_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DEVICELOG_LIST_SYNC_RESPONSE_NOTIFIER data:payload];
             break;
         };
 
@@ -1251,6 +1271,16 @@
                     commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
                     break;
                 }
+
+                case CommandType_DEVICELOG_REQUEST: {
+                    NSData *data = obj.command;
+                    NSString *json =  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+                    commandType = (unsigned int) htonl(CommandType_DEVICELOG_REQUEST);
+                    commandPayload = [NSString stringWithFormat:@"<root>%@</root>", json];
+                    break;
+                };
+
                 default:
                     break;
             } // end switch

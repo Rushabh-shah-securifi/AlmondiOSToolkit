@@ -273,25 +273,21 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)deviceMAC;
 
-- (void)asyncRequestRegisterForNotification:(NSString*)deviceToken;
+- (void)asyncRequestRegisterForNotification:(NSString *)deviceToken;
 
-- (void)asyncRequestNotificationPreferenceList:(NSString*)almondMAC;
+- (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC;
 
 // Send a command to change the notification mode for the specific almond
 - (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMAC mode:(SFIAlmondMode)newMode;
 
-- (SFIAlmondMode)modeForAlmond:(NSString*)almondMac;
+- (SFIAlmondMode)modeForAlmond:(NSString *)almondMac;
 
-// Send a command to configure notifications for the specified devices. Supported actions are:
+// Send a command to configure notifications for the specified devices. This is the way to set per-device preferences
+// for receiving notifications. Each device Index is configured separately.
+// Supported actions are:
 // kSFINotificationPreferenceChangeActionAdd;
 // kSFINotificationPreferenceChangeActionDelete;
 - (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action;
-
-// Stores a notification record that originally entered the system as an Apple Push Notification
-- (BOOL)storePushNotification:(SFINotification *)notification;
-
-// an array of all SFINotification, newest to oldest
-- (NSArray *)notifications;
 
 - (NSInteger)countUnviewedNotifications;
 
@@ -307,10 +303,16 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)tryFetchNotificationCount;
 
+// Called after all Notifications/Activity have been viewed. The Clear command is sent to the cloud to reset the
+// global state shared across all logged-in devices.
 - (void)tryClearNotificationCount;
 
+// Called to synchronize the badge count as specified in a Push Notification payload. The badge count reflects then
+// latest known global "new notification" count.
 - (NSInteger)notificationsBadgeCount;
 - (void)setNotificationsBadgeCount:(NSInteger)count;
+
+- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId;
 
 @end
  

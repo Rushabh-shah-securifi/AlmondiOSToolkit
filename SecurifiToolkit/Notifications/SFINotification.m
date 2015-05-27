@@ -22,22 +22,7 @@ IndexName       => indexname
 Value           => indexvalue
  */
 
-+ (instancetype)parseJson:(NSData *)data {
-    NSError *error = nil;
-    id json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-    if (error) {
-        NSLog(@"Failed parsing notification payload, error:%@, payload:%@", error, data);
-        return nil;
-    }
-    if (![json respondsToSelector:@selector(objectForKey:)]) {
-        NSLog(@"Failed parsing notification payload, expected a dictionary, recevied: %@", json);
-        return nil;
-    }
-
-    return [self parsePayload:json];
-}
-
-+ (instancetype)parsePayload:(NSDictionary *)payload {
++ (instancetype)parseNotificationPayload:(NSDictionary *)payload {
     SFINotification *obj = [SFINotification new];
     obj.almondMAC = payload[@"mac"];
 
@@ -71,6 +56,34 @@ Value           => indexvalue
             NSLog(@"Exception while parsing debug counter, value:'%@', e:%@", counter, e.description);
         }
     }
+
+    return obj;
+}
+
++ (instancetype)parseDeviceLogPayload:(NSDictionary *)payload {
+    SFINotification *obj = [SFINotification new];
+    obj.almondMAC = payload[@"mac"];
+
+    NSString *str;
+
+    str = payload[@"time"];
+    obj.time = str.longLongValue;
+
+    str = payload[@"device_id"];
+    obj.deviceId = (sfi_id) str.longLongValue;
+
+    obj.deviceName = payload[@"device_name"];
+
+    str = payload[@"device_type"];
+    obj.deviceType = (SFIDeviceType) str.intValue;
+
+    str = payload[@"index_id"];
+    obj.valueIndex = (sfi_id) str.longLongValue;
+
+    obj.valueType = [SFIDeviceKnownValues nameToPropertyType:payload[@"index_name"]];
+    obj.value = payload[@"value"];
+
+    obj.externalId = payload[@"pk"];
 
     return obj;
 }

@@ -9,7 +9,15 @@
 
 @implementation NotificationListResponse
 
-+ (instancetype)parseJson:(NSData *)data {
++ (instancetype)parseNotificationsJson:(NSData *)data {
+    return [self internalParseJson:data payloadPropertyName:@"notifications" parseNotification:YES];
+}
+
++ (instancetype)parseDeviceLogsJson:(NSData *)data {
+    return [self internalParseJson:data payloadPropertyName:@"logs" parseNotification:NO];
+}
+
++ (NotificationListResponse *)internalParseJson:(NSData *)data payloadPropertyName:(NSString *)payloadPropertyName parseNotification:(BOOL)notificationPayload {
     NSError *error = nil;
     id json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
     if (error) {
@@ -21,19 +29,27 @@
         return nil;
     }
 
-    return [self parsePayload:json];
+    return [self parsePayload:json payloadPropertyName:payloadPropertyName parseNotification:notificationPayload];
 }
 
-+ (instancetype)parsePayload:(NSDictionary *)payload {
++ (instancetype)parsePayload:(NSDictionary *)payload payloadPropertyName:(NSString *)payloadPropertyName parseNotification:(BOOL)notificationPayload {
     NSMutableArray *parsed = [NSMutableArray array];
 
-    NSArray *ls = payload[@"notifications"];
+    NSArray *ls = payload[payloadPropertyName];
     for (NSDictionary *dictionary in ls) {
-        NSDictionary *msg_data = dictionary[@"msg"];
-        SFINotification *n = [SFINotification parsePayload:msg_data];
-        n.externalId = dictionary[@"primarykey"];
+        if (notificationPayload) {
+            NSDictionary *msg_data = dictionary[@"msg"];
 
-        [parsed addObject:n];
+            SFINotification *n = [SFINotification parseNotificationPayload:msg_data];
+            n.externalId = dictionary[@"primarykey"];
+
+            [parsed addObject:n];
+        }
+        else {
+            SFINotification *n = [SFINotification parseDeviceLogPayload:dictionary];
+
+            [parsed addObject:n];
+        }
     }
 
     NotificationListResponse *obj = [NotificationListResponse new];

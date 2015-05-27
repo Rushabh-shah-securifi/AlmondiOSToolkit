@@ -23,9 +23,9 @@
 
 @property(nonatomic) long debugCounter;
 
-+ (instancetype)parseJson:(NSData*)data;
++ (instancetype)parseNotificationPayload:(NSDictionary *)payload;
 
-+ (instancetype)parsePayload:(NSDictionary*)payload;
++ (instancetype)parseDeviceLogPayload:(NSDictionary *)payload;
 
 // Used to alter the device name by appending the debugCounter value; useful for testing and debugging to track
 // sequences of notifications. This alteration can be done prior to persisting the notification.

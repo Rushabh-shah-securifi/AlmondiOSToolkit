@@ -22,6 +22,10 @@
 
 - (BOOL)isPageStateDefined;
 
-+ (instancetype)parseJson:(NSData *)data;
+// Parser for Notification payloads
++ (instancetype)parseNotificationsJson:(NSData *)data;
+
+// Parser for Logs payloads
++ (instancetype)parseDeviceLogsJson:(NSData *)data;
 
 @end
