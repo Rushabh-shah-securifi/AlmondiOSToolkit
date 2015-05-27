@@ -1,6 +1,6 @@
 //
 // Created by Matthew Sinclair-Day on 1/23/15.
-// Copyright (c) 2015 Nirav Uchat. All rights reserved.
+// Copyright (c) 2015 Securifi Ltd. All rights reserved.
 //
 
 #import "SFINotification.h"
@@ -66,8 +66,9 @@ Value           => indexvalue
 
     NSString *str;
 
-    str = payload[@"time"];
+    str = payload[@"time"];         // milliseconds
     obj.time = str.longLongValue;
+    obj.time = obj.time / 1000;     // convert to NSTimeInterval
 
     str = payload[@"device_id"];
     obj.deviceId = (sfi_id) str.longLongValue;
