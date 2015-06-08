@@ -8,6 +8,11 @@
 
 #import "SecurifiToolkit.h"
 
+#define SFIDeviceType_ZigbeeDoorLock_28_NOT_FULLY_LOCKED    0
+#define SFIDeviceType_ZigbeeDoorLock_28_LOCKED              1
+#define SFIDeviceType_ZigbeeDoorLock_28_UNLOCKED            2
+
+
 @implementation SFIDevice
 
 + (NSString *)nameForType:(SFIDeviceType)type {
@@ -223,7 +228,21 @@
         case SFIDeviceType_ZigbeeDoorLock_28: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
 
-            int newValue = (deviceValues.intValue == 0) ? 1 : 0;
+            int newValue;
+            switch (deviceValues.intValue) {
+                case SFIDeviceType_ZigbeeDoorLock_28_NOT_FULLY_LOCKED:
+                    newValue = SFIDeviceType_ZigbeeDoorLock_28_LOCKED;
+                    break;
+                case SFIDeviceType_ZigbeeDoorLock_28_LOCKED:
+                    newValue = SFIDeviceType_ZigbeeDoorLock_28_UNLOCKED;
+                    break;
+                case SFIDeviceType_ZigbeeDoorLock_28_UNLOCKED:
+                    newValue = SFIDeviceType_ZigbeeDoorLock_28_LOCKED;
+                    break;
+                default:
+                    newValue = SFIDeviceType_ZigbeeDoorLock_28_LOCKED;
+            }
+
             [deviceValues setIntValue:newValue];
             break;
         }
@@ -248,6 +267,38 @@
         default: {
             // do nothing
         }
+        case SFIDeviceType_UnknownDevice_0:break;
+        case SFIDeviceType_Thermostat_7:break;
+        case SFIDeviceType_Controller_8:break;
+        case SFIDeviceType_SceneController_9:break;
+        case SFIDeviceType_StandardCIE_10:break;
+        case SFIDeviceType_MotionSensor_11:break;
+        case SFIDeviceType_ContactSwitch_12:break;
+        case SFIDeviceType_FireSensor_13:break;
+        case SFIDeviceType_WaterSensor_14:break;
+        case SFIDeviceType_GasSensor_15:break;
+        case SFIDeviceType_PersonalEmergencyDevice_16:break;
+        case SFIDeviceType_VibrationOrMovementSensor_17:break;
+        case SFIDeviceType_RemoteControl_18:break;
+        case SFIDeviceType_KeyFob_19:break;
+        case SFIDeviceType_Keypad_20:break;
+        case SFIDeviceType_OccupancySensor_24:break;
+        case SFIDeviceType_LightSensor_25:break;
+        case SFIDeviceType_WindowCovering_26:break;
+        case SFIDeviceType_TemperatureSensor_27:break;
+        case SFIDeviceType_ColorControl_29:break;
+        case SFIDeviceType_PressureSensor_30:break;
+        case SFIDeviceType_FlowSensor_31:break;
+        case SFIDeviceType_ColorDimmableLight_32:break;
+        case SFIDeviceType_HAPump_33:break;
+        case SFIDeviceType_Shade_34:break;
+        case SFIDeviceType_SmokeDetector_36:break;
+        case SFIDeviceType_FloodSensor_37:break;
+        case SFIDeviceType_ShockSensor_38:break;
+        case SFIDeviceType_DoorSensor_39:break;
+        case SFIDeviceType_MoistureSensor_40:break;
+        case SFIDeviceType_MovementSensor_41:break;
+        case SFIDeviceType_MultiSwitch_43:break;
     } // end switch
 
     return deviceValues; // can be nil
