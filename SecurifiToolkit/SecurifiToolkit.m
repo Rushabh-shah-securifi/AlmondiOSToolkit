@@ -1033,6 +1033,42 @@ static SecurifiToolkit *singleton = nil;
 
 #pragma mark - Almond commands
 
+/*
+<root>
+<GenericCommandRequest>
+<AlmondplusMAC>251176214925585</AlmondplusMAC>
+<ApplicationID>1001</ApplicationID>
+<MobileInternalIndex>1</MobileInternalIndex>
+<Data>
+[Base64Encoded]
+<root><FirmwareUpdate Available="1/0"><Version>AP2-R070-L009-W016-ZW016-ZB005</Version></FirmwareUpdate></root>[Base64Encoded]
+</Data>
+</GenericCommandRequest>
+</root>
+ */
+
+- (sfi_id)asyncUpdateAlmondFirmware:(NSString *)almondMAC firmwareVersion:(NSString*)firmwareVersion {
+    SFIXmlWriter *writer = [SFIXmlWriter new];
+    [writer startElement:@"root"];
+    [writer startElement:@"FirmwareUpdate"];
+    [writer addAttribute:@"Available" value:@"1"];
+    [writer addElement:@"Version" text:firmwareVersion];
+    [writer endElement];;
+    [writer endElement];;
+
+    GenericCommandRequest *request = [GenericCommandRequest new];
+    request.almondMAC = almondMAC;
+    request.data = [writer toString];
+
+    GenericCommand *cmd = [[GenericCommand alloc] init];
+    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+    cmd.command = request;
+
+    [self asyncSendToCloud:cmd];
+
+    return request.correlationId;
+}
+
 - (sfi_id)asyncRebootAlmond:(NSString *)almondMAC {
     SFIXmlWriter *writer = [SFIXmlWriter new];
     [writer startElement:@"root"];

@@ -236,6 +236,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard*)scoreboardSnapshot;
 
+- (sfi_id)asyncUpdateAlmondFirmware:(NSString *)almondMAC firmwareVersion:(NSString*)firmwareVersion;
+
 // Issues a command to the specified Almond router to reboot itself
 - (sfi_id)asyncRebootAlmond:(NSString*)almondMAC;
 
