@@ -56,6 +56,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_MultiSwitch_43                = 43,
     SFIDeviceType_UnknownOnOffModule_44         = 44,
     SFIDeviceType_BinaryPowerSwitch_45          = 45,
+    SFIDeviceType_SetPointThermostat_46         = 46,
     SFIDeviceType_HueLamp_48                    = 48,
     SFIDeviceType_SecurifiSmartSwitch_50        = 50,
 
@@ -124,9 +125,11 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_THERMOSTAT_FAN_STATE,
     SFIDevicePropertyType_THERMOSTAT_MODE,
     SFIDevicePropertyType_THERMOSTAT_OPERATING_STATE,
+    SFIDevicePropertyType_THERMOSTAT_SETPOINT,
     SFIDevicePropertyType_THERMOSTAT_SETPOINT_COOLING,
     SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING,
     SFIDevicePropertyType_TOLERANCE,
+    SFIDevicePropertyType_UNITS,
     SFIDevicePropertyType_USER_CODE,
 
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence

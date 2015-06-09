@@ -62,6 +62,7 @@
         case SFIDeviceType_MultiSwitch_43:return @"43_MultiSwitch";
         case SFIDeviceType_UnknownOnOffModule_44:return @"44_UnknownOnOffModule";
         case SFIDeviceType_BinaryPowerSwitch_45:return @"45_BinaryPowerSwitch";
+        case SFIDeviceType_SetPointThermostat_46:return @"46_SetPointThermostat";
         case SFIDeviceType_HueLamp_48:return @"48_HueLamp";
         case SFIDeviceType_SecurifiSmartSwitch_50:return @"50_SecurifiSmartSwitch";
         default: return [NSString stringWithFormat:@"%d_UnknownDevice", type];
@@ -146,6 +147,7 @@
         case SFIDeviceType_FlowSensor_31:
         case SFIDeviceType_HAPump_33:
         case SFIDeviceType_MultiSwitch_43:
+        case SFIDeviceType_SetPointThermostat_46:
         default: {
             return SFIDevicePropertyType_STATE;
         }
@@ -299,6 +301,7 @@
         case SFIDeviceType_MoistureSensor_40:break;
         case SFIDeviceType_MovementSensor_41:break;
         case SFIDeviceType_MultiSwitch_43:break;
+        case SFIDeviceType_SetPointThermostat_46:break;
     } // end switch
 
     return deviceValues; // can be nil

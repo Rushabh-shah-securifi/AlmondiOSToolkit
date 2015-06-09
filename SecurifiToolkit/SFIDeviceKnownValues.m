@@ -76,9 +76,11 @@
                 @"THERMOSTAT FAN STATE" : @(SFIDevicePropertyType_THERMOSTAT_FAN_STATE),
                 @"THERMOSTAT MODE" : @(SFIDevicePropertyType_THERMOSTAT_MODE),
                 @"THERMOSTAT OPERATING STATE" : @(SFIDevicePropertyType_THERMOSTAT_OPERATING_STATE),
+                @"THERMOSTAT SETPOINT" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT),
                 @"THERMOSTAT SETPOINT COOLING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_COOLING),
                 @"THERMOSTAT SETPOINT HEATING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING),
                 @"TOLERANCE" : @(SFIDevicePropertyType_TOLERANCE),
+                @"UNITS" : @(SFIDevicePropertyType_UNITS),
                 @"USER_CODE" : @(SFIDevicePropertyType_USER_CODE),
 
         };
