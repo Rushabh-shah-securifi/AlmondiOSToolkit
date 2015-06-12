@@ -41,6 +41,9 @@
 // updates to fetch notification logs
 @property(nonatomic) BOOL enableNotifications;
 
+// Controls whether the app allows the user to set Home or Away mode
+@property(nonatomic) BOOL enableNotificationsHomeAwayMode;
+
 @property(nonatomic) BOOL enableNotificationsDebugLogging;
 
 // Controls whether the app allows the user to enable/disable a SSID on the router tab
