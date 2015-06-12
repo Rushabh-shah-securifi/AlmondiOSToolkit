@@ -18,6 +18,7 @@
 @property(nonatomic, readonly) NSString *deviceListFp;
 @property(nonatomic, readonly) NSString *deviceValueFp;
 @property(nonatomic, readonly) NSString *notificationPreferenceListFp;
+@property(nonatomic, readonly) NSMutableSet *markedForBackupExclusionPaths;
 @end
 
 @implementation SFIOfflineDataManager
@@ -33,11 +34,50 @@
         _deviceListFp = [SFIOfflineDataManager filePathForName:DEVICELIST_FILENAME];
         _deviceValueFp = [SFIOfflineDataManager filePathForName:DEVICEVALUE_FILENAME];
         _notificationPreferenceListFp = [SFIOfflineDataManager filePathForName:NOTIFICATION_PREF_FILENAME];
+
+        // ensure data files are excluded from iCloud backup:
+        // add all paths that need to be excluded
+        _markedForBackupExclusionPaths = [NSMutableSet setWithArray:@[
+                self.almondListFp,
+                self.hashFp,
+                self.deviceListFp,
+                self.deviceValueFp,
+                self.notificationPreferenceListFp
+        ]];
+
+        // try to exclude them now if they exist; otherwise, will be excluded on creation
+        for (NSString *path in self.markedForBackupExclusionPaths.copy) {
+            [self markExcludeFileFromBackup:path];
+        }
     }
 
     return self;
 }
 
+- (void)markExcludeFileFromBackup:(NSString*)filePath {
+    if (![self.markedForBackupExclusionPaths containsObject:filePath]) {
+        // fail fast; if already removed from set, no longer need to try excluding
+        return;
+    }
+
+    BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:filePath];
+    if (!exists) {
+        // wait until the file has been created for first time
+        return;
+    }
+
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+
+    NSError *error;
+    BOOL success = [url setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&error];
+    if (success) {
+        [self.markedForBackupExclusionPaths removeObject:filePath];
+        NSLog(@"SFIOfflineDataManager: Marked for backup exclusion: %@", filePath);
+    }
+    else {
+        NSLog(@"SFIOfflineDataManager: Error excluding %@ from backup %@", filePath, error);
+    }
+}
 
 - (void)writeAlmondList:(NSArray *)arrayAlmondList {
     @synchronized (self.syncLocker) {
@@ -45,7 +85,10 @@
 
         NSArray *arAlmondList = [arrayAlmondList copy];
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:arAlmondList toFile:filePath];
-        if (!didWriteSuccessful) {
+        if (didWriteSuccessful) {
+            [self markExcludeFileFromBackup:filePath];
+        }
+        else {
             NSLog(@"Failed to write almond list");
         }
     }
@@ -74,7 +117,10 @@
 
         //Write
         BOOL didWriteSuccessful = [dictHashList writeToFile:filePath atomically:YES];
-        if (!didWriteSuccessful) {
+        if (didWriteSuccessful) {
+            [self markExcludeFileFromBackup:filePath];
+        }
+        else {
             NSLog(@"Failed to write hash list");
         }
     }
@@ -135,8 +181,11 @@
         //Remove current hash from the dictionary
         NSMutableDictionary *mutableDictHashList = [[NSDictionary dictionaryWithContentsOfFile:filePath] mutableCopy];
         [mutableDictHashList removeObjectForKey:strCurrentMAC];
+
         NSDictionary *dictHashList = [mutableDictHashList copy];
         [dictHashList writeToFile:filePath atomically:YES];
+
+        [self markExcludeFileFromBackup:filePath];
     }
 }
 
@@ -154,7 +203,10 @@
         dictDeviceList[strCurrentMAC] = deviceList;
 
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
-        if (!didWriteSuccessful) {
+        if (didWriteSuccessful) {
+            [self markExcludeFileFromBackup:filePath];
+        }
+        else {
             NSLog(@"Faile to write device list");
         }
     }
@@ -184,6 +236,8 @@
 
         [dictDeviceList removeObjectForKey:strCurrentMAC];
         [NSKeyedArchiver archiveRootObject:dictDeviceList toFile:filePath];
+
+        [self markExcludeFileFromBackup:filePath];
     }
 }
 
@@ -202,7 +256,10 @@
         dictDeviceValueList[strCurrentMAC] = deviceValueList;
 
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictDeviceValueList toFile:filePath];
-        if (!didWriteSuccessful) {
+        if (didWriteSuccessful) {
+            [self markExcludeFileFromBackup:filePath];
+        }
+        else {
             NSLog(@"Failed to write device value list");
         }
     }
@@ -231,6 +288,8 @@
 
     [dictDeviceValueList removeObjectForKey:strCurrentMAC];
     [NSKeyedArchiver archiveRootObject:dictDeviceValueList toFile:filePath];
+
+    [self markExcludeFileFromBackup:filePath];
 }
 
 
@@ -247,7 +306,10 @@
         dictNotificationList[strCurrentMAC] = notificationList;
         
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictNotificationList toFile:filePath];
-        if (!didWriteSuccessful) {
+        if (didWriteSuccessful) {
+            [self markExcludeFileFromBackup:filePath];
+        }
+        else {
             NSLog(@"Failed to write notification list");
         }
     }
@@ -281,7 +343,10 @@
         [dictNotificationList removeObjectForKey:strCurrentMAC];
 
         BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictNotificationList toFile:filePath];
-        if (!didWriteSuccessful) {
+        if (didWriteSuccessful) {
+            [self markExcludeFileFromBackup:filePath];
+        }
+        else {
             NSLog(@"Failed to write notification list");
         }
     }
@@ -292,8 +357,14 @@
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = paths[0];
     NSString *filePath = [documentsDirectory stringByAppendingPathComponent:fileName];
+
     NSError *error;
     BOOL success = [fileManager removeItemAtPath:filePath error:&error];
+
+    if (!success) {
+        NSLog(@"Failed to remove file, path:%@, error:%@", filePath, error);
+    }
+
     return success;
 }
 

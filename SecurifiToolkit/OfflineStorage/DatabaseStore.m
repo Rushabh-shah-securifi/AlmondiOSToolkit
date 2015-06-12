@@ -89,10 +89,12 @@ create index notifications_mac on notifications (mac, time);
 }
 
 - (void)setup {
-    NSString *db_path = [self databaseInDocumentsFolderPath:self.dbFilename];
+    NSURL *db_url = [self fileInDocumentsDirectoryPath:self.dbFilename];
+    NSString *db_path = db_url.path;
     BOOL exists = [self fileExists:db_path];
 
     _db = [[ZHDatabase alloc] initWithPath:db_path];
+
 //    exists = NO;
     if (!exists) {
         [self.db execute:@"drop table if exists notifications"];
@@ -114,6 +116,9 @@ create index notifications_mac on notifications (mac, time);
         [self.db execute:@"create table notifications_syncpoints (syncpoint varchar(128) primary key, created double);"];
         [self.db execute:@"create index notifications_syncpoints_created on notifications_syncpoints (created);"];
     }
+
+    // for security reasons, do not allow backups to iCloud
+    [self markExcludeFileFromBackup:db_url];
 
     _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
@@ -268,17 +273,51 @@ create index notifications_mac on notifications (mac, time);
 
 #pragma mark - File system utilities
 
-- (NSString *)databaseInDocumentsFolderPath:(NSString *)aDatabaseFilename {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docsDir = paths[0];
-    NSString *dbPath = [docsDir stringByAppendingPathComponent:aDatabaseFilename];
-    return dbPath;
-}
+//- (NSString *)fileInDocumentsDirectoryPath:(NSString *)aDatabaseFilename {
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//    NSString *docsDir = paths[0];
+//    NSString *dbPath = [docsDir stringByAppendingPathComponent:aDatabaseFilename];
+//    return dbPath;
+//}
 
 - (BOOL)fileExists:(NSString *)filePath {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     return [fileManager fileExistsAtPath:filePath];
 }
+
+- (NSURL *)fileInDocumentsDirectoryPath:(NSString *)filename {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *docsDir = paths[0];
+    NSString *dbPath = [docsDir stringByAppendingPathComponent:filename];
+
+    return [NSURL fileURLWithPath:dbPath];
+//
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//
+//    // store in /Library/Application Support/BUNDLE_IDENTIFIER/
+//    // make sure Application Support folder exists
+//    NSError *error;
+//    NSURL *dir = [fileManager URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:&error];
+//    if (error) {
+//        NSLog(@"DataStore: Could not create application support directory. %@", error);
+//        return nil;
+//    }
+//
+//    return [dir URLByAppendingPathComponent:filename isDirectory:NO];
+}
+
+- (void)markExcludeFileFromBackup:(NSURL*)filePath {
+    NSError *error;
+    BOOL success = [filePath setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&error];
+    if (success) {
+        NSLog(@"DataStore: Marked for backup exclusion: %@", filePath);
+    }
+    else {
+        NSLog(@"DataStore: Error excluding %@ from backup %@", filePath, error);
+    }
+}
+
+#pragma mark - Notifications api
 
 - (NSInteger)storeNotifications:(NSArray *)notifications syncPoint:(NSString *)syncPoint {
     NSInteger count = 0;
