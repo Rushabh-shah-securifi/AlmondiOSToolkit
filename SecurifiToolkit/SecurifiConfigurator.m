@@ -27,6 +27,7 @@
         self.enableCertificateChainValidation = YES;
         self.certificateFileName = CLOUD_CERT_FILENAME; // file must be named "cert.der". But leave off the file extension in the config.
         self.enableNotifications = NO;
+        self.enableNotificationsHomeAwayMode = NO;
         self.enableNotificationsDebugLogging = NO;
         self.enableRouterWirelessControl = YES;
     }
@@ -46,6 +47,7 @@
         copy.enableCertificateChainValidation = self.enableCertificateChainValidation;
         copy.certificateFileName = self.certificateFileName;
         copy.enableNotifications = self.enableNotifications;
+        copy.enableNotificationsHomeAwayMode = self.enableNotificationsHomeAwayMode;
         copy.enableNotificationsDebugLogging = self.enableNotificationsDebugLogging;
         copy.enableRouterWirelessControl = self.enableRouterWirelessControl;
     }
