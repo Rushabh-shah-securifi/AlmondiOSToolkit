@@ -12,7 +12,7 @@
 @interface CloudEndpoint : NSObject <NetworkEndpoint>
 
 @property(nonatomic, readonly) BOOL useProductionHost;
-@property(weak) id <NetworkEndpointDelegate> delegate;
+@property(nonatomic, weak) id <NetworkEndpointDelegate> delegate;
 
 + (instancetype)endpointWithConfig:(SecurifiConfigurator *)config useProductionHost:(BOOL)useProductionHost;
 

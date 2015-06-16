@@ -30,9 +30,9 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 
 @protocol NetworkDelegate
 
-- (void)networkCloudConnectionDidEstablish:(Network *)Network;
+- (void)networkConnectionDidEstablish:(Network *)Network;
 
-- (void)networkCloudConnectionDidClose:(Network *)Network;
+- (void)networkConnectionDidClose:(Network *)Network;
 
 - (void)networkDidReceiveDynamicUpdate:(Network *)Network commandType:(enum CommandType)type;
 

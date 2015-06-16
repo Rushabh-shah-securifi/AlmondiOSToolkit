@@ -11,6 +11,15 @@
 #import "NotificationClearCountResponse.h"
 #import "Network.h"
 
+typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
+    CloudEndpointConnectionStatus_uninitialized = 1,
+    CloudEndpointConnectionStatus_connecting,
+    CloudEndpointConnectionStatus_established,
+    CloudEndpointConnectionStatus_failed,
+    CloudEndpointConnectionStatus_shutting_down,
+    CloudEndpointConnectionStatus_shutdown,
+};
+
 @interface CloudEndpoint () <NSStreamDelegate>
 @property(nonatomic, readonly) NSObject *syncLocker;
 
@@ -22,14 +31,13 @@
 
 @property(nonatomic) SecCertificateRef certificate;
 @property(nonatomic) BOOL certificateTrusted;
+
 @property(nonatomic, readonly) NSMutableData *partialData;
-@property(nonatomic) BOOL networkShutdown;
 @property(nonatomic) BOOL networkUpNoticePosted;
 @property(nonatomic) NSInputStream *inputStream;
 @property(nonatomic) NSOutputStream *outputStream;
-@property(nonatomic) BOOL sendCommandFail;
 
-@property(nonatomic, readonly) SDKConnectionStatus connectionState;
+@property(nonatomic, readonly) enum CloudEndpointConnectionStatus connectionState;
 
 @end
 
@@ -46,10 +54,7 @@
         _config = config;
         _useProductionHost = useProductionHost;
 
-        self.sendCommandFail = NO;
-        self.networkShutdown = NO;
-
-        [self markConnectionState:SDKConnectionStatusUninitialized];
+        [self markConnectionState:CloudEndpointConnectionStatus_uninitialized];
 
         _syncLocker = [NSObject new];
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
@@ -72,7 +77,7 @@
 - (void)connect {
     NSLog(@"Initialzing CloudEndpoint communication");
 
-    [self markConnectionState:SDKConnectionStatusInitializing];
+    [self markConnectionState:CloudEndpointConnectionStatus_connecting];
 
     __strong CloudEndpoint *block_self = self;
 
@@ -130,12 +135,13 @@
 
             DLog(@"Streams open and entering run loop");
 
+            [self markConnectionState:CloudEndpointConnectionStatus_established];
             // Signal to waiting socket writers that the CloudEndpoint is up and then invoke the run loop to pump events
             dispatch_semaphore_signal(block_self.network_established_latch);
-            //
+
             [block_self.delegate networkEndpointDidConnect:block_self];
             //
-            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && !block_self.networkShutdown) {
+            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && block_self.isStreamConnected) {
 //                DLog(@"Streams entered run loop");
             }
 
@@ -144,13 +150,14 @@
 
             DLog(@"Streams exited run loop");
 
+            [self markConnectionState:CloudEndpointConnectionStatus_shutdown];
             [block_self.delegate networkEndpointDidDisconnect:block_self];
         }
         else {
             NSLog(@"Stream already opened");
         }
 
-        block_self.networkShutdown = YES;
+        [self markConnectionState:CloudEndpointConnectionStatus_shutdown];
     });
 
 }
@@ -166,8 +173,7 @@
 
         // Signal shutdown
         //
-        block_self.networkShutdown = YES;
-        [block_self markConnectionState:SDKConnectionStatusShutdown];
+        [block_self markConnectionState:CloudEndpointConnectionStatus_shutting_down];
 
         // Clean up command queue
         //
@@ -233,16 +239,20 @@
 
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
-        if (self.networkShutdown) {
+        if (self.connectionState == CloudEndpointConnectionStatus_shutting_down) {
+            NSLog(@"%@. CloudEndpoint is shutting down.", msg);
+            break;
+        }
+        if (self.connectionState == CloudEndpointConnectionStatus_shutdown) {
             NSLog(@"%@. CloudEndpoint was shutdown.", msg);
             break;
         }
-        if (self.sendCommandFail) {
-            NSLog(@"%@. Failed to send cmd.", msg);
+        if (self.connectionState == CloudEndpointConnectionStatus_failed) {
+            NSLog(@"%@. CloudEndpoint is failed.", msg);
             break;
         }
-        if (self.connectionState == SDKConnectionStatusInitialized) {
-            NSLog(@"%@. Cloud is initialized.", msg);
+        if (self.connectionState == CloudEndpointConnectionStatus_uninitialized) {
+            NSLog(@"%@. CloudEndpoint is uniitialized.", msg);
             break;
         }
 
@@ -266,12 +276,46 @@
 #pragma mark - state
 
 - (BOOL)isStreamConnected {
-    SDKConnectionStatus status = self.connectionState;
-    return (status == SDKConnectionStatusInitialized) || (status == SDKConnectionStatusInitializing);
+    enum CloudEndpointConnectionStatus status = self.connectionState;
+
+    switch (status) {
+        case CloudEndpointConnectionStatus_connecting:
+        case CloudEndpointConnectionStatus_established:
+            return YES;
+
+        case CloudEndpointConnectionStatus_uninitialized:
+        case CloudEndpointConnectionStatus_failed:
+        case CloudEndpointConnectionStatus_shutting_down:
+        case CloudEndpointConnectionStatus_shutdown:
+        default:
+            return NO;
+    }
 }
 
-- (void)markConnectionState:(enum SDKConnectionStatus)status {
+- (void)markConnectionState:(enum CloudEndpointConnectionStatus)status {
     _connectionState = status;
+
+    switch (status) {
+        case CloudEndpointConnectionStatus_uninitialized:
+            NSLog(@"Connection State: uninitialized");
+            break;
+        case CloudEndpointConnectionStatus_connecting:
+            NSLog(@"Connection State: connecting");
+            break;
+        case CloudEndpointConnectionStatus_established:
+            NSLog(@"Connection State: established");
+            break;
+        case CloudEndpointConnectionStatus_failed:
+            NSLog(@"Connection State: failed");
+            break;
+        case CloudEndpointConnectionStatus_shutting_down:
+            NSLog(@"Connection State: shutting_down");
+            break;
+        case CloudEndpointConnectionStatus_shutdown:
+            NSLog(@"Connection State: shutdown");
+            break;
+    }
+
 }
 
 #pragma mark - NSStreamDelegate methods
@@ -309,7 +353,7 @@
         case NSStreamEventHasBytesAvailable:
             if (theStream == self.inputStream) {
                 // Multiple response payloads in one callback is possible
-                while (!self.networkShutdown && [self.inputStream hasBytesAvailable]) {
+                while (self.isStreamConnected && [self.inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
 
                     NSInteger bufferLength = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
@@ -402,8 +446,10 @@
                                     // Tell the world the connection is up and running
                                     [self tryPostNetworkUpNotification];
 
+                                    // Process the request by passing it to the delegate
                                     [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
 
+                                    // Advance the buffer
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location + endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
 
                                     // Regenerate NSRange
@@ -456,7 +502,7 @@
 }
 
 - (void)tryPostNetworkUpNotification {
-    if (self.networkShutdown) {
+    if (self.connectionState != CloudEndpointConnectionStatus_established) {
         return;
     }
     if (!self.networkUpNoticePosted) {
@@ -593,9 +639,9 @@
 #pragma mark - Command submission
 
 - (BOOL)sendCommand:(GenericCommand *)command error:(NSError **)outError {
-    if (self.networkShutdown) {
-        DLog(@"SubmitCommand failed: CloudEndpoint is shutdown");
-        *outError = [self makeError:@"SubmitCommand failed: CloudEndpoint is shutdown"];
+    if (!self.isStreamConnected) {
+        DLog(@"SendCommand failed: CloudEndpoint is not connected");
+        *outError = [self makeError:@"SubmitCommand failed: CloudEndpoint is not connected"];
         return NO;
     }
 
@@ -713,7 +759,7 @@
             NSData *sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
             unsigned int commandLength = (unsigned int) htonl([sendCommandPayload length]);
 
-            DLog(@"@Payload being sent: %@", commandPayload);
+            DLog(@"Sending payload: %@", commandPayload);
 
             NSOutputStream *outputStream = socket.outputStream;
             if (outputStream == nil) {
@@ -771,8 +817,7 @@
             {
                 DLog(@"Socket failure handler invoked");
 
-                socket.sendCommandFail = YES;
-                [socket markConnectionState:SDKConnectionStatusShutdown];
+                [socket markConnectionState:CloudEndpointConnectionStatus_failed];
 
                 *outError = [self makeError:@"Securifi Payload - Send Error"];
 

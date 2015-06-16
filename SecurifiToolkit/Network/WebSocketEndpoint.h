@@ -4,7 +4,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NetworkEndpoint.h"
+
+@protocol NetworkEndpointDelegate;
+@class PSWebSocket;
 
 
-@interface WebSocketEndpoint : NSObject
+@interface WebSocketEndpoint : NSObject <NetworkEndpoint>
+
+@property(nonatomic, weak) id <NetworkEndpointDelegate> delegate;
+
+
 @end

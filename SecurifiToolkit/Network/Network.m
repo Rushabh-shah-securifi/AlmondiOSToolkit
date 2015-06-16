@@ -19,17 +19,12 @@
 
 @property(nonatomic, readonly) dispatch_queue_t initializationQueue;    // serial queue to which network initialization commands submitted to the system are added
 @property(nonatomic, readonly) dispatch_queue_t commandQueue;           // serial queue to which commands submitted to the system are added
-@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;        // queue on which the streams are managed
 @property(nonatomic, readonly) dispatch_queue_t callbackQueue;          // queue used for posting notifications
 @property(nonatomic, readonly) dispatch_queue_t dynamicCallbackQueue;          // queue used for posting notifications
-@property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
 @property(nonatomic, readonly) dispatch_semaphore_t cloud_initialized_latch;
 
-@property(nonatomic) BOOL networkShutdown;
 @property(nonatomic) BOOL networkUpNoticePosted;
-@property(nonatomic) BOOL sendCommandFail;
-
-@property id <NetworkEndpoint> endpoint;
+@property(nonatomic) id <NetworkEndpoint> endpoint;
 
 @end
 
@@ -43,19 +38,15 @@
 - (id)initWithQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue {
     self = [super init];
     if (self) {
-        self.sendCommandFail = NO;
-        self.networkShutdown = NO;
         [self markConnectionState:SDKConnectionStatusUninitialized];
         self.loginStatus = SDKLoginStatusNotLoggedIn;
 
         _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
         _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
 
-        _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
         _callbackQueue = callbackQueue;
         _dynamicCallbackQueue = dynamicCallbackQueue;
 
-        _network_established_latch = dispatch_semaphore_create(0);
         _cloud_initialized_latch = dispatch_semaphore_create(0);
 
         _networkState = [NetworkState new];
@@ -69,72 +60,42 @@
 
     [self markConnectionState:SDKConnectionStatusInitializing];
 
-    __strong Network *block_self = self;
+    if (self.endpoint) {
+        return;
+    }
 
-    dispatch_async(self.backgroundQueue, ^(void) {
-        if (self.endpoint) {
-            return;
-        }
-
-        block_self.endpoint = [CloudEndpoint endpointWithConfig:block_self.config useProductionHost:useProductionCloud];
-        block_self.endpoint.delegate = block_self;
-        [block_self.endpoint connect];
-    });
+    self.endpoint = [CloudEndpoint endpointWithConfig:self.config useProductionHost:useProductionCloud];
+    self.endpoint.delegate = self;
+    [self.endpoint connect];
 }
 
 - (void)shutdown {
     NSLog(@"Shutting down network Network");
 
-    // Take weak reference to prevent retain cycles
-    __weak Network *block_self = self;
+    if (!self.endpoint) {
+        return;
+    }
 
-    dispatch_sync(self.backgroundQueue, ^(void) {
-        if (!self.endpoint) {
-            return;
-        }
+    NSLog(@"[%@] Network is shutting down", self.debugDescription);
 
-        NSLog(@"[%@] Network is shutting down", block_self.debugDescription);
+    // Signal shutdown
+    //
+    [self markConnectionState:SDKConnectionStatusShutdown];
+    [self markLoggedInState:NO];
 
-        // Signal shutdown
-        //
-        block_self.networkShutdown = YES;
-        [block_self markConnectionState:SDKConnectionStatusShutdown];
-        [block_self markLoggedInState:NO];
+    // Clean up command queue
+    //
+    [self tryAbortUnit];
+    dispatch_semaphore_signal(self.cloud_initialized_latch);
 
-        // Clean up command queue
-        //
-        [block_self tryAbortUnit];
-        dispatch_semaphore_signal(block_self.network_established_latch);
-        dispatch_semaphore_signal(block_self.cloud_initialized_latch);
-
-        [block_self.endpoint shutdown];
-        block_self.endpoint = nil;
-    });
+    [self.endpoint shutdown];
+    self.endpoint = nil;
 
     // Tell delegate of shutdown
-    [self.delegate networkCloudConnectionDidClose:self];
+    [self.delegate networkConnectionDidClose:self];
 }
 
 #pragma mark - Semaphores
-
-// Called during command process need to use the output stream. Blocks until the connection is set up or fails.
-// return YES when time out is reached; NO if connection established without timeout
-// On time out, the Network will shut itself down
-- (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
-    dispatch_semaphore_t latch = self.network_established_latch;
-    NSString *msg = @"Giving up on connection establishment";
-
-    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
-    if (self.isStreamConnected) {
-        // If the connection is up by now, no need to worry about the timeout.
-        return NO;
-    }
-    if (timedOut) {
-        NSLog(@"%@. Issuing shutdown on timeout", msg);
-        [self shutdown];
-    }
-    return timedOut;
-}
 
 // Called by commands submitted to the normal command queue that have to wait for the cloud initialization
 // sequence to complete. Like network establishment procedures, this process can time out in which case the
@@ -161,12 +122,8 @@
 
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
-        if (self.networkShutdown) {
+        if (!self.isStreamConnected) {
             NSLog(@"%@. Network was shutdown.", msg);
-            break;
-        }
-        if (self.sendCommandFail) {
-            NSLog(@"%@. Failed to send cmd.", msg);
             break;
         }
         if (self.connectionState == SDKConnectionStatusInitialized) {
@@ -296,6 +253,8 @@
             return;
         }
 
+        [block_self markConnectionState:SDKConnectionStatusInitialized];
+
         dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
         if (latch) {
             NSInteger limit = self.currentUnitCounter;
@@ -322,7 +281,7 @@
     dispatch_queue_t queue = self.commandQueue;
     BOOL waitForInit = YES;
 
-    if (self.networkShutdown) {
+    if (!self.isStreamConnected) {
         return NO;
     }
 
@@ -347,7 +306,7 @@
 // this mechanism allows the initialization logic to be determined by the toolkit as responses are returned.
 // when initializing, the normal command queue blocks on the network_initialized_latch semaphore
 - (BOOL)internalSubmitCommand:(GenericCommand *)command queue:(dispatch_queue_t)queue waitForNetworkInitializedLatch:(BOOL)waitForNetworkInitializedLatch waitAtMostSecs:(int)waitAtMostSecs {
-    if (self.networkShutdown) {
+    if (!self.isStreamConnected) {
         DLog(@"SubmitCommand failed: network is shutdown");
         return NO;
     }
@@ -356,7 +315,7 @@
 
     __weak Network *block_self = self;
     dispatch_async(queue, ^() {
-        if (block_self.networkShutdown) {
+        if (!block_self.isStreamConnected) {
             SLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
@@ -364,7 +323,7 @@
             int const timeOutSecs = 10;
             [block_self waitForCloudInitialization:timeOutSecs];
         }
-        if (block_self.networkShutdown) {
+        if (!block_self.isStreamConnected) {
             SLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
@@ -404,18 +363,18 @@
 }
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
-    if (self.networkShutdown) {
+    if (!self.isStreamConnected) {
         return;
     }
     if (!self.networkUpNoticePosted) {
-        [self.delegate networkCloudConnectionDidEstablish:self];
+        [self.delegate networkConnectionDidEstablish:self];
         self.networkUpNoticePosted = YES;
         [self postData:NETWORK_UP_NOTIFIER data:nil];
     }
 }
 
 - (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint {
-    [self.delegate networkCloudConnectionDidClose:self];
+    [self.delegate networkConnectionDidClose:self];
 }
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(CommandType)commandType {

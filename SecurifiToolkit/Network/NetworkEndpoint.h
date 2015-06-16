@@ -24,7 +24,7 @@
 
 @protocol NetworkEndpoint <NSObject>
 
-@property(weak) id <NetworkEndpointDelegate> delegate;
+@property(nonatomic, weak) id <NetworkEndpointDelegate> delegate;
 
 - (void)connect;
 
