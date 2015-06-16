@@ -39,7 +39,7 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 
 - (void)networkDidSendCommand:(Network *)Network command:(GenericCommand *)command;
 
-- (void)networkDidReceiveCommandResponse:(Network *)Network command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime responseType:(CommandType)type;
+- (void)networkDidReceiveCommandResponse:(Network *)Network command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime responseType:(enum CommandType)type;
 
 @end
 

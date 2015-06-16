@@ -7,7 +7,7 @@
 #import "SecurifiTypes.h"
 
 // A value holder for tracking per-connection session state. This is a helper ensuring that state is always
-// reset when the underlying Network is disposed.
+// reset when the underlying Network is disposed. Every instance of a Network has its own NetworkState.
 @interface NetworkState : NSObject
 
 // Provides a per-connection ledger for tracking Device Hash requests.

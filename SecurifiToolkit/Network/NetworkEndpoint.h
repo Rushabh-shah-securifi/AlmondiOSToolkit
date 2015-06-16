@@ -17,7 +17,7 @@
 
 - (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint;
 
-- (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(CommandType)commandType;
+- (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType;
 
 @end
 
@@ -30,9 +30,9 @@
 
 - (void)shutdown;
 
-// Queues the specified command to the cloud
+// Send the specified command to the cloud
 // Returns YES on successful submission
-// Returns NO on failure to queue
+// Returns NO on failure to send
 - (BOOL)sendCommand:(GenericCommand *)command error:(NSError **)error;
 
 @end

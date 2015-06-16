@@ -388,7 +388,7 @@
     [self.delegate networkConnectionDidClose:self];
 }
 
-- (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(CommandType)commandType {
+- (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
     switch (commandType) {
         case CommandType_LOGIN_RESPONSE: {
             LoginResponse *obj = (LoginResponse *) payload;
