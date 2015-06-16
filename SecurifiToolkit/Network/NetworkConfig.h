@@ -7,8 +7,9 @@
 
 @class SecurifiConfigurator;
 
-
 @interface NetworkConfig : NSObject
+
++ (instancetype)cloudConfig:(SecurifiConfigurator*)configurator useProductionHost:(BOOL)useProductionHost;
 
 @property(nonatomic, copy) NSString *host;
 
@@ -27,7 +28,5 @@
 // Name of the certificate file containing the cert that will be compared with the remote SSL cert, when
 // enableCertificateValidation is YES
 @property(nonatomic, copy) NSString *certificateFileName;
-
-- (void)copyFrom:(SecurifiConfigurator *)configurator;
 
 @end

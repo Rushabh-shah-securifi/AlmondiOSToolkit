@@ -42,15 +42,23 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 }
 
 - (void)connect {
-    // create the NSURLRequest that will be sent as the handshake
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"ws://192.168.1.102:7681/glair"]];
+    if (self.connectionState != WebSocketConnectionStatus_uninitialized) {
+        return;
+    }
+    [self markConnectionState:WebSocketConnectionStatus_connecting];
+
+    NetworkConfig *config = self.config;
+
+    // ws://192.168.1.102:7681/<password>
+    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@", config.host, config.port, config.password];
+    NSURL *url = [NSURL URLWithString:connect_str];
+
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
 
     // create the socket and assign delegate
     self.socket = [PSWebSocket clientSocketWithRequest:request];
     self.socket.delegate = self;
 
-    // open socket
-    [self markConnectionState:WebSocketConnectionStatus_connecting];
     [self.socket open];
 }
 

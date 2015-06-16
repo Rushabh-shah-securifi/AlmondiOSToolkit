@@ -58,7 +58,7 @@
     return self;
 }
 
-- (void)initNetworkCommunication:(BOOL)useProductionCloud {
+- (void)connect {
     NSLog(@"Initialzing network communication");
 
     [self markConnectionState:SDKConnectionStatusInitializing];

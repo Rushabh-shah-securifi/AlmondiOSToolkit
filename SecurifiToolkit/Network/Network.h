@@ -56,7 +56,8 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 // queue on which notifications will be posted
 + (instancetype)networkWithNetworkConfig:(NetworkConfig *)networkConfig callbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;
 
-- (void)initNetworkCommunication:(BOOL)useProductionCloud;
+// Initializes and opens the connection. This method must be called before submitting work.
+- (void)connect;
 
 - (void)shutdown;
 
