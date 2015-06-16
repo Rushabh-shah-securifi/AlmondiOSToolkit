@@ -13,6 +13,7 @@
 #import "NetworkEndpoint.h"
 #import "CloudEndpoint.h"
 #import "NetworkConfig.h"
+#import "WebSocketEndpoint.h"
 
 @interface Network () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
@@ -67,7 +68,14 @@
         return;
     }
 
-    self.endpoint = [CloudEndpoint endpointWithConfig:self.networkConfig];
+    NetworkConfig *config = self.networkConfig;
+    if (config.mode == NetworkEndpointMode_cloud) {
+        self.endpoint = [CloudEndpoint endpointWithConfig:config];
+    }
+    else {
+        self.endpoint = [WebSocketEndpoint endpointWithConfig:config];
+    }
+    
     self.endpoint.delegate = self;
     [self.endpoint connect];
 }

@@ -7,9 +7,18 @@
 
 @class SecurifiConfigurator;
 
+typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
+    NetworkEndpointMode_cloud,
+    NetworkEndpointMode_web_socket,
+};
+
 @interface NetworkConfig : NSObject
 
-+ (instancetype)cloudConfig:(SecurifiConfigurator*)configurator useProductionHost:(BOOL)useProductionHost;
++ (instancetype)cloudConfig:(SecurifiConfigurator *)configurator useProductionHost:(BOOL)useProductionHost;
+
++ (instancetype)configWithMode:(enum NetworkEndpointMode)mode;
+
+@property(readonly) enum NetworkEndpointMode mode;
 
 @property(nonatomic, copy) NSString *host;
 

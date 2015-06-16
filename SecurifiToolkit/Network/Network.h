@@ -49,9 +49,9 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 @property(nonatomic, weak) id <NetworkDelegate> delegate;
 
 @property(nonatomic, readonly) NetworkState *networkState;
-@property(nonatomic, readonly) SDKConnectionStatus connectionState;
+@property(nonatomic, readonly) enum SDKConnectionStatus connectionState;
 @property(nonatomic, readonly) BOOL isStreamConnected;
-@property(nonatomic) SDKLoginStatus loginStatus;
+@property(nonatomic) enum SDKLoginStatus loginStatus;
 
 // queue on which notifications will be posted
 + (instancetype)networkWithNetworkConfig:(NetworkConfig *)networkConfig callbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;

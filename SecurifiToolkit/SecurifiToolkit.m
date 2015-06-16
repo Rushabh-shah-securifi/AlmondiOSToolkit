@@ -287,6 +287,8 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 // ===============================================================================================
 
 @interface SecurifiToolkit () <SFIDeviceLogStoreDelegate, NetworkDelegate>
+@property(atomic) BOOL isShutdown;
+
 @property(nonatomic, readonly) SecurifiConfigurator *config;
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
@@ -298,7 +300,6 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property(nonatomic, strong) Network *cloudNetwork; //todo had to change from weak to strong reference after refactoring... why?
-@property(atomic) BOOL isShutdown;
 
 // a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
 // update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
@@ -1624,7 +1625,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (Network*)localNetworkForAlmond:(NSString*)almondMac {
-    NetworkConfig *config = [NetworkConfig new];
+    NetworkConfig *config = [NetworkConfig configWithMode:NetworkEndpointMode_web_socket];
     config.host = @"192.168.1.102";
     config.port = 7681;
     config.password = @"glair";
