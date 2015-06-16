@@ -10,6 +10,7 @@
 #import "NotificationCountResponse.h"
 #import "NotificationClearCountResponse.h"
 #import "Network.h"
+#import "NetworkConfig.h"
 
 typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
     CloudEndpointConnectionStatus_uninitialized = 1,
@@ -23,7 +24,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 @interface CloudEndpoint () <NSStreamDelegate>
 @property(nonatomic, readonly) NSObject *syncLocker;
 
-@property(nonatomic, readonly) SecurifiConfigurator *config;
+@property(nonatomic, readonly) NetworkConfig *networkConfig;
 
 @property(nonatomic, readonly) dispatch_queue_t backgroundQueue;        // queue on which the streams are managed
 @property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
@@ -44,15 +45,14 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
 @implementation CloudEndpoint
 
-+ (instancetype)endpointWithConfig:(SecurifiConfigurator *)config useProductionHost:(BOOL)useProductionHost {
-    return [[self alloc] initWithConfig:config useProductionHost:useProductionHost];
++ (instancetype)endpointWithConfig:(NetworkConfig *)config {
+    return [[self alloc] initWithConfig:config];
 }
 
-- (instancetype)initWithConfig:(SecurifiConfigurator *)config useProductionHost:(BOOL)useProductionHost {
+- (instancetype)initWithConfig:(NetworkConfig *)config {
     self = [super init];
     if (self) {
-        _config = config;
-        _useProductionHost = useProductionHost;
+        _networkConfig = config;
 
         [self markConnectionState:CloudEndpointConnectionStatus_uninitialized];
 
@@ -85,7 +85,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
         if (block_self.inputStream == nil && block_self.outputStream == nil) {
             [block_self.delegate networkEndpointWillStartConnecting:block_self];
 
-            SecurifiConfigurator *configurator = self.config;
+            NetworkConfig *configurator = self.networkConfig;
 
             // Load certificate
             //
@@ -99,9 +99,9 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
 
-            NSString *server = self.useProductionHost ? configurator.productionCloudHost : configurator.developmentCloudHost;
+            NSString *server = configurator.host;
             CFStringRef host = (__bridge CFStringRef) server;
-            UInt32 port = configurator.cloudPort;
+            UInt32 port = configurator.port;
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
 
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
@@ -474,7 +474,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
         case NSStreamEventHasSpaceAvailable: {
             // Evaluate the SSL connection
-            if (self.config.enableCertificateValidation && !self.certificateTrusted) {
+            if (self.networkConfig.enableCertificateValidation && !self.certificateTrusted) {
                 BOOL trusted = [self isTrustedCertificate:theStream];
                 if (!trusted) {
                     NSLog(@"%s: SSL Cert is not trusted. Issuing shutdown.", __PRETTY_FUNCTION__);
@@ -514,7 +514,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 #pragma mark - SSL certificates
 
 - (void)loadCertificate {
-    NSString *certFileName = self.config.certificateFileName;
+    NSString *certFileName = self.networkConfig.certificateFileName;
     NSString *path = [[NSBundle mainBundle] pathForResource:certFileName ofType:@"der"];
     NSData *certData = [NSData dataWithContentsOfFile:path];
 

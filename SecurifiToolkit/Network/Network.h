@@ -27,6 +27,7 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 @class GenericCommand;
 @class SecurifiConfigurator;
 @class NetworkState;
+@class NetworkConfig;
 
 @protocol NetworkDelegate
 
@@ -52,10 +53,8 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 @property(nonatomic, readonly) BOOL isStreamConnected;
 @property(nonatomic) SDKLoginStatus loginStatus;
 
-@property(nonatomic, copy) SecurifiConfigurator *config;
-
 // queue on which notifications will be posted
-+ (Network *)newNetworkWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;
++ (instancetype)networkWithNetworkConfig:(NetworkConfig *)networkConfig callbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;
 
 - (void)initNetworkCommunication:(BOOL)useProductionCloud;
 

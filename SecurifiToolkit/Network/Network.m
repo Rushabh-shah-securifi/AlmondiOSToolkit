@@ -12,8 +12,11 @@
 #import "NetworkState.h"
 #import "NetworkEndpoint.h"
 #import "CloudEndpoint.h"
+#import "NetworkConfig.h"
 
 @interface Network () <NetworkEndpointDelegate>
+@property(nonatomic, readonly) NetworkConfig *networkConfig;
+
 @property(atomic) NSInteger currentUnitCounter;
 @property(nonatomic) SUnit *currentUnit;
 
@@ -31,24 +34,24 @@
 
 @implementation Network
 
-+ (Network *)newNetworkWithResponseCallbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue {
-    return [[Network alloc] initWithQueue:callbackQueue dynamicCallbackQueue:dynamicCallbackQueue];
++ (instancetype)networkWithNetworkConfig:(NetworkConfig *)networkConfig callbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue {
+    return [[self alloc] initWithNetworkConfig:networkConfig callbackQueue:callbackQueue dynamicCallbackQueue:dynamicCallbackQueue];
 }
 
-- (id)initWithQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue {
+- (instancetype)initWithNetworkConfig:(NetworkConfig *)networkConfig callbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue {
     self = [super init];
     if (self) {
+        _networkConfig = networkConfig;
+        _callbackQueue = callbackQueue;
+        _dynamicCallbackQueue = dynamicCallbackQueue;
+
         [self markConnectionState:SDKConnectionStatusUninitialized];
         self.loginStatus = SDKLoginStatusNotLoggedIn;
 
         _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
-        _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
-
-        _callbackQueue = callbackQueue;
-        _dynamicCallbackQueue = dynamicCallbackQueue;
-
         _cloud_initialized_latch = dispatch_semaphore_create(0);
 
+        _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
         _networkState = [NetworkState new];
     }
 
@@ -64,7 +67,7 @@
         return;
     }
 
-    self.endpoint = [CloudEndpoint endpointWithConfig:self.config useProductionHost:useProductionCloud];
+    self.endpoint = [CloudEndpoint endpointWithConfig:self.networkConfig];
     self.endpoint.delegate = self;
     [self.endpoint connect];
 }

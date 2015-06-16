@@ -7,13 +7,13 @@
 #import "NetworkEndpoint.h"
 
 @class SecurifiConfigurator;
+@class NetworkConfig;
 
 
 @interface CloudEndpoint : NSObject <NetworkEndpoint>
 
-@property(nonatomic, readonly) BOOL useProductionHost;
 @property(nonatomic, weak) id <NetworkEndpointDelegate> delegate;
 
-+ (instancetype)endpointWithConfig:(SecurifiConfigurator *)config useProductionHost:(BOOL)useProductionHost;
++ (instancetype)endpointWithConfig:(NetworkConfig *)config;
 
 @end

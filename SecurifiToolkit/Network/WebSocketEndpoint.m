@@ -6,6 +6,7 @@
 #import "WebSocketEndpoint.h"
 #import "GenericCommand.h"
 #import "PSWebSocket.h"
+#import "NetworkConfig.h"
 
 
 typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
@@ -19,11 +20,26 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
 @property(nonatomic, strong) PSWebSocket *socket;
+@property(nonatomic, strong) NetworkConfig *config;
 @property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
 @property(nonatomic, readonly) enum WebSocketEndpointConnectionStatus connectionState;
 @end
 
 @implementation WebSocketEndpoint
+
++ (instancetype)endpointWithConfig:(NetworkConfig *)config {
+    return [[self alloc] initWithConfig:config];
+}
+
+- (instancetype)initWithConfig:(NetworkConfig *)config {
+    self = [super init];
+    if (self) {
+        self.config = config;
+        [self markConnectionState:WebSocketConnectionStatus_uninitialized];
+    }
+
+    return self;
+}
 
 - (void)connect {
     // create the NSURLRequest that will be sent as the handshake

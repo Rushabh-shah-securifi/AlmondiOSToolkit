@@ -7,12 +7,12 @@
 #import "NetworkEndpoint.h"
 
 @protocol NetworkEndpointDelegate;
-@class PSWebSocket;
-
+@class NetworkConfig;
 
 @interface WebSocketEndpoint : NSObject <NetworkEndpoint>
 
 @property(nonatomic, weak) id <NetworkEndpointDelegate> delegate;
 
++ (instancetype)endpointWithConfig:(NetworkConfig *)config;
 
 @end
