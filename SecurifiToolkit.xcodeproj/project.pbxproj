@@ -49,6 +49,28 @@
 		1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */; };
 		1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C414BEB1A7B625400C448A4 /* NSDate+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */; };
+		1C4382EB1B2FDD5200F6AB7A /* PSWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382D81B2FDD5200F6AB7A /* PSWebSocket.h */; };
+		1C4382EC1B2FDD5200F6AB7A /* PSWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382D91B2FDD5200F6AB7A /* PSWebSocket.m */; };
+		1C4382ED1B2FDD5200F6AB7A /* PSWebSocketBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382DA1B2FDD5200F6AB7A /* PSWebSocketBuffer.h */; };
+		1C4382EE1B2FDD5200F6AB7A /* PSWebSocketBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382DB1B2FDD5200F6AB7A /* PSWebSocketBuffer.m */; };
+		1C4382EF1B2FDD5200F6AB7A /* PSWebSocketDeflater.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382DC1B2FDD5200F6AB7A /* PSWebSocketDeflater.h */; };
+		1C4382F01B2FDD5200F6AB7A /* PSWebSocketDeflater.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382DD1B2FDD5200F6AB7A /* PSWebSocketDeflater.m */; };
+		1C4382F11B2FDD5200F6AB7A /* PSWebSocketDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382DE1B2FDD5200F6AB7A /* PSWebSocketDriver.h */; };
+		1C4382F21B2FDD5200F6AB7A /* PSWebSocketDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382DF1B2FDD5200F6AB7A /* PSWebSocketDriver.m */; };
+		1C4382F31B2FDD5200F6AB7A /* PSWebSocketInflater.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E01B2FDD5200F6AB7A /* PSWebSocketInflater.h */; };
+		1C4382F41B2FDD5200F6AB7A /* PSWebSocketInflater.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E11B2FDD5200F6AB7A /* PSWebSocketInflater.m */; };
+		1C4382F51B2FDD5200F6AB7A /* PSWebSocketInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E21B2FDD5200F6AB7A /* PSWebSocketInternal.h */; };
+		1C4382F61B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E31B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h */; };
+		1C4382F71B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E41B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m */; };
+		1C4382F81B2FDD5200F6AB7A /* PSWebSocketServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E51B2FDD5200F6AB7A /* PSWebSocketServer.h */; };
+		1C4382F91B2FDD5200F6AB7A /* PSWebSocketServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E61B2FDD5200F6AB7A /* PSWebSocketServer.m */; };
+		1C4382FA1B2FDD5200F6AB7A /* PSWebSocketTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E71B2FDD5200F6AB7A /* PSWebSocketTypes.h */; };
+		1C4382FB1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E81B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h */; };
+		1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E91B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m */; };
+		1C4382FE1B2FFA8800F6AB7A /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C4382FD1B2FFA8800F6AB7A /* CFNetwork.framework */; };
+		1C4382FF1B2FFA9400F6AB7A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE15FFAE186844AA00371183 /* Security.framework */; };
+		1C4383011B2FFAA100F6AB7A /* libSystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C4383001B2FFAA100F6AB7A /* libSystem.dylib */; };
+		1C4383031B2FFAAB00F6AB7A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C4383021B2FFAAB00F6AB7A /* libz.dylib */; };
 		1C75820C19B028F70074C601 /* Scoreboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C75820A19B028F70074C601 /* Scoreboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C75820D19B028F70074C601 /* Scoreboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C75820B19B028F70074C601 /* Scoreboard.m */; };
 		1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */; };
@@ -104,6 +126,8 @@
 		1DF038EAE9E89CD9BFFC13C7 /* AlmondVersionChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03FD4D648CEA9DD9511CA /* AlmondVersionChecker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0390759040630E20655FB /* WebSocketEndpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03452206E54610E1F7161 /* WebSocketEndpoint.h */; };
 		1DF03A62EE5637C369154114 /* NetworkEndpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CCE2A1CB575A240FE08 /* NetworkEndpoint.h */; };
+		1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0331795B522861FD989FC /* NetworkConfig.m */; };
+		1DF03B1949689A39B13C7D41 /* NetworkConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03A6156A59D49A942855B /* NetworkConfig.h */; };
 		1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */; };
 		1DF03C118A1C313783C2A754 /* AlmondModeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF031C3F506A877A179EEEE /* AlmondModeResponse.m */; };
 		1DF03C2972842728AC1A7D2A /* CloudEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0314E602EB9928C27AC69 /* CloudEndpoint.m */; };
@@ -325,6 +349,27 @@
 		1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainWrapper.m; sourceTree = "<group>"; };
 		1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Convenience.h"; sourceTree = "<group>"; };
 		1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Convenience.m"; sourceTree = "<group>"; };
+		1C4382D81B2FDD5200F6AB7A /* PSWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocket.h; sourceTree = "<group>"; };
+		1C4382D91B2FDD5200F6AB7A /* PSWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocket.m; sourceTree = "<group>"; };
+		1C4382DA1B2FDD5200F6AB7A /* PSWebSocketBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketBuffer.h; sourceTree = "<group>"; };
+		1C4382DB1B2FDD5200F6AB7A /* PSWebSocketBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketBuffer.m; sourceTree = "<group>"; };
+		1C4382DC1B2FDD5200F6AB7A /* PSWebSocketDeflater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketDeflater.h; sourceTree = "<group>"; };
+		1C4382DD1B2FDD5200F6AB7A /* PSWebSocketDeflater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketDeflater.m; sourceTree = "<group>"; };
+		1C4382DE1B2FDD5200F6AB7A /* PSWebSocketDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketDriver.h; sourceTree = "<group>"; };
+		1C4382DF1B2FDD5200F6AB7A /* PSWebSocketDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketDriver.m; sourceTree = "<group>"; };
+		1C4382E01B2FDD5200F6AB7A /* PSWebSocketInflater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketInflater.h; sourceTree = "<group>"; };
+		1C4382E11B2FDD5200F6AB7A /* PSWebSocketInflater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketInflater.m; sourceTree = "<group>"; };
+		1C4382E21B2FDD5200F6AB7A /* PSWebSocketInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketInternal.h; sourceTree = "<group>"; };
+		1C4382E31B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketNetworkThread.h; sourceTree = "<group>"; };
+		1C4382E41B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketNetworkThread.m; sourceTree = "<group>"; };
+		1C4382E51B2FDD5200F6AB7A /* PSWebSocketServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketServer.h; sourceTree = "<group>"; };
+		1C4382E61B2FDD5200F6AB7A /* PSWebSocketServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketServer.m; sourceTree = "<group>"; };
+		1C4382E71B2FDD5200F6AB7A /* PSWebSocketTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketTypes.h; sourceTree = "<group>"; };
+		1C4382E81B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketUTF8Decoder.h; sourceTree = "<group>"; };
+		1C4382E91B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketUTF8Decoder.m; sourceTree = "<group>"; };
+		1C4382FD1B2FFA8800F6AB7A /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		1C4383001B2FFAA100F6AB7A /* libSystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSystem.dylib; path = usr/lib/libSystem.dylib; sourceTree = SDKROOT; };
+		1C4383021B2FFAAB00F6AB7A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		1C75820A19B028F70074C601 /* Scoreboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scoreboard.h; sourceTree = "<group>"; };
 		1C75820B19B028F70074C601 /* Scoreboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scoreboard.m; sourceTree = "<group>"; };
 		1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationRequest.h; sourceTree = "<group>"; };
@@ -362,6 +407,7 @@
 		1DF031D70C5A2A701F6BF0F5 /* NotificationClearCountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationClearCountRequest.h; sourceTree = "<group>"; };
 		1DF03230F1B32E197753B9B3 /* DatabaseStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatabaseStore.h; sourceTree = "<group>"; };
 		1DF032AE63C201A59489980F /* NotificationStoreImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationStoreImpl.h; sourceTree = "<group>"; };
+		1DF0331795B522861FD989FC /* NetworkConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkConfig.m; sourceTree = "<group>"; };
 		1DF03322D3DC410824316347 /* SFINotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotification.h; sourceTree = "<group>"; };
 		1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiCommand.h; sourceTree = "<group>"; };
 		1DF0340881CA9720996080FA /* AlmondModeChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondModeChangeResponse.h; sourceTree = "<group>"; };
@@ -378,6 +424,7 @@
 		1DF0386BB4B3FAC65DD9B13B /* NotificationCountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCountRequest.h; sourceTree = "<group>"; };
 		1DF03895670DA1C15314D2F8 /* SFINotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFINotification.m; sourceTree = "<group>"; };
 		1DF03A2F5174C8BA97A576D0 /* SFINotificationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotificationStore.h; sourceTree = "<group>"; };
+		1DF03A6156A59D49A942855B /* NetworkConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkConfig.h; sourceTree = "<group>"; };
 		1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCommandRequest.m; sourceTree = "<group>"; };
 		1DF03AF40507D6D74C658843 /* AlmondVersionChecker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondVersionChecker.m; sourceTree = "<group>"; };
 		1DF03B0459C4363665236FA1 /* SFIXmlWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIXmlWriter.m; sourceTree = "<group>"; };
@@ -553,6 +600,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C4383031B2FFAAB00F6AB7A /* libz.dylib in Frameworks */,
+				1C4383011B2FFAA100F6AB7A /* libSystem.dylib in Frameworks */,
+				1C4382FF1B2FFA9400F6AB7A /* Security.framework in Frameworks */,
+				1C4382FE1B2FFA8800F6AB7A /* CFNetwork.framework in Frameworks */,
 				1C414BCB1A79F0AE00C448A4 /* libsqlite3.dylib in Frameworks */,
 				CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */,
 				22A19D941797AC7A003E6148 /* SystemConfiguration.framework in Frameworks */,
@@ -640,6 +691,8 @@
 				1DF03F971B12653B645E7326 /* WebSocketEndpoint.m */,
 				1DF03452206E54610E1F7161 /* WebSocketEndpoint.h */,
 				1DF03CCE2A1CB575A240FE08 /* NetworkEndpoint.h */,
+				1DF0331795B522861FD989FC /* NetworkConfig.m */,
+				1DF03A6156A59D49A942855B /* NetworkConfig.h */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -660,6 +713,31 @@
 				1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */,
 			);
 			path = AppKit;
+			sourceTree = "<group>";
+		};
+		1C4382D61B2FDD5200F6AB7A /* PocketSocket */ = {
+			isa = PBXGroup;
+			children = (
+				1C4382D81B2FDD5200F6AB7A /* PSWebSocket.h */,
+				1C4382D91B2FDD5200F6AB7A /* PSWebSocket.m */,
+				1C4382DA1B2FDD5200F6AB7A /* PSWebSocketBuffer.h */,
+				1C4382DB1B2FDD5200F6AB7A /* PSWebSocketBuffer.m */,
+				1C4382DC1B2FDD5200F6AB7A /* PSWebSocketDeflater.h */,
+				1C4382DD1B2FDD5200F6AB7A /* PSWebSocketDeflater.m */,
+				1C4382DE1B2FDD5200F6AB7A /* PSWebSocketDriver.h */,
+				1C4382DF1B2FDD5200F6AB7A /* PSWebSocketDriver.m */,
+				1C4382E01B2FDD5200F6AB7A /* PSWebSocketInflater.h */,
+				1C4382E11B2FDD5200F6AB7A /* PSWebSocketInflater.m */,
+				1C4382E21B2FDD5200F6AB7A /* PSWebSocketInternal.h */,
+				1C4382E31B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h */,
+				1C4382E41B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m */,
+				1C4382E51B2FDD5200F6AB7A /* PSWebSocketServer.h */,
+				1C4382E61B2FDD5200F6AB7A /* PSWebSocketServer.m */,
+				1C4382E71B2FDD5200F6AB7A /* PSWebSocketTypes.h */,
+				1C4382E81B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h */,
+				1C4382E91B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m */,
+			);
+			path = PocketSocket;
 			sourceTree = "<group>";
 		};
 		1C75820919B028F70074C601 /* Stats */ = {
@@ -770,6 +848,9 @@
 		221185BC178D371200EE23ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1C4383021B2FFAAB00F6AB7A /* libz.dylib */,
+				1C4383001B2FFAA100F6AB7A /* libSystem.dylib */,
+				1C4382FD1B2FFA8800F6AB7A /* CFNetwork.framework */,
 				1C414BCA1A79F0AE00C448A4 /* libsqlite3.dylib */,
 				CE15FFAE186844AA00371183 /* Security.framework */,
 				22A76D51179180AE0099CD8F /* libxml2.dylib */,
@@ -794,6 +875,7 @@
 				1CD1D5331A660B7A00C030E9 /* Notifications */,
 				1C414BCF1A79F2BE00C448A4 /* OfflineStorage */,
 				22A76D2517912B830099CD8F /* parser */,
+				1C4382D61B2FDD5200F6AB7A /* PocketSocket */,
 				22A76D2417912B6E0099CD8F /* public */,
 				221185C0178D371200EE23ED /* Supporting Files */,
 				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
@@ -1024,6 +1106,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C4382ED1B2FDD5200F6AB7A /* PSWebSocketBuffer.h in Headers */,
 				1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */,
 				1C414BDE1A79F35D00C448A4 /* SingleTon.h in Headers */,
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
@@ -1051,6 +1134,7 @@
 				1CFBB54F1A257D1900438B5F /* SecurifiConfigurator.h in Headers */,
 				1CD1D5541A660B7A00C030E9 /* NotificationRegistration.h in Headers */,
 				22B326CF1796D447004B3642 /* SanityResponse.h in Headers */,
+				1C4382F61B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h in Headers */,
 				CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */,
 				22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */,
 				22A76D4D179136B80099CD8F /* CommandParser.h in Headers */,
@@ -1063,6 +1147,7 @@
 				CE5EB5CA17E722BD00985636 /* AlmondListResponse.h in Headers */,
 				CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */,
 				CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */,
+				1C4382EF1B2FDD5200F6AB7A /* PSWebSocketDeflater.h in Headers */,
 				CE2EA27119D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h in Headers */,
 				1C414BC81A79F02600C448A4 /* ZHDatabaseStatement.h in Headers */,
 				1CD1D5581A660B7A00C030E9 /* SFINotificationDevice.h in Headers */,
@@ -1095,6 +1180,7 @@
 				CE2EA24D19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
 				1CD1D5561A660B7A00C030E9 /* NotificationRegistrationResponse.h in Headers */,
+				1C4382FA1B2FDD5200F6AB7A /* PSWebSocketTypes.h in Headers */,
 				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
 				1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */,
@@ -1113,6 +1199,7 @@
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
+				1C4382F31B2FDD5200F6AB7A /* PSWebSocketInflater.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
@@ -1120,9 +1207,11 @@
 				1C3270E61A243B28007202C1 /* SFIWirelessSetting.h in Headers */,
 				1C414BC61A79F02600C448A4 /* ZHDatabase.h in Headers */,
 				1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */,
+				1C4382EB1B2FDD5200F6AB7A /* PSWebSocket.h in Headers */,
 				1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */,
 				1DF03ED7951D970D55780A5B /* SFIXmlWriter.h in Headers */,
 				1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */,
+				1C4382F81B2FDD5200F6AB7A /* PSWebSocketServer.h in Headers */,
 				1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */,
 				1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */,
 				1DF03C9FE842023F0F9D0202 /* SFINotificationStore.h in Headers */,
@@ -1136,14 +1225,18 @@
 				1DF037D75654FB77C8A4DFA3 /* NotificationListRequest.h in Headers */,
 				1DF036CF40181B113E42E1D3 /* NotificationCountRequest.h in Headers */,
 				1DF035420555D20D2F38BC1A /* NotificationCountResponse.h in Headers */,
+				1C4382F51B2FDD5200F6AB7A /* PSWebSocketInternal.h in Headers */,
 				1DF0358CCF266F1666C24215 /* NotificationClearCountRequest.h in Headers */,
+				1C4382F11B2FDD5200F6AB7A /* PSWebSocketDriver.h in Headers */,
 				1DF0371747228122D3121E75 /* NotificationClearCountResponse.h in Headers */,
 				1DF038EAE9E89CD9BFFC13C7 /* AlmondVersionChecker.h in Headers */,
+				1C4382FB1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h in Headers */,
 				1DF03E9C2661E5E178DFE76F /* Network.h in Headers */,
 				1DF035141737DE9D6C0BC6FC /* NetworkState.h in Headers */,
 				1DF03C5F6E30C7B1DA112AFE /* CloudEndpoint.h in Headers */,
 				1DF0390759040630E20655FB /* WebSocketEndpoint.h in Headers */,
 				1DF03A62EE5637C369154114 /* NetworkEndpoint.h in Headers */,
+				1DF03B1949689A39B13C7D41 /* NetworkConfig.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1194,9 +1287,10 @@
 		221185B2178D371100EE23ED /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = "";
 				LastTestingUpgradeCheck = 0610;
 				LastUpgradeCheck = 0510;
-				ORGANIZATIONNAME = "Nirav Uchat";
+				ORGANIZATIONNAME = "Securifi Ltd";
 			};
 			buildConfigurationList = 221185B5178D371100EE23ED /* Build configuration list for PBXProject "SecurifiToolkit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1302,8 +1396,11 @@
 				CE5EB65717EAD44E00985636 /* SFIDeviceValue.m in Sources */,
 				CE9A2917188D30270063D562 /* SensorChangeResponse.m in Sources */,
 				CE466A601823CFF900E55DF9 /* ResetPasswordRequest.m in Sources */,
+				1C4382EE1B2FDD5200F6AB7A /* PSWebSocketBuffer.m in Sources */,
 				1CD1D55B1A660B7A00C030E9 /* SFINotificationUser.m in Sources */,
 				1CD1D54F1A660B7A00C030E9 /* NotificationPreferenceListResponse.m in Sources */,
+				1C4382F71B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m in Sources */,
+				1C4382F91B2FDD5200F6AB7A /* PSWebSocketServer.m in Sources */,
 				1CD1D5531A660B7A00C030E9 /* NotificationPreferences.m in Sources */,
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
 				22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */,
@@ -1318,9 +1415,11 @@
 				1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
+				1C4382F41B2FDD5200F6AB7A /* PSWebSocketInflater.m in Sources */,
 				CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */,
 				1CFBB5501A257D1900438B5F /* SecurifiConfigurator.m in Sources */,
 				CE5EB63E17E8548500985636 /* DeviceDataHashRequest.m in Sources */,
+				1C4382F01B2FDD5200F6AB7A /* PSWebSocketDeflater.m in Sources */,
 				CE5EB5CB17E722BD00985636 /* AlmondListResponse.m in Sources */,
 				22A76D4A1791347D0099CD8F /* AffiliationUserComplete.m in Sources */,
 				CE5EB63A17E852E500985636 /* SFIDevice.m in Sources */,
@@ -1335,10 +1434,12 @@
 				2204C20F1794349400B05F17 /* GenericCommand.m in Sources */,
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
 				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
+				1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */,
 				22011C9F179543E80019D5A4 /* Login.m in Sources */,
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
 				1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */,
+				1C4382EC1B2FDD5200F6AB7A /* PSWebSocket.m in Sources */,
 				CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */,
 				CE2EA25219D00B3E00C6D6A8 /* UserInviteRequest.m in Sources */,
 				CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */,
@@ -1375,6 +1476,7 @@
 				22FAE88917A8E528002FFEE8 /* Signup.m in Sources */,
 				1CD1D5511A660B7A00C030E9 /* NotificationPreferenceResponse.m in Sources */,
 				CE5EB64F17EAD41F00985636 /* DeviceValueRequest.m in Sources */,
+				1C4382F21B2FDD5200F6AB7A /* PSWebSocketDriver.m in Sources */,
 				CE2EA26A19D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m in Sources */,
 				22FE9B8017AA331300B53869 /* Logout.m in Sources */,
 				CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */,
@@ -1402,6 +1504,7 @@
 				1DF0334B41969F41A2277D18 /* NetworkState.m in Sources */,
 				1DF03C2972842728AC1A7D2A /* CloudEndpoint.m in Sources */,
 				1DF03711937B3B810AAE5178 /* WebSocketEndpoint.m in Sources */,
+				1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
