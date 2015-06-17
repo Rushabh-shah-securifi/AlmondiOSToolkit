@@ -10,15 +10,15 @@
 
 @interface SFIAlmondPlus : NSObject <NSCoding, NSCopying>
 
-@property(nonatomic) NSString *almondplusMAC;
-@property(nonatomic) NSString *almondplusName;
+@property(nonatomic, copy) NSString *almondplusMAC;
+@property(nonatomic, copy) NSString *almondplusName;
 @property(nonatomic) int index;
 @property(nonatomic) int colorCodeIndex;
 
 @property(nonatomic) int userCount;
 @property(nonatomic) NSMutableArray *accessEmailIDs;
 @property(nonatomic) BOOL isExpanded;
-@property(nonatomic) NSString *ownerEmailID;
+@property(nonatomic, copy) NSString *ownerEmailID;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
@@ -29,8 +29,8 @@
 - (id)copyWithZone:(NSZone *)zone;
 
 // indicates whether the Almond router supports the "send logs to the cloud" functionality
-- (BOOL)supportsSendLogs:(NSString*)almondVersion;
+- (BOOL)supportsSendLogs:(NSString *)almondVersion;
 
-- (BOOL)isEqualAlmondPlus:(SFIAlmondPlus*)other;
+- (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other;
 
 @end

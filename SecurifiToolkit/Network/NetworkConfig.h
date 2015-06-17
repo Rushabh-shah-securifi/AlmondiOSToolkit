@@ -14,8 +14,10 @@ typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
 
 @interface NetworkConfig : NSObject
 
+// Factory for making a Network configuration based on the main configurator settings
 + (instancetype)cloudConfig:(SecurifiConfigurator *)configurator useProductionHost:(BOOL)useProductionHost;
 
+// Factory for making a Web Socket config (set host, port, and password values individually)
 + (instancetype)configWithMode:(enum NetworkEndpointMode)mode;
 
 @property(readonly) enum NetworkEndpointMode mode;
