@@ -9,32 +9,37 @@
 #import <Foundation/Foundation.h>
 
 @class SFIAlmondPlus;
+@class SFIAlmondLocalNetworkSettings;
 
 @interface SFIOfflineDataManager : NSObject
 
-- (void)writeAlmondList:(NSArray *)arrayAlmondList;
+- (void)writeAlmondList:(NSArray *)almondList;
 
 - (NSArray *)readAlmondList;
 
-- (void)writeHashList:(NSString *)strHashValue currentMAC:(NSString *)strCurrentMAC;
+- (void)writeHashList:(NSString *)almondHashValue almondMac:(NSString *)almondMac;
 
-- (NSString *)readHashList:(NSString *)strCurrentMAC;
+- (NSString *)readHashList:(NSString *)almondMac;
 
-- (void)writeDeviceList:(NSArray *)deviceList currentMAC:(NSString *)strCurrentMAC;
+- (void)writeDeviceList:(NSArray *)deviceList almondMac:(NSString *)almondMac;
 
-- (NSArray *)readDeviceList:(NSString *)strCurrentMAC;
+- (NSArray *)readDeviceList:(NSString *)almondMac;
 
-- (void)writeDeviceValueList:(NSArray *)deviceValueList currentMAC:(NSString *)strCurrentMAC;
+- (void)writeDeviceValueList:(NSArray *)deviceValueList almondMac:(NSString *)almondMac;
 
-- (NSArray *)readDeviceValueList:(NSString *)strCurrentMAC;
+- (NSArray *)readDeviceValueList:(NSString *)almondMac;
 
-- (void)writeNotificationPreferenceList:(NSArray *)notificationList currentMAC:(NSString *)strCurrentMAC;
+- (void)writeNotificationPreferenceList:(NSArray *)notificationList almondMac:(NSString *)almondMac;
 
-- (NSArray *)readNotificationPreferenceList:(NSString *)strCurrentMAC;
+- (NSArray *)readNotificationPreferenceList:(NSString *)almondMac;
+
+- (void)writeAlmondLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
+
+- (SFIAlmondLocalNetworkSettings *)readALmondLocalNetworkSettings:(NSString *)almondMac;
 
 - (void)purgeAll;
 
 // removes the specified Almond and returns the new Almond List
-- (NSArray*)deleteAlmond:(SFIAlmondPlus*)almond;
+- (NSArray *)deleteAlmond:(SFIAlmondPlus *)almond;
 
 @end

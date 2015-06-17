@@ -11,22 +11,6 @@
 
 #import <SecurifiToolkit/Base64.h>
 
-
-//PY: ec2-50-16-22-86.compute-1.amazonaws.com
-//AD: "ec2-54-226-113-110.compute-1.amazonaws.com"
-//NU: ec2-54-226-114-39.compute-1.amazonaws.com
-//ec2-54-224-16-165.compute-1.amazonaws.com
-
-//#define CLOUD_SERVER  @"ec2-54-226-114-39.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"nodeLB-1553508487.us-east-1.elb.amazonaws.com"
-//#define CLOUD_SERVER  @"ec2-54-226-113-110.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"ec2-54-205-177-169.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"ec2-54-242-74-175.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"ec2-54-226-236-86.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"ec2-54-80-216-255.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"nodeLB-1553508487.us-east-1.elb.amazonaws.com"
-//#define CLOUD_SERVER  @"ec2-54-226-236-86.compute-1.amazonaws.com"
-//#define CLOUD_SERVER  @"ec2-54-227-49-52.compute-1.amazonaws.com"
 //Notifiers
 
 #define NETWORK_CONNECTING_NOTIFIER         @"NETWORK_CONNECTING_NOTIFIER"
@@ -82,12 +66,6 @@
 #define NOTIFICATION_COUNT_RESPONSE_NOTIFIER                @"NOTIFICATION_COUNT_RESPONSE_NOTIFIER"
 #define NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER          @"NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER"
 #define DEVICELOG_LIST_SYNC_RESPONSE_NOTIFIER               @"DEVICELOG_LIST_SYNC_RESPONSE_NOTIFIER"
-
-#define ALMONDLIST_FILENAME @"almondlist"
-#define HASH_FILENAME @"hashlist"
-#define DEVICELIST_FILENAME  @"devicelist"
-#define DEVICEVALUE_FILENAME @"devicevalue"
-#define NOTIFICATION_PREF_FILENAME @"notificationpreference"
 
 #define LOG_FILE_NAME  @"AlmondPlusLog.log"
 #define SDK_LOG_FILE_NAME  @"AlmondPlusSDKLog.log"
