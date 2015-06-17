@@ -7,6 +7,8 @@
 #import "GenericCommand.h"
 #import "PSWebSocket.h"
 #import "NetworkConfig.h"
+#import "DeviceListResponse.h"
+#import "AlmondPlusSDKConstants.h"
 
 
 typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
@@ -35,6 +37,7 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     self = [super init];
     if (self) {
         self.config = config;
+        _network_established_latch = dispatch_semaphore_create(0);
         [self markConnectionState:WebSocketConnectionStatus_uninitialized];
     }
 
@@ -59,6 +62,7 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     self.socket = [PSWebSocket clientSocketWithRequest:request];
     self.socket.delegate = self;
 
+    NSLog(@"The websocket will open");
     [self.socket open];
 }
 
@@ -67,7 +71,7 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     [self.socket close];
 }
 
-- (BOOL)sendCommand:(GenericCommand *)command error:(NSError **)outError {
+- (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
     switch (self.connectionState) {
         case WebSocketConnectionStatus_uninitialized:
             *outError = [self makeError:@"Wrong Connection state: uninitialized"];
@@ -87,12 +91,17 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
             break;
     }
 
-    if (![self waitForConnectionEstablishment:2]) {
-        *outError = [self makeError:@"Timed out waiting for connection establishment"];
+    if ([self waitForConnectionEstablishment:2]) {
+        *outError = [self makeError:@"WebSocket: Timed out waiting for connection establishment"];
         return NO;
     }
 
-    [self.socket send:command];
+    NSData *data = obj.command;
+    NSString *json =  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+    [self.socket send:json];
+    NSLog(@"Websocket send: %@", json);
+
     return YES;
 }
 
@@ -108,10 +117,10 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 // On time out, the WebSocket will shut itself down
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.network_established_latch;
-    NSString *msg = @"Giving up on connection establishment";
+    NSString *msg = @"WebSocket: Giving up on connection establishment";
 
     BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
-    if (self.isStreamConnected) {
+    if (self.connectionState == WebSocketConnectionStatus_established) {
         // If the connection is up by now, no need to worry about the timeout.
         return NO;
     }
@@ -195,26 +204,53 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     [self markConnectionState:WebSocketConnectionStatus_established];
     dispatch_semaphore_signal(self.network_established_latch);
     [self.delegate networkEndpointDidConnect:self];
+    NSLog(@"The websocket did open");
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
     NSLog(@"The websocket received a message: %@", message);
+
+    NSString *str = message;
+    NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
+
+    NSError *error;
+    id obj = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+    if (error) {
+        NSLog(@"Error decoding websocket message: %@", error);
+        return;
+    }
+
+    NSDictionary *payload = obj;
+    NSString *commandType = payload[@"commandtype"];
+
+    if ([commandType isEqualToString:@"setdeviceindex"]) {
+
+    }
+    else
+    if ([commandType isEqualToString:@"devicelist"]) {
+        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        NSString *mii = payload[@"mii"];
+        NSRange range = [mii rangeOfString:@":"];
+        res.almondMAC = [mii substringToIndex:range.location];
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+    }
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
     [self markConnectionState:WebSocketConnectionStatus_failed];
     dispatch_semaphore_signal(self.network_established_latch);
     [self.delegate networkEndpointDidDisconnect:self];
+    NSLog(@"The websocket did fial with error: %@", error.description);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
-    NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
-
     enum WebSocketEndpointConnectionStatus status = wasClean ? WebSocketConnectionStatus_shutdown : WebSocketConnectionStatus_failed;
     [self markConnectionState:status];
 
     dispatch_semaphore_signal(self.network_established_latch);
     [self.delegate networkEndpointDidDisconnect:self];
+
+    NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
 }
 
 @end
