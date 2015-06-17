@@ -9,6 +9,7 @@
 #import "NetworkConfig.h"
 #import "DeviceListResponse.h"
 #import "AlmondPlusSDKConstants.h"
+#import "DeviceValueResponse.h"
 
 
 typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
@@ -91,10 +92,10 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
             break;
     }
 
-    if ([self waitForConnectionEstablishment:2]) {
-        *outError = [self makeError:@"WebSocket: Timed out waiting for connection establishment"];
-        return NO;
-    }
+//    if ([self waitForConnectionEstablishment:2]) {
+//        *outError = [self makeError:@"WebSocket: Timed out waiting for connection establishment"];
+//        return NO;
+//    }
 
     NSData *data = obj.command;
     NSString *json =  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -177,23 +178,6 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 
 #pragma mark - State
 
-- (BOOL)isStreamConnected {
-    enum WebSocketEndpointConnectionStatus status = self.connectionState;
-
-    switch (status) {
-        case WebSocketConnectionStatus_connecting:
-        case WebSocketConnectionStatus_established:
-            return YES;
-
-        case WebSocketConnectionStatus_uninitialized:
-        case WebSocketConnectionStatus_failed:
-        case WebSocketConnectionStatus_shutting_down:
-        case WebSocketConnectionStatus_shutdown:
-        default:
-            return NO;
-    }
-}
-
 - (void)markConnectionState:(enum WebSocketEndpointConnectionStatus)status {
     _connectionState = status;
 }
@@ -223,8 +207,10 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     NSDictionary *payload = obj;
     NSString *commandType = payload[@"commandtype"];
 
-    if ([commandType isEqualToString:@"setdeviceindex"]) {
-
+    if ([commandType isEqualToString:@"SensorUpdate"]) {
+        DeviceValueResponse *res = [DeviceValueResponse parseJson:payload];
+        res.almondMAC = nil; //todo hack for now: signal that the local network almond should be used
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DYNAMIC_DEVICE_VALUE_LIST];
     }
     else
     if ([commandType isEqualToString:@"devicelist"]) {
@@ -240,7 +226,7 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     [self markConnectionState:WebSocketConnectionStatus_failed];
     dispatch_semaphore_signal(self.network_established_latch);
     [self.delegate networkEndpointDidDisconnect:self];
-    NSLog(@"The websocket did fial with error: %@", error.description);
+    NSLog(@"The websocket did fail with error: %@", error.description);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
