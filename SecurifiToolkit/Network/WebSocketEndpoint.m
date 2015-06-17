@@ -8,7 +8,6 @@
 #import "PSWebSocket.h"
 #import "NetworkConfig.h"
 #import "DeviceListResponse.h"
-#import "AlmondPlusSDKConstants.h"
 #import "DeviceValueResponse.h"
 
 
@@ -24,7 +23,6 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
 @property(nonatomic, strong) PSWebSocket *socket;
 @property(nonatomic, strong) NetworkConfig *config;
-@property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
 @property(nonatomic, readonly) enum WebSocketEndpointConnectionStatus connectionState;
 @end
 
@@ -38,7 +36,6 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     self = [super init];
     if (self) {
         self.config = config;
-        _network_established_latch = dispatch_semaphore_create(0);
         [self markConnectionState:WebSocketConnectionStatus_uninitialized];
     }
 
@@ -92,13 +89,8 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
             break;
     }
 
-//    if ([self waitForConnectionEstablishment:2]) {
-//        *outError = [self makeError:@"WebSocket: Timed out waiting for connection establishment"];
-//        return NO;
-//    }
-
     NSData *data = obj.command;
-    NSString *json =  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
     [self.socket send:json];
     NSLog(@"Websocket send: %@", json);
@@ -111,71 +103,6 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     return [NSError errorWithDomain:@"WebSocket" code:201 userInfo:details];
 }
 
-#pragma mark - Semaphores
-
-// Called during command process need to use the output stream. Blocks until the connection is set up or fails.
-// return YES when time out is reached; NO if connection established without timeout
-// On time out, the WebSocket will shut itself down
-- (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
-    dispatch_semaphore_t latch = self.network_established_latch;
-    NSString *msg = @"WebSocket: Giving up on connection establishment";
-
-    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
-    if (self.connectionState == WebSocketConnectionStatus_established) {
-        // If the connection is up by now, no need to worry about the timeout.
-        return NO;
-    }
-    if (timedOut) {
-        NSLog(@"%@. Issuing shutdown on timeout", msg);
-        [self shutdown];
-    }
-    return timedOut;
-}
-
-// Waits up to the specified number of seconds for the semaphore to be signalled.
-// Returns YES on timeout waiting on the latch.
-// Returns NO when the signal has been received before the timeout.
-- (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString *)msg {
-    dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
-
-    BOOL timedOut = NO;
-
-    dispatch_time_t blockingSleepSecondsIfNotDone;
-    do {
-        if (self.connectionState == WebSocketConnectionStatus_uninitialized) {
-            NSLog(@"%@. WebSocket is uniitialized.", msg);
-            break;
-        }
-        if (self.connectionState == WebSocketConnectionStatus_shutting_down) {
-            NSLog(@"%@. WebSocket is shutting down.", msg);
-            break;
-        }
-        if (self.connectionState == WebSocketConnectionStatus_shutdown) {
-            NSLog(@"%@. WebSocket was shutdown.", msg);
-            break;
-        }
-        if (self.connectionState == WebSocketConnectionStatus_failed) {
-            NSLog(@"%@. WebSocket is failed.", msg);
-            break;
-        }
-
-        const int waitMs = 5;
-        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, waitMs * NSEC_PER_MSEC);
-
-        timedOut = blockingSleepSecondsIfNotDone > max_time;
-        if (timedOut) {
-            NSLog(@"%@. Timeout reached.", msg);
-            break;
-        }
-    }
-    while (0 != dispatch_semaphore_wait(latch, blockingSleepSecondsIfNotDone));
-
-    // make sure...
-    dispatch_semaphore_signal(latch);
-
-    return timedOut;
-}
-
 #pragma mark - State
 
 - (void)markConnectionState:(enum WebSocketEndpointConnectionStatus)status {
@@ -186,7 +113,6 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     [self markConnectionState:WebSocketConnectionStatus_established];
-    dispatch_semaphore_signal(self.network_established_latch);
     [self.delegate networkEndpointDidConnect:self];
     NSLog(@"The websocket did open");
 }
@@ -212,8 +138,7 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
         res.almondMAC = nil; //todo hack for now: signal that the local network almond should be used
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DYNAMIC_DEVICE_VALUE_LIST];
     }
-    else
-    if ([commandType isEqualToString:@"devicelist"]) {
+    else if ([commandType isEqualToString:@"devicelist"]) {
         DeviceListResponse *res = [DeviceListResponse parseJson:payload];
         NSString *mii = payload[@"mii"];
         NSRange range = [mii rangeOfString:@":"];
@@ -224,7 +149,6 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
     [self markConnectionState:WebSocketConnectionStatus_failed];
-    dispatch_semaphore_signal(self.network_established_latch);
     [self.delegate networkEndpointDidDisconnect:self];
     NSLog(@"The websocket did fail with error: %@", error.description);
 }
@@ -233,7 +157,6 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     enum WebSocketEndpointConnectionStatus status = wasClean ? WebSocketConnectionStatus_shutdown : WebSocketConnectionStatus_failed;
     [self markConnectionState:status];
 
-    dispatch_semaphore_signal(self.network_established_latch);
     [self.delegate networkEndpointDidDisconnect:self];
 
     NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
