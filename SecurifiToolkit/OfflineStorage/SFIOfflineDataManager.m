@@ -207,7 +207,11 @@
 
 - (NSArray *)readListFromFilePath:(NSString *)filePath locker:(NSObject *)locker {
     @synchronized (locker) {
-        return [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        NSArray *ls = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        if (ls == nil) {
+            ls = [NSArray array]; // no null pointers allowed
+        }
+        return ls;
     }
 }
 
@@ -307,6 +311,10 @@
     NSString *documentsDirectory = paths[0];
     NSString *filePath = [documentsDirectory stringByAppendingPathComponent:fileName];
 
+    if (![fileManager fileExistsAtPath:filePath]) {
+        return YES;
+    }
+    
     NSError *error;
     BOOL success = [fileManager removeItemAtPath:filePath error:&error];
 
