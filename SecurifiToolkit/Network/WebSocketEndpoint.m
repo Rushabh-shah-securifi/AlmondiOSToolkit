@@ -11,19 +11,9 @@
 #import "DeviceValueResponse.h"
 
 
-typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
-    WebSocketConnectionStatus_uninitialized = 1,
-    WebSocketConnectionStatus_connecting,
-    WebSocketConnectionStatus_established,
-    WebSocketConnectionStatus_failed,
-    WebSocketConnectionStatus_shutting_down,
-    WebSocketConnectionStatus_shutdown,
-};
-
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
 @property(nonatomic, strong) PSWebSocket *socket;
 @property(nonatomic, strong) NetworkConfig *config;
-@property(nonatomic, readonly) enum WebSocketEndpointConnectionStatus connectionState;
 @end
 
 @implementation WebSocketEndpoint
@@ -36,18 +26,12 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     self = [super init];
     if (self) {
         self.config = config;
-        [self markConnectionState:WebSocketConnectionStatus_uninitialized];
     }
 
     return self;
 }
 
 - (void)connect {
-    if (self.connectionState != WebSocketConnectionStatus_uninitialized) {
-        return;
-    }
-    [self markConnectionState:WebSocketConnectionStatus_connecting];
-
     NetworkConfig *config = self.config;
 
     // ws://192.168.1.102:7681/<password>
@@ -65,30 +49,10 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 }
 
 - (void)shutdown {
-    [self markConnectionState:WebSocketConnectionStatus_shutting_down];
     [self.socket close];
 }
 
 - (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
-    switch (self.connectionState) {
-        case WebSocketConnectionStatus_uninitialized:
-            *outError = [self makeError:@"Wrong Connection state: uninitialized"];
-            return NO;
-        case WebSocketConnectionStatus_failed:
-            *outError = [self makeError:@"Wrong Connection state: failed"];
-            return NO;
-        case WebSocketConnectionStatus_shutting_down:
-            *outError = [self makeError:@"Wrong Connection state: shutting_down"];
-            return NO;
-        case WebSocketConnectionStatus_shutdown:
-            *outError = [self makeError:@"Wrong Connection state: shutdown"];
-            return NO;
-
-        case WebSocketConnectionStatus_connecting:
-        case WebSocketConnectionStatus_established:
-            break;
-    }
-
     NSData *data = obj.command;
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
@@ -98,21 +62,9 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
     return YES;
 }
 
-- (NSError *)makeError:(NSString *)description {
-    NSDictionary *details = @{NSLocalizedDescriptionKey : description};
-    return [NSError errorWithDomain:@"WebSocket" code:201 userInfo:details];
-}
-
-#pragma mark - State
-
-- (void)markConnectionState:(enum WebSocketEndpointConnectionStatus)status {
-    _connectionState = status;
-}
-
 #pragma mark - PSWebSocketDelegate methods
 
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
-    [self markConnectionState:WebSocketConnectionStatus_established];
     [self.delegate networkEndpointDidConnect:self];
     NSLog(@"The websocket did open");
 }
@@ -148,17 +100,12 @@ typedef NS_ENUM(unsigned int, WebSocketEndpointConnectionStatus) {
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
-    [self markConnectionState:WebSocketConnectionStatus_failed];
     [self.delegate networkEndpointDidDisconnect:self];
     NSLog(@"The websocket did fail with error: %@", error.description);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
-    enum WebSocketEndpointConnectionStatus status = wasClean ? WebSocketConnectionStatus_shutdown : WebSocketConnectionStatus_failed;
-    [self markConnectionState:status];
-
     [self.delegate networkEndpointDidDisconnect:self];
-
     NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
 }
 
