@@ -199,8 +199,8 @@
 }
 
 // Delete HashList for the deleted almond from offline storage
-- (void)deleteHashForAlmond:(NSString *)almomdMac {
-    [self removedDictionaryEntryFromFilePath:self.hashFp key:almomdMac locker:self.syncLocker];
+- (void)deleteHashForAlmond:(NSString *)almondMac {
+    [self removedDictionaryEntryFromFilePath:self.hashFp key:almondMac locker:self.syncLocker];
 }
 
 #pragma mark - Serialization Functions
@@ -307,17 +307,18 @@
 
 + (BOOL)deleteFile:(NSString *)fileName {
     NSFileManager *fileManager = [NSFileManager defaultManager];
+
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = paths[0];
     NSString *filePath = [documentsDirectory stringByAppendingPathComponent:fileName];
 
-    if (![fileManager fileExistsAtPath:filePath]) {
+    BOOL exists = [fileManager fileExistsAtPath:filePath];
+    if (!exists) {
         return YES;
     }
-    
+
     NSError *error;
     BOOL success = [fileManager removeItemAtPath:filePath error:&error];
-
     if (!success) {
         NSLog(@"Failed to remove file, path:%@, error:%@", filePath, error);
     }
