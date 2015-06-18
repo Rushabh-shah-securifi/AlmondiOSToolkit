@@ -41,8 +41,6 @@
 		1C414BCB1A79F0AE00C448A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C414BCA1A79F0AE00C448A4 /* libsqlite3.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BD01A79F2BE00C448A4 /* SFIOfflineDataManager.h */; };
 		1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BD11A79F2BE00C448A4 /* SFIOfflineDataManager.m */; };
-		1C414BDE1A79F35D00C448A4 /* SingleTon.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BDA1A79F35D00C448A4 /* SingleTon.h */; };
-		1C414BDF1A79F35D00C448A4 /* SingleTon.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BDB1A79F35D00C448A4 /* SingleTon.m */; };
 		1C414BE01A79F35D00C448A4 /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BDC1A79F35D00C448A4 /* SUnit.h */; };
 		1C414BE11A79F35D00C448A4 /* SUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BDD1A79F35D00C448A4 /* SUnit.m */; };
 		1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BE31A79F39600C448A4 /* KeyChainWrapper.h */; };
@@ -343,8 +341,6 @@
 		1C414BCA1A79F0AE00C448A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		1C414BD01A79F2BE00C448A4 /* SFIOfflineDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIOfflineDataManager.h; sourceTree = "<group>"; };
 		1C414BD11A79F2BE00C448A4 /* SFIOfflineDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIOfflineDataManager.m; sourceTree = "<group>"; };
-		1C414BDA1A79F35D00C448A4 /* SingleTon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingleTon.h; sourceTree = "<group>"; };
-		1C414BDB1A79F35D00C448A4 /* SingleTon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleTon.m; sourceTree = "<group>"; };
 		1C414BDC1A79F35D00C448A4 /* SUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUnit.h; sourceTree = "<group>"; };
 		1C414BDD1A79F35D00C448A4 /* SUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUnit.m; sourceTree = "<group>"; };
 		1C414BE31A79F39600C448A4 /* KeyChainWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyChainWrapper.h; sourceTree = "<group>"; };
@@ -680,8 +676,6 @@
 		1C414BD91A79F35D00C448A4 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				1C414BDA1A79F35D00C448A4 /* SingleTon.h */,
-				1C414BDB1A79F35D00C448A4 /* SingleTon.m */,
 				1C414BDC1A79F35D00C448A4 /* SUnit.h */,
 				1C414BDD1A79F35D00C448A4 /* SUnit.m */,
 				1DF03AF40507D6D74C658843 /* AlmondVersionChecker.m */,
@@ -1114,7 +1108,6 @@
 			files = (
 				1C4382ED1B2FDD5200F6AB7A /* PSWebSocketBuffer.h in Headers */,
 				1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */,
-				1C414BDE1A79F35D00C448A4 /* SingleTon.h in Headers */,
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
 				22A76D3817912EAC0099CD8F /* LoginResponse.h in Headers */,
 				1C3270E81A243B28007202C1 /* SFIWirelessSummary.h in Headers */,
@@ -1430,7 +1423,6 @@
 				CE5EB5CB17E722BD00985636 /* AlmondListResponse.m in Sources */,
 				22A76D4A1791347D0099CD8F /* AffiliationUserComplete.m in Sources */,
 				CE5EB63A17E852E500985636 /* SFIDevice.m in Sources */,
-				1C414BDF1A79F35D00C448A4 /* SingleTon.m in Sources */,
 				CE91317219C9A2F900D94876 /* ChangePasswordResponse.m in Sources */,
 				1C3270E71A243B28007202C1 /* SFIWirelessSetting.m in Sources */,
 				CE7F218519CC012C008AD4FB /* AlmondAffiliationData.m in Sources */,
