@@ -43,6 +43,7 @@
 #import "NotificationClearCountResponse.h"
 #import "NotificationClearCountRequest.h"
 #import "NetworkConfig.h"
+#import "SFIAlmondLocalNetworkSettings.h"
 
 
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -300,6 +301,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property(nonatomic, strong) Network *cloudNetwork; //todo had to change from weak to strong reference after refactoring... why?
+@property(nonatomic, strong) Network *localNetwork;
 
 // a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
 // update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
@@ -388,6 +390,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceHashResponse:) name:DEVICEDATA_HASH_NOTIFIER object:nil];
+
+        [center addObserver:self selector:@selector(onDeviceListAndValuesResponse:) name:DEVICE_LIST_AND_VALUES_NOTIFIER object:nil];
 
         if (config.enableNotifications) {
             [center addObserver:self selector:@selector(onNotificationRegistrationResponseCallback:) name:NOTIFICATION_REGISTRATION_NOTIFIER object:nil];
@@ -690,21 +694,55 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
-    // Generate internal index between 1 to 100
-    MobileCommandRequest *request = [MobileCommandRequest new];
-    request.almondMAC = almond.almondplusMAC;
-    request.deviceID = [NSString stringWithFormat:@"%d", device.deviceID];
-    request.deviceType = device.deviceType;
-    request.indexID = [NSString stringWithFormat:@"%d", newValue.index];
-    request.changedValue = newValue.value;
+    NSString *almondMac = almond.almondplusMAC;
+    BOOL local = [self useLocalNetwork:almondMac];
 
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_MOBILE_COMMAND;
-    cmd.command = request;
+    if (local) {
+        u_int32_t mii = (arc4random() % 1000) + 1;
+        NSString *miss_str = [NSString stringWithFormat:@"%@:%@", almondMac, @(mii).stringValue];
 
-    [self asyncSendToCloud:cmd];
+        NSDictionary *payload = @{
+                @"mii" : miss_str,
+                @"cmd" : @"setdeviceindex",
+                @"devid" : @(device.deviceID).stringValue,
+                @"index" : @(newValue.index).stringValue,
+                @"value" : newValue.value,
+        };
 
-    return request.correlationId;
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+
+        if (error) {
+            NSLog(@"asyncChangeAlmond: Error serializing JSON, command:%i, payload:%@, error:%@", CommandType_MOBILE_COMMAND, payload, error.description);
+            return 0;
+        }
+
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.command = data;
+        cmd.commandType = CommandType_MOBILE_COMMAND;
+
+        Network *network = [self localNetworkForAlmond:almondMac];
+        [network submitCommand:cmd];
+
+        return mii;
+    }
+    else {
+        // Generate internal index between 1 to 100
+        MobileCommandRequest *request = [MobileCommandRequest new];
+        request.almondMAC = almondMac;
+        request.deviceID = [NSString stringWithFormat:@"%d", device.deviceID];
+        request.deviceType = device.deviceType;
+        request.indexID = [NSString stringWithFormat:@"%d", newValue.index];
+        request.changedValue = newValue.value;
+
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.commandType = CommandType_MOBILE_COMMAND;
+        cmd.command = request;
+
+        [self asyncSendToCloud:cmd];
+
+        return request.correlationId;
+    }
 }
 
 
@@ -883,6 +921,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self manageCurrentAlmondChange:almond];
 
     [self postNotification:kSFIDidChangeCurrentAlmond data:almond];
+
+    [self.localNetwork shutdown];
+    self.localNetwork = nil;
 }
 
 - (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
@@ -971,35 +1012,95 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Device and Device Value Management
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
-    NetworkState *state = self.cloudNetwork.networkState;
+    BOOL local = [self useLocalNetwork:almondMac];
+    Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
+
+    NetworkState *state = network.networkState;
     if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
         return;
     }
     [state markWillFetchDeviceListForAlmond:almondMac];
 
-    DeviceListRequest *deviceListCommand = [DeviceListRequest new];
-    deviceListCommand.almondMAC = almondMac;
+    enum CommandType commandType = CommandType_DEVICE_DATA;
 
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_DEVICE_DATA;
-    cmd.command = deviceListCommand;
+    if (local) {
+        u_int32_t mii = (arc4random() % 1000) + 1;
+        NSString *miss_str = [NSString stringWithFormat:@"%@:%@", almondMac, @(mii).stringValue];
 
-    [self asyncSendToCloud:cmd];
+        NSDictionary *payload = @{
+                @"mii" : miss_str,
+                @"cmd" : @"devicelist"
+        };
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+
+        if (error) {
+            NSLog(@"internalSendJsonCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
+            return;
+        }
+
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.command = data;
+        cmd.commandType = commandType;
+
+        [network submitCommand:cmd];
+    }
+    else {
+        DeviceListRequest *deviceListCommand = [DeviceListRequest new];
+        deviceListCommand.almondMAC = almondMac;
+
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.commandType = commandType;
+        cmd.command = deviceListCommand;
+
+        [self asyncSendToCloud:cmd];
+    }
 }
 
 - (void)asyncRequestDeviceValueList:(NSString *)almondMac {
-    DeviceValueRequest *command = [DeviceValueRequest new];
-    command.almondMAC = almondMac;
+    BOOL local = [self useLocalNetwork:almondMac];
+    Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
 
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_DEVICE_VALUE;
-    cmd.command = command;
+    enum CommandType commandType = CommandType_DEVICE_VALUE;
 
-    NetworkState *state = self.cloudNetwork.networkState;
-    [state markDeviceValuesFetchedForAlmond:almondMac];
-    [self asyncSendToCloud:cmd];
+    if (local) {
+        u_int32_t mii = (arc4random() % 1000) + 1;
+        NSString *miss_str = [NSString stringWithFormat:@"%@:%@", almondMac, @(mii).stringValue];
 
-    [self asyncRequestNotificationPreferenceList:almondMac];
+        NSDictionary *payload = @{
+                @"mii" : miss_str,
+                @"cmd" : @"devicelist"
+        };
+
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+
+        if (error) {
+            NSLog(@"internalSendJsonCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
+            return;
+        }
+
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.command = data;
+        cmd.commandType = commandType;
+
+        [network submitCommand:cmd];
+    }
+    else {
+        DeviceValueRequest *command = [DeviceValueRequest new];
+        command.almondMAC = almondMac;
+
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.commandType = commandType;
+        cmd.command = command;
+
+        NetworkState *state = network.networkState;
+        [state markDeviceValuesFetchedForAlmond:almondMac];
+        [self asyncSendToCloud:cmd];
+
+        [self asyncRequestNotificationPreferenceList:almondMac];
+    }
 }
 
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
@@ -1045,7 +1146,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 </root>
  */
 
-- (sfi_id)asyncUpdateAlmondFirmware:(NSString *)almondMAC firmwareVersion:(NSString*)firmwareVersion {
+- (sfi_id)asyncUpdateAlmondFirmware:(NSString *)almondMAC firmwareVersion:(NSString *)firmwareVersion {
     SFIXmlWriter *writer = [SFIXmlWriter new];
     [writer startElement:@"root"];
     [writer startElement:@"FirmwareUpdate"];
@@ -1099,7 +1200,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 	</GenericCommandRequest>
 </root>
  */
-- (sfi_id)asyncSendAlmondLogs:(NSString *)almondMAC problemDescription:(NSString*)description {
+- (sfi_id)asyncSendAlmondLogs:(NSString *)almondMAC problemDescription:(NSString *)description {
     SFIXmlWriter *writer = [SFIXmlWriter new];
     [writer startElement:@"root"];
     [writer startElement:@"SendLogs"];
@@ -1624,18 +1725,33 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSLog(@"Finished tear down of network");
 }
 
-- (Network*)localNetworkForAlmond:(NSString*)almondMac {
+- (Network *)localNetworkForAlmond:(NSString *)almondMac {
+    if (self.localNetwork) {
+        if (self.localNetwork.connectionState == SDKConnectionStatusInitialized) {
+            return self.localNetwork;
+        }
+    }
+
+    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+
     NetworkConfig *config = [NetworkConfig configWithMode:NetworkEndpointMode_web_socket];
-    config.host = @"192.168.1.102";
-    config.port = 7681;
-    config.password = @"glair";
+    config.host = settings.host;
+    config.port = (UInt32) settings.port;
+    config.password = settings.password;
 
     Network *network = [Network networkWithNetworkConfig:config callbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];
     network.delegate = self;
 
     [network connect];
 
+    self.localNetwork = network;
     return network;
+}
+
+- (BOOL)useLocalNetwork:(NSString *)almondMac {
+    //todo need a fast cache for this; very expensive to hit the file system constantly
+    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+    return settings.enabled;
 }
 
 #pragma mark - NetworkDelegate methods
@@ -1667,7 +1783,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
-- (void)networkDidReceiveCommandResponse:(Network *)network command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime responseType:(CommandType)commandType {
+- (void)networkDidReceiveCommandResponse:(Network *)network command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime responseType:(enum CommandType)commandType {
     if (network == self.cloudNetwork) {
         self.scoreboard.commandResponseCount++;
         [self markCommandEvent:commandType];
@@ -1931,7 +2047,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     else {
         //Save hash in file for each almond
         NSLog(@"Device Hash Response: mismatch; requesting devices; mac:%@, current:%@, stored:%@", currentMac, reportedHash, storedHash);
-        [self.dataManager writeHashList:reportedHash currentMAC:currentMac];
+        [self.dataManager writeHashList:reportedHash almondMac:currentMac];
         // and update the device list -- on receipt of the device list, then the values will be updated
         [self asyncRequestDeviceList:currentMac];
     }
@@ -1955,10 +2071,37 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSString *almondMAC = obj.almondMAC;
     NSMutableArray *newDeviceList = obj.deviceList;
 
-    [self processDeviceListChange:almondMAC newDevices:newDeviceList];
+    [self processDeviceListChange:almondMAC newDevices:newDeviceList requestValues:YES];
 }
 
 - (void)onDeviceListResponse:(id)sender {
+    NSLog(@"Received device list response");
+
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
+
+    NSString *mac = obj.almondMAC;
+
+    [self.cloudNetwork.networkState clearWillFetchDeviceListForAlmond:mac];
+
+    if (!obj.isSuccessful) {
+        NSLog(@"Device list response was not successful; stopping");
+        return;
+    }
+
+    NSArray *newDevices = obj.deviceList;
+
+    // values not included in response, so request them
+    BOOL requestValues = (obj.deviceValueList == nil);
+    [self processDeviceListChange:mac newDevices:newDevices requestValues:requestValues];
+}
+
+- (void)onDeviceListAndValuesResponse:(id)sender {
     NSLog(@"Received device list response");
 
     NSNotification *notifier = (NSNotification *) sender;
@@ -1979,16 +2122,29 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSString *mac = obj.almondMAC;
     NSArray *newDevices = obj.deviceList;
 
-    [self processDeviceListChange:mac newDevices:newDevices];
+    // values not included in response, so request them
+    if (obj.deviceValueList) {
+        [self processDeviceListChange:mac newDevices:newDevices requestValues:NO];
+
+        // Update offline storage
+        [self.dataManager writeDeviceValueList:obj.deviceValueList almondMac:mac];
+
+        [self postNotification:kSFIDidChangeDeviceValueList data:mac];
+    }
+    else {
+        [self processDeviceListChange:mac newDevices:newDevices requestValues:YES];
+    }
 }
 
 // Processes device lists received in dynamic and on-demand updates.
 // After storing the new list, a notification is posted and an updated values list is requested
-- (void)processDeviceListChange:(NSString *)mac newDevices:(NSArray *)newDevices {
-    [self.dataManager writeDeviceList:newDevices currentMAC:mac];
+- (void)processDeviceListChange:(NSString *)mac newDevices:(NSArray *)newDevices requestValues:(BOOL)requestValues {
+    [self.dataManager writeDeviceList:newDevices almondMac:mac];
 
-    // Request values for devices
-    [self asyncRequestDeviceValueList:mac];
+    if (requestValues) {
+        // Request values for devices
+        [self asyncRequestDeviceValueList:mac];
+    }
 
     // And tell the world there is a new list
     [self postNotification:kSFIDidChangeDeviceList data:mac];
@@ -2005,6 +2161,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
     NSString *currentMAC = obj.almondMAC;
+
+    if (currentMAC == nil) {
+        currentMAC = [self currentAlmond].almondplusMAC; //todo a hack for now; need a formal way for the local connection endpoint to set this information and pass back up here
+    }
 
     [self processDynamicDeviceValueChange:obj currentMAC:currentMAC];
 }
@@ -2024,7 +2184,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     // Update offline storage
-    [self.dataManager writeDeviceValueList:obj.deviceValueList currentMAC:currentMAC];
+    [self.dataManager writeDeviceValueList:obj.deviceValueList almondMac:currentMAC];
 
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
@@ -2090,7 +2250,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     // Update offline storage
-    [self.dataManager writeDeviceValueList:newDeviceValueList currentMAC:currentMAC];
+    [self.dataManager writeDeviceValueList:newDeviceValueList almondMac:currentMAC];
 
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
@@ -2137,7 +2297,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
 
-    [self.dataManager writeNotificationPreferenceList:newPrefs currentMAC:almondMac];
+    [self.dataManager writeNotificationPreferenceList:newPrefs almondMac:almondMac];
 
     self.pendingNotificationPreferenceChange = nil;
     [self postNotification:kSFINotificationPreferencesDidChange data:almondMac];
@@ -2197,7 +2357,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     if ([obj.notificationDeviceList count] != 0) {
         // Update offline storage
-        [self.dataManager writeNotificationPreferenceList:obj.notificationDeviceList currentMAC:currentMAC];
+        [self.dataManager writeNotificationPreferenceList:obj.notificationDeviceList almondMac:currentMAC];
         [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
     }
 }
@@ -2231,7 +2391,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     // Update offline storage
-    [self.dataManager writeNotificationPreferenceList:notificationList currentMAC:currentMAC];
+    [self.dataManager writeNotificationPreferenceList:notificationList almondMac:currentMAC];
     [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
 }
 
@@ -2629,6 +2789,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.pendingDeviceLogRequest = nil;
     return store;
 }
+
+- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
+    return [self.dataManager readALmondLocalNetworkSettings:almondMac];
+}
+
+- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
+    if (!settings.almondplusMAC) {
+        return;
+    }
+
+    [self.dataManager writeAlmondLocalNetworkSettings:settings];
+}
+
 
 - (void)tryRefreshDeviceLog:(NSString *)almondMac deviceId:(sfi_id)deviceId {
 /*

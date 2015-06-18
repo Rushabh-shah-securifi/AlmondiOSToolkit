@@ -59,6 +59,13 @@
     return self;
 }
 
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"endpoint=%@", self.endpoint];
+    [description appendString:@">"];
+    return description;
+}
+
 - (void)connect {
     NSLog(@"Initialzing network communication");
 
@@ -113,7 +120,7 @@
 // Network is shutdown.
 - (BOOL)waitForCloudInitialization:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.cloud_initialized_latch;
-    NSString *msg = @"Giving up on cloud initialization";
+    NSString *msg = @"Giving up on endpoint initialization";
 
     BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
     if (timedOut) {
@@ -133,7 +140,7 @@
 
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
-        if (!self.isStreamConnected) {
+        if (self.connectionState == SDKConnectionStatusShutdown) {
             NSLog(@"%@. Network was shutdown.", msg);
             break;
         }
@@ -374,17 +381,20 @@
 }
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
-    if (!self.isStreamConnected) {
-        return;
+    if (self.networkConfig.mode == NetworkEndpointMode_web_socket) {
+        [self markConnectionState:SDKConnectionStatusInitialized];
     }
-    if (!self.networkUpNoticePosted) {
-        [self.delegate networkConnectionDidEstablish:self];
-        self.networkUpNoticePosted = YES;
-        [self postData:NETWORK_UP_NOTIFIER data:nil];
+    else {
+        if (!self.networkUpNoticePosted) {
+            [self.delegate networkConnectionDidEstablish:self];
+            self.networkUpNoticePosted = YES;
+            [self postData:NETWORK_UP_NOTIFIER data:nil];
+        }
     }
 }
 
 - (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint {
+    [self markConnectionState:SDKConnectionStatusShutdown];
     [self.delegate networkConnectionDidClose:self];
 }
 
@@ -459,6 +469,11 @@
             [self postData:DEVICE_DATA_NOTIFIER data:payload];
             break;
         }
+
+        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DEVICE_LIST_AND_VALUES_NOTIFIER data:payload];
+        };
 
         case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];

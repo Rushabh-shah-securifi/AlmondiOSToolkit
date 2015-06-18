@@ -23,18 +23,15 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
 @interface CloudEndpoint () <NSStreamDelegate>
 @property(nonatomic, readonly) NSObject *syncLocker;
-
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
-
-@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;        // queue on which the streams are managed
-@property(nonatomic, readonly) dispatch_semaphore_t network_established_latch;
-@property(nonatomic, readonly) dispatch_semaphore_t cloud_initialized_latch;
 
 @property(nonatomic) SecCertificateRef certificate;
 @property(nonatomic) BOOL certificateTrusted;
 
 @property(nonatomic, readonly) NSMutableData *partialData;
 @property(nonatomic) BOOL networkUpNoticePosted;
+
+@property(nonatomic, readonly) dispatch_queue_t backgroundQueue;        // queue on which the streams are managed
 @property(nonatomic) NSInputStream *inputStream;
 @property(nonatomic) NSOutputStream *outputStream;
 
@@ -58,8 +55,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
         _syncLocker = [NSObject new];
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
-        _network_established_latch = dispatch_semaphore_create(0);
-        _cloud_initialized_latch = dispatch_semaphore_create(0);
     }
 
     return self;
@@ -76,7 +71,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
 - (void)connect {
     NSLog(@"Initialzing CloudEndpoint communication");
-
     [self markConnectionState:CloudEndpointConnectionStatus_connecting];
 
     __strong CloudEndpoint *block_self = self;
@@ -136,28 +130,22 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
             DLog(@"Streams open and entering run loop");
 
             [self markConnectionState:CloudEndpointConnectionStatus_established];
-            // Signal to waiting socket writers that the CloudEndpoint is up and then invoke the run loop to pump events
-            dispatch_semaphore_signal(block_self.network_established_latch);
-
             [block_self.delegate networkEndpointDidConnect:block_self];
-            //
+
             while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && block_self.isStreamConnected) {
 //                DLog(@"Streams entered run loop");
             }
 
             [block_self.inputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
             [block_self.outputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
-
-            DLog(@"Streams exited run loop");
-
-            [self markConnectionState:CloudEndpointConnectionStatus_shutdown];
-            [block_self.delegate networkEndpointDidDisconnect:block_self];
         }
         else {
             NSLog(@"Stream already opened");
         }
 
+        DLog(@"Streams exited run loop");
         [self markConnectionState:CloudEndpointConnectionStatus_shutdown];
+        [block_self.delegate networkEndpointDidDisconnect:block_self];
     });
 
 }
@@ -174,11 +162,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
         // Signal shutdown
         //
         [block_self markConnectionState:CloudEndpointConnectionStatus_shutting_down];
-
-        // Clean up command queue
-        //
-        dispatch_semaphore_signal(block_self.network_established_latch);
-        dispatch_semaphore_signal(block_self.cloud_initialized_latch);
 
         // Synchronize access: wait for other readers/writers before tearing down the sockets
         //
@@ -206,71 +189,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
     // Tell delegate of shutdown
     [self.delegate networkEndpointDidDisconnect:self];
-}
-
-#pragma mark - Semaphores
-
-// Called during command process need to use the output stream. Blocks until the connection is set up or fails.
-// return YES when time out is reached; NO if connection established without timeout
-// On time out, the CloudEndpoint will shut itself down
-- (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
-    dispatch_semaphore_t latch = self.network_established_latch;
-    NSString *msg = @"Giving up on connection establishment";
-
-    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
-    if (self.isStreamConnected) {
-        // If the connection is up by now, no need to worry about the timeout.
-        return NO;
-    }
-    if (timedOut) {
-        NSLog(@"%@. Issuing shutdown on timeout", msg);
-        [self shutdown];
-    }
-    return timedOut;
-}
-
-// Waits up to the specified number of seconds for the semaphore to be signalled.
-// Returns YES on timeout waiting on the latch.
-// Returns NO when the signal has been received before the timeout.
-- (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString *)msg {
-    dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
-
-    BOOL timedOut = NO;
-
-    dispatch_time_t blockingSleepSecondsIfNotDone;
-    do {
-        if (self.connectionState == CloudEndpointConnectionStatus_shutting_down) {
-            NSLog(@"%@. CloudEndpoint is shutting down.", msg);
-            break;
-        }
-        if (self.connectionState == CloudEndpointConnectionStatus_shutdown) {
-            NSLog(@"%@. CloudEndpoint was shutdown.", msg);
-            break;
-        }
-        if (self.connectionState == CloudEndpointConnectionStatus_failed) {
-            NSLog(@"%@. CloudEndpoint is failed.", msg);
-            break;
-        }
-        if (self.connectionState == CloudEndpointConnectionStatus_uninitialized) {
-            NSLog(@"%@. CloudEndpoint is uniitialized.", msg);
-            break;
-        }
-
-        const int waitMs = 5;
-        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, waitMs * NSEC_PER_MSEC);
-
-        timedOut = blockingSleepSecondsIfNotDone > max_time;
-        if (timedOut) {
-            NSLog(@"%@. Timeout reached.", msg);
-            break;
-        }
-    }
-    while (0 != dispatch_semaphore_wait(latch, blockingSleepSecondsIfNotDone));
-
-    // make sure...
-    dispatch_semaphore_signal(latch);
-
-    return timedOut;
 }
 
 #pragma mark - state
@@ -496,7 +414,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
         }
 
         default: {
-            DLog(@"%s: Unhandled event: %li", __PRETTY_FUNCTION__, (long)streamEvent);
+            DLog(@"%s: Unhandled event: %li", __PRETTY_FUNCTION__, (long) streamEvent);
         }
     }
 }
@@ -649,30 +567,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 }
 
 - (BOOL)internalSendToCloud:(CloudEndpoint *)socket command:(id)sender error:(NSError **)outError {
-    DLog(@"%s: Waiting to enter sync block", __PRETTY_FUNCTION__);
-
     @synchronized (self.syncLocker) {
-        DLog(@"%s: Entered sync block", __PRETTY_FUNCTION__);
-
-        // Wait for connection establishment if need be.
-        if (!socket.isStreamConnected) {
-            DLog(@"Waiting for connection establishment");
-            BOOL timedOut = [socket waitForConnectionEstablishment:20]; // wait 20 seconds
-            DLog(@"Done waiting for connection establishment, timedOut=%@", timedOut ? @"YES" : @"NO");
-
-            if (timedOut) {
-                DLog(@"Timed out waiting to initialize connection");
-                *outError = [self makeError:@"Securifi - Timed out waiting to initialize connection"];
-                return NO;
-            }
-
-            if (!socket.isStreamConnected) {
-                DLog(@"Stream died on connection");
-                *outError = [self makeError:@"Securifi - Stream died on connection"];
-                return NO;
-            }
-        }
-
         GenericCommand *obj = (GenericCommand *) sender;
         DLog(@"Sending command, cmd:%@", obj.debugDescription);
 
@@ -708,8 +603,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                 case CommandType_ALMOND_MODE_REQUEST:
                 case CommandType_NOTIFICATIONS_SYNC_REQUEST:
                 case CommandType_NOTIFICATIONS_COUNT_REQUEST:
-                case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST:
-                {
+                case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST: {
                     id <SecurifiCommand> cmd = obj.command;
                     commandPayload = [cmd toXml];
                     break;
@@ -745,7 +639,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
                 case CommandType_DEVICELOG_REQUEST: {
                     NSData *data = obj.command;
-                    NSString *json =  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
                     commandType = (unsigned int) htonl(CommandType_DEVICELOG_REQUEST);
                     commandPayload = [NSString stringWithFormat:@"<root>%@</root>", json];

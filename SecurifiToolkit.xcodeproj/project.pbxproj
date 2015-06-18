@@ -100,7 +100,7 @@
 		1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03066782B488103FE1232 /* DynamicAlmondModeChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03048BDC4DD3CB8D3B224 /* DynamicAlmondModeChange.m */; };
 		1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F977E6A78507A5D7714 /* NotificationClearCountRequest.m */; };
-		1DF030FB420C44DB752D47D6 /* SFIAlmondLocalNetworkSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0386F473DC4BF02299011 /* SFIAlmondLocalNetworkSettings.h */; };
+		1DF030FB420C44DB752D47D6 /* SFIAlmondLocalNetworkSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0386F473DC4BF02299011 /* SFIAlmondLocalNetworkSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0318029A6D5169BBF1BAA /* AlmondVersionChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03AF40507D6D74C658843 /* AlmondVersionChecker.m */; };
 		1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F5902A972E2D8CA630A /* SFIAlmondLocalNetworkSettings.m */; };

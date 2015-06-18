@@ -72,4 +72,6 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 // Returns NO on failure to queue
 - (BOOL)submitCommand:(GenericCommand *)command;
 
+- (NSString *)description;
+
 @end

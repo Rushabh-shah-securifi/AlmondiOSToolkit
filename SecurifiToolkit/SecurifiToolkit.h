@@ -88,6 +88,7 @@
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
 @class NotificationPreferences;
+@class SFIAlmondLocalNetworkSettings;
 
 // Notification posted at the conclusion of a Login attempt.
 // The payload should contain a LoginResponse indicating success or failure.
@@ -315,6 +316,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)setNotificationsBadgeCount:(NSInteger)count;
 
 - (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId;
+
+- (SFIAlmondLocalNetworkSettings*)localNetworkSettingsForAlmond:(NSString*)almondMac;
+- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings*)settings;
 
 @end
  
