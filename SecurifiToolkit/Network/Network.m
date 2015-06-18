@@ -1,8 +1,8 @@
 //  Network.m
 //  SecurifiToolkit
 //
-//  Created by Nirav Uchat on 7/15/13.
-//  Copyright (c) 2013 Securifi Ltd. All rights reserved.
+// Created by Matthew Sinclair-Day on 6/15/15.
+// Copyright (c) 2015 Securifi Ltd. All rights reserved.
 //
 
 
@@ -46,8 +46,8 @@
         _callbackQueue = callbackQueue;
         _dynamicCallbackQueue = dynamicCallbackQueue;
 
-        [self markConnectionState:SDKConnectionStatusUninitialized];
-        self.loginStatus = SDKLoginStatusNotLoggedIn;
+        [self markConnectionState:NetworkConnectionStatusUninitialized];
+        self.loginStatus = NetworkLoginStatusNotLoggedIn;
 
         _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
         _cloud_initialized_latch = dispatch_semaphore_create(0);
@@ -69,7 +69,7 @@
 - (void)connect {
     NSLog(@"Initialzing network communication");
 
-    [self markConnectionState:SDKConnectionStatusInitializing];
+    [self markConnectionState:NetworkConnectionStatusInitializing];
 
     if (self.endpoint) {
         return;
@@ -98,7 +98,7 @@
 
     // Signal shutdown
     //
-    [self markConnectionState:SDKConnectionStatusShutdown];
+    [self markConnectionState:NetworkConnectionStatusShutdown];
     [self markLoggedInState:NO];
 
     // Clean up command queue
@@ -140,11 +140,11 @@
 
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
-        if (self.connectionState == SDKConnectionStatusShutdown) {
+        if (self.connectionState == NetworkConnectionStatusShutdown) {
             NSLog(@"%@. Network was shutdown.", msg);
             break;
         }
-        if (self.connectionState == SDKConnectionStatusInitialized) {
+        if (self.connectionState == NetworkConnectionStatusInitialized) {
             NSLog(@"%@. Cloud is initialized.", msg);
             break;
         }
@@ -169,16 +169,16 @@
 #pragma mark - state
 
 - (BOOL)isStreamConnected {
-    SDKConnectionStatus status = self.connectionState;
-    return (status == SDKConnectionStatusInitialized) || (status == SDKConnectionStatusInitializing);
+    NetworkConnectionStatus status = self.connectionState;
+    return (status == NetworkConnectionStatusInitialized) || (status == NetworkConnectionStatusInitializing);
 }
 
-- (void)markConnectionState:(enum SDKConnectionStatus)status {
+- (void)markConnectionState:(enum NetworkConnectionStatus)status {
     _connectionState = status;
 }
 
 - (void)markLoggedInState:(BOOL)loggedIn {
-    self.loginStatus = loggedIn ? SDKLoginStatusLoggedIn : SDKLoginStatusNotLoggedIn;
+    self.loginStatus = loggedIn ? NetworkLoginStatusLoggedIn : NetworkLoginStatusNotLoggedIn;
 }
 
 #pragma mark - NSStreamDelegate methods
@@ -247,11 +247,11 @@
 }
 
 - (void)markCloudInitialized {
-    SDKConnectionStatus cloudStatus = self.connectionState;
-    if (cloudStatus == SDKConnectionStatusInitialized) {
+    NetworkConnectionStatus cloudStatus = self.connectionState;
+    if (cloudStatus == NetworkConnectionStatusInitialized) {
         return;
     }
-    if (cloudStatus == SDKConnectionStatusShutdown) {
+    if (cloudStatus == NetworkConnectionStatusShutdown) {
         return;
     }
 
@@ -263,15 +263,15 @@
 
     __weak Network *block_self = self;
     dispatch_async(self.initializationQueue, ^() {
-        SDKConnectionStatus status = block_self.connectionState;
-        if (status == SDKConnectionStatusInitialized) {
+        NetworkConnectionStatus status = block_self.connectionState;
+        if (status == NetworkConnectionStatusInitialized) {
             return;
         }
-        if (status == SDKConnectionStatusShutdown) {
+        if (status == NetworkConnectionStatusShutdown) {
             return;
         }
 
-        [block_self markConnectionState:SDKConnectionStatusInitialized];
+        [block_self markConnectionState:NetworkConnectionStatusInitialized];
 
         dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
         if (latch) {
@@ -285,9 +285,9 @@
 }
 
 - (BOOL)submitCloudInitializationCommand:(GenericCommand *)command {
-    if (self.connectionState == SDKConnectionStatusInitialized) {
+    if (self.connectionState == NetworkConnectionStatusInitialized) {
         NSLog(@"Rejected cloud initialization command submission: already marked as initialized");
-        return NO;
+//        return NO; //todo fix me.
     }
 
     dispatch_queue_t queue = self.initializationQueue;
@@ -304,16 +304,16 @@
     }
 
     switch (self.connectionState) {
-        case SDKConnectionStatusUninitialized:
-        case SDKConnectionStatusShutdown:
+        case NetworkConnectionStatusUninitialized:
+        case NetworkConnectionStatusShutdown:
             // don't even queue; just get out
             return NO;
 
-        case SDKConnectionStatusInitialized:
+        case NetworkConnectionStatusInitialized:
             waitForInit = NO;
             break;
 
-        case SDKConnectionStatusInitializing:
+        case NetworkConnectionStatusInitializing:
             break;
     }
 
@@ -382,7 +382,7 @@
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
     if (self.networkConfig.mode == NetworkEndpointMode_web_socket) {
-        [self markConnectionState:SDKConnectionStatusInitialized];
+        [self markConnectionState:NetworkConnectionStatusInitialized];
     }
     else {
         if (!self.networkUpNoticePosted) {
@@ -394,7 +394,7 @@
 }
 
 - (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint {
-    [self markConnectionState:SDKConnectionStatusShutdown];
+    [self markConnectionState:NetworkConnectionStatusShutdown];
     [self.delegate networkConnectionDidClose:self];
 }
 

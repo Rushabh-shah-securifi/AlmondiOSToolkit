@@ -2,25 +2,25 @@
 //  Network.h
 //  SecurifiToolkit
 //
-//  Created by Nirav Uchat on 7/15/13.
-//  Copyright (c) 2013 Securifi Ltd. All rights reserved.
+// Created by Matthew Sinclair-Day on 6/15/15.
+// Copyright (c) 2015 Securifi Ltd. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import "CommandTypes.h"
 #import "SecurifiTypes.h"
 
-typedef NS_ENUM(NSUInteger, SDKConnectionStatus) {
-    SDKConnectionStatusUninitialized = 1,
-    SDKConnectionStatusInitializing,
-    SDKConnectionStatusInitialized,
-    SDKConnectionStatusShutdown,
+typedef NS_ENUM(NSUInteger, NetworkConnectionStatus) {
+    NetworkConnectionStatusUninitialized = 1,
+    NetworkConnectionStatusInitializing,
+    NetworkConnectionStatusInitialized,
+    NetworkConnectionStatusShutdown,
 };
 
-typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
-    SDKLoginStatusNotLoggedIn = 1,
-    SDKLoginStatusInProcess,
-    SDKLoginStatusLoggedIn,
+typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
+    NetworkLoginStatusNotLoggedIn = 1,
+    NetworkLoginStatusInProcess,
+    NetworkLoginStatusLoggedIn,
 };
 
 @class Network;
@@ -49,9 +49,9 @@ typedef NS_ENUM(NSUInteger, SDKLoginStatus) {
 @property(nonatomic, weak) id <NetworkDelegate> delegate;
 
 @property(nonatomic, readonly) NetworkState *networkState;
-@property(nonatomic, readonly) enum SDKConnectionStatus connectionState;
+@property(nonatomic, readonly) enum NetworkConnectionStatus connectionState;
 @property(nonatomic, readonly) BOOL isStreamConnected;
-@property(nonatomic) enum SDKLoginStatus loginStatus;
+@property(nonatomic) enum NetworkLoginStatus loginStatus;
 
 // queue on which notifications will be posted
 + (instancetype)networkWithNetworkConfig:(NetworkConfig *)networkConfig callbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;

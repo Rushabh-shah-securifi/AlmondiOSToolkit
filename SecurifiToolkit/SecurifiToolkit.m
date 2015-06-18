@@ -430,8 +430,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return NO;
     }
 
-    SDKConnectionStatus state = [self getConnectionState];
-    return state == SDKConnectionStatusInitializing;
+    NetworkConnectionStatus state = [self getConnectionState];
+    return state == NetworkConnectionStatusInitializing;
 }
 
 - (BOOL)isCloudOnline {
@@ -440,15 +440,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return NO;
     }
 
-    SDKConnectionStatus state = [self getConnectionState];
+    NetworkConnectionStatus state = [self getConnectionState];
 
     switch (state) {
-        case SDKConnectionStatusInitialized:
+        case NetworkConnectionStatusInitialized:
             return YES;
 
-        case SDKConnectionStatusUninitialized:
-        case SDKConnectionStatusInitializing:
-        case SDKConnectionStatusShutdown:
+        case NetworkConnectionStatusUninitialized:
+        case NetworkConnectionStatusInitializing:
+        case NetworkConnectionStatusShutdown:
             return NO;
 
         default:
@@ -462,7 +462,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (BOOL)isLoggedIn {
     Network *network = self.cloudNetwork;
-    return network && network.loginStatus == SDKLoginStatusLoggedIn;
+    return network && network.loginStatus == NetworkLoginStatusLoggedIn;
 }
 
 - (BOOL)isAccountActivated {
@@ -473,13 +473,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return (int) [self secMinsRemainingForUnactivatedAccount];
 }
 
-- (SDKConnectionStatus)getConnectionState {
+- (NetworkConnectionStatus)getConnectionState {
     Network *network = self.cloudNetwork;
     if (network) {
         return network.connectionState;
     }
     else {
-        return SDKConnectionStatusUninitialized;
+        return NetworkConnectionStatusUninitialized;
     }
 }
 
@@ -517,20 +517,20 @@ static SecurifiToolkit *toolkit_singleton = nil;
             return;
         }
 
-        SDKConnectionStatus state = [block_self getConnectionState];
+        NetworkConnectionStatus state = [block_self getConnectionState];
         switch (state) {
-            case SDKConnectionStatusInitialized: {
+            case NetworkConnectionStatusInitialized: {
                 DLog(@"INIT SDK. Connection established already. Returning.");
                 return;
             };
 
-            case SDKConnectionStatusInitializing: {
+            case NetworkConnectionStatusInitializing: {
                 DLog(@"INIT SDK. Already initializing. Returning.");
                 return;
             };
 
-            case SDKConnectionStatusUninitialized:
-            case SDKConnectionStatusShutdown:
+            case NetworkConnectionStatusUninitialized:
+            case NetworkConnectionStatusShutdown:
             default: {
                 DLog(@"INIT SDK. Connection needs establishment. Passing thru");
             };
@@ -563,8 +563,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // If no logon credentials, then initialization is completed.
         if (![block_self hasLoginCredentials]) {
             DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
-            network.loginStatus = SDKLoginStatusNotLoggedIn;
-            [network markCloudInitialized];
+            network.loginStatus = NetworkLoginStatusNotLoggedIn;
+            [network markCloudInitialized]; //todo fix me: this is fouling up the Network control logic, but removing it then prevents normal commands from being sent...
 
             // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
             // We probably should track things down and find a way to remove a dependency on this event in the UI.
@@ -573,7 +573,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
 
         // Send logon credentials
-        network.loginStatus = SDKLoginStatusInProcess;
+        network.loginStatus = NetworkLoginStatusInProcess;
 
         DLog(@"%s: sending temp pass credentials", __PRETTY_FUNCTION__);
         cmd = [block_self makeTempPassLoginCommand];
@@ -674,7 +674,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     // Initialize network if need be
     Network *network = self.cloudNetwork;
-    if (network == nil || (!network.isStreamConnected && network.connectionState != SDKConnectionStatusInitializing)) {
+    if (network == nil || (!network.isStreamConnected && network.connectionState != NetworkConnectionStatusInitializing)) {
         // Set up network and wait
         //
         NSLog(@"Waiting to initialize socket");
@@ -1727,7 +1727,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (Network *)localNetworkForAlmond:(NSString *)almondMac {
     if (self.localNetwork) {
-        if (self.localNetwork.connectionState == SDKConnectionStatusInitialized) {
+        if (self.localNetwork.connectionState == NetworkConnectionStatusInitialized) {
             return self.localNetwork;
         }
     }
