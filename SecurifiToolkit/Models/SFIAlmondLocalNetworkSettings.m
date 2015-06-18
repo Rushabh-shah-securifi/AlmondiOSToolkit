@@ -8,6 +8,16 @@
 
 @implementation SFIAlmondLocalNetworkSettings
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.port = 7681; // default web socket port
+    }
+
+    return self;
+}
+
+
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
