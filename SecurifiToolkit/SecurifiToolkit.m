@@ -698,24 +698,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     BOOL local = [self useLocalNetwork:almondMac];
 
     if (local) {
-        u_int32_t mii = (arc4random() % 1000) + 1;
-        NSString *miss_str = [NSString stringWithFormat:@"%@:%@", almondMac, @(mii).stringValue];
+        BaseCommandRequest *bcmd = [BaseCommandRequest new];
 
         NSDictionary *payload = @{
-                @"mii" : miss_str,
+                @"mii" : @(bcmd.correlationId).stringValue,
                 @"cmd" : @"setdeviceindex",
                 @"devid" : @(device.deviceID).stringValue,
                 @"index" : @(newValue.index).stringValue,
                 @"value" : newValue.value,
         };
 
-        NSError *error;
-        NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
-
-        if (error) {
-            NSLog(@"asyncChangeAlmond: Error serializing JSON, command:%i, payload:%@, error:%@", CommandType_MOBILE_COMMAND, payload, error.description);
-            return 0;
-        }
+        NSData *data = [bcmd serializeJson:payload];
 
         GenericCommand *cmd = [GenericCommand new];
         cmd.command = data;
@@ -724,7 +717,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         Network *network = [self localNetworkForAlmond:almondMac];
         [network submitCommand:cmd];
 
-        return mii;
+        return bcmd.correlationId;
     }
     else {
         // Generate internal index between 1 to 100
@@ -1051,21 +1044,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     enum CommandType commandType = CommandType_DEVICE_DATA;
 
     if (local) {
-        u_int32_t mii = (arc4random() % 1000) + 1;
-        NSString *miss_str = [NSString stringWithFormat:@"%@:%@", almondMac, @(mii).stringValue];
+        BaseCommandRequest *bcmd = [BaseCommandRequest new];
 
         NSDictionary *payload = @{
-                @"mii" : miss_str,
+                @"mii" : @(bcmd.correlationId).stringValue,
                 @"cmd" : @"devicelist"
         };
 
-        NSError *error;
-        NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
-
-        if (error) {
-            NSLog(@"internalSendJsonCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
-            return;
-        }
+        NSData *data = [bcmd serializeJson:payload];
 
         GenericCommand *cmd = [GenericCommand new];
         cmd.command = data;
@@ -1092,21 +1078,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     enum CommandType commandType = CommandType_DEVICE_VALUE;
 
     if (local) {
-        u_int32_t mii = (arc4random() % 1000) + 1;
-        NSString *miss_str = [NSString stringWithFormat:@"%@:%@", almondMac, @(mii).stringValue];
+        BaseCommandRequest *bcmd = [BaseCommandRequest new];
 
         NSDictionary *payload = @{
-                @"mii" : miss_str,
+                @"mii" : @(bcmd.correlationId).stringValue,
                 @"cmd" : @"devicelist"
         };
 
-        NSError *error;
-        NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
-
-        if (error) {
-            NSLog(@"internalSendJsonCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
-            return;
-        }
+        NSData *data = [bcmd serializeJson:payload];
 
         GenericCommand *cmd = [GenericCommand new];
         cmd.command = data;
@@ -1345,6 +1324,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - Almond and router settings
 
+typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
+    AlmondStatusAndSettings_summary = 1,
+    AlmondStatusAndSettings_settings,
+    AlmondStatusAndSettings_connected_device,
+    AlmondStatusAndSettings_blocked_device,
+};
+
 - (void)asyncAlmondStatusAndSettings:(NSString *)almondMac {
     if (almondMac.length == 0) {
         return;
@@ -1360,17 +1346,59 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     // sends a series of requests to fetch all the information at once.
     // note ordering might be important to the UI layer, which for now receives the response payloads directly
-    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_WIRELESS_SUMMARY_COMMAND];
-    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_WIRELESS_SETTINGS_COMMAND];
-    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_CONNECTED_DEVICE_COMMAND];
-    [self internalRequestAlmondStatusAndSettings:almondMac command:GET_BLOCKED_DEVICE_COMMAND];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_summary];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_settings];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_connected_device];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_blocked_device];
 }
 
-- (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(NSString *)commandPayload {
+- (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum AlmondStatusAndSettings)type {
+    if (type == AlmondStatusAndSettings_connected_device) {
+        BOOL local = [self useLocalNetwork:almondMac];
+        Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
+
+        if (local) {
+            BaseCommandRequest *bcmd = [BaseCommandRequest new];
+
+            NSDictionary *payload = @{
+                    @"MobileInternalIndex" : @(bcmd.correlationId).stringValue,
+                    @"CommandType" : @"ClientsList"
+            };
+
+            NSData *data = [bcmd serializeJson:payload];
+
+            GenericCommand *cmd = [GenericCommand new];
+            cmd.command = data;
+            cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+
+            [network submitCommand:cmd];
+
+            return;
+
+            // else pass through
+        }
+    }
+
+    NSString *data;
+    switch (type) {
+        case AlmondStatusAndSettings_summary:
+            data = GET_WIRELESS_SUMMARY_COMMAND;
+            break;
+        case AlmondStatusAndSettings_settings:
+            data = GET_WIRELESS_SETTINGS_COMMAND;
+            break;
+        case AlmondStatusAndSettings_connected_device:
+            data = GET_CONNECTED_DEVICE_COMMAND;
+            break;
+        case AlmondStatusAndSettings_blocked_device:
+            data = GET_BLOCKED_DEVICE_COMMAND;
+            break;
+    }
+
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMac;
     request.applicationID = APPLICATION_ID;
-    request.data = commandPayload;
+    request.data = data;
 
     GenericCommand *cmd = [[GenericCommand alloc] init];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
