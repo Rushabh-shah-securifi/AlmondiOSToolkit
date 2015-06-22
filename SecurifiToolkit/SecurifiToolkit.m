@@ -745,6 +745,33 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
+- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus*)almond device:(SFIDevice*)device name:(NSString*)deviceName location:(NSString*)deviceLocation {
+    NSString *almondMac = almond.almondplusMAC;
+
+    SensorChangeRequest *request = [SensorChangeRequest new];
+    request.almondMAC = almondMac;
+    request.deviceId = device.deviceID;
+    request.changedName = deviceName;
+    request.changedLocation = deviceLocation;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_MOBILE_COMMAND;
+
+    BOOL local = [self useLocalNetwork:almondMac];
+    if (local) {
+        cmd.command = [request toJson];
+
+        Network *network = [self localNetworkForAlmond:almondMac];
+        [network submitCommand:cmd];
+    }
+    else {
+        cmd.command = request;
+
+        [self asyncSendToCloud:cmd];
+    }
+
+    return request.correlationId;
+}
 
 #pragma mark - Cloud Logon
 
@@ -1465,26 +1492,36 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMAC mode:(SFIAlmondMode)newMode {
-    if (almondMAC == nil) {
+- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode {
+    if (almondMac == nil) {
         SLog(@"asyncRequestAlmondModeChange : almond MAC is nil");
         return 0;
     }
 
-    AlmondModeChangeRequest *req = [AlmondModeChangeRequest new];
-    req.almondMAC = almondMAC;
-    req.mode = newMode;
-    req.userId = [self loginEmail];
+    AlmondModeChangeRequest *request = [AlmondModeChangeRequest new];
+    request.almondMAC = almondMac;
+    request.mode = newMode;
+    request.userId = [self loginEmail];
 
-    self.pendingAlmondModeChange = req;
+    self.pendingAlmondModeChange = request;
 
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
-    cmd.command = req;
 
-    [self asyncSendToCloud:cmd];
+    BOOL local = [self useLocalNetwork:almondMac];
+    if (local) {
+        cmd.command = [request toJson];
 
-    return req.correlationId;
+        Network *network = [self localNetworkForAlmond:almondMac];
+        [network submitCommand:cmd];
+    }
+    else {
+        cmd.command = request;
+
+        [self asyncSendToCloud:cmd];
+    }
+
+    return request.correlationId;
 }
 
 - (SFIAlmondMode)modeForAlmond:(NSString *)almondMac {
@@ -1734,9 +1771,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
 
-    NetworkConfig *config = [NetworkConfig configWithMode:NetworkEndpointMode_web_socket];
+    NetworkConfig *config = [NetworkConfig webSocketConfigAlmond:almondMac];
     config.host = settings.host;
-    config.port = (UInt32) settings.port;
+    config.port = settings.port;
     config.password = settings.password;
 
     Network *network = [Network networkWithNetworkConfig:config callbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];

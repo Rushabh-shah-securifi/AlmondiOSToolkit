@@ -184,6 +184,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // On completion, kSFIDidCompleteMobileCommandRequest is posted
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus*)almond device:(SFIDevice*)device value:(SFIDeviceKnownValues *)newValue;
 
+- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus*)almond device:(SFIDevice*)device name:(NSString*)deviceName location:(NSString*)deviceLocation;
+
 - (BOOL)isCloudConnecting;
 
 - (BOOL)isCloudOnline;
@@ -281,7 +283,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC;
 
 // Send a command to change the notification mode for the specific almond
-- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMAC mode:(SFIAlmondMode)newMode;
+- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode;
 
 - (SFIAlmondMode)modeForAlmond:(NSString *)almondMac;
 
