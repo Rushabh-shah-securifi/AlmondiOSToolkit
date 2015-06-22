@@ -38,6 +38,9 @@
 // Converts a type into a standard mnemonic name suitable for event logging
 + (NSString *)nameForType:(SFIDeviceType)type;
 
++ (NSArray*)addDevice:(SFIDevice*)device list:(NSArray*)list;
++ (NSArray*)removeDevice:(SFIDevice*)device list:(NSArray*)list;
+
 // Indicates whether the device has been tampered
 - (BOOL)isTampered:(SFIDeviceValue *)deviceValue;
 

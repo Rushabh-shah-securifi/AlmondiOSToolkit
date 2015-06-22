@@ -2175,30 +2175,63 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
         return;
     }
 
-    DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
+    DeviceListResponse *res = (DeviceListResponse *) [data valueForKey:@"data"];
 
-    [self.cloudNetwork.networkState clearWillFetchDeviceListForAlmond:obj.almondMAC];
+    [self.cloudNetwork.networkState clearWillFetchDeviceListForAlmond:res.almondMAC];
 
-    if (!obj.isSuccessful) {
+    if (!res.isSuccessful) {
         NSLog(@"Device list response was not successful; stopping");
         return;
     }
 
-    NSString *mac = obj.almondMAC;
-    NSArray *newDevices = obj.deviceList;
+    NSString *mac = res.almondMAC;
 
-    // values not included in response, so request them
-    if (obj.deviceValueList) {
-        [self processDeviceListChange:mac newDevices:newDevices requestValues:NO];
+    switch (res.type) {
+        case DeviceListResponseType_updated: {
+            // values not included in response, so request them
+            NSArray *newDevices = res.deviceList;
 
-        // Update offline storage
-        [self.dataManager writeDeviceValueList:obj.deviceValueList almondMac:mac];
+            if (res.deviceValueList) {
+                [self processDeviceListChange:mac newDevices:newDevices requestValues:NO];
 
-        [self postNotification:kSFIDidChangeDeviceValueList data:mac];
+                // Update offline storage
+                [self.dataManager writeDeviceValueList:res.deviceValueList almondMac:mac];
+
+                [self postNotification:kSFIDidChangeDeviceValueList data:mac];
+            }
+            else {
+                [self processDeviceListChange:mac newDevices:newDevices requestValues:YES];
+            }
+
+            break;
+        };
+        case DeviceListResponseType_added: {
+            NSArray *current = [self.dataManager readDeviceList:mac];
+            for (SFIDevice *device in res.deviceList) {
+                current = [SFIDevice addDevice:device list:current];
+            }
+
+            [self processDeviceListChange:mac newDevices:current requestValues:YES];
+
+            break;
+        };
+        case DeviceListResponseType_removed: {
+            NSArray *current = [self.dataManager readDeviceList:mac];
+            for (SFIDevice *device in res.deviceList) {
+                current = [SFIDevice removeDevice:device list:current];
+            }
+
+            [self processDeviceListChange:mac newDevices:current requestValues:YES];
+
+            break;
+        };
+        case DeviceListResponseType_removed_all: {
+            [self.dataManager removeAllDevices:mac];
+            [self postNotification:kSFIDidChangeDeviceList data:mac];
+            break;
+        }
     }
-    else {
-        [self processDeviceListChange:mac newDevices:newDevices requestValues:YES];
-    }
+
 }
 
 // Processes device lists received in dynamic and on-demand updates.

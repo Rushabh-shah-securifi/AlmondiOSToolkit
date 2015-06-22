@@ -69,6 +69,33 @@
     }
 }
 
++ (NSArray *)addDevice:(SFIDevice *)device list:(NSArray *)list {
+    for (SFIDevice *old in list) {
+        if (device.deviceID == old.deviceID) {
+            // already in list; do nothing
+            return list;
+        }
+    }
+
+    NSMutableArray *new_list = [NSMutableArray arrayWithArray:list];
+    [new_list addObject:device];
+
+    return new_list;
+}
+
++ (NSArray *)removeDevice:(SFIDevice *)device list:(NSArray *)list {
+    NSMutableArray *new_list = [NSMutableArray array];
+
+    for (SFIDevice *old in list) {
+        if (device.deviceID != old.deviceID) {
+            // already in list; do nothing
+            [new_list addObject:device];
+        }
+    }
+
+    return new_list;
+}
+
 - (SFIDevicePropertyType)statePropertyType {
     switch (self.deviceType) {
         case SFIDeviceType_MultiLevelSwitch_2: {

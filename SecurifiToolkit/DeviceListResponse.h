@@ -8,9 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(unsigned int, DeviceListResponseType) {
+    DeviceListResponseType_updated = 0,
+    DeviceListResponseType_added,
+    DeviceListResponseType_removed,
+    DeviceListResponseType_removed_all,
+};
+
 @interface DeviceListResponse : NSObject
 
 + (instancetype)parseJson:(NSDictionary *)payload;
+
+@property(nonatomic) enum DeviceListResponseType type;
 
 @property(nonatomic) BOOL isSuccessful;
 @property(nonatomic) unsigned int deviceCount;

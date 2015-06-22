@@ -86,7 +86,11 @@
     }
 
     NSDictionary *payload = obj;
+
     NSString *commandType = payload[@"commandtype"];
+    if (commandType.length == 0) {
+        commandType = payload[@"CommandType"];
+    }
 
     if ([commandType isEqualToString:@"SensorUpdate"]) {
         DeviceValueResponse *res = [DeviceValueResponse parseJson:payload];
@@ -96,6 +100,28 @@
     }
     else if ([commandType isEqualToString:@"DeviceUpdated"]) {
         DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        res.type = DeviceListResponseType_updated;
+        res.almondMAC = self.config.almondMac;
+
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+    }
+    else if ([commandType isEqualToString:@"DeviceAdded"]) {
+        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        res.type = DeviceListResponseType_added;
+        res.almondMAC = self.config.almondMac;
+
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+    }
+    else if ([commandType isEqualToString:@"DeviceRemoved"]) {
+        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        res.type = DeviceListResponseType_removed;
+        res.almondMAC = self.config.almondMac;
+
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+    }
+    else if ([commandType isEqualToString:@"DeviceRemoveAll"]) {
+        DeviceListResponse *res = [DeviceListResponse new];
+        res.type = DeviceListResponseType_removed_all;
         res.almondMAC = self.config.almondMac;
 
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
@@ -110,7 +136,7 @@
         AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
     }
-    else if ([payload[@"CommandType"] isEqualToString:@"ClientsList"]) {
+    else if ([commandType isEqualToString:@"ClientsList"]) {
         SFIDevicesList *res = [SFIDevicesList parseJson:payload];
 
         SFIGenericRouterCommand *cmd = [SFIGenericRouterCommand new];

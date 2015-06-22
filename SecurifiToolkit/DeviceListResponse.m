@@ -97,10 +97,14 @@
     NSString *str;
 
     str = payload[@"devicetype"];
-    device.deviceType = (SFIDeviceType) str.intValue;
+    if (str.length > 0) {
+        device.deviceType = (SFIDeviceType) str.intValue;
+    }
 
     str = payload[@"deviceid"];
-    device.deviceID = (sfi_id) str.intValue;
+    if (str.length > 0) {
+        device.deviceID = (sfi_id) str.intValue;
+    }
 
     return device;
 }
@@ -125,7 +129,9 @@
     SFIDeviceKnownValues *values = [SFIDeviceKnownValues new];
 
     NSString *index = payload[@"index"];
-    values.index = (unsigned int) index.intValue;
+    if (index.length > 0) {
+        values.index = (unsigned int) index.intValue;
+    }
 
     NSString *valueName = payload[@"name"];
     values.valueName = valueName;

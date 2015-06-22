@@ -29,6 +29,8 @@
 
 - (NSArray *)readDeviceValueList:(NSString *)almondMac;
 
+- (void)removeAllDevices:(NSString *)almondMac;
+
 - (void)writeNotificationPreferenceList:(NSArray *)notificationList almondMac:(NSString *)almondMac;
 
 - (NSArray *)readNotificationPreferenceList:(NSString *)almondMac;

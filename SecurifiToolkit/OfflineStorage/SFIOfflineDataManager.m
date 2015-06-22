@@ -116,6 +116,13 @@
     return [self readDictionaryEntryForFilePath:self.deviceValueFp key:almondMac locker:self.syncLocker];
 }
 
+- (void)removeAllDevices:(NSString *)almondMac {
+    @synchronized (self.syncLocker) {
+        [self removedDictionaryEntryFromFilePath:self.deviceListFp key:almondMac locker:self.syncLocker];
+        [self removedDictionaryEntryFromFilePath:self.deviceValueFp key:almondMac locker:self.syncLocker];
+    }
+}
+
 // Delete DeviceValueList for the deleted almond from offline storage
 - (void)deleteDeviceValueForAlmond:(NSString *)almondMac {
     [self removedDictionaryEntryFromFilePath:self.deviceValueFp key:almondMac locker:self.syncLocker];
