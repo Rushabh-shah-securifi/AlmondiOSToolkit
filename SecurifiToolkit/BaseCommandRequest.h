@@ -25,4 +25,6 @@
 // Called to check against standard expiration time, which is 5 seconds.
 - (BOOL)isExpired;
 
+- (NSData *)serializeJson:(NSDictionary *)payload;
+
 @end

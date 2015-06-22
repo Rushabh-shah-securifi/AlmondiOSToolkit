@@ -9,6 +9,7 @@
 #import "NetworkConfig.h"
 #import "DeviceListResponse.h"
 #import "DeviceValueResponse.h"
+#import "AlmondModeChangeResponse.h"
 
 
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
@@ -35,7 +36,7 @@
     NetworkConfig *config = self.config;
 
     // ws://192.168.1.102:7681/<password>
-    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@", config.host, config.port, config.password];
+    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@", config.host, (unsigned long) config.port, config.password];
     NSURL *url = [NSURL URLWithString:connect_str];
 
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -87,15 +88,25 @@
 
     if ([commandType isEqualToString:@"SensorUpdate"]) {
         DeviceValueResponse *res = [DeviceValueResponse parseJson:payload];
-        res.almondMAC = nil; //todo hack for now: signal that the local network almond should be used
+        res.almondMAC = self.config.almondMac;
+
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DYNAMIC_DEVICE_VALUE_LIST];
+    }
+    else if ([commandType isEqualToString:@"DeviceUpdated"]) {
+        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        res.almondMAC = self.config.almondMac;
+
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
     }
     else if ([commandType isEqualToString:@"devicelist"]) {
         DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-        NSString *mii = payload[@"mii"];
-        NSRange range = [mii rangeOfString:@":"];
-        res.almondMAC = [mii substringToIndex:range.location];
+        res.almondMAC = self.config.almondMac;
+
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+    }
+    else if ([commandType isEqualToString:@"updatealmondmode"]) {
+        AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
     }
 }
 

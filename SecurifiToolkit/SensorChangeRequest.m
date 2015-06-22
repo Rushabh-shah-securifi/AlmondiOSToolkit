@@ -20,7 +20,7 @@
     [writer addElement:@"AlmondplusMAC" text:self.almondMAC];
 
     [writer startElement:@"Device"];
-    [writer addAttribute:@"ID" value:self.deviceID];
+    [writer addAttribute:@"ID" intValue:self.deviceId];
     //
     NSString *name = [self.changedName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (name.length > 0) {
@@ -44,5 +44,32 @@
 
     return writer.toString;
 }
+
+/*
+
+{
+"mii":"<random key>",
+"cmd":"editdevicename",
+"devid":"6",
+"name":"newswitchsss",
+"location":"default"
+}
+
+ */
+
+- (NSData *)toJson {
+    NSString *mii = [NSString stringWithFormat:@"%d", self.correlationId];
+
+    NSDictionary *payload = @{
+            @"mii" : mii,
+            @"cmd" : @"editdevicename",
+            @"devid" : @(self.deviceId).stringValue,
+            @"name" : self.changedName,
+            @"location" : self.changedLocation
+    };
+
+    return [self serializeJson:payload];
+}
+
 
 @end

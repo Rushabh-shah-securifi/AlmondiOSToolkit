@@ -12,10 +12,11 @@
 
 @interface SensorChangeRequest : BaseCommandRequest <SecurifiCommand>
 @property(nonatomic, copy) NSString *almondMAC;
-@property(nonatomic, copy) NSString *deviceID;
+@property(nonatomic) sfi_id deviceId;
 @property(nonatomic, copy) NSString *changedName;
 @property(nonatomic, copy) NSString *changedLocation;
 
 - (NSString *)toXml;
+- (NSData *)toJson;
 
 @end

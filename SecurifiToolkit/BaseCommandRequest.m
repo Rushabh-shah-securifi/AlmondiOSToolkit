@@ -35,4 +35,16 @@
     return [self shouldExpireAfterSeconds:5];
 }
 
+- (NSData *)serializeJson:(NSDictionary *)payload {
+    NSError *error;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+
+    if (error) {
+        NSLog(@"serializeJson: error serializing JSON, payload:%@, error:%@", payload, error.description);
+        return [NSData data];
+    }
+
+    return data;
+}
+
 @end
