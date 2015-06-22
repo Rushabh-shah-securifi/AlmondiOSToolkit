@@ -11,6 +11,10 @@
 //todo badly modeled: no needed for a value holder for an array of ConnectedDevice
 
 @interface SFIDevicesList : NSObject
-@property unsigned int deviceCount;
-@property (nonatomic,retain) NSArray *deviceList; //SFIConnectedDevice and SFIBlockedDevice
+
++ (instancetype)parseJson:(NSDictionary *)payload;
+
+@property(nonatomic) unsigned int deviceCount;
+@property(nonatomic, retain) NSArray *deviceList; //SFIConnectedDevice and SFIBlockedDevice
+
 @end

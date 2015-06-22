@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Securifi. All rights reserved.
 //
 
+#import "SFIGenericRouterCommand.h"
+
 @implementation SFIGenericRouterCommand
 
 @end

@@ -91,6 +91,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
 
     CommandType_ALMOND_MODE_CHANGE_REQUEST              = 635,  // 61 (635)
     CommandType_ALMOND_MODE_CHANGE_RESPONSE             = 638,  // 64 (638)
+    CommandType_ALMOND_COMMAND_RESPONSE                 = 2001, // internally defined command type;
 
     CommandType_NOTIFICATIONS_SYNC_REQUEST              = 800,
     CommandType_NOTIFICATIONS_SYNC_RESPONSE             = 801,

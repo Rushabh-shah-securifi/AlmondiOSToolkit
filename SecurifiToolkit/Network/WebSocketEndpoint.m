@@ -10,6 +10,8 @@
 #import "DeviceListResponse.h"
 #import "DeviceValueResponse.h"
 #import "AlmondModeChangeResponse.h"
+#import "SFIDevicesList.h"
+#import "SFIGenericRouterCommand.h"
 
 
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
@@ -107,6 +109,17 @@
     else if ([commandType isEqualToString:@"updatealmondmode"]) {
         AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
+    }
+    else if ([payload[@"CommandType"] isEqualToString:@"ClientsList"]) {
+        SFIDevicesList *res = [SFIDevicesList parseJson:payload];
+
+        SFIGenericRouterCommand *cmd = [SFIGenericRouterCommand new];
+        cmd.almondMAC = self.config.almondMac;
+        cmd.commandSuccess = YES;
+        cmd.commandType = SFIGenericRouterCommandType_CONNECTED_DEVICES;
+        cmd.command = res;
+
+        [self.delegate networkEndpoint:self dispatchResponse:cmd commandType:CommandType_ALMOND_COMMAND_RESPONSE];
     }
 }
 

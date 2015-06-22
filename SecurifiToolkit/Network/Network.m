@@ -663,6 +663,12 @@
             break;
         };
 
+        case CommandType_ALMOND_COMMAND_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ALMOND_COMMAND_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+
         default:
             break;
     }
