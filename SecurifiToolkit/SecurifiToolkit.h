@@ -85,6 +85,11 @@
 
 #import <SecurifiToolkit/AlmondVersionChecker.h>
 
+#import <SecurifiToolkit/SFIGenericRouterCommand.h>
+#import <SecurifiToolkit/SFIBlockedDevice.h>
+#import <SecurifiToolkit/SFIConnectedDevice.h>
+#import <SecurifiToolkit/SFIDevicesList.h>
+
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
 @class NotificationPreferences;

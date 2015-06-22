@@ -1355,7 +1355,6 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
 - (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum AlmondStatusAndSettings)type {
     if (type == AlmondStatusAndSettings_connected_device) {
         BOOL local = [self useLocalNetwork:almondMac];
-        Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
 
         if (local) {
             BaseCommandRequest *bcmd = [BaseCommandRequest new];
@@ -1371,12 +1370,13 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
             cmd.command = data;
             cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
 
+            Network *network = [self localNetworkForAlmond:almondMac];
             [network submitCommand:cmd];
 
             return;
-
-            // else pass through
         }
+
+        // else pass through
     }
 
     NSString *data;

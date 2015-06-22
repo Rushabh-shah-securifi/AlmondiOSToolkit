@@ -34,6 +34,14 @@
 		1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3270E11A243B28007202C1 /* SFIWirelessSummary.m */; };
 		1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3270E21A243B28007202C1 /* SFIWirelessUsers.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3270E31A243B28007202C1 /* SFIWirelessUsers.m */; };
+		1C3EEFBF1B37999300DFCF62 /* SFIBlockedDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFB91B37999300DFCF62 /* SFIBlockedDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C3EEFC01B37999300DFCF62 /* SFIBlockedDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFBA1B37999300DFCF62 /* SFIBlockedDevice.m */; };
+		1C3EEFC11B37999300DFCF62 /* SFIConnectedDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFBB1B37999300DFCF62 /* SFIConnectedDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C3EEFC21B37999300DFCF62 /* SFIConnectedDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFBC1B37999300DFCF62 /* SFIConnectedDevice.m */; };
+		1C3EEFC31B37999300DFCF62 /* SFIDevicesList.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFBD1B37999300DFCF62 /* SFIDevicesList.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C3EEFC41B37999300DFCF62 /* SFIDevicesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFBE1B37999300DFCF62 /* SFIDevicesList.m */; };
+		1C3EEFC71B379B3800DFCF62 /* SFIGenericRouterCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFC51B379B3800DFCF62 /* SFIGenericRouterCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C3EEFC81B379B3800DFCF62 /* SFIGenericRouterCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFC61B379B3800DFCF62 /* SFIGenericRouterCommand.m */; };
 		1C414BC61A79F02600C448A4 /* ZHDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BC21A79F02600C448A4 /* ZHDatabase.h */; };
 		1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BC31A79F02600C448A4 /* ZHDatabase.m */; };
 		1C414BC81A79F02600C448A4 /* ZHDatabaseStatement.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BC41A79F02600C448A4 /* ZHDatabaseStatement.h */; };
@@ -334,6 +342,14 @@
 		1C3270E11A243B28007202C1 /* SFIWirelessSummary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessSummary.m; sourceTree = "<group>"; };
 		1C3270E21A243B28007202C1 /* SFIWirelessUsers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIWirelessUsers.h; sourceTree = "<group>"; };
 		1C3270E31A243B28007202C1 /* SFIWirelessUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessUsers.m; sourceTree = "<group>"; };
+		1C3EEFB91B37999300DFCF62 /* SFIBlockedDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIBlockedDevice.h; sourceTree = "<group>"; };
+		1C3EEFBA1B37999300DFCF62 /* SFIBlockedDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIBlockedDevice.m; sourceTree = "<group>"; };
+		1C3EEFBB1B37999300DFCF62 /* SFIConnectedDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIConnectedDevice.h; sourceTree = "<group>"; };
+		1C3EEFBC1B37999300DFCF62 /* SFIConnectedDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIConnectedDevice.m; sourceTree = "<group>"; };
+		1C3EEFBD1B37999300DFCF62 /* SFIDevicesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIDevicesList.h; sourceTree = "<group>"; };
+		1C3EEFBE1B37999300DFCF62 /* SFIDevicesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIDevicesList.m; sourceTree = "<group>"; };
+		1C3EEFC51B379B3800DFCF62 /* SFIGenericRouterCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIGenericRouterCommand.h; sourceTree = "<group>"; };
+		1C3EEFC61B379B3800DFCF62 /* SFIGenericRouterCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIGenericRouterCommand.m; sourceTree = "<group>"; };
 		1C414BC21A79F02600C448A4 /* ZHDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZHDatabase.h; sourceTree = "<group>"; };
 		1C414BC31A79F02600C448A4 /* ZHDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZHDatabase.m; sourceTree = "<group>"; };
 		1C414BC41A79F02600C448A4 /* ZHDatabaseStatement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZHDatabaseStatement.h; sourceTree = "<group>"; };
@@ -648,6 +664,21 @@
 			path = Router;
 			sourceTree = "<group>";
 		};
+		1C3EEFB81B37999300DFCF62 /* Almond */ = {
+			isa = PBXGroup;
+			children = (
+				1C3EEFB91B37999300DFCF62 /* SFIBlockedDevice.h */,
+				1C3EEFBA1B37999300DFCF62 /* SFIBlockedDevice.m */,
+				1C3EEFBB1B37999300DFCF62 /* SFIConnectedDevice.h */,
+				1C3EEFBC1B37999300DFCF62 /* SFIConnectedDevice.m */,
+				1C3EEFBD1B37999300DFCF62 /* SFIDevicesList.h */,
+				1C3EEFBE1B37999300DFCF62 /* SFIDevicesList.m */,
+				1C3EEFC51B379B3800DFCF62 /* SFIGenericRouterCommand.h */,
+				1C3EEFC61B379B3800DFCF62 /* SFIGenericRouterCommand.m */,
+			);
+			path = Almond;
+			sourceTree = "<group>";
+		};
 		1C414BC11A79F02600C448A4 /* Db */ = {
 			isa = PBXGroup;
 			children = (
@@ -863,6 +894,7 @@
 		221185BF178D371200EE23ED /* SecurifiToolkit */ = {
 			isa = PBXGroup;
 			children = (
+				1C3EEFB81B37999300DFCF62 /* Almond */,
 				1CE67A2E1A91D7670004E68C /* AlmondMode */,
 				1C414BE71A7B625400C448A4 /* AppKit */,
 				CE7EA7DB18978910005DCBA3 /* Base64 */,
@@ -1115,6 +1147,7 @@
 				22A76D3C17912F980099CD8F /* SignupResponse.h in Headers */,
 				CE6DC94517EC60C2006F48C4 /* MobileCommandRequest.h in Headers */,
 				1CD1D5521A660B7A00C030E9 /* NotificationPreferences.h in Headers */,
+				1C3EEFC31B37999300DFCF62 /* SFIDevicesList.h in Headers */,
 				22A76D491791347D0099CD8F /* AffiliationUserComplete.h in Headers */,
 				2204C20E1794349400B05F17 /* GenericCommand.h in Headers */,
 				22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */,
@@ -1154,6 +1187,7 @@
 				22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */,
 				CE5EB63D17E8548500985636 /* DeviceDataHashRequest.h in Headers */,
 				CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */,
+				1C3EEFC11B37999300DFCF62 /* SFIConnectedDevice.h in Headers */,
 				CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */,
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
 				1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */,
@@ -1214,6 +1248,7 @@
 				1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */,
 				1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */,
 				1DF03C9FE842023F0F9D0202 /* SFINotificationStore.h in Headers */,
+				1C3EEFC71B379B3800DFCF62 /* SFIGenericRouterCommand.h in Headers */,
 				1DF037531EF66D6AA5504BD5 /* NotificationStoreImpl.h in Headers */,
 				1DF03EAA8828BEC034BDCA43 /* AlmondModeChangeResponse.h in Headers */,
 				1DF03C8BC24C649E0B09C2BE /* DynamicAlmondModeChange.h in Headers */,
@@ -1228,6 +1263,7 @@
 				1DF0358CCF266F1666C24215 /* NotificationClearCountRequest.h in Headers */,
 				1C4382F11B2FDD5200F6AB7A /* PSWebSocketDriver.h in Headers */,
 				1DF0371747228122D3121E75 /* NotificationClearCountResponse.h in Headers */,
+				1C3EEFBF1B37999300DFCF62 /* SFIBlockedDevice.h in Headers */,
 				1DF038EAE9E89CD9BFFC13C7 /* AlmondVersionChecker.h in Headers */,
 				1C4382FB1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h in Headers */,
 				1DF03E9C2661E5E178DFE76F /* Network.h in Headers */,
@@ -1439,12 +1475,14 @@
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
 				1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */,
 				1C4382EC1B2FDD5200F6AB7A /* PSWebSocket.m in Sources */,
+				1C3EEFC01B37999300DFCF62 /* SFIBlockedDevice.m in Sources */,
 				CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */,
 				CE2EA25219D00B3E00C6D6A8 /* UserInviteRequest.m in Sources */,
 				CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */,
 				CEAD85AA19CABCBE006D1048 /* DeleteAccountResponse.m in Sources */,
 				CE9A2913188D2B240063D562 /* SensorChangeRequest.m in Sources */,
 				22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */,
+				1C3EEFC21B37999300DFCF62 /* SFIConnectedDevice.m in Sources */,
 				CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
 				1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */,
@@ -1452,6 +1490,7 @@
 				CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */,
 				CE5EB64A17E86D2200985636 /* DeviceListResponse.m in Sources */,
 				CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */,
+				1C3EEFC81B379B3800DFCF62 /* SFIGenericRouterCommand.m in Sources */,
 				CE91316E19C9A2DD00D94876 /* ChangePasswordRequest.m in Sources */,
 				22B326D01796D447004B3642 /* SanityResponse.m in Sources */,
 				CE2EA25E19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m in Sources */,
@@ -1494,6 +1533,7 @@
 				1DF03C118A1C313783C2A754 /* AlmondModeResponse.m in Sources */,
 				1DF03E686E9BAAF688AD3552 /* NotificationListResponse.m in Sources */,
 				1DF03CA0928047DC7842F144 /* NotificationListRequest.m in Sources */,
+				1C3EEFC41B37999300DFCF62 /* SFIDevicesList.m in Sources */,
 				1DF03D5707598F4315C494FC /* NotificationCountRequest.m in Sources */,
 				1DF03CBA2B45BFB97D3A8E79 /* NotificationCountResponse.m in Sources */,
 				1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */,
