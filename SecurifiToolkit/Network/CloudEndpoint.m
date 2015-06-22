@@ -95,7 +95,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
             NSString *server = configurator.host;
             CFStringRef host = (__bridge CFStringRef) server;
-            UInt32 port = configurator.port;
+            UInt32 port = (UInt32) configurator.port;
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
 
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;

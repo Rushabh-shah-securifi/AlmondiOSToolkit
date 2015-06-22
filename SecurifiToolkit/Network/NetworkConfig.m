@@ -5,6 +5,7 @@
 
 #import "NetworkConfig.h"
 #import "SecurifiConfigurator.h"
+#import "SFIAlmondPlus.h"
 
 
 @implementation NetworkConfig
@@ -16,6 +17,12 @@
     config.enableCertificateValidation = configurator.enableCertificateValidation;
     config.host = useProductionHost ? configurator.productionCloudHost : configurator.developmentCloudHost;
     config.port = configurator.cloudPort;
+    return config;
+}
+
++ (instancetype)webSocketConfigAlmond:(NSString *)almond {
+    NetworkConfig *config = [NetworkConfig configWithMode:NetworkEndpointMode_web_socket];
+    config.almondMac = almond;
     return config;
 }
 

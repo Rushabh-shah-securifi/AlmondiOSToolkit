@@ -6,6 +6,7 @@
 #import <Foundation/Foundation.h>
 
 @class SecurifiConfigurator;
+@class SFIAlmondPlus;
 
 typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
     NetworkEndpointMode_cloud,
@@ -17,14 +18,16 @@ typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
 // Factory for making a Network configuration based on the main configurator settings
 + (instancetype)cloudConfig:(SecurifiConfigurator *)configurator useProductionHost:(BOOL)useProductionHost;
 
-// Factory for making a Web Socket config (set host, port, and password values individually)
-+ (instancetype)configWithMode:(enum NetworkEndpointMode)mode;
++ (instancetype)webSocketConfigAlmond:(NSString *)almondMac;
 
 @property(readonly) enum NetworkEndpointMode mode;
 
+// Optional value: used for web socket mode to inform the socket/callbacks about the Almond
+@property(nonatomic, copy) NSString *almondMac;
+
 @property(nonatomic, copy) NSString *host;
 
-@property(nonatomic) UInt32 port;
+@property(nonatomic) NSUInteger port;
 
 @property(nonatomic, copy) NSString *password;
 
