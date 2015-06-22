@@ -82,7 +82,7 @@
     }
 
     res.deviceList = devices;
-    res.deviceCount = devices.count;
+    res.deviceCount = (unsigned int) devices.count;
     res.deviceValueList = deviceValueList;
     
     return res;
