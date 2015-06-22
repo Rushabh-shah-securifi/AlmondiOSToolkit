@@ -22,7 +22,7 @@
 
 @property(nonatomic, copy) NSString *developmentCloudHost;
 
-@property(nonatomic) UInt32 cloudPort;
+@property(nonatomic) NSUInteger cloudPort;
 
 // defaults to NO; when YES, the remote SSL certificate is validated against one stored in the app's bundle
 @property(nonatomic) BOOL enableCertificateValidation;
