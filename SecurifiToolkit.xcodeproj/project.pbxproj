@@ -226,8 +226,6 @@
 		CE466A601823CFF900E55DF9 /* ResetPasswordRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A5E1823CFF900E55DF9 /* ResetPasswordRequest.m */; };
 		CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A611823D01E00E55DF9 /* ResetPasswordResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */; };
-		CE539F8E17FAD40B00640820 /* SNLog.h in Headers */ = {isa = PBXBuildFile; fileRef = CE539F8C17FAD40B00640820 /* SNLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE539F8F17FAD40B00640820 /* SNLog.m in Sources */ = {isa = PBXBuildFile; fileRef = CE539F8D17FAD40B00640820 /* SNLog.m */; };
 		CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */; };
 		CE5EB5B917E703AB00985636 /* LogoutAllRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -540,8 +538,6 @@
 		CE466A5E1823CFF900E55DF9 /* ResetPasswordRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResetPasswordRequest.m; sourceTree = "<group>"; };
 		CE466A611823D01E00E55DF9 /* ResetPasswordResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResetPasswordResponse.h; sourceTree = "<group>"; };
 		CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResetPasswordResponse.m; sourceTree = "<group>"; };
-		CE539F8C17FAD40B00640820 /* SNLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNLog.h; sourceTree = "<group>"; };
-		CE539F8D17FAD40B00640820 /* SNLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNLog.m; sourceTree = "<group>"; };
 		CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SFIAlmondPlus.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SFIAlmondPlus.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllRequest.h; sourceTree = "<group>"; };
@@ -899,7 +895,6 @@
 				1C414BE71A7B625400C448A4 /* AppKit */,
 				CE7EA7DB18978910005DCBA3 /* Base64 */,
 				1C414BC11A79F02600C448A4 /* Db */,
-				CE539F8B17FAD3F900640820 /* Logs */,
 				1C414BE21A79F39600C448A4 /* keychain */,
 				1C414BD91A79F35D00C448A4 /* Network */,
 				1CD1D5331A660B7A00C030E9 /* Notifications */,
@@ -1096,15 +1091,6 @@
 			name = util;
 			sourceTree = "<group>";
 		};
-		CE539F8B17FAD3F900640820 /* Logs */ = {
-			isa = PBXGroup;
-			children = (
-				CE539F8C17FAD40B00640820 /* SNLog.h */,
-				CE539F8D17FAD40B00640820 /* SNLog.m */,
-			);
-			name = Logs;
-			sourceTree = "<group>";
-		};
 		CE5EB63617E852AA00985636 /* models */ = {
 			isa = PBXGroup;
 			children = (
@@ -1156,7 +1142,6 @@
 				CE5EB63417E82CB400985636 /* DeviceListRequest.h in Headers */,
 				CE5EB64917E86D2200985636 /* DeviceListResponse.h in Headers */,
 				1CD1D54A1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h in Headers */,
-				CE539F8E17FAD40B00640820 /* SNLog.h in Headers */,
 				CE2EA25119D00B3E00C6D6A8 /* UserInviteRequest.h in Headers */,
 				CE5EB64E17EAD41F00985636 /* DeviceValueRequest.h in Headers */,
 				CE5EB63917E852E500985636 /* SFIDevice.h in Headers */,
@@ -1441,7 +1426,6 @@
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
 				22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */,
 				1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */,
-				CE539F8F17FAD40B00640820 /* SNLog.m in Sources */,
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				22A76D461791339B0099CD8F /* LogoutResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
