@@ -151,7 +151,7 @@
     [self writeDictionaryEntryToFilePath:self.almondLocalNetworkSettingsFp key:settings.almondplusMAC value:settings locker:self.syncLocker];
 }
 
-- (SFIAlmondLocalNetworkSettings *)readALmondLocalNetworkSettings:(NSString *)almondMac {
+- (SFIAlmondLocalNetworkSettings *)readAlmondLocalNetworkSettings:(NSString *)almondMac {
     return [self readDictionaryEntryForFilePath:self.almondLocalNetworkSettingsFp key:almondMac locker:self.syncLocker];
 }
 

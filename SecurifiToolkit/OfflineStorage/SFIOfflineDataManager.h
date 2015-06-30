@@ -37,7 +37,7 @@
 
 - (void)writeAlmondLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
 
-- (SFIAlmondLocalNetworkSettings *)readALmondLocalNetworkSettings:(NSString *)almondMac;
+- (SFIAlmondLocalNetworkSettings *)readAlmondLocalNetworkSettings:(NSString *)almondMac;
 
 - (void)purgeAll;
 

@@ -2891,7 +2891,7 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
 }
 
 - (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
-    return [self.dataManager readALmondLocalNetworkSettings:almondMac];
+    return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
 }
 
 - (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
