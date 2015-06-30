@@ -14,6 +14,7 @@
 #import "CloudEndpoint.h"
 #import "NetworkConfig.h"
 #import "WebSocketEndpoint.h"
+#import "LoginResponse.h"
 
 @interface Network () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) NetworkConfig *networkConfig;

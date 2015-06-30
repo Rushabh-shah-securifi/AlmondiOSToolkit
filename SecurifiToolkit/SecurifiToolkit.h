@@ -21,16 +21,10 @@
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>
 
 #import <SecurifiToolkit/CommandTypes.h>
-#import <SecurifiToolkit/LoginResponse.h>
-#import <SecurifiToolkit/Login.h>
 #import <SecurifiToolkit/AffiliationUserRequest.h>
 #import <SecurifiToolkit/AffiliationUserComplete.h>
 #import <SecurifiToolkit/Signup.h>
 #import <SecurifiToolkit/SignupResponse.h>
-#import <SecurifiToolkit/Logout.h>
-#import <SecurifiToolkit/LogoutResponse.h>
-#import <SecurifiToolkit/LogoutAllRequest.h>
-#import <SecurifiToolkit/LogoutAllResponse.h>
 #import <SecurifiToolkit/AlmondListRequest.h>
 #import <SecurifiToolkit/AlmondListResponse.h>
 #import <SecurifiToolkit/DeviceDataHashRequest.h>
@@ -39,6 +33,10 @@
 #import <SecurifiToolkit/DeviceListResponse.h>
 #import <SecurifiToolkit/DeviceValueRequest.h>
 #import <SecurifiToolkit/DeviceValueResponse.h>
+
+#import <SecurifiToolkit/LoginResponse.h>
+#import <SecurifiToolkit/LogoutResponse.h>
+#import <SecurifiToolkit/LogoutAllResponse.h>
 
 #import <SecurifiToolkit/SFIReachabilityManager.h>
 #import <SecurifiToolkit/MobileCommandRequest.h>

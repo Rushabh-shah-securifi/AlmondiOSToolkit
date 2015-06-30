@@ -9,7 +9,9 @@
 #import <SecurifiToolkit/SecurifiToolkit.h>
 #import "Network.h"
 #import "NetworkState.h"
+#import "Login.h"
 #import "LoginTempPass.h"
+#import "LogoutAllRequest.h"
 #import "KeyChainWrapper.h"
 #import "ChangePasswordRequest.h"
 #import "UnlinkAlmondRequest.h"

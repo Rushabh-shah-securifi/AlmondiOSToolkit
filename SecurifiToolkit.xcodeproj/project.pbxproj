@@ -105,6 +105,7 @@
 		1CFBB5501A257D1900438B5F /* SecurifiConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */; };
 		1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */ = {isa = PBXBuildFile; fileRef = CE91315519C6B94500D94876 /* UserProfileResponse.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03066782B488103FE1232 /* DynamicAlmondModeChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03048BDC4DD3CB8D3B224 /* DynamicAlmondModeChange.m */; };
+		1DF030928185AD7897BD4669 /* LogoutAllRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0390D1F9488A35437C274 /* LogoutAllRequest.h */; };
 		1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F977E6A78507A5D7714 /* NotificationClearCountRequest.m */; };
 		1DF030FB420C44DB752D47D6 /* SFIAlmondLocalNetworkSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0386F473DC4BF02299011 /* SFIAlmondLocalNetworkSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0318029A6D5169BBF1BAA /* AlmondVersionChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03AF40507D6D74C658843 /* AlmondVersionChecker.m */; };
@@ -116,11 +117,15 @@
 		1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03895670DA1C15314D2F8 /* SFINotification.m */; };
 		1DF033F86547E8B8555F3561 /* NotificationClearCountResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0302CDB8965A050AD9FE6 /* NotificationClearCountResponse.m */; };
 		1DF034303C37A11B7DC547A6 /* Network.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0350AA74A3E1DB6F0FB69 /* Network.m */; };
+		1DF034D24160AD58745E639A /* Login.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF034839BEB39276F041984 /* Login.h */; };
 		1DF035141737DE9D6C0BC6FC /* NetworkState.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03C6B69373981F3AE8A22 /* NetworkState.h */; };
 		1DF035420555D20D2F38BC1A /* NotificationCountResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF030ADDC3DE8F3592D6848 /* NotificationCountResponse.h */; };
+		1DF03573A6FF405D7E53703D /* LoginTempPass.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0379AC087F23C3556032D /* LoginTempPass.h */; };
 		1DF0358CCF266F1666C24215 /* NotificationClearCountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF031D70C5A2A701F6BF0F5 /* NotificationClearCountRequest.h */; };
+		1DF035F57F29A54222660EEB /* LogoutAllResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0306BCF4286F284285323 /* LogoutAllResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0360F76B7FDD43B761465 /* NotificationListResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CBFFB839D0CCE8BCB80 /* NotificationListResponse.h */; };
 		1DF036470B9395C15C0C6DE9 /* SFIAlmondModeRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03B4F919594612F230FCE /* SFIAlmondModeRef.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1DF0368DD83B59AA804E1C53 /* Logout.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03637629F3FCED078391C /* Logout.h */; };
 		1DF036CF40181B113E42E1D3 /* NotificationCountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0386BB4B3FAC65DD9B13B /* NotificationCountRequest.h */; };
 		1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF034243877C8131B0AE8FE /* XMLWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03230F1B32E197753B9B3 /* DatabaseStore.h */; };
@@ -130,9 +135,15 @@
 		1DF03753A9285273865B06F1 /* AlmondModeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03706AD1D324848D38018 /* AlmondModeResponse.h */; };
 		1DF037CAB07B19208BC80642 /* AlmondModeChangeResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03FE0AE2F686D9B9567D2 /* AlmondModeChangeResponse.m */; };
 		1DF037D75654FB77C8A4DFA3 /* NotificationListRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03D1CB4599BCCF5F3A4D6 /* NotificationListRequest.h */; };
+		1DF03869CA4DCBEF86FDB796 /* LoginTempPass.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0300E2D5F2FDCCE4E0D40 /* LoginTempPass.m */; };
+		1DF03893C0E4096C00AD3FAC /* LogoutAllRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF038B47543CC3DB75CC4DA /* LogoutAllRequest.m */; };
 		1DF038D75AEE3E0335A71E1F /* NotificationStoreImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF036BCA9C9243024CE5DC3 /* NotificationStoreImpl.m */; };
 		1DF038EAE9E89CD9BFFC13C7 /* AlmondVersionChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03FD4D648CEA9DD9511CA /* AlmondVersionChecker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF0390759040630E20655FB /* WebSocketEndpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03452206E54610E1F7161 /* WebSocketEndpoint.h */; };
+		1DF039194B7179E760D5F2F5 /* LogoutResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0317A8DDEF36E96CAE5D1 /* LogoutResponse.m */; };
+		1DF0391E21650F9E90235929 /* Login.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03C7EBCF2870EE8286168 /* Login.m */; };
+		1DF0394FB68EE0CD0700B060 /* LoginResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03A406FB6E19CB2451868 /* LoginResponse.m */; };
+		1DF0398177D6DD566A25FA8B /* LogoutResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03E106E165456C1E264EC /* LogoutResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03A62EE5637C369154114 /* NetworkEndpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CCE2A1CB575A240FE08 /* NetworkEndpoint.h */; };
 		1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0331795B522861FD989FC /* NetworkConfig.m */; };
 		1DF03B1949689A39B13C7D41 /* NetworkConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03A6156A59D49A942855B /* NetworkConfig.h */; };
@@ -147,19 +158,18 @@
 		1DF03CBA2B45BFB97D3A8E79 /* NotificationCountResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF031525512886EC02E8E6E /* NotificationCountResponse.m */; };
 		1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF037E41986B5D077457BCB /* SecurifiTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03D5707598F4315C494FC /* NotificationCountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF035054F2C01C6FEEB7FC0 /* NotificationCountRequest.m */; };
+		1DF03DBC398A267A9DC97053 /* Logout.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0364DC25ECA87A0B0132E /* Logout.m */; };
 		1DF03E686E9BAAF688AD3552 /* NotificationListResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03C2A0526E007E2895002 /* NotificationListResponse.m */; };
 		1DF03E9C2661E5E178DFE76F /* Network.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03D1D1C66E96149090ACE /* Network.h */; };
 		1DF03EAA8828BEC034BDCA43 /* AlmondModeChangeResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0340881CA9720996080FA /* AlmondModeChangeResponse.h */; };
 		1DF03ED7951D970D55780A5B /* SFIXmlWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CB16EDB103AB5B43224 /* SFIXmlWriter.h */; };
+		1DF03F07DEDDEB40985EC721 /* LoginResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03859DF7750FF4162D60A /* LoginResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1DF03F559DD7C482A3D38939 /* LogoutAllResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03452D464546CF7E7CBE1 /* LogoutAllResponse.m */; };
 		1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */; };
 		1DF03FF5727F64CF4EDF5625 /* SFIXmlWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03B0459C4363665236FA1 /* SFIXmlWriter.m */; };
 		1DF03FFBF6EF6243078A2329 /* DatabaseStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F975AE4915FC041E2D3 /* DatabaseStore.m */; };
 		22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D42179132A40099CD8F /* CommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22011C9E179543E80019D5A4 /* Login.h in Headers */ = {isa = PBXBuildFile; fileRef = 22011C9C179543E80019D5A4 /* Login.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22011C9F179543E80019D5A4 /* Login.m in Sources */ = {isa = PBXBuildFile; fileRef = 22011C9D179543E80019D5A4 /* Login.m */; };
-		22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */ = {isa = PBXBuildFile; fileRef = 22011CA1179549C70019D5A4 /* LoginTempPass.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */ = {isa = PBXBuildFile; fileRef = 22011CA2179549C70019D5A4 /* LoginTempPass.m */; };
 		2204C20E1794349400B05F17 /* GenericCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 2204C20C1794349400B05F17 /* GenericCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2204C20F1794349400B05F17 /* GenericCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2204C20D1794349400B05F17 /* GenericCommand.m */; };
 		221185BE178D371200EE23ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185BD178D371200EE23ED /* Foundation.framework */; };
@@ -172,14 +182,8 @@
 		2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 2253388317A6B7380051BF0F /* AffiliationUserRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2253388617A6B7380051BF0F /* AffiliationUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253388417A6B7380051BF0F /* AffiliationUserRequest.m */; };
 		22A19D941797AC7A003E6148 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A19D931797AC7A003E6148 /* SystemConfiguration.framework */; };
-		22A76D3817912EAC0099CD8F /* LoginResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D3617912EAC0099CD8F /* LoginResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22A76D3917912EAC0099CD8F /* LoginResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A76D3717912EAC0099CD8F /* LoginResponse.m */; };
 		22A76D3C17912F980099CD8F /* SignupResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D3A17912F980099CD8F /* SignupResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A76D3B17912F980099CD8F /* SignupResponse.m */; };
-		22A76D4017912FF10099CD8F /* LogoutAllResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D3E17912FF10099CD8F /* LogoutAllResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A76D3F17912FF10099CD8F /* LogoutAllResponse.m */; };
-		22A76D451791339B0099CD8F /* LogoutResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D431791339B0099CD8F /* LogoutResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22A76D461791339B0099CD8F /* LogoutResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A76D441791339B0099CD8F /* LogoutResponse.m */; };
 		22A76D491791347D0099CD8F /* AffiliationUserComplete.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D471791347D0099CD8F /* AffiliationUserComplete.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22A76D4A1791347D0099CD8F /* AffiliationUserComplete.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A76D481791347D0099CD8F /* AffiliationUserComplete.m */; };
 		22A76D4D179136B80099CD8F /* CommandParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D4B179136B80099CD8F /* CommandParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -189,8 +193,6 @@
 		22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22B326D11796D659004B3642 /* PrivateCommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22FAE88817A8E528002FFEE8 /* Signup.h in Headers */ = {isa = PBXBuildFile; fileRef = 22FAE88617A8E528002FFEE8 /* Signup.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22FAE88917A8E528002FFEE8 /* Signup.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FAE88717A8E528002FFEE8 /* Signup.m */; };
-		22FE9B7F17AA331300B53869 /* Logout.h in Headers */ = {isa = PBXBuildFile; fileRef = 22FE9B7D17AA331300B53869 /* Logout.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FE9B8017AA331300B53869 /* Logout.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FE9B7E17AA331300B53869 /* Logout.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
 		CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */; };
 		CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */; };
@@ -228,8 +230,6 @@
 		CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */; };
 		CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */; };
-		CE5EB5B917E703AB00985636 /* LogoutAllRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CE5EB5BB17E703BA00985636 /* LogoutAllRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5EB5BA17E703BA00985636 /* LogoutAllRequest.m */; };
 		CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB5C417E7204000985636 /* AlmondListRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5EB5C717E7204000985636 /* AlmondListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5EB5C517E7204000985636 /* AlmondListRequest.m */; };
@@ -408,12 +408,15 @@
 		1CE67A301A91D7670004E68C /* AlmondModeChangeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondModeChangeRequest.m; sourceTree = "<group>"; };
 		1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiConfigurator.h; sourceTree = "<group>"; };
 		1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurifiConfigurator.m; sourceTree = "<group>"; };
+		1DF0300E2D5F2FDCCE4E0D40 /* LoginTempPass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginTempPass.m; sourceTree = "<group>"; };
 		1DF0302CDB8965A050AD9FE6 /* NotificationClearCountResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationClearCountResponse.m; sourceTree = "<group>"; };
 		1DF0303DDB9378A8510BC7AA /* NetworkState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkState.m; sourceTree = "<group>"; };
 		1DF03048BDC4DD3CB8D3B224 /* DynamicAlmondModeChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicAlmondModeChange.m; sourceTree = "<group>"; };
+		1DF0306BCF4286F284285323 /* LogoutAllResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllResponse.h; sourceTree = "<group>"; };
 		1DF030ADDC3DE8F3592D6848 /* NotificationCountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCountResponse.h; sourceTree = "<group>"; };
 		1DF0314E602EB9928C27AC69 /* CloudEndpoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudEndpoint.m; sourceTree = "<group>"; };
 		1DF031525512886EC02E8E6E /* NotificationCountResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationCountResponse.m; sourceTree = "<group>"; };
+		1DF0317A8DDEF36E96CAE5D1 /* LogoutResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutResponse.m; sourceTree = "<group>"; };
 		1DF031934B0D8B88D0839053 /* CloudEndpoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloudEndpoint.h; sourceTree = "<group>"; };
 		1DF031C3F506A877A179EEEE /* AlmondModeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondModeResponse.m; sourceTree = "<group>"; };
 		1DF031D70C5A2A701F6BF0F5 /* NotificationClearCountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationClearCountRequest.h; sourceTree = "<group>"; };
@@ -425,18 +428,27 @@
 		1DF0340881CA9720996080FA /* AlmondModeChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondModeChangeResponse.h; sourceTree = "<group>"; };
 		1DF034243877C8131B0AE8FE /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLWriter.m; sourceTree = "<group>"; };
 		1DF03452206E54610E1F7161 /* WebSocketEndpoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocketEndpoint.h; sourceTree = "<group>"; };
+		1DF03452D464546CF7E7CBE1 /* LogoutAllResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutAllResponse.m; sourceTree = "<group>"; };
+		1DF034839BEB39276F041984 /* Login.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Login.h; sourceTree = "<group>"; };
 		1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseCommandRequest.h; sourceTree = "<group>"; };
 		1DF035054F2C01C6FEEB7FC0 /* NotificationCountRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationCountRequest.m; sourceTree = "<group>"; };
 		1DF0350AA74A3E1DB6F0FB69 /* Network.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Network.m; sourceTree = "<group>"; };
 		1DF035CF619945E1C34866DB /* AlmondModeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondModeRequest.h; sourceTree = "<group>"; };
+		1DF03637629F3FCED078391C /* Logout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logout.h; sourceTree = "<group>"; };
+		1DF0364DC25ECA87A0B0132E /* Logout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logout.m; sourceTree = "<group>"; };
 		1DF036BCA9C9243024CE5DC3 /* NotificationStoreImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationStoreImpl.m; sourceTree = "<group>"; };
 		1DF03706AD1D324848D38018 /* AlmondModeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondModeResponse.h; sourceTree = "<group>"; };
 		1DF037331E46597BC5D76F2D /* NotificationListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationListRequest.m; sourceTree = "<group>"; };
+		1DF0379AC087F23C3556032D /* LoginTempPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginTempPass.h; sourceTree = "<group>"; };
 		1DF037E41986B5D077457BCB /* SecurifiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiTypes.h; sourceTree = "<group>"; };
+		1DF03859DF7750FF4162D60A /* LoginResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginResponse.h; sourceTree = "<group>"; };
 		1DF0386BB4B3FAC65DD9B13B /* NotificationCountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCountRequest.h; sourceTree = "<group>"; };
 		1DF0386F473DC4BF02299011 /* SFIAlmondLocalNetworkSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SFIAlmondLocalNetworkSettings.h; path = Models/SFIAlmondLocalNetworkSettings.h; sourceTree = "<group>"; };
 		1DF03895670DA1C15314D2F8 /* SFINotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFINotification.m; sourceTree = "<group>"; };
+		1DF038B47543CC3DB75CC4DA /* LogoutAllRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutAllRequest.m; sourceTree = "<group>"; };
+		1DF0390D1F9488A35437C274 /* LogoutAllRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllRequest.h; sourceTree = "<group>"; };
 		1DF03A2F5174C8BA97A576D0 /* SFINotificationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFINotificationStore.h; sourceTree = "<group>"; };
+		1DF03A406FB6E19CB2451868 /* LoginResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginResponse.m; sourceTree = "<group>"; };
 		1DF03A6156A59D49A942855B /* NetworkConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkConfig.h; sourceTree = "<group>"; };
 		1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseCommandRequest.m; sourceTree = "<group>"; };
 		1DF03AF40507D6D74C658843 /* AlmondVersionChecker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondVersionChecker.m; sourceTree = "<group>"; };
@@ -445,6 +457,7 @@
 		1DF03BE5F618AF7F2A8BC094 /* NotificationClearCountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationClearCountResponse.h; sourceTree = "<group>"; };
 		1DF03C2A0526E007E2895002 /* NotificationListResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationListResponse.m; sourceTree = "<group>"; };
 		1DF03C6B69373981F3AE8A22 /* NetworkState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkState.h; sourceTree = "<group>"; };
+		1DF03C7EBCF2870EE8286168 /* Login.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Login.m; sourceTree = "<group>"; };
 		1DF03CB16EDB103AB5B43224 /* SFIXmlWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIXmlWriter.h; sourceTree = "<group>"; };
 		1DF03CBFFB839D0CCE8BCB80 /* NotificationListResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationListResponse.h; sourceTree = "<group>"; };
 		1DF03CC112AAF7E9C1B57ADF /* XMLWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLWriter.h; sourceTree = "<group>"; };
@@ -452,6 +465,7 @@
 		1DF03CEAC18088B30D7961FF /* AlmondModeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondModeRequest.m; sourceTree = "<group>"; };
 		1DF03D1CB4599BCCF5F3A4D6 /* NotificationListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationListRequest.h; sourceTree = "<group>"; };
 		1DF03D1D1C66E96149090ACE /* Network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Network.h; sourceTree = "<group>"; };
+		1DF03E106E165456C1E264EC /* LogoutResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutResponse.h; sourceTree = "<group>"; };
 		1DF03F5902A972E2D8CA630A /* SFIAlmondLocalNetworkSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SFIAlmondLocalNetworkSettings.m; path = Models/SFIAlmondLocalNetworkSettings.m; sourceTree = "<group>"; };
 		1DF03F966C294C431498AE05 /* DynamicAlmondModeChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicAlmondModeChange.h; sourceTree = "<group>"; };
 		1DF03F971B12653B645E7326 /* WebSocketEndpoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebSocketEndpoint.m; sourceTree = "<group>"; };
@@ -459,10 +473,6 @@
 		1DF03F977E6A78507A5D7714 /* NotificationClearCountRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationClearCountRequest.m; sourceTree = "<group>"; };
 		1DF03FD4D648CEA9DD9511CA /* AlmondVersionChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondVersionChecker.h; sourceTree = "<group>"; };
 		1DF03FE0AE2F686D9B9567D2 /* AlmondModeChangeResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondModeChangeResponse.m; sourceTree = "<group>"; };
-		22011C9C179543E80019D5A4 /* Login.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Login.h; sourceTree = "<group>"; };
-		22011C9D179543E80019D5A4 /* Login.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Login.m; sourceTree = "<group>"; };
-		22011CA1179549C70019D5A4 /* LoginTempPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginTempPass.h; sourceTree = "<group>"; };
-		22011CA2179549C70019D5A4 /* LoginTempPass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginTempPass.m; sourceTree = "<group>"; };
 		2204C20C1794349400B05F17 /* GenericCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericCommand.h; sourceTree = "<group>"; };
 		2204C20D1794349400B05F17 /* GenericCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericCommand.m; sourceTree = "<group>"; };
 		221185BA178D371200EE23ED /* libSecurifiToolkit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSecurifiToolkit.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -480,15 +490,9 @@
 		2253388317A6B7380051BF0F /* AffiliationUserRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AffiliationUserRequest.h; sourceTree = "<group>"; };
 		2253388417A6B7380051BF0F /* AffiliationUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AffiliationUserRequest.m; sourceTree = "<group>"; };
 		22A19D931797AC7A003E6148 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		22A76D3617912EAC0099CD8F /* LoginResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginResponse.h; sourceTree = "<group>"; };
-		22A76D3717912EAC0099CD8F /* LoginResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginResponse.m; sourceTree = "<group>"; };
 		22A76D3A17912F980099CD8F /* SignupResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignupResponse.h; sourceTree = "<group>"; };
 		22A76D3B17912F980099CD8F /* SignupResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignupResponse.m; sourceTree = "<group>"; };
-		22A76D3E17912FF10099CD8F /* LogoutAllResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllResponse.h; sourceTree = "<group>"; };
-		22A76D3F17912FF10099CD8F /* LogoutAllResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutAllResponse.m; sourceTree = "<group>"; };
 		22A76D42179132A40099CD8F /* CommandTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommandTypes.h; sourceTree = "<group>"; };
-		22A76D431791339B0099CD8F /* LogoutResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutResponse.h; sourceTree = "<group>"; };
-		22A76D441791339B0099CD8F /* LogoutResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutResponse.m; sourceTree = "<group>"; };
 		22A76D471791347D0099CD8F /* AffiliationUserComplete.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AffiliationUserComplete.h; sourceTree = "<group>"; };
 		22A76D481791347D0099CD8F /* AffiliationUserComplete.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AffiliationUserComplete.m; sourceTree = "<group>"; };
 		22A76D4B179136B80099CD8F /* CommandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandParser.h; sourceTree = "<group>"; };
@@ -499,8 +503,6 @@
 		22B326D11796D659004B3642 /* PrivateCommandTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrivateCommandTypes.h; sourceTree = "<group>"; };
 		22FAE88617A8E528002FFEE8 /* Signup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Signup.h; sourceTree = "<group>"; };
 		22FAE88717A8E528002FFEE8 /* Signup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Signup.m; sourceTree = "<group>"; };
-		22FE9B7D17AA331300B53869 /* Logout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logout.h; sourceTree = "<group>"; };
-		22FE9B7E17AA331300B53869 /* Logout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logout.m; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
 		CE15FFAE186844AA00371183 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		CE15FFB418684D7500371183 /* certificate.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = certificate.cer; sourceTree = "<group>"; };
@@ -540,8 +542,6 @@
 		CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResetPasswordResponse.m; sourceTree = "<group>"; };
 		CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SFIAlmondPlus.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SFIAlmondPlus.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllRequest.h; sourceTree = "<group>"; };
-		CE5EB5BA17E703BA00985636 /* LogoutAllRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutAllRequest.m; sourceTree = "<group>"; };
 		CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlmondPlusSDKConstants.h; path = SecurifiToolkit/AlmondPlusSDKConstants.h; sourceTree = SOURCE_ROOT; };
 		CE5EB5C417E7204000985636 /* AlmondListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondListRequest.h; sourceTree = "<group>"; };
 		CE5EB5C517E7204000985636 /* AlmondListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondListRequest.m; sourceTree = "<group>"; };
@@ -851,6 +851,27 @@
 			path = xml;
 			sourceTree = "<group>";
 		};
+		1DF03F78AD630FEC5A752AC1 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				1DF034839BEB39276F041984 /* Login.h */,
+				1DF03C7EBCF2870EE8286168 /* Login.m */,
+				1DF03637629F3FCED078391C /* Logout.h */,
+				1DF0364DC25ECA87A0B0132E /* Logout.m */,
+				1DF03859DF7750FF4162D60A /* LoginResponse.h */,
+				1DF03A406FB6E19CB2451868 /* LoginResponse.m */,
+				1DF0379AC087F23C3556032D /* LoginTempPass.h */,
+				1DF0300E2D5F2FDCCE4E0D40 /* LoginTempPass.m */,
+				1DF03E106E165456C1E264EC /* LogoutResponse.h */,
+				1DF0317A8DDEF36E96CAE5D1 /* LogoutResponse.m */,
+				1DF0390D1F9488A35437C274 /* LogoutAllRequest.h */,
+				1DF038B47543CC3DB75CC4DA /* LogoutAllRequest.m */,
+				1DF0306BCF4286F284285323 /* LogoutAllResponse.h */,
+				1DF03452D464546CF7E7CBE1 /* LogoutAllResponse.m */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
 		221185B1178D371100EE23ED = {
 			isa = PBXGroup;
 			children = (
@@ -907,6 +928,7 @@
 				1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */,
 				1DF035609133676CE2B94C18 /* xml */,
 				1DF037E41986B5D077457BCB /* SecurifiTypes.h */,
+				1DF03F78AD630FEC5A752AC1 /* Login */,
 			);
 			path = SecurifiToolkit;
 			sourceTree = "<group>";
@@ -948,11 +970,8 @@
 				1C75820919B028F70074C601 /* Stats */,
 				1C23FBCC19480D6C00E353D1 /* Reachability */,
 				CE5EB63617E852AA00985636 /* models */,
-				CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */,
 				2253388317A6B7380051BF0F /* AffiliationUserRequest.h */,
 				22A76D471791347D0099CD8F /* AffiliationUserComplete.h */,
-				22011C9C179543E80019D5A4 /* Login.h */,
-				22FE9B7D17AA331300B53869 /* Logout.h */,
 				CE466A5D1823CFF900E55DF9 /* ResetPasswordRequest.h */,
 				CE466A611823D01E00E55DF9 /* ResetPasswordResponse.h */,
 				22A76D42179132A40099CD8F /* CommandTypes.h */,
@@ -961,15 +980,12 @@
 				22A76D3A17912F980099CD8F /* SignupResponse.h */,
 				CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */,
 				CE466A591823C50700E55DF9 /* ValidateAccountResponse.h */,
-				22A76D3617912EAC0099CD8F /* LoginResponse.h */,
 				CE5EB5C417E7204000985636 /* AlmondListRequest.h */,
 				CE5EB5C817E722BD00985636 /* AlmondListResponse.h */,
 				CE5EB63B17E8548500985636 /* DeviceDataHashRequest.h */,
 				CE5EB63217E82CB400985636 /* DeviceListRequest.h */,
 				CE5EB64717E86D2200985636 /* DeviceListResponse.h */,
 				CE5EB63F17E8549200985636 /* DeviceDataHashResponse.h */,
-				22A76D3E17912FF10099CD8F /* LogoutAllResponse.h */,
-				22A76D431791339B0099CD8F /* LogoutResponse.h */,
 				CE5EB64C17EAD41F00985636 /* DeviceValueRequest.h */,
 				CE5EB65017EAD43000985636 /* DeviceValueResponse.h */,
 				CE6DC94317EC60C2006F48C4 /* MobileCommandRequest.h */,
@@ -1041,7 +1057,6 @@
 				CE98307618C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m */,
 				CE9C5B49188669B6006F2306 /* SensorForcedUpdateRequest.m */,
 				22B326CD1796D447004B3642 /* SanityResponse.h */,
-				CE5EB5BA17E703BA00985636 /* LogoutAllRequest.m */,
 				CE466A5E1823CFF900E55DF9 /* ResetPasswordRequest.m */,
 				CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */,
 				22A76D481791347D0099CD8F /* AffiliationUserComplete.m */,
@@ -1049,13 +1064,6 @@
 				22A76D4B179136B80099CD8F /* CommandParser.h */,
 				22A76D4C179136B80099CD8F /* CommandParser.m */,
 				2204C20D1794349400B05F17 /* GenericCommand.m */,
-				22011C9D179543E80019D5A4 /* Login.m */,
-				22A76D3717912EAC0099CD8F /* LoginResponse.m */,
-				22011CA1179549C70019D5A4 /* LoginTempPass.h */,
-				22011CA2179549C70019D5A4 /* LoginTempPass.m */,
-				22FE9B7E17AA331300B53869 /* Logout.m */,
-				22A76D3F17912FF10099CD8F /* LogoutAllResponse.m */,
-				22A76D441791339B0099CD8F /* LogoutResponse.m */,
 				22B326D11796D659004B3642 /* PrivateCommandTypes.h */,
 				22B326CE1796D447004B3642 /* SanityResponse.m */,
 				22FAE88717A8E528002FFEE8 /* Signup.m */,
@@ -1127,7 +1135,6 @@
 				1C4382ED1B2FDD5200F6AB7A /* PSWebSocketBuffer.h in Headers */,
 				1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */,
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
-				22A76D3817912EAC0099CD8F /* LoginResponse.h in Headers */,
 				1C3270E81A243B28007202C1 /* SFIWirelessSummary.h in Headers */,
 				CE5EB65617EAD44E00985636 /* SFIDeviceValue.h in Headers */,
 				22A76D3C17912F980099CD8F /* SignupResponse.h in Headers */,
@@ -1137,7 +1144,6 @@
 				22A76D491791347D0099CD8F /* AffiliationUserComplete.h in Headers */,
 				2204C20E1794349400B05F17 /* GenericCommand.h in Headers */,
 				22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */,
-				22011C9E179543E80019D5A4 /* Login.h in Headers */,
 				1CD1D5501A660B7A00C030E9 /* NotificationPreferenceResponse.h in Headers */,
 				CE5EB63417E82CB400985636 /* DeviceListRequest.h in Headers */,
 				CE5EB64917E86D2200985636 /* DeviceListResponse.h in Headers */,
@@ -1146,8 +1152,6 @@
 				CE5EB64E17EAD41F00985636 /* DeviceValueRequest.h in Headers */,
 				CE5EB63917E852E500985636 /* SFIDevice.h in Headers */,
 				CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */,
-				22A76D4017912FF10099CD8F /* LogoutAllResponse.h in Headers */,
-				CE5EB5B917E703AB00985636 /* LogoutAllRequest.h in Headers */,
 				1CFBB54F1A257D1900438B5F /* SecurifiConfigurator.h in Headers */,
 				1CD1D5541A660B7A00C030E9 /* NotificationRegistration.h in Headers */,
 				22B326CF1796D447004B3642 /* SanityResponse.h in Headers */,
@@ -1158,7 +1162,6 @@
 				CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */,
 				CE5EB64117E8549200985636 /* DeviceDataHashResponse.h in Headers */,
 				CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */,
-				22A76D451791339B0099CD8F /* LogoutResponse.h in Headers */,
 				1C75820C19B028F70074C601 /* Scoreboard.h in Headers */,
 				CE6DC94917EC60D1006F48C4 /* MobileCommandResponse.h in Headers */,
 				CE5EB5CA17E722BD00985636 /* AlmondListResponse.h in Headers */,
@@ -1169,7 +1172,6 @@
 				1C414BC81A79F02600C448A4 /* ZHDatabaseStatement.h in Headers */,
 				1CD1D5581A660B7A00C030E9 /* SFINotificationDevice.h in Headers */,
 				CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */,
-				22011CA3179549C70019D5A4 /* LoginTempPass.h in Headers */,
 				CE5EB63D17E8548500985636 /* DeviceDataHashRequest.h in Headers */,
 				CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */,
 				1C3EEFC11B37999300DFCF62 /* SFIConnectedDevice.h in Headers */,
@@ -1220,7 +1222,6 @@
 				1C4382F31B2FDD5200F6AB7A /* PSWebSocketInflater.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
-				22FE9B7F17AA331300B53869 /* Logout.h in Headers */,
 				CEA605B71A113E4E008380D3 /* DynamicNotificationPreferenceList.h in Headers */,
 				1C3270E61A243B28007202C1 /* SFIWirelessSetting.h in Headers */,
 				1C414BC61A79F02600C448A4 /* ZHDatabase.h in Headers */,
@@ -1258,6 +1259,13 @@
 				1DF03A62EE5637C369154114 /* NetworkEndpoint.h in Headers */,
 				1DF03B1949689A39B13C7D41 /* NetworkConfig.h in Headers */,
 				1DF030FB420C44DB752D47D6 /* SFIAlmondLocalNetworkSettings.h in Headers */,
+				1DF034D24160AD58745E639A /* Login.h in Headers */,
+				1DF0368DD83B59AA804E1C53 /* Logout.h in Headers */,
+				1DF03F07DEDDEB40985EC721 /* LoginResponse.h in Headers */,
+				1DF03573A6FF405D7E53703D /* LoginTempPass.h in Headers */,
+				1DF0398177D6DD566A25FA8B /* LogoutResponse.h in Headers */,
+				1DF030928185AD7897BD4669 /* LogoutAllRequest.h in Headers */,
+				1DF035F57F29A54222660EEB /* LogoutAllResponse.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1406,11 +1414,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
-				CE5EB5BB17E703BA00985636 /* LogoutAllRequest.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
 				CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */,
 				CE466A5C1823C50700E55DF9 /* ValidateAccountResponse.m in Sources */,
-				22A76D3917912EAC0099CD8F /* LoginResponse.m in Sources */,
 				CE5EB64217E8549200985636 /* DeviceDataHashResponse.m in Sources */,
 				CE5EB63517E82CB400985636 /* DeviceListRequest.m in Sources */,
 				1C3270E51A243B28007202C1 /* SFIRouterSummary.m in Sources */,
@@ -1424,10 +1430,8 @@
 				1C4382F91B2FDD5200F6AB7A /* PSWebSocketServer.m in Sources */,
 				1CD1D5531A660B7A00C030E9 /* NotificationPreferences.m in Sources */,
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
-				22A76D4117912FF10099CD8F /* LogoutAllResponse.m in Sources */,
 				1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */,
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
-				22A76D461791339B0099CD8F /* LogoutResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
 				1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */,
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
@@ -1454,7 +1458,6 @@
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
 				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
 				1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */,
-				22011C9F179543E80019D5A4 /* Login.m in Sources */,
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
 				1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */,
@@ -1465,7 +1468,6 @@
 				CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */,
 				CEAD85AA19CABCBE006D1048 /* DeleteAccountResponse.m in Sources */,
 				CE9A2913188D2B240063D562 /* SensorChangeRequest.m in Sources */,
-				22011CA4179549C70019D5A4 /* LoginTempPass.m in Sources */,
 				1C3EEFC21B37999300DFCF62 /* SFIConnectedDevice.m in Sources */,
 				CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
@@ -1500,7 +1502,6 @@
 				CE5EB64F17EAD41F00985636 /* DeviceValueRequest.m in Sources */,
 				1C4382F21B2FDD5200F6AB7A /* PSWebSocketDriver.m in Sources */,
 				CE2EA26A19D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m in Sources */,
-				22FE9B8017AA331300B53869 /* Logout.m in Sources */,
 				CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */,
 				CE2EA25A19D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
@@ -1529,6 +1530,13 @@
 				1DF03711937B3B810AAE5178 /* WebSocketEndpoint.m in Sources */,
 				1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */,
 				1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */,
+				1DF0391E21650F9E90235929 /* Login.m in Sources */,
+				1DF03DBC398A267A9DC97053 /* Logout.m in Sources */,
+				1DF0394FB68EE0CD0700B060 /* LoginResponse.m in Sources */,
+				1DF03869CA4DCBEF86FDB796 /* LoginTempPass.m in Sources */,
+				1DF039194B7179E760D5F2F5 /* LogoutResponse.m in Sources */,
+				1DF03893C0E4096C00AD3FAC /* LogoutAllRequest.m in Sources */,
+				1DF03F559DD7C482A3D38939 /* LogoutAllResponse.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
