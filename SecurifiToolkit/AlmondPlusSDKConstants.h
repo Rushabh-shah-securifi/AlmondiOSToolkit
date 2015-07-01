@@ -3,7 +3,7 @@
 //  SecurifiToolkit
 //
 //  Created by Priya Yerunkar on 16/09/13.
-//  Copyright (c) 2013 Nirav Uchat. All rights reserved.
+//  Copyright (c) 2013 Securifi Ltd. All rights reserved.
 //
 
 #ifndef SecurifiToolkit_Header_h

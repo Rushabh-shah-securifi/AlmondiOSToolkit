@@ -3,7 +3,7 @@
 //  SecurifiToolkit
 //
 //  Created by Nirav Uchat on 7/13/13.
-//  Copyright (c) 2013 Nirav Uchat. All rights reserved.
+//  Copyright (c) 2013 Securifi Ltd. All rights reserved.
 //
 
 #import "AffiliationUserComplete.h"

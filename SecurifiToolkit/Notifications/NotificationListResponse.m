@@ -1,6 +1,6 @@
 //
 // Created by Matthew Sinclair-Day on 3/23/15.
-// Copyright (c) 2015 Nirav Uchat. All rights reserved.
+// Copyright (c) 2015 Securifi Ltd. All rights reserved.
 //
 
 #import "NotificationListResponse.h"
