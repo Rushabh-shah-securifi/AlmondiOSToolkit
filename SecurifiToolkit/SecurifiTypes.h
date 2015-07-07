@@ -135,6 +135,19 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 
+// Indicates whether communication with an Almond is being done through the Cloud or through a local connection
+typedef NS_ENUM(unsigned int, SFIAlmondConnectionMode) {
+    SFIAlmondConnectionMode_cloud,
+    SFIAlmondConnectionMode_local
+};
+
+typedef NS_ENUM(unsigned int, SFIAlmondConnectionStatus) {
+    SFIAlmondConnectionStatus_disconnected,
+    SFIAlmondConnectionStatus_connecting,
+    SFIAlmondConnectionStatus_connected,
+    SFIAlmondConnectionStatus_error,
+};
+
 // Per almond "mode" setting indicating
 typedef NS_ENUM(unsigned int, SFIAlmondMode) {
     SFIAlmondMode_unknown           = 0,

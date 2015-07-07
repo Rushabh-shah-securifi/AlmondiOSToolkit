@@ -49,6 +49,11 @@
 // Controls whether the app allows the user to enable/disable a SSID on the router tab
 @property(nonatomic) BOOL enableRouterWirelessControl;
 
+// Controls whether the app allows for local LAN connections to an Almond; when NO, all connections are routed
+// through the Securifi cloud.
+// Defaults to NO
+@property(nonatomic) BOOL enableLocalNetworking;
+
 - (id)copyWithZone:(NSZone *)zone;
 
 @end

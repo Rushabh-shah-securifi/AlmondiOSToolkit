@@ -30,6 +30,7 @@
         self.enableNotificationsHomeAwayMode = NO;
         self.enableNotificationsDebugLogging = NO;
         self.enableRouterWirelessControl = YES;
+        self.enableLocalNetworking = NO;
     }
 
     return self;
@@ -50,6 +51,7 @@
         copy.enableNotificationsHomeAwayMode = self.enableNotificationsHomeAwayMode;
         copy.enableNotificationsDebugLogging = self.enableNotificationsDebugLogging;
         copy.enableRouterWirelessControl = self.enableRouterWirelessControl;
+        copy.enableLocalNetworking = self.enableLocalNetworking;
     }
 
     return copy;

@@ -71,6 +71,7 @@ NSString *const kSFIDidLogoutNotification = @"kSFIDidLogoutNotification";
 NSString *const kSFIDidLogoutAllNotification = @"kSFIDidLogoutAllNotification";
 NSString *const kSFIDidChangeCurrentAlmond = @"kSFIDidChangeCurrentAlmond";
 NSString *const kSFIDidUpdateAlmondList = @"kSFIDidUpdateAlmondList";
+NSString *const kSFIDidChangeAlmondConnectionMode = @"kSFIDidChangeAlmondConnectionMode";
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 NSString *const kSFIDidCompleteAlmondModeChangeRequest = @"kSFIDidCompleteAlmondChangeRequest";
 NSString *const kSFIAlmondModeDidChange = @"kSFIAlmondModeDidChange";
@@ -424,45 +425,87 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [center removeObserver:self];
 }
 
-#pragma mark - SDK state
+#pragma mark - Connection management
+
+- (enum SFIAlmondConnectionMode)connectionModeForAlmond:(NSString *)almondMac {
+    if (!self.config.enableLocalNetworking) {
+        return SFIAlmondConnectionMode_cloud;
+    }
+
+    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+    return settings.enabled ? SFIAlmondConnectionMode_local: SFIAlmondConnectionMode_cloud;
+}
+
+- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac {
+    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+    settings.enabled = (mode == SFIAlmondConnectionMode_local);
+
+    [self setLocalNetworkSettings:settings];
+
+    [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
+}
+
+- (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString*)almondMac {
+    enum NetworkConnectionStatus status;
+
+    if (self.config.enableLocalNetworking) {
+        SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+        if (settings.enabled) {
+            Network *network = self.localNetwork;
+            status = network ? network.connectionState : NetworkConnectionStatusUninitialized;
+        }
+        else {
+            status = [self cloudNetworkStatus];
+        }
+    }
+    else {
+        status = [self cloudNetworkStatus];
+    }
+
+    return [self connectionStatusFromNetworkState:status];
+}
+
+- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
+    return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
+}
+
+- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
+    if (!settings.almondplusMAC) {
+        return;
+    }
+
+    [self.dataManager writeAlmondLocalNetworkSettings:settings];
+}
 
 - (BOOL)isCloudConnecting {
-    BOOL reachable = [self isReachable];
+    BOOL reachable = [self isCloudReachable];
     if (!reachable) {
         return NO;
     }
 
-    NetworkConnectionStatus state = [self getConnectionState];
-    return state == NetworkConnectionStatusInitializing;
+    NetworkConnectionStatus state = [self cloudNetworkStatus];
+
+    enum SFIAlmondConnectionStatus status = [self connectionStatusFromNetworkState:state];
+    return status == SFIAlmondConnectionStatus_connecting;
 }
 
 - (BOOL)isCloudOnline {
-    BOOL reachable = [self isReachable];
+    BOOL reachable = [self isCloudReachable];
     if (!reachable) {
         return NO;
     }
 
-    NetworkConnectionStatus state = [self getConnectionState];
+    NetworkConnectionStatus state = [self cloudNetworkStatus];
 
-    switch (state) {
-        case NetworkConnectionStatusInitialized:
-            return YES;
-
-        case NetworkConnectionStatusUninitialized:
-        case NetworkConnectionStatusInitializing:
-        case NetworkConnectionStatusShutdown:
-            return NO;
-
-        default:
-            return NO;
-    }
+    enum SFIAlmondConnectionStatus status = [self connectionStatusFromNetworkState:state];
+    return status == SFIAlmondConnectionStatus_connected;
 }
 
-- (BOOL)isReachable {
+- (BOOL)isCloudReachable {
     return [self.cloudReachability isReachable];
 }
 
-- (BOOL)isLoggedIn {
+- (BOOL)isCloudLoggedIn {
     Network *network = self.cloudNetwork;
     return network && network.loginStatus == NetworkLoginStatusLoggedIn;
 }
@@ -475,7 +518,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return (int) [self secMinsRemainingForUnactivatedAccount];
 }
 
-- (NetworkConnectionStatus)getConnectionState {
+- (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(enum NetworkConnectionStatus)status {
+    switch (status) {
+        case NetworkConnectionStatusUninitialized:
+            return SFIAlmondConnectionStatus_disconnected;
+        case NetworkConnectionStatusInitializing:
+            return SFIAlmondConnectionStatus_connecting;
+        case NetworkConnectionStatusInitialized:
+            return SFIAlmondConnectionStatus_connected;
+        case NetworkConnectionStatusShutdown:
+            return SFIAlmondConnectionStatus_disconnected;
+        default:
+            return SFIAlmondConnectionStatus_disconnected;
+    }
+}
+
+- (NetworkConnectionStatus)cloudNetworkStatus {
     Network *network = self.cloudNetwork;
     if (network) {
         return network.connectionState;
@@ -519,7 +577,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             return;
         }
 
-        NetworkConnectionStatus state = [block_self getConnectionState];
+        NetworkConnectionStatus state = [block_self cloudNetworkStatus];
         switch (state) {
             case NetworkConnectionStatusInitialized: {
                 DLog(@"INIT SDK. Connection established already. Returning.");
@@ -2698,7 +2756,7 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
         return;
     }
 
-    if (!self.isLoggedIn) {
+    if (!self.isCloudLoggedIn) {
         return;
     }
 
@@ -2780,7 +2838,7 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
         return;
     }
 
-    if (!self.isLoggedIn) {
+    if (!self.isCloudLoggedIn) {
         return;
     }
 
@@ -2889,19 +2947,6 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
     self.pendingDeviceLogRequest = nil;
     return store;
 }
-
-- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
-    return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
-}
-
-- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
-    if (!settings.almondplusMAC) {
-        return;
-    }
-
-    [self.dataManager writeAlmondLocalNetworkSettings:settings];
-}
-
 
 - (void)tryRefreshDeviceLog:(NSString *)almondMac deviceId:(sfi_id)deviceId {
 /*

@@ -110,6 +110,9 @@ extern NSString *const kSFIDidChangeCurrentAlmond;
 // Notification posted when the Almond list has been updated
 extern NSString *const kSFIDidUpdateAlmondList;
 
+// Notification posted when the connection mode is changed
+extern NSString *const kSFIDidChangeAlmondConnectionMode;
+
 // Notification posted when an Almond's name has changed
 extern NSString *const kSFIDidChangeAlmondName;
 
@@ -171,7 +174,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 + (instancetype)sharedInstance;
 
 // Returns a copy of the configuration currently in effect. Changes to the configuration have no effect on the shared instance.
-- (SecurifiConfigurator*)configuration;
+- (SecurifiConfigurator *)configuration;
 
 - (void)initToolkit;
 
@@ -185,27 +188,45 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // Sends an update to a sensor device property.
 // On completion, kSFIDidCompleteMobileCommandRequest is posted
-- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus*)almond device:(SFIDevice*)device value:(SFIDeviceKnownValues *)newValue;
+- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue;
 
-- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus*)almond device:(SFIDevice*)device name:(NSString*)deviceName location:(NSString*)deviceLocation;
+- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device name:(NSString *)deviceName location:(NSString *)deviceLocation;
+
+// returns the current connection interface used for communicating with the almond
+- (enum SFIAlmondConnectionMode)connectionModeForAlmond:(NSString *)almondMac;
+
+// configures which connection interface to use for communicating with the almond
+// assumes local network settings are already configured for the almond.
+- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac;
+
+// returns the status of the connection interface
+- (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString *)almondMac;
+
+// returns the Local Connection settings for the almond, or nil if none configured
+- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
+
+- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
 
 - (BOOL)isCloudConnecting;
 
 - (BOOL)isCloudOnline;
 
-- (BOOL)isReachable;
+- (BOOL)isCloudReachable;
 
-- (BOOL)isLoggedIn;
+- (BOOL)isCloudLoggedIn;
 
 - (BOOL)isAccountActivated;
+
 - (int)minsRemainingForUnactivatedAccount;
 
 - (BOOL)hasLoginCredentials;
 
-- (void)asyncSendLoginWithEmail:(NSString*)email password:(NSString*)password;
-- (NSString*)loginEmail;
+- (void)asyncSendLoginWithEmail:(NSString *)email password:(NSString *)password;
+
+- (NSString *)loginEmail;
 
 - (void)asyncSendLogout;
+
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
 
 // Nils out the current Almond selection
@@ -215,16 +236,16 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
 
 // Returns the designated "current" Almond, or nil.
-- (SFIAlmondPlus*)currentAlmond;
+- (SFIAlmondPlus *)currentAlmond;
 
 // Fetch the local copy of the Almond's attached to the logon account
-- (NSArray*)almondList;
+- (NSArray *)almondList;
 
 // Fetch the locally stored devices list for the Almond
-- (NSArray*)deviceList:(NSString*)almondMac;
+- (NSArray *)deviceList:(NSString *)almondMac;
 
 // Fetch the locally stored values for the Almond's devices
-- (NSArray*)deviceValuesList:(NSString*)almondMac;
+- (NSArray *)deviceValuesList:(NSString *)almondMac;
 
 // Fetch the locally stored values for the Almond's notification preferences
 - (NSArray *)notificationPrefList:(NSString *)almondMac;
@@ -240,42 +261,42 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac;
 
 // Returns running stats on internals of this toolkit; useful for debugging and development
-- (Scoreboard*)scoreboardSnapshot;
+- (Scoreboard *)scoreboardSnapshot;
 
-- (sfi_id)asyncUpdateAlmondFirmware:(NSString *)almondMAC firmwareVersion:(NSString*)firmwareVersion;
+- (sfi_id)asyncUpdateAlmondFirmware:(NSString *)almondMAC firmwareVersion:(NSString *)firmwareVersion;
 
 // Issues a command to the specified Almond router to reboot itself
-- (sfi_id)asyncRebootAlmond:(NSString*)almondMAC;
+- (sfi_id)asyncRebootAlmond:(NSString *)almondMAC;
 
 - (sfi_id)asyncSendAlmondLogs:(NSString *)almondMAC problemDescription:(NSString *)description;
 
 //PY 150914 - Accounts
 // Send a command to the cloud requesting to change the password for cloud account
-- (void)asyncRequestChangeCloudPassword:(NSString*)currentPwd changedPwd:(NSString*)changedPwd;
+- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
 
 // Send a command to the cloud requesting to delete cloud account
-- (void)asyncRequestDeleteCloudAccount:(NSString*)password;
+- (void)asyncRequestDeleteCloudAccount:(NSString *)password;
 
 // Send a command to the cloud requesting to unlink the current Almond from cloud account
-- (void)asyncRequestUnlinkAlmond:(NSString*)almondMAC password:(NSString*)password;
+- (void)asyncRequestUnlinkAlmond:(NSString *)almondMAC password:(NSString *)password;
 
 // Send a command to the cloud requesting to invite secondary user to the current Almond from cloud account
-- (void)asyncRequestInviteForSharingAlmond:(NSString*)almondMAC inviteEmail:(NSString*)inviteEmailID;
+- (void)asyncRequestInviteForSharingAlmond:(NSString *)almondMAC inviteEmail:(NSString *)inviteEmailID;
 
 // Send a command to the cloud requesting to remove another secondary user from the current Almond from cloud account
-- (void)asyncRequestDeleteSecondaryUser:(NSString *)almondMAC email:(NSString*)emailID;
+- (void)asyncRequestDeleteSecondaryUser:(NSString *)almondMAC email:(NSString *)emailID;
 
 // Send a command to the cloud requesting to change the name of current Almond
-- (void)asyncRequestChangeAlmondName:(NSString*)changedAlmondName almondMAC:(NSString*)almondMAC;
+- (void)asyncRequestChangeAlmondName:(NSString *)changedAlmondName almondMAC:(NSString *)almondMAC;
 
 // Send a command to the cloud requesting to
 - (void)asyncRequestMeAsSecondaryUser;
 
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
-- (void)asyncRequestDeleteMeAsSecondaryUser:(NSString*)almondMAC;
+- (void)asyncRequestDeleteMeAsSecondaryUser:(NSString *)almondMAC;
 
 // Sends commands directly to the specified Almond, requesting summary and settings information
-- (void)asyncAlmondStatusAndSettings:(NSString*)almondMac;
+- (void)asyncAlmondStatusAndSettings:(NSString *)almondMac;
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
@@ -295,14 +316,14 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Supported actions are:
 // kSFINotificationPreferenceChangeActionAdd;
 // kSFINotificationPreferenceChangeActionDelete;
-- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString*)action;
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action;
 
 - (NSInteger)countUnviewedNotifications;
 
 - (id <SFINotificationStore>)newNotificationStore;
 
 // makes a copy of the notifications database; used for debugging
-- (BOOL)copyNotificationStoreTo:(NSString*)filePath;
+- (BOOL)copyNotificationStoreTo:(NSString *)filePath;
 
 // Initiates a process to synchronize the on-board Notifications database with the cloud.
 // If a request is already in flight, this call fails fast and silently.
@@ -318,12 +339,10 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Called to synchronize the badge count as specified in a Push Notification payload. The badge count reflects then
 // latest known global "new notification" count.
 - (NSInteger)notificationsBadgeCount;
+
 - (void)setNotificationsBadgeCount:(NSInteger)count;
 
 - (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId;
-
-- (SFIAlmondLocalNetworkSettings*)localNetworkSettingsForAlmond:(NSString*)almondMac;
-- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings*)settings;
 
 @end
  
