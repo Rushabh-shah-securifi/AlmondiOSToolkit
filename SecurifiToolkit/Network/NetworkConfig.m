@@ -39,4 +39,21 @@
     return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    NetworkConfig *copy = [[[self class] allocWithZone:zone] init];
+
+    if (copy != nil) {
+        copy->_mode = _mode;
+        copy.almondMac = self.almondMac;
+        copy.host = self.host;
+        copy.port = self.port;
+        copy.password = self.password;
+        copy.enableCertificateValidation = self.enableCertificateValidation;
+        copy.enableCertificateChainValidation = self.enableCertificateChainValidation;
+        copy.certificateFileName = self.certificateFileName;
+    }
+
+    return copy;
+}
+
 @end

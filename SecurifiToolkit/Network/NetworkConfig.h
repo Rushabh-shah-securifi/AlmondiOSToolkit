@@ -13,12 +13,14 @@ typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
     NetworkEndpointMode_web_socket,
 };
 
-@interface NetworkConfig : NSObject
+@interface NetworkConfig : NSObject <NSCopying>
 
 // Factory for making a Network configuration based on the main configurator settings
 + (instancetype)cloudConfig:(SecurifiConfigurator *)configurator useProductionHost:(BOOL)useProductionHost;
 
 + (instancetype)webSocketConfigAlmond:(NSString *)almondMac;
+
+- (id)copyWithZone:(NSZone *)zone;
 
 @property(readonly) enum NetworkEndpointMode mode;
 

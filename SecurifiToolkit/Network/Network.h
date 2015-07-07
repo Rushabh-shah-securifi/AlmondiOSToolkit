@@ -72,6 +72,8 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 // Returns NO on failure to queue
 - (BOOL)submitCommand:(GenericCommand *)command;
 
+- (NetworkConfig*)config;
+
 - (NSString *)description;
 
 @end
