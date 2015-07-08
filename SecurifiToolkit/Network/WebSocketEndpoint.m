@@ -47,7 +47,6 @@
     self.socket = [PSWebSocket clientSocketWithRequest:request];
     self.socket.delegate = self;
 
-    NSLog(@"The websocket will open");
     [self.socket open];
 }
 
@@ -60,7 +59,7 @@
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
     [self.socket send:json];
-    NSLog(@"Websocket send: %@", json);
+    DLog(@"Websocket send: %@", json);
 
     return YES;
 }
@@ -69,11 +68,11 @@
 
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     [self.delegate networkEndpointDidConnect:self];
-    NSLog(@"The websocket did open");
+    DLog(@"Websocket did open");
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
-    NSLog(@"The websocket received a message: %@", message);
+    DLog(@"Websocket received a message: %@", message);
 
     NSString *str = message;
     NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
