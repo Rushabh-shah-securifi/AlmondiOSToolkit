@@ -442,6 +442,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     [self setLocalNetworkSettings:settings];
 
+    if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
+        [self.localNetwork shutdown];
+        self.localNetwork = nil;
+    }
+
+    if (mode == SFIAlmondConnectionMode_local) {
+        Network *network = [self localNetworkForAlmond:almondMac];
+        [network connect];
+    }
+    
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
 
@@ -1851,7 +1861,7 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
 }
 
 - (Network *)localNetworkForAlmond:(NSString *)almondMac {
-    if (self.localNetwork) {
+    if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
         if (self.localNetwork.connectionState == NetworkConnectionStatusInitialized) {
             return self.localNetwork;
         }
@@ -1877,6 +1887,16 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
     //todo need a fast cache for this; very expensive to hit the file system constantly
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
     return settings.enabled;
+}
+
+- (BOOL)isCurrentLocalNetworkForAlmond:(NSString*)almondMac {
+    Network *network = self.localNetwork;
+    if (network) {
+        NetworkConfig *config = network.config;
+        return [config.almondMac isEqualToString:almondMac];
+    }
+
+    return NO;
 }
 
 #pragma mark - NetworkDelegate methods
@@ -2318,13 +2338,9 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
     }
 
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
-    NSString *currentMAC = obj.almondMAC;
+    NSString *almondMac = obj.almondMAC;
 
-    if (currentMAC == nil) {
-        currentMAC = [self currentAlmond].almondplusMAC; //todo a hack for now; need a formal way for the local connection endpoint to set this information and pass back up here
-    }
-
-    [self processDynamicDeviceValueChange:obj currentMAC:currentMAC];
+    [self processDynamicDeviceValueChange:obj currentMAC:almondMac];
 }
 
 - (void)onDeviceValueListChange:(id)sender {
@@ -2335,16 +2351,16 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
     }
 
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
-    NSString *currentMAC = obj.almondMAC;
+    NSString *almondMac = obj.almondMAC;
 
-    if (currentMAC.length == 0) {
+    if (almondMac.length == 0) {
         return;
     }
 
     // Update offline storage
-    [self.dataManager writeDeviceValueList:obj.deviceValueList almondMac:currentMAC];
+    [self.dataManager writeDeviceValueList:obj.deviceValueList almondMac:almondMac];
 
-    [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
+    [self postNotification:kSFIDidChangeDeviceValueList data:almondMac];
 }
 
 // Processes a dynamic change to a device value
