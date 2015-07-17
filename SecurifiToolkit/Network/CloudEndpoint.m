@@ -342,20 +342,27 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
                                             // All others are XML
                                         default: {
-                                            NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
-                                            NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
-                                            DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                            @try {
+                                                NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
+                                                NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
+                                                DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
-                                            CommandParser *parser = [CommandParser new];
-                                            GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
-                                            responsePayload = temp.command;
+                                                CommandParser *parser = [CommandParser new];
+                                                GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
+                                                responsePayload = temp.command;
 
-                                            // important to pull command type from the parsed payload because the underlying
-                                            // command that we dispatch on can be different than the "container" carrying it
-                                            commandType = temp.commandType;
-                                        }
+                                                // important to pull command type from the parsed payload because the underlying
+                                                // command that we dispatch on can be different than the "container" carrying it
+                                                commandType = temp.commandType;
+                                            }
+                                            @catch (NSException *ex) {
+                                                NSString *buffer_str = [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding];
+                                                NSLog(@"Exception on parsing XML payload, ex:%@, data:'%@'", ex, buffer_str);
+                                                return;
+                                            }
 
                                             break;
+                                        }
                                     }
 
                                     // Remove 8 bytes from received command
