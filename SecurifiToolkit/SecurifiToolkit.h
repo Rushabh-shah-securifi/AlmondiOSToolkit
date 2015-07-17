@@ -209,6 +209,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // returns the Local Connection settings for the almond, or nil if none configured
 - (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
 
+- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
+
 - (BOOL)isCloudConnecting;
 
 - (BOOL)isCloudOnline;

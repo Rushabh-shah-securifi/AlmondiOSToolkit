@@ -39,6 +39,8 @@
 
 - (SFIAlmondLocalNetworkSettings *)readAlmondLocalNetworkSettings:(NSString *)almondMac;
 
+- (void)deleteLocalNetworkSettingsForAlmond:(NSString *)strAlmondMac;
+
 - (void)purgeAll;
 
 // removes the specified Almond and returns the new Almond List

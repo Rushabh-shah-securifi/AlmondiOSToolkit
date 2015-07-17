@@ -438,9 +438,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac {
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-    settings.enabled = (mode == SFIAlmondConnectionMode_local);
 
-    [self storeLocalNetworkSettings:settings];
+    if (settings) {
+        settings.enabled = (mode == SFIAlmondConnectionMode_local);
+        [self storeLocalNetworkSettings:settings];
+    }
+
     [self tryShutdownAndStartLocalConnection:mode almondMac:almondMac];
 
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
@@ -480,6 +483,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
     return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
+}
+
+- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac {
+    if (!almondMac) {
+        return;
+    }
+
+    [self.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
+    [self setConnectionMode:SFIAlmondConnectionMode_cloud forAlmond:almondMac];
 }
 
 - (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
