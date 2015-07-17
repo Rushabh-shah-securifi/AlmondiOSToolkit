@@ -440,19 +440,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
     settings.enabled = (mode == SFIAlmondConnectionMode_local);
 
-    [self setLocalNetworkSettings:settings];
+    [self storeLocalNetworkSettings:settings];
+    [self tryShutdownAndStartLocalConnection:mode almondMac:almondMac];
 
-    if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
-        [self.localNetwork shutdown];
-        self.localNetwork = nil;
-    }
-
-    if (mode == SFIAlmondConnectionMode_local) {
-        Network *network = [self localNetworkForAlmond:almondMac];
-        [network connect];
-    }
-    
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
+}
+
+- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
+    NSString *almondMac = settings.almondplusMAC;
+    if (!almondMac) {
+        return;
+    }
+
+    enum SFIAlmondConnectionMode mode = [self connectionModeForAlmond:almondMac];
+
+    [self storeLocalNetworkSettings:settings];
+    [self tryShutdownAndStartLocalConnection:mode almondMac:almondMac];
 }
 
 - (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString*)almondMac {
@@ -479,12 +482,30 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
 }
 
-- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
+- (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
     if (!settings.almondplusMAC) {
         return;
     }
 
     [self.dataManager writeAlmondLocalNetworkSettings:settings];
+}
+
+// for changing network settings
+// ensures a local connection for the specified almond is shutdown and, if needed, restarted
+- (void)tryShutdownAndStartLocalConnection:(enum SFIAlmondConnectionMode)mode almondMac:(NSString *)almondMac {
+    if (!self.config.enableLocalNetworking) {
+        return;
+    }
+
+    if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
+        [self.localNetwork shutdown];
+        self.localNetwork = nil;
+    }
+
+    if (mode == SFIAlmondConnectionMode_local) {
+        Network *network = [self localNetworkForAlmond:almondMac];
+        [network connect];
+    }
 }
 
 - (BOOL)isCloudConnecting {

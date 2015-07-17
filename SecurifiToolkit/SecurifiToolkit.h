@@ -199,13 +199,15 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // assumes local network settings are already configured for the almond.
 - (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac;
 
+// configure local network settings; if a connection is opened for the almond specified in the settings,
+// the connection is torn down and, depending on the current connection mode, restarted.
+- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
+
 // returns the status of the connection interface
 - (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString *)almondMac;
 
 // returns the Local Connection settings for the almond, or nil if none configured
 - (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
-
-- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
 
 - (BOOL)isCloudConnecting;
 
