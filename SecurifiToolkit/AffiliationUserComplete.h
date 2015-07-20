@@ -32,4 +32,8 @@ typedef NS_ENUM(unsigned int, AffiliationUserCompleteFailureCode) {
 
 - (NSString *)formattedAlmondPlusMac;
 
+- (NSInteger)ssidCount;
+
+- (NSArray *)ssidNames;
+
 @end
