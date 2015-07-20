@@ -28,7 +28,7 @@
 - (instancetype)initWithConfig:(NetworkConfig *)config {
     self = [super init];
     if (self) {
-        self.config = config;
+        self.config = [config copy];
     }
 
     return self;
@@ -43,7 +43,6 @@
 
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
 
-    // create the socket and assign delegate
     self.socket = [PSWebSocket clientSocketWithRequest:request];
     self.socket.delegate = self;
 
