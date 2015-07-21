@@ -6,10 +6,12 @@
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "WebSocketEndpoint.h"
 #import "NetworkConfig.h"
+#import "GenericCommand.h"
 
 
 @interface SFIAlmondLocalNetworkSettings () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) dispatch_semaphore_t test_connection_latch;
+@property(nonatomic, readonly) dispatch_semaphore_t test_command_latch;
 @property(nonatomic) BOOL testConnectionSuccess;
 @end
 
@@ -24,12 +26,12 @@
     return self;
 }
 
-
 - (BOOL)testConnection {
     NSString *mac = @"test_almond";
 
     NetworkConfig *config = [NetworkConfig webSocketConfigAlmond:mac];
     config.host = self.host;
+    config.port = self.port;
     config.password = self.password;
 
     self.testConnectionSuccess = NO;
@@ -42,10 +44,31 @@
     [self waitOnLatch:self.test_connection_latch timeout:3 logMsg:@"Failed to connect to web socket"];
     BOOL success = self.testConnectionSuccess;
 
+    if (success) {
+        self.testConnectionSuccess = NO;
+        _test_command_latch = dispatch_semaphore_create(0);
+
+        NSTimeInterval cid = [NSDate date].timeIntervalSince1970;
+        NSDictionary *payload = @{
+                @"MobileInternalIndex" : @(cid),
+                @"CommandType" : @"GetAlmondNameandMAC",
+        };
+
+        GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:CommandType_ALMOND_NAME_AND_MAC_REQUEST];
+        NSError *error = nil;
+        if ([endpoint sendCommand:cmd error:&error]) {
+            [self waitOnLatch:self.test_command_latch timeout:3 logMsg:@"Failed to send GetAlmondNameandMAC to web socket"];
+
+            success = self.testConnectionSuccess;
+        }
+    }
+
+    // clean up
     endpoint.delegate = nil;
     [endpoint shutdown];
-
+    //
     _test_connection_latch = nil;
+    _test_command_latch = nil;
 
     return success;
 }
@@ -161,7 +184,11 @@
 }
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
-
+    if (commandType == CommandType_ALMOND_NAME_AND_MAC_RESPONSE) {
+        dispatch_semaphore_t latch = self.test_command_latch;
+        NSDictionary *almond_data = payload;
+        dispatch_semaphore_signal(latch);
+    }
 }
 
 // Waits up to the specified number of seconds for the semaphore to be signalled.
