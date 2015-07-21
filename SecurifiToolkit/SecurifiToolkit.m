@@ -3088,19 +3088,11 @@ Mobile +++++++++>>>>  Cloud 804
 #pragma mark - JSON command helper
 
 - (void)internalSendJsonCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
-    NSError *error;
-    NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+    GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:commandType];
 
-    if (error) {
-        NSLog(@"internalSendJsonCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
-        return;
+    if (cmd) {
+        [self asyncSendToCloud:cmd];
     }
-
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.command = data;
-    cmd.commandType = commandType;
-
-    [self asyncSendToCloud:cmd];
 }
 
 @end

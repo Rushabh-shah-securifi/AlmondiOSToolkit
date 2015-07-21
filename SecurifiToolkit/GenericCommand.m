@@ -10,6 +10,22 @@
 
 @implementation GenericCommand
 
++ (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(CommandType)commandType {
+    NSError *error;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+
+    if (error) {
+        NSLog(@"jsonPayloadCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
+        return nil;
+    }
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.command = data;
+    cmd.commandType = commandType;
+
+    return cmd;
+}
+
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.command=%@", self.command];

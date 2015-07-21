@@ -11,6 +11,10 @@
 
 @interface GenericCommand : NSObject
 
+// convenience method for generating a command structure for sending to a web service that consumes JSON.
+// the dictionary will be serialized as JSON (NSData)
++ (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(CommandType)type;
+
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
 
