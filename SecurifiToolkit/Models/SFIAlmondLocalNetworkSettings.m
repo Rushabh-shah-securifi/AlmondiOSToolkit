@@ -4,7 +4,14 @@
 //
 
 #import "SFIAlmondLocalNetworkSettings.h"
+#import "WebSocketEndpoint.h"
+#import "NetworkConfig.h"
 
+
+@interface SFIAlmondLocalNetworkSettings () <NetworkEndpointDelegate>
+@property(nonatomic, readonly) dispatch_semaphore_t test_connection_latch;
+@property(nonatomic) BOOL testConnectionSuccess;
+@end
 
 @implementation SFIAlmondLocalNetworkSettings
 
@@ -17,6 +24,29 @@
     return self;
 }
 
+
+- (BOOL)testConnection {
+    NSString *mac = @"test_almond";
+
+    NetworkConfig *config = [NetworkConfig webSocketConfigAlmond:mac];
+    config.host = self.host;
+    config.password = self.password;
+
+    self.testConnectionSuccess = NO;
+    _test_connection_latch = dispatch_semaphore_create(0);
+
+    WebSocketEndpoint *endpoint = [WebSocketEndpoint endpointWithConfig:config];
+    endpoint.delegate = self;
+
+    [endpoint connect];
+    [self waitOnLatch:self.test_connection_latch timeout:3 logMsg:@"Failed to connect to web socket"];
+    BOOL success = self.testConnectionSuccess;
+
+    endpoint.delegate = nil;
+    [endpoint shutdown];
+
+    return success;
+}
 
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
@@ -108,6 +138,55 @@
     hash = hash * 31u + [self.login hash];
     hash = hash * 31u + [self.password hash];
     return hash;
+}
+
+#pragma mark - NetworkEndpointDelegate methods
+
+- (void)networkEndpointWillStartConnecting:(id <NetworkEndpoint>)endpoint {
+
+}
+
+- (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
+    dispatch_semaphore_t latch = self.test_connection_latch;
+    if (latch) {
+        self.testConnectionSuccess = YES;
+        dispatch_semaphore_signal(latch);
+    }
+}
+
+- (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint {
+
+}
+
+- (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
+
+}
+
+// Waits up to the specified number of seconds for the semaphore to be signalled.
+// Returns YES on timeout waiting on the latch.
+// Returns NO when the signal has been received before the timeout.
+- (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString *)msg {
+    dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
+
+    BOOL timedOut;
+
+    dispatch_time_t blockingSleepSecondsIfNotDone;
+    do {
+        const int waitMs = 5;
+        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, waitMs * NSEC_PER_MSEC);
+
+        timedOut = blockingSleepSecondsIfNotDone > max_time;
+        if (timedOut) {
+            NSLog(@"%@. Timeout reached.", msg);
+            break;
+        }
+    }
+    while (0 != dispatch_semaphore_wait(latch, blockingSleepSecondsIfNotDone));
+
+    // make sure...
+    dispatch_semaphore_signal(latch);
+
+    return timedOut;
 }
 
 

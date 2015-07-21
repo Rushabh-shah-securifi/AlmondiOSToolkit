@@ -33,6 +33,8 @@
 // password for login
 @property(nonatomic, copy) NSString *password;
 
+- (BOOL)testConnection;
+
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
