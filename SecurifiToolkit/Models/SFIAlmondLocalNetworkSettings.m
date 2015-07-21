@@ -45,6 +45,8 @@
     endpoint.delegate = nil;
     [endpoint shutdown];
 
+    _test_connection_latch = nil;
+
     return success;
 }
 
