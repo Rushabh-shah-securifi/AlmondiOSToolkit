@@ -145,6 +145,10 @@
 
         [self.delegate networkEndpoint:self dispatchResponse:cmd commandType:CommandType_ALMOND_COMMAND_RESPONSE];
     }
+    else if ([commandType isEqualToString:@"GetAlmondNameandMAC"]) {
+        // just send back raw dictionary for now
+        [self.delegate networkEndpoint:self dispatchResponse:payload commandType:CommandType_ALMOND_NAME_AND_MAC_RESPONSE];
+    }
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
