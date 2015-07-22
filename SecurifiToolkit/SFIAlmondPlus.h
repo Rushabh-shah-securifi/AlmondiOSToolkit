@@ -10,6 +10,10 @@
 
 @interface SFIAlmondPlus : NSObject <NSCoding, NSCopying>
 
++ (NSString*)convertDecimalToMacHex:(NSString*)decimal;
+
++ (NSString*)convertMacHexToDecimal:(NSString*)decimal;
+
 @property(nonatomic, copy) NSString *almondplusMAC;
 @property(nonatomic, copy) NSString *almondplusName;
 @property(nonatomic) int index;

@@ -11,6 +11,43 @@
 
 @implementation SFIAlmondPlus
 
++ (NSString *)convertDecimalToMacHex:(NSString *)decimalString {
+    //Step 1: Conversion from decimal to hexadecimal
+    DLog(@"%llu", (unsigned long long) [decimalString longLongValue]);
+    NSString *hexIP = [NSString stringWithFormat:@"%llX", (unsigned long long) [decimalString longLongValue]];
+
+    NSMutableString *wifiMAC = [[NSMutableString alloc] init];
+    //Step 2: Divide in pairs of 2 hex
+    for (NSUInteger i = 0; i < [hexIP length]; i = i + 2) {
+        NSString *ichar = [NSString stringWithFormat:@"%c%c:", [hexIP characterAtIndex:i], [hexIP characterAtIndex:i + 1]];
+        [wifiMAC appendString:ichar];
+    }
+
+    [wifiMAC deleteCharactersInRange:NSMakeRange([wifiMAC length] - 1, 1)];
+
+    DLog(@"WifiMAC: %@", wifiMAC);
+    return wifiMAC;
+}
+
++ (NSString *)convertMacHexToDecimal:(NSString *)decimal {
+    if (!decimal) {
+        return nil;
+    }
+
+    NSString *cleaned = [decimal stringByReplacingOccurrencesOfString:@":" withString:@""];
+    NSScanner *scanner = [NSScanner scannerWithString:cleaned];
+
+    unsigned long long int result = 0;
+    BOOL success = [scanner scanHexLongLong:&result];
+    if (!success) {
+        return nil;
+    }
+
+    NSNumber *number = @(result);
+    return number.stringValue;
+}
+
+
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
@@ -111,7 +148,7 @@
     if (!this_mac || !other_mac) {
         return NO;
     }
-    
+
     return [this_mac isEqualToString:other_mac];
 }
 
