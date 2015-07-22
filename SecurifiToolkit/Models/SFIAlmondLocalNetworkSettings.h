@@ -5,6 +5,16 @@
 
 #import <Foundation/Foundation.h>
 
+@class SFIAlmondPlus;
+
+typedef NS_ENUM(unsigned int, TestConnectionResult) {
+    TestConnectionResult_unknown,           // result is not obtained
+    TestConnectionResult_success,           // all is good
+    TestConnectionResult_macMismatch,       // the mac specified in the settings do not match the mac on the remote host
+    TestConnectionResult_unknownError,      // some error here or there prevented the test from completing
+};
+
+
 // Represents the settings used for connecting directly to an Almond over a web socket
 @interface SFIAlmondLocalNetworkSettings : NSObject <NSCopying, NSCoding>
 
@@ -17,6 +27,9 @@
 
 // name for SSID 5ghz
 @property(nonatomic, copy) NSString *ssid5;
+
+// almond MAC id
+@property(nonatomic, copy) NSString *almondplusName;
 
 // almond MAC id
 @property(nonatomic, copy) NSString *almondplusMAC;
@@ -33,7 +46,7 @@
 // password for login
 @property(nonatomic, copy) NSString *password;
 
-- (BOOL)testConnection;
+- (enum TestConnectionResult)testConnection;
 
 - (id)initWithCoder:(NSCoder *)coder;
 

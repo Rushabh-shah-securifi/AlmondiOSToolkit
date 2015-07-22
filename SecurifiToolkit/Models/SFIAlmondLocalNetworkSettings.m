@@ -7,12 +7,13 @@
 #import "WebSocketEndpoint.h"
 #import "NetworkConfig.h"
 #import "GenericCommand.h"
+#import "SFIAlmondPlus.h"
 
 
 @interface SFIAlmondLocalNetworkSettings () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) dispatch_semaphore_t test_connection_latch;
 @property(nonatomic, readonly) dispatch_semaphore_t test_command_latch;
-@property(nonatomic) BOOL testConnectionSuccess;
+@property(nonatomic) enum TestConnectionResult testResult;
 @end
 
 @implementation SFIAlmondLocalNetworkSettings
@@ -26,7 +27,7 @@
     return self;
 }
 
-- (BOOL)testConnection {
+- (enum TestConnectionResult)testConnection {
     NSString *mac = @"test_almond";
 
     NetworkConfig *config = [NetworkConfig webSocketConfigAlmond:mac];
@@ -34,7 +35,7 @@
     config.port = self.port;
     config.password = self.password;
 
-    self.testConnectionSuccess = NO;
+    self.testResult = TestConnectionResult_unknown;
     _test_connection_latch = dispatch_semaphore_create(0);
 
     WebSocketEndpoint *endpoint = [WebSocketEndpoint endpointWithConfig:config];
@@ -42,10 +43,10 @@
 
     [endpoint connect];
     [self waitOnLatch:self.test_connection_latch timeout:3 logMsg:@"Failed to connect to web socket"];
-    BOOL success = self.testConnectionSuccess;
 
+    BOOL success = (self.testResult == TestConnectionResult_success);
     if (success) {
-        self.testConnectionSuccess = NO;
+        self.testResult = TestConnectionResult_unknown;
         _test_command_latch = dispatch_semaphore_create(0);
 
         NSTimeInterval cid = [NSDate date].timeIntervalSince1970;
@@ -58,8 +59,6 @@
         NSError *error = nil;
         if ([endpoint sendCommand:cmd error:&error]) {
             [self waitOnLatch:self.test_command_latch timeout:3 logMsg:@"Failed to send GetAlmondNameandMAC to web socket"];
-
-            success = self.testConnectionSuccess;
         }
     }
 
@@ -70,7 +69,35 @@
     _test_connection_latch = nil;
     _test_command_latch = nil;
 
-    return success;
+    return self.testResult;
+}
+
+- (void)processTestConnectionResponsePayload:(NSDictionary*)payload {
+    NSString *str = payload[@"Success"];
+
+    BOOL success = [str isEqualToString:@"true"];
+    self.testResult = success ? TestConnectionResult_success : TestConnectionResult_unknownError;
+
+    if (!success) {
+        return;
+    }
+
+    NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:payload[@"MAC"]];
+
+    if (self.almondplusMAC) {
+        // if a MAC is specified then let's compare and make sure the almond to which we connected is the same one specified
+        // in these settings.
+
+        if (![self.almondplusMAC isEqualToString:mac]) {
+            // not the same
+            self.testResult = TestConnectionResult_macMismatch;
+            return;
+        }
+    }
+
+    // update the almond plus mac with this one
+    self.almondplusMAC = mac;
+    self.almondplusName = payload[@"Name"];
 }
 
 - (id)initWithCoder:(NSCoder *)coder {
@@ -174,7 +201,7 @@
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
     dispatch_semaphore_t latch = self.test_connection_latch;
     if (latch) {
-        self.testConnectionSuccess = YES;
+        self.testResult = TestConnectionResult_success;
         dispatch_semaphore_signal(latch);
     }
 }
@@ -186,7 +213,7 @@
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
     if (commandType == CommandType_ALMOND_NAME_AND_MAC_RESPONSE) {
         dispatch_semaphore_t latch = self.test_command_latch;
-        NSDictionary *almond_data = payload;
+        [self processTestConnectionResponsePayload:payload];
         dispatch_semaphore_signal(latch);
     }
 }
