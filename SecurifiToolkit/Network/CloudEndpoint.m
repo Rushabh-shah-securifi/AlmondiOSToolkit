@@ -311,6 +311,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                     // Process a single command response at a time
                                     id responsePayload = nil;
 
+                                    BOOL parsedPayload = NO;
+
                                     switch (commandType) {
                                         // these are the only command responses so far that uses a JSON payload; we special case them for now
                                         case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
@@ -337,13 +339,28 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                                 responsePayload = [NotificationListResponse parseDeviceLogsJson:buffer];
                                             }
 
+                                            parsedPayload = YES;
+
                                             break;
                                         };
 
-                                            // All others are XML
+                                        // All others are XML
                                         default: {
+                                            if (!securifi_validCommandType((CommandType) commandType)) {
+                                                NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@", commandType, [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding]);
+                                                break;
+                                            }
+
+                                            NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
+
+                                            NSInteger actual_length = self.partialData.length;
+                                            NSInteger expected_length = xmlParserRange.length - xmlParserRange.location;
+                                            if (actual_length < expected_length) {
+                                                NSLog(@"Ignoring payload, the buffer length is wrong, actual:%i, expected:%i", actual_length, expected_length);
+                                                break;
+                                            }
+
                                             @try {
-                                                NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
                                                 NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
                                                 DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
@@ -354,11 +371,12 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                                 // important to pull command type from the parsed payload because the underlying
                                                 // command that we dispatch on can be different than the "container" carrying it
                                                 commandType = temp.commandType;
+
+                                                parsedPayload = YES;
                                             }
                                             @catch (NSException *ex) {
                                                 NSString *buffer_str = [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding];
                                                 NSLog(@"Exception on parsing XML payload, ex:%@, data:'%@'", ex, buffer_str);
-                                                return;
                                             }
 
                                             break;
@@ -368,11 +386,13 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                     // Remove 8 bytes from received command
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
 
-                                    // Tell the world the connection is up and running
-                                    [self tryPostNetworkUpNotification];
+                                    if (parsedPayload) {
+                                        // Tell the world the connection is up and running
+                                        [self tryPostNetworkUpNotification];
 
-                                    // Process the request by passing it to the delegate
-                                    [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
+                                        // Process the request by passing it to the delegate
+                                        [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
+                                    }
 
                                     // Advance the buffer
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location + endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
