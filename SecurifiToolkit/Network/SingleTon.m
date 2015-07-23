@@ -64,88 +64,88 @@
         self.networkShutdown = NO;
         self.connectionState = SDKCloudStatusUninitialized;
         _syncLocker = [NSObject new];
-
+        
         _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
         _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
-
+        
         _backgroundQueue = dispatch_queue_create("socket_queue", DISPATCH_QUEUE_CONCURRENT);
         _callbackQueue = callbackQueue;
         _dynamicCallbackQueue = dynamicCallbackQueue;
-
+        
         _network_established_latch = dispatch_semaphore_create(0);
         _cloud_initialized_latch = dispatch_semaphore_create(0);
-
+        
         _almondTableSyncLocker = [NSObject new];
         _hashCheckedForAlmondTable = [NSMutableSet new];
         _deviceValuesCheckedForAlmondTable = [NSMutableSet new];
-
+        
         _willFetchDeviceListFlagSyncLocker = [NSObject new];
         _willFetchDeviceListFlag = [NSMutableSet new];
-
+        
         _almondModeSynLocker = [NSObject new];
         _almondModeTable = [NSMutableDictionary new];
     }
-
+    
     return self;
 }
 
 - (void)initNetworkCommunication:(BOOL)useProductionCloud {
     NSLog(@"Initialzing network communication");
-
+    
     __strong SingleTon *block_self = self;
-
+    
     dispatch_async(self.backgroundQueue, ^(void) {
         if (block_self.inputStream == nil && block_self.outputStream == nil) {
             [block_self postData:NETWORK_CONNECTING_NOTIFIER data:nil];
-
+            
             // Load certificate
             //
             if (self.config.enableCertificateValidation) {
                 DLog(@"Loading certificate");
                 [block_self loadCertificate];
             }
-
+            
             DLog(@"Initializing sockets");
-
+            
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
-
+            
             NSString *server = useProductionCloud ? self.config.productionCloudHost : self.config.developmentCloudHost;
             CFStringRef host = (__bridge CFStringRef) server;
             UInt32 port = self.config.cloudPort;
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
-
+            
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
             block_self.outputStream = (__bridge_transfer NSOutputStream *) writeStream;
-
+            
             block_self.inputStream.delegate = block_self;
             block_self.outputStream.delegate = block_self;
-
+            
             [block_self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
             [block_self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
-
+            
             NSNumber *enableChainValidation = self.config.enableCertificateChainValidation ? @YES : @NO;
             NSDictionary *settings = @{
-                    (__bridge id) kCFStreamSSLValidatesCertificateChain : enableChainValidation
-            };
-
+                                       (__bridge id) kCFStreamSSLValidatesCertificateChain : enableChainValidation
+                                       };
+            
             CFReadStreamSetProperty(readStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
             CFWriteStreamSetProperty(writeStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
-
+            
             NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-
+            
             DLog(@"Secheduling in run loop");
-
+            
             [block_self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
             [block_self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
-
+            
             DLog(@"Opening streams");
-
+            
             [block_self.inputStream open];
             [block_self.outputStream open];
-
+            
             DLog(@"Streams open and entering run loop");
-
+            
             // Signal to waiting socket writers that the network is up and then invoke the run loop to pump events
             block_self.isStreamConnected = YES;
             dispatch_semaphore_signal(block_self.network_established_latch);
@@ -153,21 +153,21 @@
             [block_self.delegate singletTonCloudConnectionDidEstablish:block_self];
             //
             while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && !block_self.networkShutdown) {
-//                DLog(@"Streams entered run loop");
+                //                DLog(@"Streams entered run loop");
             }
             block_self.isStreamConnected = NO;
-
+            
             [block_self.inputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
             [block_self.outputStream removeFromRunLoop:runLoop forMode:NSDefaultRunLoopMode];
-
+            
             DLog(@"Streams exited run loop");
-
+            
             [block_self.delegate singletTonCloudConnectionDidClose:block_self];
         }
         else {
             NSLog(@"Stream already opened");
         }
-
+        
         block_self.networkShutdown = YES;
     });
 }
@@ -181,41 +181,41 @@
 
 - (void)shutdown {
     NSLog(@"Shutting down network singleton");
-
+    
     // Take weak reference to prevent retain cycles
     __weak SingleTon *block_self = self;
-
+    
     dispatch_sync(self.backgroundQueue, ^(void) {
         NSLog(@"[%@] Singleton is shutting down", block_self.debugDescription);
-
+        
         // Signal shutdown
         //
         block_self.networkShutdown = YES;
         block_self.isLoggedIn = NO;
         block_self.connectionState = SDKCloudStatusCloudConnectionShutdown;
         block_self.isStreamConnected = NO;
-
+        
         // Clean up command queue
         //
         [block_self tryAbortUnit];
         dispatch_semaphore_signal(block_self.network_established_latch);
         dispatch_semaphore_signal(block_self.cloud_initialized_latch);
-
+        
         // Synchronize access: wait for other readers/writers before tearing down the sockets
         //
         @synchronized (self.syncLocker) {
             NSInputStream *in_stream = block_self.inputStream;
             NSOutputStream *out_stream = block_self.outputStream;
-
+            
             NSRunLoop *loop = [NSRunLoop currentRunLoop];
-
+            
             if (out_stream != nil) {
                 out_stream.delegate = nil;
                 [out_stream close];
                 [out_stream removeFromRunLoop:loop forMode:NSDefaultRunLoopMode];
                 block_self.outputStream = nil;
             }
-
+            
             if (in_stream != nil) {
                 in_stream.delegate = nil;
                 [in_stream close];
@@ -224,7 +224,7 @@
             }
         }
     });
-
+    
     // Tell delegate of shutdown
     [self.delegate singletTonCloudConnectionDidClose:self];
 }
@@ -237,7 +237,7 @@
 - (BOOL)waitForConnectionEstablishment:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.network_established_latch;
     NSString *msg = @"Giving up on connection establishment";
-
+    
     BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
     if (self.isStreamConnected) {
         // If the connection is up by now, no need to worry about the timeout.
@@ -256,7 +256,7 @@
 - (BOOL)waitForCloudInitialization:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.cloud_initialized_latch;
     NSString *msg = @"Giving up on cloud initialization";
-
+    
     BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
     if (timedOut) {
         NSLog(@"%@. Issuing shutdown on timeout", msg);
@@ -270,9 +270,9 @@
 // Returns NO when the signal has been received before the timeout.
 - (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString *)msg {
     dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
-
+    
     BOOL timedOut = NO;
-
+    
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
         if (self.networkShutdown) {
@@ -287,10 +287,10 @@
             NSLog(@"%@. Cloud is initialized.", msg);
             break;
         }
-
+        
         const int waitMs = 5;
         blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, waitMs * NSEC_PER_MSEC);
-
+        
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
             NSLog(@"%@. Timeout reached.", msg);
@@ -298,10 +298,10 @@
         }
     }
     while (0 != dispatch_semaphore_wait(latch, blockingSleepSecondsIfNotDone));
-
+    
     // make sure...
     dispatch_semaphore_signal(latch);
-
+    
     return timedOut;
 }
 
@@ -316,7 +316,7 @@
 
 - (void)tryMarkUnitCompletion:(BOOL)success responseType:(CommandType)responseType {
     SUnit *unit = self.currentUnit;
-
+    
     if (unit) {
         [unit markResponse:success];
         [self.delegate singletTonDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess responseType:responseType];
@@ -329,7 +329,7 @@
 
 - (void)tryAbortUnit {
     SUnit *unit = self.currentUnit;
-
+    
     if (unit) {
         DLog(@"Marking unit as aborted: %@", unit.description);
         [unit abort];
@@ -338,77 +338,135 @@
 
 - (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
     /*
-        sinclair 24 Mar 2015
-        some notes from 'reverse engineering' the wire format...
-
-        1. stream is continuous one of command responses.
-        2. the cloud sends some data in chunks that will be delivered to this handler over multiple calls.
-        3. we cumulate all bytes/chunks looking for the structures of a single command response and isolate that run
-        4. a command response data stream is delimited into a [payload length][command type]<root>[payload]</root> segments
-        5. <root> and </root> are literal values and serve as a common "envelope" wrapping either XML or JSON payloads
-        6. payload length segment is stored in the first 4 bytes
-        7. command type is stored in the next 4 bytes
-        8. the command type is an unsigned int value that can be used to determine whether the payload is XML or JSON
+     sinclair 24 Mar 2015
+     some notes from 'reverse engineering' the wire format...
+     
+     1. stream is continuous one of command responses.
+     2. the cloud sends some data in chunks that will be delivered to this handler over multiple calls.
+     3. we cumulate all bytes/chunks looking for the structures of a single command response and isolate that run
+     4. a command response data stream is delimited into a [payload length][command type]<root>[payload]</root> segments
+     5. <root> and </root> are literal values and serve as a common "envelope" wrapping either XML or JSON payloads
+     6. payload length segment is stored in the first 4 bytes
+     7. command type is stored in the next 4 bytes
+     8. the command type is an unsigned int value that can be used to determine whether the payload is XML or JSON
      */
-
+    
     if (!self.partialData) {
         _partialData = [[NSMutableData alloc] init];
     }
-
+    
     NSString *startTagString = @"<root>";
     NSData *startTag = [startTagString dataUsingEncoding:NSUTF8StringEncoding];
-
+    
     NSString *endTagString = @"</root>";
     NSData *endTag = [endTagString dataUsingEncoding:NSUTF8StringEncoding];
-
+    
     switch (streamEvent) {
         case NSStreamEventOpenCompleted: {
             break;
         }
-
+            
         case NSStreamEventHasBytesAvailable:
             if (theStream == self.inputStream) {
                 // Multiple response payloads in one callback is possible
                 while (!self.networkShutdown && [self.inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
-
+                    
                     NSInteger bufferLength = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
                     if (bufferLength > 0) {
                         //Append received data to partial buffer
                         [self.partialData appendBytes:&inputBuffer[0] length:(NSUInteger) bufferLength];
-
+                        BOOL dataMayContainJSON = YES;
+                        while (dataMayContainJSON) {
+                            dataMayContainJSON = NO;
+                            if (self.partialData.length > 8) {
+                                unsigned int commandType;
+                                NSRange commandTypeRange = NSMakeRange(4, 4);
+                                [self.partialData getBytes:&commandType range:commandTypeRange];
+                                commandType = NSSwapBigIntToHost(commandType);
+                                DLog(@"%s:COMMAND Received: %d TIME => %f ", __PRETTY_FUNCTION__, commandType, CFAbsoluteTimeGetCurrent());
+                                
+                                
+                                if (commandType == CommandType_LIST_SCENE_RESPONSE || commandType==CommandType_COMMAND_RESPONSE || commandType == CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE  || commandType==CommandType_WIFI_CLIENTS_LIST_RESPONSE || commandType==CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST || commandType==1549 || commandType==1547 || commandType==1545 || commandType==1543 || commandType==1551  || commandType==99) {
+                                    //MD01 ----means json / not xml -----------------
+                                    if (commandType==1549 || commandType==1547 || commandType==1545 || commandType==1543 || commandType==1541 || commandType==1551) {
+                                        //99 chgitenq inch command a
+                                        
+                                        int a=1;
+                                    }
+                                    
+                                    NSRange payloadLenghtRange = NSMakeRange(0, 4);
+                                    unsigned int payloadLenght;
+                                    [self.partialData getBytes:&payloadLenght range:payloadLenghtRange];
+                                    payloadLenght = NSSwapBigIntToHost(payloadLenght);
+                                    
+                                    if (self.partialData.length>=8+payloadLenght) {
+                                        NSUInteger start_loc = 8;
+                                        NSRange jsonParseRange = NSMakeRange(start_loc, payloadLenght);
+                                        
+                                        NSData *buffer = [self.partialData subdataWithRange:jsonParseRange];
+                                        
+                                        DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                        //                                        id responsePayload = nil;
+                                        
+                                        //                                        responsePayload = [NotificationListResponse parseJson:buffer];
+                                        
+                                        // Remove 8 bytes from received command
+                                        [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
+                                        
+                                        // Tell the world the connection is up and running
+                                        [self tryPostNetworkUpNotification];
+                                        
+                                        [self dispatchResponse:buffer commandType:(CommandType) commandType];
+                                        
+                                        [self.partialData replaceBytesInRange:NSMakeRange(0, payloadLenght /* Removed 8 bytes before */) withBytes:NULL length:0];
+                                        if (self.partialData.length>8) {
+                                            dataMayContainJSON = YES;
+                                        }
+                                    }
+                                    
+                                }
+                                
+                            }
+                        }
+                        
+                        
+                        
                         // Range of current data buffer
                         NSRange endTagRange = NSMakeRange(0, [self.partialData length]);
+                        
                         while (endTagRange.location != NSNotFound) {
+                            
+                            
                             endTagRange = [self.partialData rangeOfData:endTag options:0 range:endTagRange];
-
+                            
                             if (endTagRange.location != NSNotFound) {
                                 // Look for <root> tag in [0 to endTag]
                                 NSRange startTagRange = NSMakeRange(0, endTagRange.location);
-
+                                
                                 startTagRange = [self.partialData rangeOfData:startTag options:0 range:startTagRange];
-
+                                
                                 if (startTagRange.location == NSNotFound) {
                                     NSLog(@"%s: Serious error !!! should not come here// Invalid command /// without startRootTag", __PRETTY_FUNCTION__);
                                 }
                                 else {
-/*
-                                    unsigned int payloadLength;
-                                    NSRange payloadLengthRange = NSMakeRange(0, 4);
-                                    [self.partialData getBytes:&payloadLength range:payloadLengthRange];
-                                    payloadLength = NSSwapBigIntToHost(payloadLength);
-                                    NSLog(@"Payload is %i bytes long", payloadLength);
-*/
-
+                                    /*
+                                     unsigned int payloadLength;
+                                     NSRange payloadLengthRange = NSMakeRange(0, 4);
+                                     [self.partialData getBytes:&payloadLength range:payloadLengthRange];
+                                     payloadLength = NSSwapBigIntToHost(payloadLength);
+                                     NSLog(@"Payload is %i bytes long", payloadLength);
+                                     */
+                                    
                                     unsigned int commandType;
                                     NSRange commandTypeRange = NSMakeRange(4, 4);
                                     [self.partialData getBytes:&commandType range:commandTypeRange];
                                     commandType = NSSwapBigIntToHost(commandType);
                                     DLog(@"%s: Response Received: %d TIME => %f ", __PRETTY_FUNCTION__, commandType, CFAbsoluteTimeGetCurrent());
-
+                                    
                                     // Process a single command response at a time
                                     id responsePayload = nil;
-
+                                    
                                     // these are the only command responses so far that uses a JSON payload; we special case them for now
                                     if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE || commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE || commandType == CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE) {
                                         // we only want the JSON wrapped inside the <root></root> pair
@@ -416,7 +474,7 @@
                                         NSRange jsonParseRange = NSMakeRange(start_loc, endTagRange.location - start_loc);
                                         NSData *buffer = [self.partialData subdataWithRange:jsonParseRange];
                                         DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
-
+                                        
                                         if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE) {
                                             responsePayload = [NotificationListResponse parseJson:buffer];
                                         }
@@ -431,46 +489,49 @@
                                         NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
                                         NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
                                         DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
-
+                                        
                                         CommandParser *parser = [CommandParser new];
                                         GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
                                         responsePayload = temp.command;
-
+                                        
                                         // important to pull command type from the parsed payload because the underlying
                                         // command that we dispatch on can be different than the "container" carrying it
                                         commandType = temp.commandType;
                                     }
-
+                                    
                                     // Remove 8 bytes from received command
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
-
+                                    
                                     // Tell the world the connection is up and running
                                     [self tryPostNetworkUpNotification];
-
+                                    
                                     [self dispatchResponse:responsePayload commandType:(CommandType) commandType];
-
+                                    
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, endTagRange.location + endTagRange.length - 8 /* Removed 8 bytes before */) withBytes:NULL length:0];
-
+                                    
                                     // Regenerate NSRange
                                     endTagRange = NSMakeRange(0, [self.partialData length]);
                                 }
+                                
+                                
+                                
                             }
                         }
                     }
                 }
-
+                
                 break;
             }
-
+            
         case NSStreamEventErrorOccurred: {
             if (theStream == self.outputStream) {
                 NSLog(@"Output stream error: %@", theStream.streamError.localizedDescription);
                 [self shutdown];
             }
-
+            
             break;
         }
-
+            
         case NSStreamEventHasSpaceAvailable: {
             // Evaluate the SSL connection
             if (self.config.enableCertificateValidation && !self.certificateTrusted) {
@@ -481,19 +542,19 @@
                 }
                 self.certificateTrusted = trusted;
             }
-
+            
             break;
         }
-
+            
         case NSStreamEventEndEncountered: {
             if (theStream == self.inputStream) {
                 DLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 [self shutdown];
             }
-
+            
             break;
         }
-
+            
         default: {
             DLog(@"%s: Unhandled event: %li", __PRETTY_FUNCTION__, (long)streamEvent);
         }
@@ -509,34 +570,34 @@
             [self postData:LOGIN_NOTIFIER data:obj];
             break;
         }
-
+            
         case CommandType_SIGNUP_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:SIGN_UP_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_KEEP_ALIVE: {
             break;
         }
-
+            
         case CommandType_CLOUD_SANITY_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             break;
         }
-
+            
         case CommandType_LOGOUT_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:LOGOUT_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_LOGOUT_ALL_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:LOGOUT_ALL_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_AFFILIATION_USER_COMPLETE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:AFFILIATION_COMPLETE_NOTIFIER data:payload];
@@ -559,19 +620,19 @@
             [self postData:ALMOND_LIST_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DEVICE_DATA_HASH_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DEVICEDATA_HASH_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DEVICE_DATA_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DEVICE_DATA_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DEVICE_VALUE_LIST_NOTIFIER data:payload];
@@ -597,7 +658,7 @@
             break;
         }
         case CommandType_GENERIC_COMMAND_NOTIFICATION: {
-//                                            [self tryMarkUnitCompletion:YES responseType:GENERIC_COMMAND_NOTIFICATION];
+            //                                            [self tryMarkUnitCompletion:YES responseType:GENERIC_COMMAND_NOTIFICATION];
             [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:payload];
             break;
         }
@@ -632,103 +693,103 @@
             [self postDataDynamic:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER data:payload commandType:commandType];
             break;
         }
-
+            
         case CommandType_USER_PROFILE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:USER_PROFILE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_CHANGE_PASSWORD_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:CHANGE_PWD_RESPONSE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DELETE_ACCOUNT_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_UPDATE_USER_PROFILE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:UPDATE_USER_PROFILE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ALMOND_AFFILIATION_DATA_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_UNLINK_ALMOND_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:UNLINK_ALMOND_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_USER_INVITE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:USER_INVITE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DELETE_SECONDARY_USER_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DELETE_SECONDARY_USER_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ALMOND_NAME_CHANGE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ALMOND_MODE_CHANGE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_ALMOND_MODE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ALMOND_MODE_RESPONSE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_DEREGISTRATION_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:payload];
@@ -754,7 +815,36 @@
             [self postData:NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER data:payload];
             break;
         };
-
+        case CommandType_LIST_SCENE_RESPONSE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_COMMAND_RESPONSE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_COMMAND_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DYNAMIC_CLIENT_UPDATE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
         default:
             break;
     }
@@ -791,13 +881,13 @@
 
 - (void)post:(NSString *)notificationName payload:(id)payload queue:(dispatch_queue_t)queue {
     __weak id block_payload = payload;
-
+    
     dispatch_sync(queue, ^() {
         NSDictionary *data = nil;
         if (payload) {
             data = @{@"data" : block_payload};
         }
-
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
     });
 }
@@ -808,7 +898,7 @@
     NSString *certFileName = self.config.certificateFileName;
     NSString *path = [[NSBundle mainBundle] pathForResource:certFileName ofType:@"der"];
     NSData *certData = [NSData dataWithContentsOfFile:path];
-
+    
     SecCertificateRef oldCertificate = self.certificate;
     self.certificate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef) certData);
     if (oldCertificate) {
@@ -822,53 +912,53 @@
         NSLog(@"%s: Unable to evaluate trust; stream did not return security trust ref", __PRETTY_FUNCTION__);
         return NO;
     }
-
+    
     SecTrustResultType resultType;
     SecTrustGetTrustResult(secTrust, &resultType);
-
+    
     switch (resultType) {
         case kSecTrustResultDeny:
         case kSecTrustResultRecoverableTrustFailure:
         case kSecTrustResultFatalTrustFailure:
         case kSecTrustResultOtherError:
             return NO;
-
+            
         case kSecTrustResultInvalid:
         case kSecTrustResultProceed:
         case kSecTrustResultUnspecified:
         default:
             break;
     }
-
+    
     if (resultType == kSecTrustResultInvalid) {
         NSLog(@"Cert test: kSecTrustResultInvalid");
-
+        
         SecTrustResultType result;
         OSStatus status = SecTrustEvaluate(secTrust, &result);
         if (status != errSecSuccess) {
             NSLog(@"Cert test fail: kSecTrustResultInvalid !errSecSuccess");
             return NO;
         }
-
+        
         switch (result) {
             case kSecTrustResultDeny:
             case kSecTrustResultRecoverableTrustFailure:
             case kSecTrustResultFatalTrustFailure:
             case kSecTrustResultOtherError:
                 return NO;
-
+                
             case kSecTrustResultInvalid: {
                 NSLog(@"Cert test fail: kSecTrustResultInvalid again");
                 return NO;
             }
-
+                
             case kSecTrustResultProceed:
             case kSecTrustResultUnspecified:
             default:
                 break;
         }
     }
-
+    
     return [self evaluateCertificate:secTrust];
 }
 
@@ -878,30 +968,30 @@
         NSLog(@"Cert test fail: zero certificate count");
         return NO;
     }
-
+    
     NSMutableArray *streamCertificates = [NSMutableArray array];
     for (CFIndex index = 0; index < count; index++) {
         SecCertificateRef certificate = SecTrustGetCertificateAtIndex(secTrust, index);
         id cert = (__bridge id) certificate;
         [streamCertificates addObject:cert];
     }
-
+    
     SecPolicyRef policy = SecPolicyCreateSSL(YES, CFSTR("*.securifi.com")); // must be released
-
+    
     SecTrustRef trust = NULL; // must be released
     OSStatus status;
-
+    
     status = SecTrustCreateWithCertificates((__bridge CFArrayRef) streamCertificates, policy, &trust);
     if (status != errSecSuccess) {
         NSLog(@"%s: Failed to create trust with certs copy", __PRETTY_FUNCTION__);
         return NO;
     }
-
+    
     SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) @[(id) self.certificate]);
-
+    
     SecTrustResultType trustResultType = kSecTrustResultInvalid;
     status = SecTrustEvaluate(trust, &trustResultType);
-
+    
     BOOL trusted;
     if (status == errSecSuccess) {
         if (trustResultType == kSecTrustResultUnspecified) {
@@ -916,14 +1006,14 @@
         NSLog(@"%s: Unable to evaluate trust: %d", __PRETTY_FUNCTION__, (int) status);
         trusted = NO;
     }
-
+    
     if (trust) {
         CFRelease(trust);
     }
     if (policy) {
         CFRelease(policy);
     }
-
+    
     return trusted;
 }
 
@@ -984,7 +1074,7 @@
     if (aAlmondMac == nil) {
         return;
     }
-
+    
     NSNumber *num = @(mode);
     @synchronized (self.almondModeSynLocker) {
         self.almondModeTable[aAlmondMac] = num;
@@ -995,14 +1085,14 @@
     if (aAlmondMac == nil) {
         return SFIAlmondMode_unknown;
     }
-
+    
     @synchronized (self.almondModeSynLocker) {
         NSNumber *num = self.almondModeTable[aAlmondMac];
-
+        
         if (num == nil) {
             return SFIAlmondMode_unknown;
         }
-
+        
         return (SFIAlmondMode) [num unsignedIntValue];
     }
 }
@@ -1011,7 +1101,7 @@
     if (aAlmondMac == nil) {
         return;
     }
-
+    
     @synchronized (self.almondModeSynLocker) {
         [self.almondModeTable removeObjectForKey:aAlmondMac];
     }
@@ -1034,13 +1124,13 @@
     if (cloudStatus == SDKCloudStatusCloudConnectionShutdown) {
         return;
     }
-
+    
     // There may be other commands in the initialization queue still waiting for responses.
     // Let them complete or timeout before opening up the main command queue.
     // Therefore, queue a command to make the state change and start the main queue's processing.
-
+    
     NSLog(@"Queuing cloud initialization completed command");
-
+    
     __weak SingleTon *block_self = self;
     dispatch_async(self.initializationQueue, ^() {
         SDKCloudStatus status = block_self.connectionState;
@@ -1050,7 +1140,7 @@
         if (status == SDKCloudStatusCloudConnectionShutdown) {
             return;
         }
-
+        
         block_self.connectionState = SDKCloudStatusInitialized;
         dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
         if (latch) {
@@ -1068,7 +1158,7 @@
         NSLog(@"Rejected cloud initialization command submission: already marked as initialized");
         return NO;
     }
-
+    
     dispatch_queue_t queue = self.initializationQueue;
     BOOL waitForInit = NO;
     return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:5];
@@ -1077,17 +1167,17 @@
 - (BOOL)submitCommand:(GenericCommand *)command {
     dispatch_queue_t queue = self.commandQueue;
     BOOL waitForInit = YES;
-
+    
     switch (self.connectionState) {
         case SDKCloudStatusNetworkDown:
         case SDKCloudStatusCloudConnectionShutdown:
             // don't even queue; just get out
             return NO;
-
+            
         case SDKCloudStatusInitialized:
             waitForInit = NO;
             break;
-
+            
         case SDKCloudStatusUninitialized:
             break;
         case SDKCloudStatusInitializing:
@@ -1099,7 +1189,7 @@
         case SDKCloudStatusLoggedIn:
             break;
     }
-
+    
     return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:0];
 }
 
@@ -1111,9 +1201,9 @@
         DLog(@"SubmitCommand failed: network is shutdown");
         return NO;
     }
-
+    
     DLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
-
+    
     __weak SingleTon *block_self = self;
     dispatch_async(queue, ^() {
         if (block_self.networkShutdown) {
@@ -1128,15 +1218,15 @@
             SLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
-
+        
         NSInteger tag = [block_self nextUnitCounter];
-
+        
         SUnit *unit = [[SUnit alloc] initWithCommand:command];
         [unit markWorking:tag];
         block_self.currentUnit = unit;
-
+        
         SLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
-
+        
         NSError *error;
         BOOL success = [block_self internalSendToCloud:block_self command:command error:&error];
         if (!success) {
@@ -1145,49 +1235,49 @@
             return;
         }
         [block_self.delegate singletTonDidSendCommand:block_self command:command];
-
+        
         SLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
-
-//        int const waitAtMostSecs = 1;
+        
+        //        int const waitAtMostSecs = 1;
         [unit waitForResponse:waitAtMostSecs];
-
+        
         SLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
     });
-
+    
     return YES;
 }
 
 - (BOOL)internalSendToCloud:(SingleTon *)socket command:(id)sender error:(NSError **)outError {
     DLog(@"%s: Waiting to enter sync block", __PRETTY_FUNCTION__);
-
+    
     @synchronized (self.syncLocker) {
         DLog(@"%s: Entered sync block", __PRETTY_FUNCTION__);
-
+        
         // Wait for connection establishment if need be.
         if (!socket.isStreamConnected) {
             DLog(@"Waiting for connection establishment");
             BOOL timedOut = [socket waitForConnectionEstablishment:20]; // wait 20 seconds
             DLog(@"Done waiting for connection establishment, timedOut=%@", timedOut ? @"YES" : @"NO");
-
+            
             if (timedOut) {
                 DLog(@"Timed out waiting to initialize connection");
                 *outError = [self makeError:@"Securifi - Timed out waiting to initialize connection"];
                 return NO;
             }
-
+            
             if (!socket.isStreamConnected) {
                 DLog(@"Stream died on connection");
                 *outError = [self makeError:@"Securifi - Stream died on connection"];
                 return NO;
             }
         }
-
+        
         GenericCommand *obj = (GenericCommand *) sender;
         DLog(@"Sending command, cmd:%@", obj.debugDescription);
-
+        
         unsigned int commandType = htonl(obj.commandType);;
         NSString *commandPayload;
-
+        
         @try {
             switch (obj.commandType) {
                 case CommandType_LOGIN_COMMAND:
@@ -1223,7 +1313,7 @@
                     commandPayload = [cmd toXml];
                     break;
                 }
-
+                    
                     // Commands that transfer in Command 61 container
                 case CommandType_ALMOND_NAME_CHANGE_REQUEST:
                 case CommandType_ALMOND_MODE_CHANGE_REQUEST:
@@ -1234,12 +1324,12 @@
                     commandPayload = [cmd toXml];
                     break;
                 }
-
+                    
                 case CommandType_LOGOUT_COMMAND: {
                     commandPayload = LOGOUT_REQUEST_XML;
                     break;
                 }
-
+                    
                 case CommandType_CLOUD_SANITY: {
                     commandPayload = CLOUD_SANITY_REQUEST_XML;
                     break;
@@ -1251,51 +1341,59 @@
                     commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
                     break;
                 }
+                case CommandType_GET_ALL_SCENES:
+                case CommandType_UPDATE_REQUEST:
+                case CommandType_WIFI_CLIENTS_LIST_REQUEST:{
+                    
+                    commandType = (unsigned int) htonl(obj.commandType);
+                    commandPayload = obj.command;
+                    break;
+                }
                 default:
                     break;
             } // end switch
-
+            
             NSData *sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
             unsigned int commandLength = (unsigned int) htonl([sendCommandPayload length]);
-
+            
             DLog(@"@Payload being sent: %@", commandPayload);
-
+            
             NSOutputStream *outputStream = socket.outputStream;
             if (outputStream == nil) {
                 DLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, outputStream);
                 return NO;
             }
-
+            
             // Wait until socket is open
             NSStreamStatus type;
             do {
                 type = [outputStream streamStatus];
             } while (type == NSStreamStatusOpening);
-
-//            if (socket.isStreamConnected) {
-//                [outputStream streamStatus];
-//            }
-
+            
+            //            if (socket.isStreamConnected) {
+            //                [outputStream streamStatus];
+            //            }
+            
             if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [outputStream write:(uint8_t *) &commandLength maxLength:4]) {
                     goto socket_failure_handler;
                 }
             }
-
+            
             if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [outputStream write:(uint8_t *) &commandType maxLength:4]) {
                     goto socket_failure_handler;
                 }
             }
-
+            
             if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
                 if (-1 == [outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]]) {
                     goto socket_failure_handler;
                 }
             }
-
+            
             DLog(@"%s: Exiting sync block", __PRETTY_FUNCTION__);
-
+            
             if (!socket.isStreamConnected) {
                 DLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, outputStream);
                 return NO;
@@ -1308,17 +1406,17 @@
                 DLog(@"%s: sent command to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 return YES;
             }
-
-            socket_failure_handler:
+            
+        socket_failure_handler:
             {
                 DLog(@"Socket failure handler invoked");
-
+                
                 socket.isLoggedIn = NO;
                 socket.sendCommandFail = YES;
                 socket.isStreamConnected = NO;
-
+                
                 *outError = [self makeError:@"Securifi Payload - Send Error"];
-
+                
                 return NO;
             }//label socket_failure_handler
         }

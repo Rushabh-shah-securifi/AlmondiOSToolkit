@@ -148,6 +148,10 @@
 		22FAE88917A8E528002FFEE8 /* Signup.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FAE88717A8E528002FFEE8 /* Signup.m */; };
 		22FE9B7F17AA331300B53869 /* Logout.h in Headers */ = {isa = PBXBuildFile; fileRef = 22FE9B7D17AA331300B53869 /* Logout.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22FE9B8017AA331300B53869 /* Logout.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FE9B7E17AA331300B53869 /* Logout.m */; };
+		8482878D1B170A8F008826C7 /* ScenesListRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 8482878B1B170A8F008826C7 /* ScenesListRequest.h */; };
+		8482878E1B170A8F008826C7 /* ScenesListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8482878C1B170A8F008826C7 /* ScenesListRequest.m */; };
+		848CA5E81B5527110010B846 /* MDJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CA5E61B5527110010B846 /* MDJSON.h */; };
+		848CA5E91B5527110010B846 /* MDJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 848CA5E71B5527110010B846 /* MDJSON.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
 		CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */; };
 		CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */; };
@@ -418,6 +422,10 @@
 		22FAE88717A8E528002FFEE8 /* Signup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Signup.m; sourceTree = "<group>"; };
 		22FE9B7D17AA331300B53869 /* Logout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logout.h; sourceTree = "<group>"; };
 		22FE9B7E17AA331300B53869 /* Logout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logout.m; sourceTree = "<group>"; };
+		8482878B1B170A8F008826C7 /* ScenesListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenesListRequest.h; sourceTree = "<group>"; };
+		8482878C1B170A8F008826C7 /* ScenesListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenesListRequest.m; sourceTree = "<group>"; };
+		848CA5E61B5527110010B846 /* MDJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MDJSON.h; path = ../../../iosapp/SecurifiApp/Scene/MDJSON.h; sourceTree = "<group>"; };
+		848CA5E71B5527110010B846 /* MDJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MDJSON.m; path = ../../../iosapp/SecurifiApp/Scene/MDJSON.m; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
 		CE15FFAE186844AA00371183 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		CE15FFB418684D7500371183 /* certificate.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = certificate.cer; sourceTree = "<group>"; };
@@ -461,7 +469,7 @@
 		CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SFIAlmondPlus.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE5EB5B817E703AB00985636 /* LogoutAllRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllRequest.h; sourceTree = "<group>"; };
 		CE5EB5BA17E703BA00985636 /* LogoutAllRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutAllRequest.m; sourceTree = "<group>"; };
-		CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlmondPlusSDKConstants.h; path = SecurifiToolkit/AlmondPlusSDKConstants.h; sourceTree = SOURCE_ROOT; };
+		CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlmondPlusSDKConstants.h; path = SecurifiToolkit/AlmondPlusSDKConstants.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE5EB5C417E7204000985636 /* AlmondListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondListRequest.h; sourceTree = "<group>"; };
 		CE5EB5C517E7204000985636 /* AlmondListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondListRequest.m; sourceTree = "<group>"; };
 		CE5EB5C817E722BD00985636 /* AlmondListResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondListResponse.h; sourceTree = "<group>"; };
@@ -766,6 +774,7 @@
 				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
 				1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */,
 				1DF035609133676CE2B94C18 /* xml */,
+				848CA5EA1B5527180010B846 /* JSON */,
 				1DF037E41986B5D077457BCB /* SecurifiTypes.h */,
 			);
 			path = SecurifiToolkit;
@@ -938,8 +947,20 @@
 				CE9A2915188D30270063D562 /* SensorChangeResponse.m */,
 				1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */,
 				1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */,
+				8482878B1B170A8F008826C7 /* ScenesListRequest.h */,
+				8482878C1B170A8F008826C7 /* ScenesListRequest.m */,
 			);
 			name = parser;
+			sourceTree = "<group>";
+		};
+		848CA5EA1B5527180010B846 /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				848CA5E61B5527110010B846 /* MDJSON.h */,
+				848CA5E71B5527110010B846 /* MDJSON.m */,
+			);
+			name = JSON;
+			path = xml;
 			sourceTree = "<group>";
 		};
 		CE458D5919EBBB5000689251 /* util */ = {
@@ -1052,7 +1073,9 @@
 				CE5EB65217EAD43000985636 /* DeviceValueResponse.h in Headers */,
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
+				848CA5E81B5527110010B846 /* MDJSON.h in Headers */,
 				1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */,
+				8482878D1B170A8F008826C7 /* ScenesListRequest.h in Headers */,
 				1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */,
 				1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */,
 				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
@@ -1276,6 +1299,7 @@
 				1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */,
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
 				1CD1D5591A660B7A00C030E9 /* SFINotificationDevice.m in Sources */,
+				848CA5E91B5527110010B846 /* MDJSON.m in Sources */,
 				1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
@@ -1319,6 +1343,7 @@
 				CE2EA26619D04BEA00C6D6A8 /* AlmondNameChangeResponse.m in Sources */,
 				2253388617A6B7380051BF0F /* AffiliationUserRequest.m in Sources */,
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
+				8482878E1B170A8F008826C7 /* ScenesListRequest.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				1CD1D54B1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.m in Sources */,
 				1C414BEB1A7B625400C448A4 /* NSDate+Convenience.m in Sources */,

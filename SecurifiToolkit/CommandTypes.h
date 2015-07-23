@@ -39,14 +39,14 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DYNAMIC_ALMOND_NAME_CHANGE              = 85,
     CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST    = 87,
     CommandType_DYNAMIC_ALMOND_MODE_CHANGE              = 89,
-
+    
     CommandType_LOGIN_TEMPPASS_COMMAND                  = 101,
     CommandType_CLOUD_SANITY                            = 102,
     CommandType_CLOUD_SANITY_RESPONSE                   = 103,
     CommandType_KEEP_ALIVE                              = 104,
     CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST    = 113,
     CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE   = 114,
-
+    
     CommandType_GENERIC_COMMAND_REQUEST                 = 201,
     CommandType_GENERIC_COMMAND_RESPONSE                = 204,
     CommandType_GENERIC_COMMAND_NOTIFICATION            = 205,
@@ -54,11 +54,11 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE       = 301,
     CommandType_SENSOR_CHANGE_REQUEST                   = 301,
     CommandType_SENSOR_CHANGE_RESPONSE                  = 304,
-
+    
     CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST       = 321,
     CommandType_ALMOND_NAME_CHANGE_REQUEST              = 401,
     CommandType_ALMOND_NAME_CHANGE_RESPONSE             = 404,
-
+    
     CommandType_CHANGE_PASSWORD_REQUEST                 = 251,
     CommandType_CHANGE_PASSWORD_RESPONSE                = 252,
     CommandType_DELETE_ACCOUNT_REQUEST                  = 253,
@@ -85,18 +85,30 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_NOTIFICATION_REGISTRATION_RESPONSE      = 282,
     CommandType_NOTIFICATION_DEREGISTRATION             = 283,
     CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE    = 284,
-
+    
     CommandType_ALMOND_MODE_REQUEST                     = 151,
     CommandType_ALMOND_MODE_RESPONSE                    = 152,
-
+    
     CommandType_ALMOND_MODE_CHANGE_REQUEST              = 635,  // 61 (635)
     CommandType_ALMOND_MODE_CHANGE_RESPONSE             = 638,  // 64 (638)
-
+    
     CommandType_NOTIFICATIONS_SYNC_REQUEST              = 800,
     CommandType_NOTIFICATIONS_SYNC_RESPONSE             = 801,
     CommandType_NOTIFICATIONS_COUNT_REQUEST             = 802,
     CommandType_NOTIFICATIONS_COUNT_RESPONSE            = 803,
-
+    
     CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST       = 806,
     CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE      = 807,
+
+    
+    CommandType_UPDATE_REQUEST                          = 1061,//md01
+
+    CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE             = 1301,//md01
+    CommandType_GET_ALL_SCENES                          = 1041, //md01
+    CommandType_LIST_SCENE_RESPONSE                     = 1054, //TEST 1042,//md01
+    CommandType_DYNAMIC_DELETE_SCENE_REQUEST            = 1053, //md01
+    CommandType_WIFI_CLIENTS_LIST_REQUEST               = 1523, //md01
+    CommandType_WIFI_CLIENTS_LIST_RESPONSE              = 1524, //md01
+    CommandType_COMMAND_RESPONSE                        = 1064,//md01 for all requests will get this as response(Set/update/remove/activate etc...)
+    CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST           = 1541,
 };

@@ -63,5 +63,5 @@
 - (NSString *)description;
 
 - (id)copyWithZone:(NSZone *)zone;
-
+- (BOOL)isActuator;
 @end
