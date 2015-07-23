@@ -8,7 +8,7 @@
 
 #import "CommandTypes.h"
 
-NSString * commandTypeToString(CommandType type) {
+NSString *securifi_commandTypeToString(CommandType type) {
     switch (type) {
         case CommandType_LOGIN_COMMAND:
             return [NSString stringWithFormat:@"LOGIN_COMMAND_%d", type];

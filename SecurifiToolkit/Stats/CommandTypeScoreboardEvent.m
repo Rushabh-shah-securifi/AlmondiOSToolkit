@@ -17,7 +17,7 @@
 }
 
 - (NSString *)label {
-    return commandTypeToString(self.commandType);
+    return securifi_commandTypeToString(self.commandType);
 }
 
 @end

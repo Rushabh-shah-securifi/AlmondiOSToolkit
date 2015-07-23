@@ -109,4 +109,4 @@ typedef NS_ENUM(unsigned int, CommandType) {
 };
 
 // returns a string name for the specified type; useful for logging
-NSString * commandTypeToString(CommandType type);
+NSString *securifi_commandTypeToString(CommandType type);
