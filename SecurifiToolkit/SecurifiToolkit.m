@@ -796,6 +796,23 @@ static SecurifiToolkit *toolkit_singleton = nil;
     });
 }
 
+- (sfi_id)asyncSendAlmondAffiliationRequest:(NSString *)linkCode {
+    if (!linkCode) {
+        return 0;
+    }
+
+    AffiliationUserRequest *request = [[AffiliationUserRequest alloc] init];
+    request.Code = linkCode;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_AFFILIATION_CODE_REQUEST;
+    cmd.command = request;
+
+    [self asyncSendToCloud:cmd];
+
+    return request.correlationId;
+}
+
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
     NSString *almondMac = almond.almondplusMAC;
     BOOL local = [self useLocalNetwork:almondMac];
@@ -1045,6 +1062,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     [self postNotification:kSFIDidChangeCurrentAlmond data:almond];
 
+
     [self.localNetwork shutdown];
     self.localNetwork = nil;
 }
@@ -1115,6 +1133,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return nil;
     }
 }
+
 
 - (NSArray *)almondList {
     return [self.dataManager readAlmondList];
@@ -1917,12 +1936,20 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
 }
 
 - (BOOL)useLocalNetwork:(NSString *)almondMac {
+    if (!self.config.enableLocalNetworking) {
+        return NO;
+    }
+
     //todo need a fast cache for this; very expensive to hit the file system constantly
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
     return settings.enabled;
 }
 
 - (BOOL)isCurrentLocalNetworkForAlmond:(NSString*)almondMac {
+    if (!self.config.enableLocalNetworking) {
+        return NO;
+    }
+
     Network *network = self.localNetwork;
     if (network) {
         NetworkConfig *config = network.config;

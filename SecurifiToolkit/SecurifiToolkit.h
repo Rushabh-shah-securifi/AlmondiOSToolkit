@@ -186,6 +186,10 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)asyncSendToCloud:(GenericCommand *)command;
 
+// Send a request to affiliate an Almond with the Cloud account. The link code is the code generated on the Almond
+// and inputted by the user.
+- (sfi_id)asyncSendAlmondAffiliationRequest:(NSString*)linkCode;
+
 // Sends an update to a sensor device property.
 // On completion, kSFIDidCompleteMobileCommandRequest is posted
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue;
