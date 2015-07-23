@@ -182,3 +182,98 @@ NSString *securifi_commandTypeToString(CommandType type) {
         }
     }
 }
+
+BOOL securifi_validCommandType(CommandType type) {
+    switch (type) {
+        case CommandType_LOGIN_COMMAND:
+        case CommandType_LOGIN_RESPONSE:
+        case CommandType_LOGOUT_COMMAND:
+        case CommandType_LOGOUT_ALL_COMMAND:
+        case CommandType_LOGOUT_ALL_RESPONSE:
+        case CommandType_SIGNUP_COMMAND:
+        case CommandType_SIGNUP_RESPONSE:
+        case CommandType_VALIDATE_REQUEST:
+        case CommandType_VALIDATE_RESPONSE:
+        case CommandType_RESET_PASSWORD_REQUEST:
+        case CommandType_RESET_PASSWORD_RESPONSE:
+        case CommandType_LOGOUT_RESPONSE:
+        case CommandType_AFFILIATION_CODE_REQUEST:
+        case CommandType_AFFILIATION_USER_COMPLETE:
+        case CommandType_ALMOND_LIST:
+        case CommandType_ALMOND_LIST_RESPONSE:
+        case CommandType_DEVICE_DATA_HASH:
+        case CommandType_DEVICE_DATA_HASH_RESPONSE:
+        case CommandType_DEVICE_DATA:
+        case CommandType_DEVICE_DATA_RESPONSE:
+        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE:
+        case CommandType_DEVICE_VALUE:
+        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
+        case CommandType_MOBILE_COMMAND:
+        case CommandType_MOBILE_COMMAND_RESPONSE:
+        case CommandType_DYNAMIC_DEVICE_DATA:
+        case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
+        case CommandType_DYNAMIC_ALMOND_ADD:
+        case CommandType_DYNAMIC_ALMOND_DELETE:
+        case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
+        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:
+        case CommandType_LOGIN_TEMPPASS_COMMAND:
+        case CommandType_CLOUD_SANITY:
+        case CommandType_CLOUD_SANITY_RESPONSE:
+        case CommandType_KEEP_ALIVE:
+        case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
+        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
+        case CommandType_GENERIC_COMMAND_REQUEST:
+        case CommandType_GENERIC_COMMAND_RESPONSE:
+        case CommandType_GENERIC_COMMAND_NOTIFICATION:
+        case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
+        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:
+        case CommandType_SENSOR_CHANGE_RESPONSE:
+        case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST:
+        case CommandType_ALMOND_NAME_CHANGE_REQUEST:
+        case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
+        case CommandType_CHANGE_PASSWORD_REQUEST:
+        case CommandType_CHANGE_PASSWORD_RESPONSE:
+        case CommandType_DELETE_ACCOUNT_REQUEST:
+        case CommandType_DELETE_ACCOUNT_RESPONSE:
+        case CommandType_USER_INVITE_REQUEST:
+        case CommandType_USER_INVITE_RESPONSE:
+        case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:
+        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE:
+        case CommandType_USER_PROFILE_REQUEST:
+        case CommandType_USER_PROFILE_RESPONSE:
+        case CommandType_UPDATE_USER_PROFILE_REQUEST:
+        case CommandType_UPDATE_USER_PROFILE_RESPONSE:
+        case CommandType_ME_AS_SECONDARY_USER_REQUEST:
+        case CommandType_ME_AS_SECONDARY_USER_RESPONSE:
+        case CommandType_DELETE_SECONDARY_USER_REQUEST:
+        case CommandType_DELETE_SECONDARY_USER_RESPONSE:
+        case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
+        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:
+        case CommandType_UNLINK_ALMOND_REQUEST:
+        case CommandType_UNLINK_ALMOND_RESPONSE:
+        case CommandType_NOTIFICATION_REGISTRATION:
+        case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:
+        case CommandType_NOTIFICATION_DEREGISTRATION:
+        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:
+        case CommandType_ALMOND_MODE_REQUEST:
+        case CommandType_ALMOND_MODE_RESPONSE:
+        case CommandType_ALMOND_MODE_CHANGE_REQUEST:
+        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:
+        case CommandType_ALMOND_COMMAND_RESPONSE:
+        case CommandType_ALMOND_NAME_AND_MAC_REQUEST:
+        case CommandType_ALMOND_NAME_AND_MAC_RESPONSE:
+        case CommandType_NOTIFICATIONS_SYNC_REQUEST:
+        case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
+        case CommandType_NOTIFICATIONS_COUNT_REQUEST:
+        case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
+        case CommandType_DEVICELOG_REQUEST:
+        case CommandType_DEVICELOG_RESPONSE:
+        case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST:
+        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
+            return YES;
+
+        default:
+            return NO;
+    }
+}

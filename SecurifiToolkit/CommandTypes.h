@@ -110,3 +110,6 @@ typedef NS_ENUM(unsigned int, CommandType) {
 
 // returns a string name for the specified type; useful for logging
 NSString *securifi_commandTypeToString(CommandType type);
+
+// indicates whether the type is actually a command supported by this system
+BOOL securifi_validCommandType(CommandType type);
