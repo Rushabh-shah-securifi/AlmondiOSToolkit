@@ -111,6 +111,7 @@
 		1DF0318029A6D5169BBF1BAA /* AlmondVersionChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03AF40507D6D74C658843 /* AlmondVersionChecker.m */; };
 		1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F5902A972E2D8CA630A /* SFIAlmondLocalNetworkSettings.m */; };
+		1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF037D41EC5DF2929F41AF8 /* CommandTypes.m */; };
 		1DF0329C5A1F03EC60478DC4 /* AlmondModeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03CEAC18088B30D7961FF /* AlmondModeRequest.m */; };
 		1DF0334B41969F41A2277D18 /* NetworkState.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0303DDB9378A8510BC7AA /* NetworkState.m */; };
 		1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03322D3DC410824316347 /* SFINotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -157,6 +158,7 @@
 		1DF03CA0928047DC7842F144 /* NotificationListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF037331E46597BC5D76F2D /* NotificationListRequest.m */; };
 		1DF03CBA2B45BFB97D3A8E79 /* NotificationCountResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF031525512886EC02E8E6E /* NotificationCountResponse.m */; };
 		1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF037E41986B5D077457BCB /* SecurifiTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1DF03D24E7252EEB274F79D7 /* CommandTypeScoreboardEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF034282793C152CB44DDBC /* CommandTypeScoreboardEvent.h */; };
 		1DF03D5707598F4315C494FC /* NotificationCountRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF035054F2C01C6FEEB7FC0 /* NotificationCountRequest.m */; };
 		1DF03DBC398A267A9DC97053 /* Logout.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0364DC25ECA87A0B0132E /* Logout.m */; };
 		1DF03E686E9BAAF688AD3552 /* NotificationListResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03C2A0526E007E2895002 /* NotificationListResponse.m */; };
@@ -167,6 +169,7 @@
 		1DF03F559DD7C482A3D38939 /* LogoutAllResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03452D464546CF7E7CBE1 /* LogoutAllResponse.m */; };
 		1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF034DB9A5EB16C6103650B /* BaseCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03ACB54706CD00DA0F5A2 /* BaseCommandRequest.m */; };
+		1DF03FE22D7AB1C44290B0BC /* CommandTypeScoreboardEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03655B5B501C383A5F391 /* CommandTypeScoreboardEvent.m */; };
 		1DF03FF5727F64CF4EDF5625 /* SFIXmlWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03B0459C4363665236FA1 /* SFIXmlWriter.m */; };
 		1DF03FFBF6EF6243078A2329 /* DatabaseStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03F975AE4915FC041E2D3 /* DatabaseStore.m */; };
 		22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22A76D42179132A40099CD8F /* CommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -427,6 +430,7 @@
 		1DF0338D9377EDE427CF0CA3 /* SecurifiCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiCommand.h; sourceTree = "<group>"; };
 		1DF0340881CA9720996080FA /* AlmondModeChangeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondModeChangeResponse.h; sourceTree = "<group>"; };
 		1DF034243877C8131B0AE8FE /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLWriter.m; sourceTree = "<group>"; };
+		1DF034282793C152CB44DDBC /* CommandTypeScoreboardEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandTypeScoreboardEvent.h; sourceTree = "<group>"; };
 		1DF03452206E54610E1F7161 /* WebSocketEndpoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocketEndpoint.h; sourceTree = "<group>"; };
 		1DF03452D464546CF7E7CBE1 /* LogoutAllResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutAllResponse.m; sourceTree = "<group>"; };
 		1DF034839BEB39276F041984 /* Login.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Login.h; sourceTree = "<group>"; };
@@ -436,10 +440,12 @@
 		1DF035CF619945E1C34866DB /* AlmondModeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondModeRequest.h; sourceTree = "<group>"; };
 		1DF03637629F3FCED078391C /* Logout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logout.h; sourceTree = "<group>"; };
 		1DF0364DC25ECA87A0B0132E /* Logout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logout.m; sourceTree = "<group>"; };
+		1DF03655B5B501C383A5F391 /* CommandTypeScoreboardEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommandTypeScoreboardEvent.m; sourceTree = "<group>"; };
 		1DF036BCA9C9243024CE5DC3 /* NotificationStoreImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationStoreImpl.m; sourceTree = "<group>"; };
 		1DF03706AD1D324848D38018 /* AlmondModeResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondModeResponse.h; sourceTree = "<group>"; };
 		1DF037331E46597BC5D76F2D /* NotificationListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationListRequest.m; sourceTree = "<group>"; };
 		1DF0379AC087F23C3556032D /* LoginTempPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginTempPass.h; sourceTree = "<group>"; };
+		1DF037D41EC5DF2929F41AF8 /* CommandTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommandTypes.m; sourceTree = "<group>"; };
 		1DF037E41986B5D077457BCB /* SecurifiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurifiTypes.h; sourceTree = "<group>"; };
 		1DF03859DF7750FF4162D60A /* LoginResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginResponse.h; sourceTree = "<group>"; };
 		1DF0386BB4B3FAC65DD9B13B /* NotificationCountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCountRequest.h; sourceTree = "<group>"; };
@@ -770,6 +776,8 @@
 			children = (
 				1C75820A19B028F70074C601 /* Scoreboard.h */,
 				1C75820B19B028F70074C601 /* Scoreboard.m */,
+				1DF03655B5B501C383A5F391 /* CommandTypeScoreboardEvent.m */,
+				1DF034282793C152CB44DDBC /* CommandTypeScoreboardEvent.h */,
 			);
 			path = Stats;
 			sourceTree = "<group>";
@@ -1024,6 +1032,7 @@
 				CEA605B51A113E4E008380D3 /* DynamicNotificationPreferenceList.h */,
 				1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */,
 				1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */,
+				1DF037D41EC5DF2929F41AF8 /* CommandTypes.m */,
 			);
 			name = public;
 			sourceTree = "<group>";
@@ -1266,6 +1275,7 @@
 				1DF0398177D6DD566A25FA8B /* LogoutResponse.h in Headers */,
 				1DF030928185AD7897BD4669 /* LogoutAllRequest.h in Headers */,
 				1DF035F57F29A54222660EEB /* LogoutAllResponse.h in Headers */,
+				1DF03D24E7252EEB274F79D7 /* CommandTypeScoreboardEvent.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1537,6 +1547,8 @@
 				1DF039194B7179E760D5F2F5 /* LogoutResponse.m in Sources */,
 				1DF03893C0E4096C00AD3FAC /* LogoutAllRequest.m in Sources */,
 				1DF03F559DD7C482A3D38939 /* LogoutAllResponse.m in Sources */,
+				1DF03FE22D7AB1C44290B0BC /* CommandTypeScoreboardEvent.m in Sources */,
+				1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

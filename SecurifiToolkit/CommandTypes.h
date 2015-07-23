@@ -80,7 +80,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE    = 268,
     CommandType_UNLINK_ALMOND_REQUEST                   = 269,
     CommandType_UNLINK_ALMOND_RESPONSE                  = 270,
-    
+
     CommandType_NOTIFICATION_REGISTRATION               = 281,
     CommandType_NOTIFICATION_REGISTRATION_RESPONSE      = 282,
     CommandType_NOTIFICATION_DEREGISTRATION             = 283,
@@ -107,3 +107,6 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST       = 806,
     CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE      = 807,
 };
+
+// returns a string name for the specified type; useful for logging
+NSString * commandTypeToString(CommandType type);
