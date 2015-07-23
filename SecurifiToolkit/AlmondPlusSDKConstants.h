@@ -79,7 +79,6 @@
 #define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"
 #define ALMOND_LIST_REQUEST_XML             @"<root></root>"
 
-#define AFFILIATION_CODE_CHAR_COUNT 6
 #define SSID_CHAR_COUNT 32
 #define WPAWPA2_MAX_CHAR_COUNT 32
 #define WPA_MAX_CHAR_COUNT 32
