@@ -249,6 +249,10 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Fetch the local copy of the Almond's attached to the logon account
 - (NSArray *)almondList;
 
+// List of all Almonds that are locally linked only. Almonds that have both cloud and local links would be provided
+// by almondList method. Can return nil.
+- (NSArray *)localLinkedAlmondList;
+
 // Fetch the locally stored devices list for the Almond
 - (NSArray *)deviceList:(NSString *)almondMac;
 

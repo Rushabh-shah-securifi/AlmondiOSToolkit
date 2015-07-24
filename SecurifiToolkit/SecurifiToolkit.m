@@ -863,11 +863,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
 
+    if (self.config.enableLocalNetworking) {
+        [self.localNetwork shutdown];
+        self.localNetwork = nil;
+    }
+
     [self postNotification:kSFIDidChangeCurrentAlmond data:almond];
-
-
-    [self.localNetwork shutdown];
-    self.localNetwork = nil;
 }
 
 - (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
@@ -940,6 +941,34 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (NSArray *)almondList {
     return [self.dataManager readAlmondList];
+}
+
+- (NSArray *)localLinkedAlmondList {
+    if (!self.config.enableLocalNetworking) {
+        return nil;
+    }
+
+    NSDictionary *local_settings = [self.dataManager readAllAlmondLocalNetworkSettings];
+    NSMutableSet *local_macs = [NSMutableSet setWithArray:local_settings.allKeys];
+    
+    // filter out all almnonds that are linked also with the cloud
+    NSArray *cloudList = [self.dataManager readAlmondList];
+    for (SFIAlmondPlus *plus in cloudList) {
+        NSString *mac = plus.almondplusMAC;
+        if ([local_macs containsObject:mac]) {
+            [local_macs removeObject:mac];
+        }
+    }
+
+    // the remaining macs are for local-only almonds
+    NSMutableArray *local_almonds = [NSMutableArray array];
+    for (NSString *mac in local_macs) {
+        SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
+        SFIAlmondPlus *local = setting.asAlmondPlus;
+        [local_almonds addObject:local];
+    }
+    
+    return (local_almonds.count == 0) ? nil : local_almonds;
 }
 
 - (NSArray *)deviceList:(NSString *)almondMac {
@@ -1720,6 +1749,7 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
         if (self.localNetwork.connectionState == NetworkConnectionStatusInitialized) {
             return self.localNetwork;
         }
+        //todo what if NetworkConnectionStatusInitializing ?
     }
 
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
