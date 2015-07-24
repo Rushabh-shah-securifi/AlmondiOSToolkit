@@ -35,9 +35,6 @@
 @property(nonatomic, readonly) SFIDevicePropertyType statePropertyType;
 @property(nonatomic, readonly) SFIDevicePropertyType mutableStatePropertyType; //todo probably need a better name for this; it was 'most important property index'; maybe call it "variableStatePropertyType" to mean the value can be in a range, not just binary.
 
-// Converts a type into a standard mnemonic name suitable for event logging
-+ (NSString *)nameForType:(SFIDeviceType)type;
-
 + (NSArray*)addDevice:(SFIDevice*)device list:(NSArray*)list;
 + (NSArray*)removeDevice:(SFIDevice*)device list:(NSArray*)list;
 

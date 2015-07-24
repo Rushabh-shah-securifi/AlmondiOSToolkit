@@ -59,9 +59,17 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_SetPointThermostat_46         = 46,
     SFIDeviceType_HueLamp_48                    = 48,
     SFIDeviceType_SecurifiSmartSwitch_50        = 50,
+    SFIDeviceType_51                            = 51,
+    SFIDeviceType_RollerShutter_52              = 52,
+    SFIDeviceType_GarageDoorOpener_53           = 53,
 
-    SFIDeviceType_count                         = 50, // always set to the last value; assumes sequence is continuous
+    SFIDeviceType_count                         = 53, // always set to the last value; assumes sequence is continuous
 };
+
+// Converts a type into a standard mnemonic name suitable for event logging
+NSString * securifi_nameToDeviceType(SFIDeviceType type);
+
+// ===========================================================================================================
 
 typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_UNKNOWN = 0,
@@ -77,6 +85,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_ACTIVE_POWER,
     SFIDevicePropertyType_ALARM_STATE,
     SFIDevicePropertyType_ARMMODE,
+    SFIDevicePropertyType_BARRIER_OPERATOR,
     SFIDevicePropertyType_BASIC,
     SFIDevicePropertyType_BATTERY,
     SFIDevicePropertyType_BRIGHTNESS,
@@ -134,6 +143,12 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
 
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
+
+SFIDevicePropertyType securifi_NameToPropertyType(NSString *valueName);
+
+NSString *securifi_propertyTypeToName(SFIDevicePropertyType propertyType);
+
+// ===========================================================================================================
 
 // Indicates whether communication with an Almond is being done through the Cloud or through a local connection
 typedef NS_ENUM(unsigned int, SFIAlmondConnectionMode) {
