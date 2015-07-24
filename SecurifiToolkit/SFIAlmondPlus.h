@@ -10,11 +10,11 @@
 
 @interface SFIAlmondPlus : NSObject <NSCoding, NSCopying>
 
-+ (NSString*)convertDecimalToMacHex:(NSString*)decimal;
++ (NSString*)convertDecimalToMacHex:(NSString*)macDecimal;
 
-+ (NSString*)convertMacHexToDecimal:(NSString*)decimal;
++ (NSString*)convertMacHexToDecimal:(NSString*)macHex;
 
-@property(nonatomic, copy) NSString *almondplusMAC;
+@property(nonatomic, copy) NSString *almondplusMAC; // mac decimal value
 @property(nonatomic, copy) NSString *almondplusName;
 @property(nonatomic) int index;
 @property(nonatomic) int colorCodeIndex;
@@ -32,7 +32,9 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
-// indicates whether the Almond router supports the "send logs to the cloud" functionality
+// indicates whether the Almond router supports the "send logs to the cloud" functionality.
+// the version string is attained dynamically from the almond, and this method tests whether it is a
+// current enough version.
 - (BOOL)supportsSendLogs:(NSString *)almondVersion;
 
 - (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other;

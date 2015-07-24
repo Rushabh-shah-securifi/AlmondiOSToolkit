@@ -11,10 +11,10 @@
 
 @implementation SFIAlmondPlus
 
-+ (NSString *)convertDecimalToMacHex:(NSString *)decimalString {
++ (NSString *)convertDecimalToMacHex:(NSString *)macDecimal {
     //Step 1: Conversion from decimal to hexadecimal
-    DLog(@"%llu", (unsigned long long) [decimalString longLongValue]);
-    NSString *hexIP = [NSString stringWithFormat:@"%llX", (unsigned long long) [decimalString longLongValue]];
+    DLog(@"%llu", (unsigned long long) [macDecimal longLongValue]);
+    NSString *hexIP = [NSString stringWithFormat:@"%llX", (unsigned long long) [macDecimal longLongValue]];
 
     NSMutableString *wifiMAC = [[NSMutableString alloc] init];
     //Step 2: Divide in pairs of 2 hex
@@ -29,12 +29,12 @@
     return wifiMAC;
 }
 
-+ (NSString *)convertMacHexToDecimal:(NSString *)decimal {
-    if (!decimal) {
++ (NSString *)convertMacHexToDecimal:(NSString *)macHex {
+    if (!macHex) {
         return nil;
     }
 
-    NSString *cleaned = [decimal stringByReplacingOccurrencesOfString:@":" withString:@""];
+    NSString *cleaned = [macHex stringByReplacingOccurrencesOfString:@":" withString:@""];
     NSScanner *scanner = [NSScanner scannerWithString:cleaned];
 
     unsigned long long int result = 0;
