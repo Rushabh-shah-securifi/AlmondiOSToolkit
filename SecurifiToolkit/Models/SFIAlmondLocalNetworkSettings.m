@@ -100,97 +100,13 @@
     self.almondplusName = payload[@"Name"];
 }
 
-- (id)initWithCoder:(NSCoder *)coder {
-    self = [super init];
-    if (self) {
-        self.enabled = [coder decodeBoolForKey:@"self.enabled"];
-        self.ssid2 = [coder decodeObjectForKey:@"self.ssid2"];
-        self.ssid5 = [coder decodeObjectForKey:@"self.ssid5"];
-        self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
-        self.host = [coder decodeObjectForKey:@"self.host"];
-        self.port = (NSUInteger) [coder decodeInt64ForKey:@"self.port"];
-        self.login = [coder decodeObjectForKey:@"self.login"];
-        self.password = [coder decodeObjectForKey:@"self.password"];
-    }
-
-    return self;
+- (SFIAlmondPlus *)asAlmondPlus {
+    SFIAlmondPlus *plus = SFIAlmondPlus.new;
+    plus.almondplusName = self.almondplusName;
+    plus.almondplusMAC = self.almondplusMAC;
+    return plus;
 }
 
-- (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeBool:self.enabled forKey:@"self.enabled"];
-    [coder encodeObject:self.ssid2 forKey:@"self.ssid2"];
-    [coder encodeObject:self.ssid5 forKey:@"self.ssid5"];
-    [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
-    [coder encodeObject:self.host forKey:@"self.host"];
-    [coder encodeInt64:self.port forKey:@"self.port"];
-    [coder encodeObject:self.login forKey:@"self.login"];
-    [coder encodeObject:self.password forKey:@"self.password"];
-}
-
-- (id)copyWithZone:(NSZone *)zone {
-    SFIAlmondLocalNetworkSettings *copy = (SFIAlmondLocalNetworkSettings *) [[[self class] allocWithZone:zone] init];
-
-    if (copy != nil) {
-        copy.enabled = self.enabled;
-        copy.ssid2 = self.ssid2;
-        copy.ssid5 = self.ssid5;
-        copy.almondplusMAC = self.almondplusMAC;
-        copy.host = self.host;
-        copy.port = self.port;
-        copy.login = self.login;
-        copy.password = self.password;
-    }
-
-    return copy;
-}
-
-- (BOOL)isEqual:(id)other {
-    if (other == self) {
-        return YES;
-    }
-
-    if (!other || ![[other class] isEqual:[self class]]) {
-        return NO;
-    }
-
-    return [self isEqualToSettings:other];
-}
-
-- (BOOL)isEqualToSettings:(SFIAlmondLocalNetworkSettings *)settings {
-    if (self == settings)
-        return YES;
-    if (settings == nil)
-        return NO;
-    if (self.enabled != settings.enabled)
-        return NO;
-    if (self.ssid2 != settings.ssid2 && ![self.ssid2 isEqualToString:settings.ssid2])
-        return NO;
-    if (self.ssid5 != settings.ssid5 && ![self.ssid5 isEqualToString:settings.ssid5])
-        return NO;
-    if (self.almondplusMAC != settings.almondplusMAC && ![self.almondplusMAC isEqualToString:settings.almondplusMAC])
-        return NO;
-    if (self.host != settings.host && ![self.host isEqualToString:settings.host])
-        return NO;
-    if (self.port != settings.port)
-        return NO;
-    if (self.login != settings.login && ![self.login isEqualToString:settings.login])
-        return NO;
-    if (self.password != settings.password && ![self.password isEqualToString:settings.password])
-        return NO;
-    return YES;
-}
-
-- (NSUInteger)hash {
-    NSUInteger hash = (NSUInteger) self.enabled;
-    hash = hash * 31u + [self.ssid2 hash];
-    hash = hash * 31u + [self.ssid5 hash];
-    hash = hash * 31u + [self.almondplusMAC hash];
-    hash = hash * 31u + [self.host hash];
-    hash = hash * 31u + self.port;
-    hash = hash * 31u + [self.login hash];
-    hash = hash * 31u + [self.password hash];
-    return hash;
-}
 
 #pragma mark - NetworkEndpointDelegate methods
 
@@ -243,6 +159,116 @@
     dispatch_semaphore_signal(latch);
 
     return timedOut;
+}
+
+- (id)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    if (self) {
+        self.enabled = [coder decodeBoolForKey:@"self.enabled"];
+        self.ssid2 = [coder decodeObjectForKey:@"self.ssid2"];
+        self.ssid5 = [coder decodeObjectForKey:@"self.ssid5"];
+        self.almondplusName = [coder decodeObjectForKey:@"self.almondplusName"];
+        self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
+        self.host = [coder decodeObjectForKey:@"self.host"];
+        self.port = [coder decodeInt64ForKey:@"self.port"];
+        self.login = [coder decodeObjectForKey:@"self.login"];
+        self.password = [coder decodeObjectForKey:@"self.password"];
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeBool:self.enabled forKey:@"self.enabled"];
+    [coder encodeObject:self.ssid2 forKey:@"self.ssid2"];
+    [coder encodeObject:self.ssid5 forKey:@"self.ssid5"];
+    [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
+    [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
+    [coder encodeObject:self.host forKey:@"self.host"];
+    [coder encodeInt64:self.port forKey:@"self.port"];
+    [coder encodeObject:self.login forKey:@"self.login"];
+    [coder encodeObject:self.password forKey:@"self.password"];
+}
+
+- (id)copyWithZone:(NSZone *)zone {
+    SFIAlmondLocalNetworkSettings *copy = [[[self class] allocWithZone:zone] init];
+
+    if (copy != nil) {
+        copy.enabled = self.enabled;
+        copy.ssid2 = self.ssid2;
+        copy.ssid5 = self.ssid5;
+        copy.almondplusName = self.almondplusName;
+        copy.almondplusMAC = self.almondplusMAC;
+        copy.host = self.host;
+        copy.port = self.port;
+        copy.login = self.login;
+        copy.password = self.password;
+    }
+
+    return copy;
+}
+
+- (BOOL)isEqual:(id)other {
+    if (other == self)
+        return YES;
+    if (!other || ![[other class] isEqual:[self class]])
+        return NO;
+
+    return [self isEqualToSettings:other];
+}
+
+- (BOOL)isEqualToSettings:(SFIAlmondLocalNetworkSettings *)settings {
+    if (self == settings)
+        return YES;
+    if (settings == nil)
+        return NO;
+    if (self.enabled != settings.enabled)
+        return NO;
+    if (self.ssid2 != settings.ssid2 && ![self.ssid2 isEqualToString:settings.ssid2])
+        return NO;
+    if (self.ssid5 != settings.ssid5 && ![self.ssid5 isEqualToString:settings.ssid5])
+        return NO;
+    if (self.almondplusName != settings.almondplusName && ![self.almondplusName isEqualToString:settings.almondplusName])
+        return NO;
+    if (self.almondplusMAC != settings.almondplusMAC && ![self.almondplusMAC isEqualToString:settings.almondplusMAC])
+        return NO;
+    if (self.host != settings.host && ![self.host isEqualToString:settings.host])
+        return NO;
+    if (self.port != settings.port)
+        return NO;
+    if (self.login != settings.login && ![self.login isEqualToString:settings.login])
+        return NO;
+    if (self.password != settings.password && ![self.password isEqualToString:settings.password])
+        return NO;
+    return YES;
+}
+
+- (NSUInteger)hash {
+    NSUInteger hash = (NSUInteger) self.enabled;
+    hash = hash * 31u + [self.ssid2 hash];
+    hash = hash * 31u + [self.ssid5 hash];
+    hash = hash * 31u + [self.almondplusName hash];
+    hash = hash * 31u + [self.almondplusMAC hash];
+    hash = hash * 31u + [self.host hash];
+    hash = hash * 31u + self.port;
+    hash = hash * 31u + [self.login hash];
+    hash = hash * 31u + [self.password hash];
+    return hash;
+}
+
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.enabled=%d", self.enabled];
+    [description appendFormat:@", self.ssid2=%@", self.ssid2];
+    [description appendFormat:@", self.ssid5=%@", self.ssid5];
+    [description appendFormat:@", self.almondplusName=%@", self.almondplusName];
+    [description appendFormat:@", self.almondplusMAC=%@", self.almondplusMAC];
+    [description appendFormat:@", self.host=%@", self.host];
+    [description appendFormat:@", self.port=%u", self.port];
+    [description appendFormat:@", self.login=%@", self.login];
+    [description appendFormat:@", self.password=%@", self.password];
+    [description appendString:@">"];
+    return description;
 }
 
 

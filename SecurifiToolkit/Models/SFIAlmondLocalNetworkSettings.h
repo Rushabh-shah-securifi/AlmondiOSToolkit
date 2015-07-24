@@ -29,10 +29,10 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 @property(nonatomic, copy) NSString *ssid5;
 
 // almond MAC id
-@property(nonatomic, copy) NSString *almondplusName;
+@property(nonatomic, copy) NSString *almondplusName; // null unless testConnection succeeds;
 
 // almond MAC id
-@property(nonatomic, copy) NSString *almondplusMAC;
+@property(nonatomic, copy) NSString *almondplusMAC; // null unless testConnection succeeds; mac decimal value
 
 // IP address for almond
 @property(nonatomic, copy) NSString *host;
@@ -48,6 +48,9 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 
 - (enum TestConnectionResult)testConnection;
 
+// makes an SFIAlmondPlus representation
+- (SFIAlmondPlus *)asAlmondPlus;
+
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
@@ -59,5 +62,7 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 - (BOOL)isEqualToSettings:(SFIAlmondLocalNetworkSettings *)settings;
 
 - (NSUInteger)hash;
+
+- (NSString *)description;
 
 @end
