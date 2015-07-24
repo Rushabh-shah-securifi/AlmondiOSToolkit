@@ -12,6 +12,13 @@
 #define SFIDeviceType_ZigbeeDoorLock_28_LOCKED              1
 #define SFIDeviceType_ZigbeeDoorLock_28_UNLOCKED            2
 
+#define SFIDeviceType_GarageDoorOpener_53_CLOSED            0
+#define SFIDeviceType_GarageDoorOpener_53_CLOSING           252
+#define SFIDeviceType_GarageDoorOpener_53_STOPPED           253
+#define SFIDeviceType_GarageDoorOpener_53_OPENING           254
+#define SFIDeviceType_GarageDoorOpener_53_OPEN              255
+
+
 
 @implementation SFIDevice
 
@@ -103,6 +110,10 @@
             return SFIDevicePropertyType_OCCUPANCY;
         };
 
+        case SFIDeviceType_GarageDoorOpener_53: {
+            return SFIDevicePropertyType_BARRIER_OPERATOR;
+        }
+
         // Not implemented devices
         case SFIDeviceType_UnknownDevice_0:
         case SFIDeviceType_Thermostat_7:
@@ -121,6 +132,8 @@
         case SFIDeviceType_HAPump_33:
         case SFIDeviceType_MultiSwitch_43:
         case SFIDeviceType_SetPointThermostat_46:
+        case SFIDeviceType_51:
+        case SFIDeviceType_RollerShutter_52:
         default: {
             return SFIDevicePropertyType_STATE;
         }
@@ -154,7 +167,8 @@
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
-        case SFIDeviceType_SecurifiSmartSwitch_50: {
+        case SFIDeviceType_SecurifiSmartSwitch_50:
+        case SFIDeviceType_GarageDoorOpener_53: {
             return YES;
         }
 
@@ -222,6 +236,43 @@
             break;
         }
 
+        case SFIDeviceType_GarageDoorOpener_53: {
+/*
+    0	we can set 0 (to close) and 255(to open) only	Closed
+    252		closing
+    253		Stopped
+    254		Opening
+    255		Open
+ */
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
+
+            int newValue;
+
+            switch (deviceValues.intValue) {
+                case SFIDeviceType_GarageDoorOpener_53_CLOSED:
+                    newValue = SFIDeviceType_GarageDoorOpener_53_OPEN;
+                    break;
+                case SFIDeviceType_GarageDoorOpener_53_CLOSING:
+                    newValue = SFIDeviceType_GarageDoorOpener_53_CLOSED;
+                    break;
+                case SFIDeviceType_GarageDoorOpener_53_STOPPED:
+                    newValue = SFIDeviceType_GarageDoorOpener_53_CLOSED;
+                    break;
+                case SFIDeviceType_GarageDoorOpener_53_OPENING:
+                    newValue = SFIDeviceType_GarageDoorOpener_53_CLOSED;
+                    break;
+                case SFIDeviceType_GarageDoorOpener_53_OPEN:
+                    newValue = SFIDeviceType_GarageDoorOpener_53_CLOSED;
+                    break;
+                default:
+                    newValue = SFIDeviceType_GarageDoorOpener_53_CLOSED;
+                    break;
+            }
+
+            [deviceValues setIntValue:newValue];
+            break;
+        }
+
         case SFIDeviceType_BinarySwitch_1:
         case SFIDeviceType_MultiLevelOnOff_4:
         case SFIDeviceType_SmartACSwitch_22:
@@ -275,6 +326,8 @@
         case SFIDeviceType_MovementSensor_41:break;
         case SFIDeviceType_MultiSwitch_43:break;
         case SFIDeviceType_SetPointThermostat_46:break;
+        case SFIDeviceType_51:break;
+        case SFIDeviceType_RollerShutter_52:break;
     } // end switch
 
     return deviceValues; // can be nil

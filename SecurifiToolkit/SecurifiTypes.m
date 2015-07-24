@@ -75,7 +75,7 @@ NSDictionary *securifi_propertyNameToTypeDictionary() {
                 @"ACTIVE_POWER" : @(SFIDevicePropertyType_ACTIVE_POWER),
                 @"ALARM_STATE" : @(SFIDevicePropertyType_ALARM_STATE),
                 @"ARMMODE" : @(SFIDevicePropertyType_ARMMODE),
-                @"BARRIER_OPERATOR" : @(SFIDevicePropertyType_BARRIER_OPERATOR),
+                @"BARRIER OPERATOR" : @(SFIDevicePropertyType_BARRIER_OPERATOR),
                 @"BASIC" : @(SFIDevicePropertyType_BASIC),
                 @"BATTERY" : @(SFIDevicePropertyType_BATTERY),
                 @"BRIGHTNESS" : @(SFIDevicePropertyType_BRIGHTNESS),
