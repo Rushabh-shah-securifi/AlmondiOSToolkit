@@ -347,7 +347,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                         // All others are XML
                                         default: {
                                             if (!securifi_validCommandType((CommandType) commandType)) {
-                                                NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@", commandType, [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding]);
+                                                NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@",
+                                                        commandType, [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding]);
                                                 break;
                                             }
 
@@ -356,7 +357,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                             NSInteger actual_length = self.partialData.length;
                                             NSInteger expected_length = xmlParserRange.length - xmlParserRange.location;
                                             if (actual_length < expected_length) {
-                                                NSLog(@"Ignoring payload, the buffer length is wrong, actual:%i, expected:%i", actual_length, expected_length);
+                                                NSLog(@"Ignoring payload, the buffer length is wrong, actual:%li, expected:%li", (long) actual_length, (long) expected_length);
                                                 break;
                                             }
 
