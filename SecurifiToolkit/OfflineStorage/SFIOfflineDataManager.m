@@ -155,6 +155,17 @@
     return [self readDictionaryEntryForFilePath:self.almondLocalNetworkSettingsFp key:almondMac locker:self.syncLocker];
 }
 
+- (NSDictionary *)readAllAlmondLocalNetworkSettings {
+    @synchronized (self.syncLocker) {
+        NSMutableDictionary *dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:self.almondLocalNetworkSettingsFp];
+        if (!dictionary) {
+            return [NSDictionary dictionary];
+        }
+
+        return dictionary;
+    }
+}
+
 - (void)deleteLocalNetworkSettingsForAlmond:(NSString *)strAlmondMac {
     [self removedDictionaryEntryFromFilePath:self.almondLocalNetworkSettingsFp key:strAlmondMac locker:self.syncLocker];
 }

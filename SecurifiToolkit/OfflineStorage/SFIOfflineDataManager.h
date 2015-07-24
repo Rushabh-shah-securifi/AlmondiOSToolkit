@@ -39,6 +39,9 @@
 
 - (SFIAlmondLocalNetworkSettings *)readAlmondLocalNetworkSettings:(NSString *)almondMac;
 
+// keyed by mac address
+- (NSDictionary *)readAllAlmondLocalNetworkSettings;
+
 - (void)deleteLocalNetworkSettingsForAlmond:(NSString *)strAlmondMac;
 
 - (void)purgeAll;
