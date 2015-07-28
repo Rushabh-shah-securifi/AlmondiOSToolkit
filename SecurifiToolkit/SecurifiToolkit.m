@@ -950,8 +950,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     NSDictionary *local_settings = [self.dataManager readAllAlmondLocalNetworkSettings];
     NSMutableSet *local_macs = [NSMutableSet setWithArray:local_settings.allKeys];
-    
-    // filter out all almnonds that are linked also with the cloud
+
+    // filter out all Almonds that are linked also with the cloud
     NSArray *cloudList = [self.dataManager readAlmondList];
     for (SFIAlmondPlus *plus in cloudList) {
         NSString *mac = plus.almondplusMAC;
@@ -967,7 +967,24 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SFIAlmondPlus *local = setting.asAlmondPlus;
         [local_almonds addObject:local];
     }
-    
+
+    // Sort the local Almonds alphabetically
+    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"almondplusName" ascending:YES];
+    [local_almonds sortUsingDescriptors:@[sort]];
+
+    // Color the local Almonds
+    int nextIndex = 0;
+    SFIAlmondPlus *lastAlmond = cloudList.lastObject;
+    if (lastAlmond) {
+        nextIndex = lastAlmond.colorCodeIndex;
+        nextIndex++;
+    }
+    //
+    for (SFIAlmondPlus *local in local_almonds) {
+        local.colorCodeIndex = nextIndex;
+        nextIndex++;
+    }
+
     return (local_almonds.count == 0) ? nil : local_almonds;
 }
 
