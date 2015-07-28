@@ -106,6 +106,7 @@
     SFIAlmondPlus *plus = SFIAlmondPlus.new;
     plus.almondplusName = self.almondplusName;
     plus.almondplusMAC = self.almondplusMAC;
+    plus.linkType = SFIAlmondPlusLinkType_local_only;
     return plus;
 }
 

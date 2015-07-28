@@ -972,19 +972,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"almondplusName" ascending:YES];
     [local_almonds sortUsingDescriptors:@[sort]];
 
-    // Color the local Almonds
-    int nextIndex = 0;
-    SFIAlmondPlus *lastAlmond = cloudList.lastObject;
-    if (lastAlmond) {
-        nextIndex = lastAlmond.colorCodeIndex;
-        nextIndex++;
-    }
-    //
-    for (SFIAlmondPlus *local in local_almonds) {
-        local.colorCodeIndex = nextIndex;
-        nextIndex++;
-    }
-
     return (local_almonds.count == 0) ? nil : local_almonds;
 }
 
@@ -2010,10 +1997,15 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
     }
 }
 
-// When the almond list is changed, ensure the Current Almond setting is consistent with the list.
-// The setting may be changed by this method.
+// When the cloud almond list is changed, ensure the Current Almond setting is consistent with the list.
+// This method has side-effects and can change settings.
 // Returns the current Almond, which might or might not be the same as the old one. May return nil.
 - (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
+    SFIAlmondPlus *current = [self currentAlmond];
+    if (current.linkType == SFIAlmondPlusLinkType_local_only) {
+        return current;
+    }
+
     // Manage the "Current selected Almond" value
     if (almondList.count == 0) {
         [self purgeStoredData];

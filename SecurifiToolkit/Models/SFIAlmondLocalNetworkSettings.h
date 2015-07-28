@@ -56,7 +56,7 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 
 - (enum TestConnectionResult)testConnection;
 
-// makes an SFIAlmondPlus representation
+// makes an SFIAlmondPlus representation marked with SFIAlmondPlusLinkType_local_only
 - (SFIAlmondPlus *)asAlmondPlus;
 
 - (id)initWithCoder:(NSCoder *)coder;

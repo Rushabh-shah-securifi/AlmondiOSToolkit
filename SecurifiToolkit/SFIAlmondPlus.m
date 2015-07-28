@@ -47,9 +47,18 @@
     return number.stringValue;
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.linkType = SFIAlmondPlusLinkType_cloud_local;
+    }
+
+    return self;
+}
+
 
 - (id)initWithCoder:(NSCoder *)coder {
-    self = [super init];
+    self = [self init];
     if (self) {
         self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
         self.almondplusName = [coder decodeObjectForKey:@"self.almondplusName"];
@@ -60,6 +69,7 @@
         self.accessEmailIDs = [coder decodeObjectForKey:@"self.accessEmailIDs"];
         self.isExpanded = [coder decodeBoolForKey:@"self.isExpanded"];
         self.ownerEmailID = [coder decodeObjectForKey:@"self.ownerEmailID"];
+        self.linkType = (enum SFIAlmondPlusLinkType) [coder decodeIntForKey:@"self.linkType"];
     }
 
     return self;
@@ -76,6 +86,8 @@
     [coder encodeObject:self.accessEmailIDs forKey:@"self.accessEmailIDs"];
     [coder encodeBool:self.isExpanded forKey:@"self.isExpanded"];
     [coder encodeObject:self.ownerEmailID forKey:@"self.ownerEmailID"];
+
+    [coder encodeInt:self.linkType forKey:@"self.linkType"];
 }
 
 - (NSString *)description {
@@ -88,12 +100,13 @@
     [description appendFormat:@", self.accessEmailIDs=%@", self.accessEmailIDs];
     [description appendFormat:@", self.isExpanded=%d", self.isExpanded];
     [description appendFormat:@", self.ownerEmailID=%@", self.ownerEmailID];
+    [description appendFormat:@", self.linkType=%i", self.linkType];
     [description appendString:@">"];
     return description;
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    SFIAlmondPlus *copy = [[[self class] allocWithZone:zone] init];
+    SFIAlmondPlus *copy = (SFIAlmondPlus *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy.almondplusMAC = self.almondplusMAC;
@@ -104,6 +117,7 @@
         copy.accessEmailIDs = self.accessEmailIDs;
         copy.isExpanded = self.isExpanded;
         copy.ownerEmailID = self.ownerEmailID;
+        copy.linkType = self.linkType;
     }
 
     return copy;

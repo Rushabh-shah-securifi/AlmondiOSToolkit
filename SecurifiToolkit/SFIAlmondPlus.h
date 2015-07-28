@@ -8,6 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+// Indicates whether the Almond can be linked with the cloud or by local connection only.
+// The default is "cloud_local" indicating any of those connection methods is possible.
+// "local only" is reserved for Almonds that bypass Cloud registration.
+// See asAlmondPlus in SFIAlmondLocalNetworkSettings for factory that makes local-only Almonds.
+//
+typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
+    SFIAlmondPlusLinkType_cloud_local   = 0,
+    SFIAlmondPlusLinkType_local_only    = 1,
+};
+
 @interface SFIAlmondPlus : NSObject <NSCoding, NSCopying>
 
 + (NSString*)convertDecimalToMacHex:(NSString*)macDecimal;
@@ -23,6 +33,8 @@
 @property(nonatomic) NSMutableArray *accessEmailIDs;
 @property(nonatomic) BOOL isExpanded;
 @property(nonatomic, copy) NSString *ownerEmailID;
+
+@property(nonatomic) enum SFIAlmondPlusLinkType linkType;
 
 - (id)initWithCoder:(NSCoder *)coder;
 
