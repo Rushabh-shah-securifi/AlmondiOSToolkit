@@ -15,7 +15,15 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 };
 
 
-// Represents the settings used for connecting directly to an Almond over a web socket
+// Represents the settings used for connecting directly to an Almond over a web socket.
+// The settings can also be converted into SFIAlmondPlus for presentation in the UI and management in the toolkit.
+//
+// Note method testConnection. It will attempt to connect to the specified host and interrogate it for the Almond's
+// MAC address and name. This is considered and essential and required step when filling out the settings. If the
+// test should not succeed, the settings should not be saved.
+//
+// Note when encoding/persisting a settings, the password property is persisted in the system's keychain and is not
+// encoded in the archive.
 @interface SFIAlmondLocalNetworkSettings : NSObject <NSCopying, NSCoding>
 
 // indicates whether this local connection setting should be used or not

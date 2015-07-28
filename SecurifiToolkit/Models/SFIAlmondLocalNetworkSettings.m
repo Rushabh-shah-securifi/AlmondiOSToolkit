@@ -8,7 +8,9 @@
 #import "NetworkConfig.h"
 #import "GenericCommand.h"
 #import "SFIAlmondPlus.h"
+#import "KeyChainWrapper.h"
 
+#define SEC_PASSWORD @"password"
 
 @interface SFIAlmondLocalNetworkSettings () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) dispatch_semaphore_t test_connection_latch;
@@ -170,9 +172,11 @@
         self.almondplusName = [coder decodeObjectForKey:@"self.almondplusName"];
         self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
         self.host = [coder decodeObjectForKey:@"self.host"];
-        self.port = [coder decodeInt64ForKey:@"self.port"];
+        self.port = (NSUInteger) [coder decodeInt64ForKey:@"self.port"];
         self.login = [coder decodeObjectForKey:@"self.login"];
-        self.password = [coder decodeObjectForKey:@"self.password"];
+
+        NSString *serviceName = [self makeKeychainServiceName];
+        self.password = [KeyChainWrapper retrieveEntryForUser:SEC_PASSWORD forService:serviceName];
     }
 
     return self;
@@ -187,11 +191,20 @@
     [coder encodeObject:self.host forKey:@"self.host"];
     [coder encodeInt64:self.port forKey:@"self.port"];
     [coder encodeObject:self.login forKey:@"self.login"];
-    [coder encodeObject:self.password forKey:@"self.password"];
+
+    NSString *password = self.password;
+    if (password) {
+        NSString *serviceName = [self makeKeychainServiceName];
+        [KeyChainWrapper createEntryForUser:SEC_PASSWORD entryValue:password forService:serviceName];
+    }
+}
+
+- (NSString *)makeKeychainServiceName {
+    return [NSString stringWithFormat:@"almond_local_settings:%@", self.almondplusMAC];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    SFIAlmondLocalNetworkSettings *copy = [[[self class] allocWithZone:zone] init];
+    SFIAlmondLocalNetworkSettings *copy = (SFIAlmondLocalNetworkSettings *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy.enabled = self.enabled;
