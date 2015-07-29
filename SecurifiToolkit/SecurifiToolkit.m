@@ -280,7 +280,20 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
             return [NSString stringWithFormat:@"NOTIFICATIONS_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_REQUEST%d", type];
         case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST:
             return [NSString stringWithFormat:@"NOTIFICATIONS_DYNAMIC_CLIENT_UPDATE_REQUEST%d", type];
-
+        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_DYNAMIC_CLIENT_ADD_REQUEST%d", type];
+        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_DYNAMIC_CLIENT_JOIN_REQUEST%d", type];
+        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_DYNAMIC_CLIENT_LEFT_REQUEST%d", type];
+        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_DYNAMIC_CLIENT_REMOVE_REQUEST%d", type];
+        case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_WIFI_CLIENT_GET_PREFERENCE_REQUEST%d", type];
+        case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE%d", type];
+        case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+            return [NSString stringWithFormat:@"NOTIFICATIONS_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST%d", type];
         case CommandType_GET_ALL_SCENES:
             return [NSString stringWithFormat:@"NOTIFICATIONS_GET_ALL_SCENES_%d", type];
         case CommandType_LIST_SCENE_RESPONSE:

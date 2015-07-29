@@ -387,13 +387,10 @@
                                 DLog(@"%s:COMMAND Received: %d TIME => %f ", __PRETTY_FUNCTION__, commandType, CFAbsoluteTimeGetCurrent());
                                 
                                 
-                                if (commandType == CommandType_LIST_SCENE_RESPONSE || commandType==CommandType_COMMAND_RESPONSE || commandType == CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE  || commandType==CommandType_WIFI_CLIENTS_LIST_RESPONSE || commandType==CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST || commandType==1549 || commandType==1547 || commandType==1545 || commandType==1543 || commandType==1551  || commandType==99) {
+                                if (commandType == CommandType_LIST_SCENE_RESPONSE || commandType==CommandType_COMMAND_RESPONSE || commandType == CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE  || commandType==CommandType_WIFI_CLIENTS_LIST_RESPONSE || commandType==CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST || commandType==CommandType_DYNAMIC_CLIENT_ADD_REQUEST || commandType==CommandType_DYNAMIC_CLIENT_LEFT_REQUEST || commandType==CommandType_DYNAMIC_CLIENT_JOIN_REQUEST || commandType==CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST || commandType==CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST ||
+                                    commandType==CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST
+                                    || commandType==1543 || commandType==1551  || commandType==99 || commandType == CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE) {
                                     //MD01 ----means json / not xml -----------------
-                                    if (commandType==1549 || commandType==1547 || commandType==1545 || commandType==1543 || commandType==1541 || commandType==1551) {
-                                        //99 chgitenq inch command a
-                                        
-                                        int a=1;
-                                    }
                                     
                                     NSRange payloadLenghtRange = NSMakeRange(0, 4);
                                     unsigned int payloadLenght;
@@ -843,6 +840,48 @@
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_DYNAMIC_CLIENT_UPDATE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DYNAMIC_CLIENT_JOIN_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DYNAMIC_CLIENT_LEFT_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DYNAMIC_CLIENT_ADD_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DYNAMIC_CLIENT_REMOVE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENT_GET_PREFERENCE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_NOTIFIER data:payload];
             break;
         };
         default:
@@ -1343,7 +1382,9 @@
                 }
                 case CommandType_GET_ALL_SCENES:
                 case CommandType_UPDATE_REQUEST:
-                case CommandType_WIFI_CLIENTS_LIST_REQUEST:{
+                case CommandType_WIFI_CLIENTS_LIST_REQUEST:
+                case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+                case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:{
                     
                     commandType = (unsigned int) htonl(obj.commandType);
                     commandPayload = obj.command;
