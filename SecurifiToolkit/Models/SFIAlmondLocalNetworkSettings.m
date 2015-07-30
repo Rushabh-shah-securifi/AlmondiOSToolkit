@@ -102,7 +102,7 @@
     self.almondplusName = payload[@"Name"];
 }
 
-- (SFIAlmondPlus *)asAlmondPlus {
+- (SFIAlmondPlus *)asLocalLinkAlmondPlus {
     SFIAlmondPlus *plus = SFIAlmondPlus.new;
     plus.almondplusName = self.almondplusName;
     plus.almondplusMAC = self.almondplusMAC;
@@ -184,6 +184,8 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInt32:1 forKey:@"self.schemaVersion"]; // for future use/expansion; version this schema
+
     [coder encodeBool:self.enabled forKey:@"self.enabled"];
     [coder encodeObject:self.ssid2 forKey:@"self.ssid2"];
     [coder encodeObject:self.ssid5 forKey:@"self.ssid5"];
