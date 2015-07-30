@@ -1309,7 +1309,24 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
     [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_summary];
     [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_settings];
     [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_connected_device];
+    [self internalJSONRequestAlmondStatusAndSettings:almondMac];//md01
     [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_blocked_device];
+}
+
+- (void)internalJSONRequestAlmondStatusAndSettings:(NSString *)almondMac {
+    //md01
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = CommandType_WIFI_CLIENTS_LIST_REQUEST;
+
+    NSDictionary *testDict = @{
+            @"commandtype" : @"WifiClientList",
+            @"AlmondMAC" : almondMac,
+            @"MobileInternalIndex" : @"324"
+    };
+
+    cloudCommand.command = [testDict JSONString];
+
+    [self asyncSendToCloud:cloudCommand];
 }
 
 - (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum AlmondStatusAndSettings)type {
