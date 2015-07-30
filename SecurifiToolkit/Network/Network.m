@@ -677,6 +677,79 @@
             break;
         };
 
+        case CommandType_LIST_SCENE_RESPONSE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_COMMAND_RESPONSE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_COMMAND_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
+            break;
+        };
+        case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE data:payload];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_UPDATE_REQUEST_NOTIFIER data:payload commandType:commandType];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_JOIN_REQUEST_NOTIFIER data:payload commandType:commandType];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_LEFT_REQUEST_NOTIFIER data:payload commandType:commandType];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_ADD_REQUEST_NOTIFIER data:payload commandType:commandType];
+            break;
+        };
+        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DYNAMIC_CLIENT_REMOVE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENT_GET_PREFERENCE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE: {
+            //md01
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_NOTIFIER data:payload];
+            break;
+        };
+
         default:
             break;
     }
