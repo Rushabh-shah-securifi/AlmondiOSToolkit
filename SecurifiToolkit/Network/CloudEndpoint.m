@@ -302,88 +302,104 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                     NSLog(@"Payload is %i bytes long", payloadLength);
 */
 
-                                    unsigned int commandType;
+                                    unsigned int commandType_raw;
                                     NSRange commandTypeRange = NSMakeRange(4, 4);
-                                    [self.partialData getBytes:&commandType range:commandTypeRange];
-                                    commandType = NSSwapBigIntToHost(commandType);
+                                    [self.partialData getBytes:&commandType_raw range:commandTypeRange];
+                                    commandType_raw = NSSwapBigIntToHost(commandType_raw);
                                     DLog(@"%s: Response Received: %d TIME => %f ", __PRETTY_FUNCTION__, commandType, CFAbsoluteTimeGetCurrent());
 
-                                    // Process a single command response at a time
+                                    CommandType commandType = (CommandType) commandType_raw;
                                     id responsePayload = nil;
-
                                     BOOL parsedPayload = NO;
 
-                                    switch (commandType) {
-                                        // these are the only command responses so far that uses a JSON payload; we special case them for now
-                                        case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
-                                        case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
-                                        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
-                                        case CommandType_DEVICELOG_RESPONSE: {
-                                            // we only want the JSON wrapped inside the <root></root> pair
-                                            NSUInteger start_loc = startTagRange.location + startTagRange.length;
-                                            NSRange jsonParseRange = NSMakeRange(start_loc, endTagRange.location - start_loc);
-                                            NSData *buffer = [self.partialData subdataWithRange:jsonParseRange];
-                                            DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    if (!securifi_valid_command_type(commandType)) {
+                                        NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@",
+                                                commandType, [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding]);
+                                    }
+                                    else
+                                    if (securifi_valid_json_command_type(commandType)) {
+                                        // JSON payloads
+                                        // we only want the JSON wrapped inside the <root></root> pair
+                                        NSUInteger start_loc = startTagRange.location + startTagRange.length;
+                                        NSRange jsonParseRange = NSMakeRange(start_loc, endTagRange.location - start_loc);
+                                        NSData *buffer = [self.partialData subdataWithRange:jsonParseRange];
+                                        DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
-                                            if (commandType == CommandType_NOTIFICATIONS_SYNC_RESPONSE) {
+                                        switch (commandType) {
+                                            // these are the only command responses so far that uses a JSON payload; we special case them for now
+                                            case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
                                                 responsePayload = [NotificationListResponse parseNotificationsJson:buffer];
-                                            }
-                                            else if (commandType == CommandType_NOTIFICATIONS_COUNT_RESPONSE) {
-                                                responsePayload = [NotificationCountResponse parseJson:buffer];
-                                            }
-                                            else if (commandType == CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE) {
-                                                responsePayload = [NotificationClearCountResponse parseJson:buffer];
-                                            }
-                                            else {
-                                                // CommandType_DEVICELOG_RESPONSE
-                                                responsePayload = [NotificationListResponse parseDeviceLogsJson:buffer];
-                                            }
-
-                                            parsedPayload = YES;
-
-                                            break;
-                                        };
-
-                                        // All others are XML
-                                        default: {
-                                            if (!securifi_validCommandType((CommandType) commandType)) {
-                                                NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@",
-                                                        commandType, [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding]);
-                                                break;
-                                            }
-
-                                            NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
-
-                                            NSInteger actual_length = self.partialData.length;
-                                            NSInteger expected_length = xmlParserRange.length - xmlParserRange.location;
-                                            if (actual_length < expected_length) {
-                                                NSLog(@"Ignoring payload, the buffer length is wrong, actual:%li, expected:%li", (long) actual_length, (long) expected_length);
-                                                break;
-                                            }
-
-                                            @try {
-                                                NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
-                                                DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
-
-                                                CommandParser *parser = [CommandParser new];
-                                                GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
-                                                responsePayload = temp.command;
-
-                                                // important to pull command type from the parsed payload because the underlying
-                                                // command that we dispatch on can be different than the "container" carrying it
-                                                commandType = temp.commandType;
-
                                                 parsedPayload = YES;
-                                            }
-                                            @catch (NSException *ex) {
-                                                NSString *buffer_str = [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding];
-                                                NSLog(@"Exception on parsing XML payload, ex:%@, data:'%@'", ex, buffer_str);
-                                            }
+                                                break;
+                                            case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
+                                                responsePayload = [NotificationCountResponse parseJson:buffer];
+                                                parsedPayload = YES;
+                                                break;
+                                            case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
+                                                responsePayload = [NotificationClearCountResponse parseJson:buffer];
+                                                parsedPayload = YES;
+                                                break;
+                                            case CommandType_DEVICELOG_RESPONSE:
+                                                responsePayload = [NotificationListResponse parseDeviceLogsJson:buffer];
+                                                parsedPayload = YES;
+                                                break;
 
-                                            break;
+                                            case CommandType_LIST_SCENE_RESPONSE:
+                                            case CommandType_COMMAND_RESPONSE:
+                                            case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
+                                            case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
+                                            case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST:
+                                            case CommandType_DYNAMIC_CLIENT_ADD_REQUEST:
+                                            case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST:
+                                            case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST:
+                                            case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST:
+                                            case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
+                                            case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+                                            case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
+                                            case (CommandType) 1551:
+                                            case (CommandType) 99:
+                                                responsePayload = buffer;
+                                                parsedPayload = YES;
+                                                break;
+
+                                            default: {
+                                                NSString *name = securifi_command_type_to_string(commandType);
+                                                NSLog(@"Warning: unhandled JSON command type, id=%i, name=%@", commandType, name);
+                                                break;
+                                            }
                                         }
                                     }
+                                    else {
+                                        // XML payloads
+                                        NSRange xmlParserRange = NSMakeRange(startTagRange.location, (endTagRange.location + endTagRange.length - 8));
 
+                                        NSInteger actual_length = self.partialData.length;
+                                        NSInteger expected_length = xmlParserRange.length - xmlParserRange.location;
+                                        if (actual_length < expected_length) {
+                                            NSLog(@"Ignoring payload, the buffer length is wrong, actual:%li, expected:%li", (long) actual_length, (long) expected_length);
+                                            break;
+                                        }
+
+                                        @try {
+                                            NSData *buffer = [self.partialData subdataWithRange:xmlParserRange];
+                                            DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+
+                                            CommandParser *parser = [CommandParser new];
+                                            GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
+                                            responsePayload = temp.command;
+
+                                            // important to pull command type from the parsed payload because the underlying
+                                            // command that we dispatch on can be different than the "container" carrying it
+                                            commandType = temp.commandType;
+
+                                            parsedPayload = YES;
+                                        }
+                                        @catch (NSException *ex) {
+                                            NSString *buffer_str = [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding];
+                                            NSLog(@"Exception on parsing XML payload, ex:%@, data:'%@'", ex, buffer_str);
+                                        }
+                                    } // end if valid command, json, or xml
+                                    
                                     // Remove 8 bytes from received command
                                     [self.partialData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
 
@@ -673,6 +689,14 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                     commandPayload = [NSString stringWithFormat:@"<root>%@</root>", json];
                     break;
                 };
+
+                case CommandType_GET_ALL_SCENES:
+                case CommandType_UPDATE_REQUEST:
+                case CommandType_WIFI_CLIENTS_LIST_REQUEST: {
+                    commandType = (unsigned int) htonl(obj.commandType);
+                    commandPayload = obj.command;
+                    break;
+                }
 
                 default:
                     break;
