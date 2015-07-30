@@ -175,6 +175,35 @@
 }
 
 
+
+- (BOOL)isActuator{
+    //        case SFIDeviceType_Alarm_6:
+    switch (self.deviceType) {
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_MultiLevelSwitch_2:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_DoorLock_5:
+        case SFIDeviceType_Thermostat_7:
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_ZigbeeDoorLock_28:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45:
+        case SFIDeviceType_HueLamp_48:
+        case SFIDeviceType_SecurifiSmartSwitch_50:{
+            return YES;
+        }
+            
+        default: {
+            return NO;
+        }
+    }
+}
+
+
+
+
 - (SFIDeviceKnownValues *)switchBinaryState:(SFIDeviceValue *)value {
     SFIDeviceKnownValues *deviceValues = nil;
 

@@ -49,6 +49,7 @@
 #import <SecurifiToolkit/ResetPasswordResponse.h>
 #import <SecurifiToolkit/SensorForcedUpdateRequest.h>
 #import <SecurifiToolkit/SensorChangeRequest.h>
+#import <SecurifiToolkit/ScenesListRequest.h>
 
 #import <SecurifiToolkit/SensorChangeResponse.h>
 
