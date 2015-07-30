@@ -88,6 +88,8 @@
 #import <SecurifiToolkit/SFIConnectedDevice.h>
 #import <SecurifiToolkit/SFIDevicesList.h>
 
+#import <SecurifiToolkit/MDJSON.h>
+
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
 @class NotificationPreferences;
