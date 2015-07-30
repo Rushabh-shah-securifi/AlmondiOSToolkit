@@ -12,11 +12,11 @@
 
 
 + (SFIDevicePropertyType)nameToPropertyType:(NSString *)valueName {
-    return securifi_NameToPropertyType(valueName);
+    return securifi_name_to_property_type(valueName);
 }
 
 + (NSString *)propertyTypeToName:(SFIDevicePropertyType)propertyType {
-    return securifi_propertyTypeToName(propertyType);
+    return securifi_property_type_to_name(propertyType);
 }
 
 - (id)initWithCoder:(NSCoder *)coder {
