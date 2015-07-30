@@ -26,6 +26,10 @@
 		1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBCE19480D6C00E353D1 /* Reachability.m */; };
 		1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */; };
+		1C2F60561B69D5B9001CCA34 /* ScenesListRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C2F60541B69D5B9001CCA34 /* ScenesListRequest.h */; };
+		1C2F60571B69D5B9001CCA34 /* ScenesListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C2F60551B69D5B9001CCA34 /* ScenesListRequest.m */; };
+		1C2F605B1B69D6F3001CCA34 /* MDJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C2F60591B69D6F3001CCA34 /* MDJSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1C2F605C1B69D6F3001CCA34 /* MDJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C2F605A1B69D6F3001CCA34 /* MDJSON.m */; };
 		1C3270E41A243B28007202C1 /* SFIRouterSummary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3270DC1A243B28007202C1 /* SFIRouterSummary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C3270E51A243B28007202C1 /* SFIRouterSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3270DD1A243B28007202C1 /* SFIRouterSummary.m */; };
 		1C3270E61A243B28007202C1 /* SFIWirelessSetting.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3270DE1A243B28007202C1 /* SFIWirelessSetting.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -336,6 +340,10 @@
 		1C23FBCE19480D6C00E353D1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		1C23FBCF19480D6C00E353D1 /* SFIReachabilityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIReachabilityManager.h; sourceTree = "<group>"; };
 		1C23FBD019480D6C00E353D1 /* SFIReachabilityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIReachabilityManager.m; sourceTree = "<group>"; };
+		1C2F60541B69D5B9001CCA34 /* ScenesListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenesListRequest.h; sourceTree = "<group>"; };
+		1C2F60551B69D5B9001CCA34 /* ScenesListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScenesListRequest.m; sourceTree = "<group>"; };
+		1C2F60591B69D6F3001CCA34 /* MDJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDJSON.h; sourceTree = "<group>"; };
+		1C2F605A1B69D6F3001CCA34 /* MDJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDJSON.m; sourceTree = "<group>"; };
 		1C3270DC1A243B28007202C1 /* SFIRouterSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIRouterSummary.h; sourceTree = "<group>"; };
 		1C3270DD1A243B28007202C1 /* SFIRouterSummary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIRouterSummary.m; sourceTree = "<group>"; };
 		1C3270DE1A243B28007202C1 /* SFIWirelessSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIWirelessSetting.h; sourceTree = "<group>"; };
@@ -653,6 +661,24 @@
 			path = Reachability;
 			sourceTree = "<group>";
 		};
+		1C2F60531B69D5B9001CCA34 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				1C2F60541B69D5B9001CCA34 /* ScenesListRequest.h */,
+				1C2F60551B69D5B9001CCA34 /* ScenesListRequest.m */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		1C2F60581B69D6F3001CCA34 /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				1C2F60591B69D6F3001CCA34 /* MDJSON.h */,
+				1C2F605A1B69D6F3001CCA34 /* MDJSON.m */,
+			);
+			path = JSON;
+			sourceTree = "<group>";
+		};
 		1C3270DB1A243B28007202C1 /* Router */ = {
 			isa = PBXGroup;
 			children = (
@@ -926,6 +952,7 @@
 				1C414BE71A7B625400C448A4 /* AppKit */,
 				CE7EA7DB18978910005DCBA3 /* Base64 */,
 				1C414BC11A79F02600C448A4 /* Db */,
+				1C2F60581B69D6F3001CCA34 /* JSON */,
 				1C414BE21A79F39600C448A4 /* keychain */,
 				1C414BD91A79F35D00C448A4 /* Network */,
 				1CD1D5331A660B7A00C030E9 /* Notifications */,
@@ -933,6 +960,7 @@
 				22A76D2517912B830099CD8F /* parser */,
 				1C4382D61B2FDD5200F6AB7A /* PocketSocket */,
 				22A76D2417912B6E0099CD8F /* public */,
+				1C2F60531B69D5B9001CCA34 /* Scenes */,
 				221185C0178D371200EE23ED /* Supporting Files */,
 				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
 				1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */,
@@ -1159,6 +1187,7 @@
 				1CD1D5501A660B7A00C030E9 /* NotificationPreferenceResponse.h in Headers */,
 				CE5EB63417E82CB400985636 /* DeviceListRequest.h in Headers */,
 				CE5EB64917E86D2200985636 /* DeviceListResponse.h in Headers */,
+				1C2F60561B69D5B9001CCA34 /* ScenesListRequest.h in Headers */,
 				1CD1D54A1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h in Headers */,
 				CE2EA25119D00B3E00C6D6A8 /* UserInviteRequest.h in Headers */,
 				CE5EB64E17EAD41F00985636 /* DeviceValueRequest.h in Headers */,
@@ -1278,6 +1307,7 @@
 				1DF0398177D6DD566A25FA8B /* LogoutResponse.h in Headers */,
 				1DF030928185AD7897BD4669 /* LogoutAllRequest.h in Headers */,
 				1DF035F57F29A54222660EEB /* LogoutAllResponse.h in Headers */,
+				1C2F605B1B69D6F3001CCA34 /* MDJSON.h in Headers */,
 				1DF03D24E7252EEB274F79D7 /* CommandTypeScoreboardEvent.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1446,6 +1476,7 @@
 				1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */,
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
+				1C2F60571B69D5B9001CCA34 /* ScenesListRequest.m in Sources */,
 				1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */,
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
 				1CD1D5591A660B7A00C030E9 /* SFINotificationDevice.m in Sources */,
@@ -1500,6 +1531,7 @@
 				1CD1D54B1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.m in Sources */,
 				1C414BEB1A7B625400C448A4 /* NSDate+Convenience.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
+				1C2F605C1B69D6F3001CCA34 /* MDJSON.m in Sources */,
 				CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */,
 				1C414BC91A79F02600C448A4 /* ZHDatabaseStatement.m in Sources */,
 				1C23FBD419480D6C00E353D1 /* SFIReachabilityManager.m in Sources */,
