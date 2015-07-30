@@ -38,6 +38,8 @@
 + (NSArray*)addDevice:(SFIDevice*)device list:(NSArray*)list;
 + (NSArray*)removeDevice:(SFIDevice*)device list:(NSArray*)list;
 
+- (BOOL)isActuator;
+
 // Indicates whether the device has been tampered
 - (BOOL)isTampered:(SFIDeviceValue *)deviceValue;
 

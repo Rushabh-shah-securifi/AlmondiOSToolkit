@@ -19,7 +19,6 @@
 #define SFIDeviceType_GarageDoorOpener_53_OPEN              255
 
 
-
 @implementation SFIDevice
 
 + (NSArray *)addDevice:(SFIDevice *)device list:(NSArray *)list {
@@ -56,8 +55,7 @@
         }
 
         case SFIDeviceType_DoorLock_5:
-        case SFIDeviceType_ZigbeeDoorLock_28:
-        {
+        case SFIDeviceType_ZigbeeDoorLock_28: {
             return SFIDevicePropertyType_LOCK_STATE;
         }
 
@@ -78,8 +76,7 @@
         case SFIDeviceType_WaterSensor_14:
         case SFIDeviceType_GasSensor_15:
         case SFIDeviceType_VibrationOrMovementSensor_17:
-        case SFIDeviceType_Keypad_20:
-        {
+        case SFIDeviceType_Keypad_20: {
             return SFIDevicePropertyType_STATE;
         }
 
@@ -93,16 +90,14 @@
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
-        case SFIDeviceType_SecurifiSmartSwitch_50:
-        {
+        case SFIDeviceType_SecurifiSmartSwitch_50: {
             return SFIDevicePropertyType_SWITCH_BINARY;
         }
 
         case SFIDeviceType_BinarySensor_3:
         case SFIDeviceType_ShockSensor_38:
         case SFIDeviceType_DoorSensor_39:
-        case SFIDeviceType_MovementSensor_41:
-        {
+        case SFIDeviceType_MovementSensor_41: {
             return SFIDevicePropertyType_SENSOR_BINARY;
         }
 
@@ -114,7 +109,7 @@
             return SFIDevicePropertyType_BARRIER_OPERATOR;
         }
 
-        // Not implemented devices
+            // Not implemented devices
         case SFIDeviceType_UnknownDevice_0:
         case SFIDeviceType_Thermostat_7:
         case SFIDeviceType_Controller_8:
@@ -137,7 +132,8 @@
         default: {
             return SFIDevicePropertyType_STATE;
         }
-    }}
+    }
+}
 
 - (SFIDevicePropertyType)mutableStatePropertyType {
     switch (self.deviceType) {
@@ -198,8 +194,7 @@
         }
 
         case SFIDeviceType_DoorLock_5:
-        case SFIDeviceType_Alarm_6:
-        {
+        case SFIDeviceType_Alarm_6: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
 
             int newValue = (deviceValues.intValue == 0) ? 255 : 0;
@@ -281,8 +276,7 @@
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
-        case SFIDeviceType_SecurifiSmartSwitch_50:
-        {
+        case SFIDeviceType_SecurifiSmartSwitch_50: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             if (deviceValues.hasValue) {
                 [deviceValues setBoolValue:!deviceValues.boolValue];
@@ -293,41 +287,76 @@
         default: {
             // do nothing
         }
-        case SFIDeviceType_UnknownDevice_0:break;
-        case SFIDeviceType_Thermostat_7:break;
-        case SFIDeviceType_Controller_8:break;
-        case SFIDeviceType_SceneController_9:break;
-        case SFIDeviceType_StandardCIE_10:break;
-        case SFIDeviceType_MotionSensor_11:break;
-        case SFIDeviceType_ContactSwitch_12:break;
-        case SFIDeviceType_FireSensor_13:break;
-        case SFIDeviceType_WaterSensor_14:break;
-        case SFIDeviceType_GasSensor_15:break;
-        case SFIDeviceType_PersonalEmergencyDevice_16:break;
-        case SFIDeviceType_VibrationOrMovementSensor_17:break;
-        case SFIDeviceType_RemoteControl_18:break;
-        case SFIDeviceType_KeyFob_19:break;
-        case SFIDeviceType_Keypad_20:break;
-        case SFIDeviceType_OccupancySensor_24:break;
-        case SFIDeviceType_LightSensor_25:break;
-        case SFIDeviceType_WindowCovering_26:break;
-        case SFIDeviceType_TemperatureSensor_27:break;
-        case SFIDeviceType_ColorControl_29:break;
-        case SFIDeviceType_PressureSensor_30:break;
-        case SFIDeviceType_FlowSensor_31:break;
-        case SFIDeviceType_ColorDimmableLight_32:break;
-        case SFIDeviceType_HAPump_33:break;
-        case SFIDeviceType_Shade_34:break;
-        case SFIDeviceType_SmokeDetector_36:break;
-        case SFIDeviceType_FloodSensor_37:break;
-        case SFIDeviceType_ShockSensor_38:break;
-        case SFIDeviceType_DoorSensor_39:break;
-        case SFIDeviceType_MoistureSensor_40:break;
-        case SFIDeviceType_MovementSensor_41:break;
-        case SFIDeviceType_MultiSwitch_43:break;
-        case SFIDeviceType_SetPointThermostat_46:break;
-        case SFIDeviceType_51:break;
-        case SFIDeviceType_RollerShutter_52:break;
+        case SFIDeviceType_UnknownDevice_0:
+            break;
+        case SFIDeviceType_Thermostat_7:
+            break;
+        case SFIDeviceType_Controller_8:
+            break;
+        case SFIDeviceType_SceneController_9:
+            break;
+        case SFIDeviceType_StandardCIE_10:
+            break;
+        case SFIDeviceType_MotionSensor_11:
+            break;
+        case SFIDeviceType_ContactSwitch_12:
+            break;
+        case SFIDeviceType_FireSensor_13:
+            break;
+        case SFIDeviceType_WaterSensor_14:
+            break;
+        case SFIDeviceType_GasSensor_15:
+            break;
+        case SFIDeviceType_PersonalEmergencyDevice_16:
+            break;
+        case SFIDeviceType_VibrationOrMovementSensor_17:
+            break;
+        case SFIDeviceType_RemoteControl_18:
+            break;
+        case SFIDeviceType_KeyFob_19:
+            break;
+        case SFIDeviceType_Keypad_20:
+            break;
+        case SFIDeviceType_OccupancySensor_24:
+            break;
+        case SFIDeviceType_LightSensor_25:
+            break;
+        case SFIDeviceType_WindowCovering_26:
+            break;
+        case SFIDeviceType_TemperatureSensor_27:
+            break;
+        case SFIDeviceType_ColorControl_29:
+            break;
+        case SFIDeviceType_PressureSensor_30:
+            break;
+        case SFIDeviceType_FlowSensor_31:
+            break;
+        case SFIDeviceType_ColorDimmableLight_32:
+            break;
+        case SFIDeviceType_HAPump_33:
+            break;
+        case SFIDeviceType_Shade_34:
+            break;
+        case SFIDeviceType_SmokeDetector_36:
+            break;
+        case SFIDeviceType_FloodSensor_37:
+            break;
+        case SFIDeviceType_ShockSensor_38:
+            break;
+        case SFIDeviceType_DoorSensor_39:
+            break;
+        case SFIDeviceType_MoistureSensor_40:
+            break;
+        case SFIDeviceType_MovementSensor_41:
+            break;
+        case SFIDeviceType_MultiSwitch_43:
+            break;
+        case SFIDeviceType_SetPointThermostat_46:
+            break;
+        case SFIDeviceType_51:
+            break;
+        case SFIDeviceType_RollerShutter_52:
+            break;
     } // end switch
 
     return deviceValues; // can be nil
@@ -429,6 +458,31 @@
     }
 
     return copy;
+}
+
+- (BOOL)isActuator {
+    //        case SFIDeviceType_Alarm_6:
+    switch (self.deviceType) {
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_MultiLevelSwitch_2:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_DoorLock_5:
+        case SFIDeviceType_Thermostat_7:
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_ZigbeeDoorLock_28:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45:
+        case SFIDeviceType_HueLamp_48:
+        case SFIDeviceType_SecurifiSmartSwitch_50: {
+            return YES;
+        }
+
+        default: {
+            return NO;
+        }
+    }
 }
 
 - (BOOL)isTampered:(SFIDeviceValue *)deviceValue {
