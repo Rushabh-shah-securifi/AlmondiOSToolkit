@@ -895,28 +895,30 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self asyncRequestDeviceList:mac];
     }
 
-    // If the network is down, then do not send Hash request:
-    // 1. it's not needed
-    // 2. it will be sent automatically when the connection comes up
-    // 3. sending it now will stimulate connection establishment and sending the command prior to other normal-bring up
-    // commands will cause the connection to fail IF the currently selected almond is no longer linked to the account.
-    Network *network = self.cloudNetwork;
+    if (almond.linkType == SFIAlmondPlusLinkType_cloud_local) {
+        // If the network is down, then do not send Hash request:
+        // 1. it's not needed
+        // 2. it will be sent automatically when the connection comes up
+        // 3. sending it now will stimulate connection establishment and sending the command prior to other normal-bring up
+        // commands will cause the connection to fail IF the currently selected almond is no longer linked to the account.
+        Network *network = self.cloudNetwork;
 
-    if (network == nil) {
-        DLog(@"%s: network is down; not sending request for hash or mode: %@", __PRETTY_FUNCTION__, mac);
-        return;
-    }
+        if (network == nil) {
+            DLog(@"%s: network is down; not sending request for hash or mode: %@", __PRETTY_FUNCTION__, mac);
+            return;
+        }
 
-    NetworkState *state = network.networkState;
-    if (![state wasHashFetchedForAlmond:mac]) {
-        [state markHashFetchedForAlmond:mac];
+        NetworkState *state = network.networkState;
+        if (![state wasHashFetchedForAlmond:mac]) {
+            [state markHashFetchedForAlmond:mac];
 
-        DLog(@"%s: hash not checked on this connection: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
-        GenericCommand *cmd = [self makeDeviceHashCommand:mac];
-        [self asyncSendToCloud:cmd];
-    }
-    else {
-        DLog(@"%s: hash already checked on this connection for current almond: %@", __PRETTY_FUNCTION__, mac);
+            DLog(@"%s: hash not checked on this connection: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
+            GenericCommand *cmd = [self makeDeviceHashCommand:mac];
+            [self asyncSendToCloud:cmd];
+        }
+        else {
+            DLog(@"%s: hash already checked on this connection for current almond: %@", __PRETTY_FUNCTION__, mac);
+        }
     }
 
     // Fetch the Almond Mode
@@ -964,7 +966,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSMutableArray *local_almonds = [NSMutableArray array];
     for (NSString *mac in local_macs) {
         SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
-        SFIAlmondPlus *local = setting.asAlmondPlus;
+        SFIAlmondPlus *local = setting.asLocalLinkAlmondPlus;
         [local_almonds addObject:local];
     }
 
@@ -2001,6 +2003,7 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
 // This method has side-effects and can change settings.
 // Returns the current Almond, which might or might not be the same as the old one. May return nil.
 - (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
+    // if current is "local only" then no need to inspect the almond list; just return the current one.
     SFIAlmondPlus *current = [self currentAlmond];
     if (current.linkType == SFIAlmondPlusLinkType_local_only) {
         return current;
@@ -2022,8 +2025,6 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
         return currentAlmond;
     }
     else {
-        SFIAlmondPlus *current = [self currentAlmond];
-
         if (current) {
             for (SFIAlmondPlus *almond in almondList) {
                 if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
@@ -2064,10 +2065,13 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
         // our list of Almonds is out of date. Therefore, issue a request for the Almond list.
         NSLog(@"Device hash response failed; requesting Almond list");
 
-        [self removeCurrentAlmond];
+        SFIAlmondPlus *currentAlmond = [self currentAlmond];
+        if (currentAlmond.linkType == SFIAlmondPlusLinkType_cloud_local) {
+            [self removeCurrentAlmond];
 
-        GenericCommand *cmd = [self makeAlmondListCommand];
-        [self asyncSendToCloud:cmd];
+            GenericCommand *cmd = [self makeAlmondListCommand];
+            [self asyncSendToCloud:cmd];
+        }
 
         return;
     }
