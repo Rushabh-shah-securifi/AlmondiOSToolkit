@@ -1,6 +1,6 @@
 #import "SecurifiTypes.h"
 
-NSString * securifi_nameToDeviceType(SFIDeviceType type) {
+NSString *securifi_name_to_device_type(SFIDeviceType type) {
     switch (type) {
         case SFIDeviceType_UnknownDevice_0:return @"0_UnknownDevice";
         case SFIDeviceType_BinarySwitch_1:return @"1_BinarySwitch";
@@ -57,7 +57,7 @@ NSString * securifi_nameToDeviceType(SFIDeviceType type) {
     }
 }
 
-NSDictionary *securifi_propertyNameToTypeDictionary() {
+NSDictionary *securifi_property_name_to_type_dictionary() {
     static NSDictionary *lookupTable;
 
     if (lookupTable == nil) {
@@ -137,14 +137,14 @@ NSDictionary *securifi_propertyNameToTypeDictionary() {
             lookupTable;
 }
 
-SFIDevicePropertyType securifi_NameToPropertyType(NSString *valueName) {
+SFIDevicePropertyType securifi_name_to_property_type(NSString *valueName) {
     if (valueName == nil) {
         return SFIDevicePropertyType_UNKNOWN;
     }
     // normalize all names
     valueName = [valueName uppercaseString];
 
-    NSDictionary *lookupTable = securifi_propertyNameToTypeDictionary();
+    NSDictionary *lookupTable = securifi_property_name_to_type_dictionary();
 
     NSNumber *o = lookupTable[valueName];
     if (!o) {
@@ -153,11 +153,11 @@ SFIDevicePropertyType securifi_NameToPropertyType(NSString *valueName) {
     return (SFIDevicePropertyType) [o intValue];
 }
 
-NSString *securifi_propertyTypeToName(SFIDevicePropertyType propertyType) {
+NSString *securifi_property_type_to_name(SFIDevicePropertyType propertyType) {
     static NSDictionary *lookupTable;
 
     if (lookupTable == nil) {
-        NSDictionary *namesToType = securifi_propertyNameToTypeDictionary();
+        NSDictionary *namesToType = securifi_property_name_to_type_dictionary();
         NSMutableDictionary *typeToName = [NSMutableDictionary dictionary];
 
         for (NSString *key in namesToType.allKeys) {

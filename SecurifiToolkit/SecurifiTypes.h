@@ -67,7 +67,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
 };
 
 // Converts a type into a standard mnemonic name suitable for event logging
-NSString * securifi_nameToDeviceType(SFIDeviceType type);
+NSString *securifi_name_to_device_type(SFIDeviceType type);
 
 // ===========================================================================================================
 
@@ -144,9 +144,9 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 
-SFIDevicePropertyType securifi_NameToPropertyType(NSString *valueName);
+SFIDevicePropertyType securifi_name_to_property_type(NSString *valueName);
 
-NSString *securifi_propertyTypeToName(SFIDevicePropertyType propertyType);
+NSString *securifi_property_type_to_name(SFIDevicePropertyType propertyType);
 
 // ===========================================================================================================
 
