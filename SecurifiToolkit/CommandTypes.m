@@ -8,7 +8,7 @@
 
 #import "CommandTypes.h"
 
-NSString *securifi_commandTypeToString(CommandType type) {
+NSString *securifi_command_type_to_string(CommandType type) {
     switch (type) {
         case CommandType_LOGIN_COMMAND:
             return [NSString stringWithFormat:@"LOGIN_COMMAND_%d", type];
@@ -177,13 +177,58 @@ NSString *securifi_commandTypeToString(CommandType type) {
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
             return [NSString stringWithFormat:@"NOTIFICATIONS_CLEAR_COUNT_RESPONSE_%d", type];
 
+        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE:
+            return [NSString stringWithFormat:@"DEVICE_LIST_AND_VALUES_RESPONSE_%d", type];
+        case CommandType_ALMOND_COMMAND_RESPONSE:
+            return [NSString stringWithFormat:@"ALMOND_COMMAND_RESPONSE_%d", type];
+        case CommandType_ALMOND_NAME_AND_MAC_REQUEST:
+            return [NSString stringWithFormat:@"ALMOND_NAME_AND_MAC_REQUEST_%d", type];
+        case CommandType_ALMOND_NAME_AND_MAC_RESPONSE:
+            return [NSString stringWithFormat:@"ALMOND_NAME_AND_MAC_RESPONSE_%d", type];
+        case CommandType_DEVICELOG_REQUEST:
+            return [NSString stringWithFormat:@"DEVICELOG_REQUEST_%d", type];
+        case CommandType_DEVICELOG_RESPONSE:
+            return [NSString stringWithFormat:@"DEVICELOG_RESPONSE_%d", type];
+        case CommandType_UPDATE_REQUEST:
+            return [NSString stringWithFormat:@"UPDATE_REQUEST_%d", type];
+        case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
+            return [NSString stringWithFormat:@"DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_%d", type];
+        case CommandType_GET_ALL_SCENES:
+            return [NSString stringWithFormat:@"GET_ALL_SCENES_%d", type];
+        case CommandType_LIST_SCENE_RESPONSE:
+            return [NSString stringWithFormat:@"LIST_SCENE_RESPONSE_%d", type];
+        case CommandType_DYNAMIC_DELETE_SCENE_REQUEST:
+            return [NSString stringWithFormat:@"DYNAMIC_DELETE_SCENE_REQUEST_%d", type];
+        case CommandType_WIFI_CLIENTS_LIST_REQUEST:
+            return [NSString stringWithFormat:@"WIFI_CLIENTS_LIST_REQUEST_%d", type];
+        case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
+            return [NSString stringWithFormat:@"WIFI_CLIENTS_LIST_RESPONSE_%d", type];
+        case CommandType_COMMAND_RESPONSE:
+            return [NSString stringWithFormat:@"COMMAND_RESPONSE_%d", type];
+        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST:
+            return [NSString stringWithFormat:@"DYNAMIC_CLIENT_UPDATE_REQUEST_%d", type];
+        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST:
+            return [NSString stringWithFormat:@"DYNAMIC_CLIENT_ADD_REQUEST_%d", type];
+        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST:
+            return [NSString stringWithFormat:@"DYNAMIC_CLIENT_REMOVE_REQUEST_%d", type];
+        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST:
+            return [NSString stringWithFormat:@"DYNAMIC_CLIENT_JOIN_REQUEST_%d", type];
+        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST:
+            return [NSString stringWithFormat:@"DYNAMIC_CLIENT_LEFT_REQUEST_%d", type];
+        case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+            return [NSString stringWithFormat:@"WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST_%d", type];
+        case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
+            return [NSString stringWithFormat:@"WIFI_CLIENT_GET_PREFERENCE_REQUEST_%d", type];
+        case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
+            return [NSString stringWithFormat:@"WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_%d", type];
+
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
     }
 }
 
-BOOL securifi_validCommandType(CommandType type) {
+BOOL securifi_valid_command_type(CommandType type) {
     switch (type) {
         case CommandType_LOGIN_COMMAND:
         case CommandType_LOGIN_RESPONSE:
@@ -271,6 +316,49 @@ BOOL securifi_validCommandType(CommandType type) {
         case CommandType_DEVICELOG_RESPONSE:
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST:
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
+        case CommandType_UPDATE_REQUEST:
+        case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
+        case CommandType_GET_ALL_SCENES:
+        case CommandType_LIST_SCENE_RESPONSE:
+        case CommandType_DYNAMIC_DELETE_SCENE_REQUEST:
+        case CommandType_WIFI_CLIENTS_LIST_REQUEST:
+        case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
+        case CommandType_COMMAND_RESPONSE:
+        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST:
+        case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+        case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
+        case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
+            return YES;
+
+        default:
+            return NO;
+    }
+}
+
+BOOL securifi_valid_json_command_type(CommandType type) {
+    switch (type) {
+        case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
+        case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
+        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
+        case CommandType_DEVICELOG_RESPONSE:
+        case CommandType_LIST_SCENE_RESPONSE:
+        case CommandType_COMMAND_RESPONSE:
+        case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
+        case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
+        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST:
+        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST:
+        case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
+        case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+        case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
+        case (CommandType) 1551:
+        case (CommandType) 99:
             return YES;
 
         default:
