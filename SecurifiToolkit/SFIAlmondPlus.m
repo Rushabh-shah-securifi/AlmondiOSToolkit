@@ -76,6 +76,8 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInt32:1 forKey:@"self.schemaVersion"]; // for future use/expansion; version this schema
+
     [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
     [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
     [coder encodeInt:self.index forKey:@"self.index"];
