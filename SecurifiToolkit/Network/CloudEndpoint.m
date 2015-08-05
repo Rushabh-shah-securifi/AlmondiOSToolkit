@@ -271,6 +271,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
         8. the command type is an unsigned int value that can be used to determine whether the payload is XML or JSON
      */
 
+    NSMutableData *const dataBuffer = self.partialData;
+
     switch (streamEvent) {
         case NSStreamEventOpenCompleted: {
             break;
@@ -285,22 +287,23 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                     NSInteger bufferLength = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
                     if (bufferLength > 0) {
                         // Append received data to partial buffer
-                        [self.partialData appendBytes:&inputBuffer[0] length:(NSUInteger) bufferLength];
 
-                        while (self.partialData.length > COMMAND_HEADER_LEN_BYTES) {
+                        [dataBuffer appendBytes:&inputBuffer[0] length:(NSUInteger) bufferLength];
+
+                        while (dataBuffer.length > COMMAND_HEADER_LEN_BYTES) {
                             // number of bytes for the complete response
                             unsigned int payloadLength = 0;
-                            [self.partialData getBytes:&payloadLength range:NSMakeRange(0, 4)];
+                            [dataBuffer getBytes:&payloadLength range:NSMakeRange(0, 4)];
                             payloadLength = NSSwapBigIntToHost(payloadLength);
 
                             // fail fast if we have not cumulateed enough data
-                            if (self.partialData.length < COMMAND_HEADER_LEN_BYTES + payloadLength) {
+                            if (dataBuffer.length < COMMAND_HEADER_LEN_BYTES + payloadLength) {
                                 break; // command not completely received
                             }
 
                             // the command type pertaining to the response
                             unsigned int commandType_raw;
-                            [self.partialData getBytes:&commandType_raw range:NSMakeRange(4, 4)];
+                            [dataBuffer getBytes:&commandType_raw range:NSMakeRange(4, 4)];
                             commandType_raw = NSSwapBigIntToHost(commandType_raw);
 
                             CommandType commandType = (CommandType) commandType_raw;
@@ -309,10 +312,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
                             if (!securifi_valid_command_type(commandType)) {
                                 NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@",
-                                        commandType, [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding]);
+                                        commandType, [[NSString alloc] initWithData:dataBuffer encoding:NSUTF8StringEncoding]);
                             }
                             else if (securifi_valid_json_command_type(commandType)) {
-                                NSData *buffer = [self.partialData subdataWithRange:NSMakeRange(COMMAND_HEADER_LEN_BYTES, payloadLength)];
+                                NSData *buffer = [dataBuffer subdataWithRange:NSMakeRange(COMMAND_HEADER_LEN_BYTES, payloadLength)];
 
                                 // JSON payloads for Notifications are wrapped in <root></root>.
                                 // All other JSON commands are NOT
@@ -322,7 +325,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                     NSUInteger endLen = @"</root>".length;
                                     NSRange parseRange = NSMakeRange(COMMAND_HEADER_LEN_BYTES + startLen, payloadLength - endLen - startLen);
 
-                                    buffer = [self.partialData subdataWithRange:parseRange];
+                                    buffer = [dataBuffer subdataWithRange:parseRange];
                                 }
 
                                 switch (commandType) {
@@ -375,7 +378,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                 // XML payloads
                                 NSRange parseRange = NSMakeRange(COMMAND_HEADER_LEN_BYTES, payloadLength);
 
-                                NSInteger actual_length = self.partialData.length;
+                                NSInteger actual_length = dataBuffer.length;
                                 NSInteger expected_length = parseRange.length - parseRange.location;
                                 if (actual_length < expected_length) {
                                     NSLog(@"Ignoring payload, the buffer length is wrong, actual:%li, expected:%li", (long) actual_length, (long) expected_length);
@@ -383,8 +386,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                 }
 
                                 @try {
-                                    NSData *buffer = [self.partialData subdataWithRange:parseRange];
-                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    NSData *buffer = [dataBuffer subdataWithRange:parseRange];
+//                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
                                     CommandParser *parser = [CommandParser new];
                                     GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
@@ -397,7 +400,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                     parsedPayload = YES;
                                 }
                                 @catch (NSException *ex) {
-                                    NSString *buffer_str = [[NSString alloc] initWithData:self.partialData encoding:NSUTF8StringEncoding];
+                                    NSString *buffer_str = [[NSString alloc] initWithData:dataBuffer encoding:NSUTF8StringEncoding];
                                     NSLog(@"Exception on parsing XML payload, ex:%@, data:'%@'", ex, buffer_str);
                                 }
                             } // end if valid command, json, or xml
@@ -408,10 +411,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
                                 // Process the request by passing it to the delegate
                                 [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
-
-                                // clear out the consumed command payload; truncate the buffer
-                                [self.partialData replaceBytesInRange:NSMakeRange(0, COMMAND_HEADER_LEN_BYTES + payloadLength) withBytes:NULL length:0];
                             }
+
+                            // clear out the consumed command payload; truncate the buffer
+                            [dataBuffer replaceBytesInRange:NSMakeRange(0, COMMAND_HEADER_LEN_BYTES + payloadLength) withBytes:NULL length:0];
                         }
                     }
                 }
