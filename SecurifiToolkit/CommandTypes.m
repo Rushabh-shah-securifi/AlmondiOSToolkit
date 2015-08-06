@@ -221,6 +221,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"WIFI_CLIENT_GET_PREFERENCE_REQUEST_%d", type];
         case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
             return [NSString stringWithFormat:@"WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_%d", type];
+        case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
+            return [NSString stringWithFormat:@"DYNAMIC_WIFI_CLIENT_REMOVED_ALL_%d", type];
 
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];

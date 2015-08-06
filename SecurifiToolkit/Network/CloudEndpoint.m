@@ -359,7 +359,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                                     case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
                                     case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                                     case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
-                                    case (CommandType) 1551:
+                                    case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
