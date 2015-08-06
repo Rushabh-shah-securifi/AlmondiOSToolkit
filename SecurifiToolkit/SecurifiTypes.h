@@ -11,6 +11,7 @@
 typedef unsigned int sfi_id;
 
 typedef NS_ENUM(unsigned int, SFIDeviceType) {
+    SFIDeviceType_BinarySwitch_0                = 100,//this is for scenes Home/Away row
     SFIDeviceType_UnknownDevice_0               = 0,
     SFIDeviceType_BinarySwitch_1                = 1,
     SFIDeviceType_MultiLevelSwitch_2            = 2,
