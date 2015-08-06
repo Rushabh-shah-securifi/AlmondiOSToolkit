@@ -309,8 +309,17 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Send a command to the cloud requesting to remove the user as secondary user from the current Almond from cloud account
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString *)almondMAC;
 
+typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
+    SecurifiToolkitAlmondRouterRequest_summary = 1,         // router summary information
+    SecurifiToolkitAlmondRouterRequest_settings,            // detailed router settings
+    SecurifiToolkitAlmondRouterRequest_wifi_clients,        // connected and blocked devices
+};
+
 // Sends commands directly to the specified Almond, requesting summary and settings information
-- (void)asyncAlmondStatusAndSettings:(NSString *)almondMac;
+- (void)asyncAlmondStatusAndSettingsRequest:(NSString *)almondMac request:(enum SecurifiToolkitAlmondRouterRequest)requestType;
+
+// Sends commands directly to the specified Almond, requesting summary and settings information
+- (void)asyncAlmondSummaryInfoRequest:(NSString *)almondMac;
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 

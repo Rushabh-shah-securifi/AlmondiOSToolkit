@@ -62,8 +62,6 @@
 
 #define GET_WIRELESS_SUMMARY_COMMAND @"<root><AlmondRouterSummary action=\"get\">1</AlmondRouterSummary></root>"
 #define GET_WIRELESS_SETTINGS_COMMAND @"<root><AlmondWirelessSettings action=\"get\">1</AlmondWirelessSettings></root>"
-#define GET_CONNECTED_DEVICE_COMMAND @"<root><AlmondConnectedDevices action=\"get\">1</AlmondConnectedDevices></root>"
-#define GET_BLOCKED_DEVICE_COMMAND @"<root><AlmondBlockedMACs action=\"get\">1</AlmondBlockedMACs></root>"
 #define APPLICATION_ID @"1001"
 
 
@@ -120,7 +118,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) NotificationCountRequest *pendingNotificationCountRequest;
 @property(nonatomic, strong) NotificationClearCountRequest *pendingClearNotificationCountRequest;
 
-@property(nonatomic, strong) BaseCommandRequest *pendingAlmondStateAndSettingsRequest;
+@property(nonatomic, strong) GenericCommandRequest *pendingAlmondStateAndSettingsRequest;
 @property(nonatomic, strong) BaseCommandRequest *pendingDeviceLogRequest;
 @end
 
@@ -1284,53 +1282,52 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - Almond and router settings
 
-typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
-    AlmondStatusAndSettings_summary = 1,
-    AlmondStatusAndSettings_settings,
-    AlmondStatusAndSettings_connected_device,
-    AlmondStatusAndSettings_blocked_device,
-};
-
-- (void)asyncAlmondStatusAndSettings:(NSString *)almondMac {
+- (void)asyncAlmondStatusAndSettingsRequest:(NSString *)almondMac request:(enum SecurifiToolkitAlmondRouterRequest)requestType {
     if (almondMac.length == 0) {
         return;
     }
 
-    BaseCommandRequest *pending = self.pendingAlmondStateAndSettingsRequest;
+    [self internalRequestAlmondStatusAndSettings:almondMac command:requestType];
+}
+
+- (void)asyncAlmondSummaryInfoRequest:(NSString *)almondMac {
+    if (almondMac.length == 0) {
+        return;
+    }
+
+    GenericCommandRequest *pending = self.pendingAlmondStateAndSettingsRequest;
     if (pending) {
-        if (!pending.isExpired) {
-            return;
+        if ([pending.almondMAC isEqualToString:almondMac]) {
+            if (!pending.isExpired) {
+                return;
+            }
         }
     }
-    self.pendingAlmondStateAndSettingsRequest = [BaseCommandRequest new];
+    GenericCommandRequest *timeOutTracker = [GenericCommandRequest new];
+    timeOutTracker.almondMAC = almondMac;
+    self.pendingAlmondStateAndSettingsRequest = timeOutTracker;
 
     // sends a series of requests to fetch all the information at once.
     // note ordering might be important to the UI layer, which for now receives the response payloads directly
-    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_summary];
-    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_settings];
-    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_connected_device];
-    [self internalJSONRequestAlmondStatusAndSettings:almondMac];//md01
-    [self internalRequestAlmondStatusAndSettings:almondMac command:AlmondStatusAndSettings_blocked_device];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary];
 }
 
-- (void)internalJSONRequestAlmondStatusAndSettings:(NSString *)almondMac {
-    //md01
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_WIFI_CLIENTS_LIST_REQUEST;
-
-    NSDictionary *testDict = @{
+- (void)internalJSONRequestAlmondWifiClients:(NSString *)almondMac {
+    NSDictionary *payload = @{
             @"commandtype" : @"WifiClientList",
             @"AlmondMAC" : almondMac,
             @"MobileInternalIndex" : @"324"
     };
 
-    cloudCommand.command = [testDict JSONString];
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_WIFI_CLIENTS_LIST_REQUEST;
+    cmd.command = [payload JSONString];
 
-    [self asyncSendToCloud:cloudCommand];
+    [self asyncSendToCloud:cmd];
 }
 
-- (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum AlmondStatusAndSettings)type {
-    if (type == AlmondStatusAndSettings_connected_device) {
+- (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum SecurifiToolkitAlmondRouterRequest)type {
+    if (type == SecurifiToolkitAlmondRouterRequest_wifi_clients) {
         BOOL local = [self useLocalNetwork:almondMac];
 
         if (local) {
@@ -1358,18 +1355,16 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
 
     NSString *data;
     switch (type) {
-        case AlmondStatusAndSettings_summary:
+        case SecurifiToolkitAlmondRouterRequest_summary:
             data = GET_WIRELESS_SUMMARY_COMMAND;
             break;
-        case AlmondStatusAndSettings_settings:
+        case SecurifiToolkitAlmondRouterRequest_settings:
             data = GET_WIRELESS_SETTINGS_COMMAND;
             break;
-        case AlmondStatusAndSettings_connected_device:
-            data = GET_CONNECTED_DEVICE_COMMAND;
-            break;
-        case AlmondStatusAndSettings_blocked_device:
-            data = GET_BLOCKED_DEVICE_COMMAND;
-            break;
+
+        case SecurifiToolkitAlmondRouterRequest_wifi_clients:
+            [self internalJSONRequestAlmondWifiClients:almondMac];
+            return;
     }
 
     GenericCommandRequest *request = [GenericCommandRequest new];
@@ -1377,7 +1372,7 @@ typedef NS_ENUM(NSInteger, AlmondStatusAndSettings) {
     request.applicationID = APPLICATION_ID;
     request.data = data;
 
-    GenericCommand *cmd = [[GenericCommand alloc] init];
+    GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
 
