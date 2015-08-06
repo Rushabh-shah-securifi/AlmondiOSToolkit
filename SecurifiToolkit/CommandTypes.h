@@ -107,19 +107,20 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST       = 806,
     CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE      = 807,
 
-    CommandType_UPDATE_REQUEST                          = 1061,//md01
-    CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE= 1301,//md01
-    CommandType_GET_ALL_SCENES                          = 1041, //md01
-    CommandType_LIST_SCENE_RESPONSE                     = 1054, //TEST 1042,//md01
-    CommandType_DYNAMIC_DELETE_SCENE_REQUEST            = 1053, //md01
-    CommandType_WIFI_CLIENTS_LIST_REQUEST               = 1523, //md01
-    CommandType_WIFI_CLIENTS_LIST_RESPONSE              = 1524, //md01
-    CommandType_COMMAND_RESPONSE                        = 1064,//md01 for all requests will get this as response(Set/update/remove/activate etc...)
+    CommandType_UPDATE_REQUEST                          = 1061,
+    CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE= 1301,
+    CommandType_GET_ALL_SCENES                          = 1041,
+    CommandType_LIST_SCENE_RESPONSE                     = 1054, //TEST 1042
+    CommandType_WIFI_CLIENTS_LIST_REQUEST               = 1523,
+    CommandType_DYNAMIC_DELETE_SCENE_REQUEST            = 1053,
+    CommandType_WIFI_CLIENTS_LIST_RESPONSE              = 1524,
+    CommandType_COMMAND_RESPONSE                        = 1064,// for all requests will get this as response(Set/update/remove/activate etc...)
     CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST           = 1541,
     CommandType_DYNAMIC_CLIENT_ADD_REQUEST              = 1543,
     CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST           = 1545,
     CommandType_DYNAMIC_CLIENT_JOIN_REQUEST             = 1547,
     CommandType_DYNAMIC_CLIENT_LEFT_REQUEST             = 1549,
+    CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL         = 1551,
 
     CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST   = 1525,
     CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST      = 1526,

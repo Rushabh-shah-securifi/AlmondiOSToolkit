@@ -31,6 +31,7 @@
         self.enableNotificationsDebugLogging = NO;
         self.enableRouterWirelessControl = YES;
         self.enableLocalNetworking = NO;
+        self.enableScenes = NO;
     }
 
     return self;
@@ -52,6 +53,7 @@
         copy.enableNotificationsDebugLogging = self.enableNotificationsDebugLogging;
         copy.enableRouterWirelessControl = self.enableRouterWirelessControl;
         copy.enableLocalNetworking = self.enableLocalNetworking;
+        copy.enableScenes = self.enableScenes;
     }
 
     return copy;

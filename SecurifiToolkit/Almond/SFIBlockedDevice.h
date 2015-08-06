@@ -14,4 +14,5 @@
 @interface SFIBlockedDevice : NSObject
 //<BlockedMAC>10:60:4b:d9:60:84</BlockedMAC>
 @property(nonatomic, copy) NSString *deviceMAC;
+//TEST md01
 @end

@@ -54,6 +54,8 @@
 // Defaults to NO
 @property(nonatomic) BOOL enableLocalNetworking;
 
+@property(nonatomic) BOOL enableScenes;
+
 - (id)copyWithZone:(NSZone *)zone;
 
 @end
