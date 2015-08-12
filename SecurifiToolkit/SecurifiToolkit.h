@@ -313,6 +313,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
     SecurifiToolkitAlmondRouterRequest_summary = 1,         // router summary information
     SecurifiToolkitAlmondRouterRequest_settings,            // detailed router settings
+    SecurifiToolkitAlmondRouterRequest_connected_device,    // legacy: connected wifi clients (use SecurifiToolkitAlmondRouterRequest_wifi_clients)
+    SecurifiToolkitAlmondRouterRequest_blocked_device,      // legacy: blocked wifi clients (use SecurifiToolkitAlmondRouterRequest_wifi_clients)
     SecurifiToolkitAlmondRouterRequest_wifi_clients,        // connected and blocked devices
 };
 

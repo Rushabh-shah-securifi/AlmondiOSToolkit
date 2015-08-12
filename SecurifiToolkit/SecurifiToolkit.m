@@ -62,6 +62,8 @@
 
 #define GET_WIRELESS_SUMMARY_COMMAND @"<root><AlmondRouterSummary action=\"get\">1</AlmondRouterSummary></root>"
 #define GET_WIRELESS_SETTINGS_COMMAND @"<root><AlmondWirelessSettings action=\"get\">1</AlmondWirelessSettings></root>"
+#define GET_CONNECTED_DEVICE_COMMAND @"<root><AlmondConnectedDevices action=\"get\">1</AlmondConnectedDevices></root>"
+#define GET_BLOCKED_DEVICE_COMMAND @"<root><AlmondBlockedMACs action=\"get\">1</AlmondBlockedMACs></root>"
 #define APPLICATION_ID @"1001"
 
 
@@ -1309,7 +1311,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     // sends a series of requests to fetch all the information at once.
     // note ordering might be important to the UI layer, which for now receives the response payloads directly
-    [self internalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary];
+    [self in
+    ternalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary];
 }
 
 - (void)internalJSONRequestAlmondWifiClients:(NSString *)almondMac {
@@ -1361,8 +1364,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case SecurifiToolkitAlmondRouterRequest_settings:
             data = GET_WIRELESS_SETTINGS_COMMAND;
             break;
-
+        case SecurifiToolkitAlmondRouterRequest_connected_device:
+            data = GET_CONNECTED_DEVICE_COMMAND;
+            break;
+        case SecurifiToolkitAlmondRouterRequest_blocked_device:
+            data = GET_BLOCKED_DEVICE_COMMAND;
+            break;
         case SecurifiToolkitAlmondRouterRequest_wifi_clients:
+            // special case
             [self internalJSONRequestAlmondWifiClients:almondMac];
             return;
     }
