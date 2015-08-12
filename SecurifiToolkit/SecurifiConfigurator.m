@@ -32,6 +32,7 @@
         self.enableRouterWirelessControl = YES;
         self.enableLocalNetworking = NO;
         self.enableScenes = NO;
+        self.enableWifiClients = NO;
     }
 
     return self;
@@ -54,6 +55,7 @@
         copy.enableRouterWirelessControl = self.enableRouterWirelessControl;
         copy.enableLocalNetworking = self.enableLocalNetworking;
         copy.enableScenes = self.enableScenes;
+        copy.enableWifiClients = self.enableWifiClients;
     }
 
     return copy;

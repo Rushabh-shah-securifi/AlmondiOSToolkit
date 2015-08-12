@@ -54,7 +54,11 @@
 // Defaults to NO
 @property(nonatomic) BOOL enableLocalNetworking;
 
+// Controls whether the app shows the Scenes tab and functions
 @property(nonatomic) BOOL enableScenes;
+
+// Controls whether the app uses the new WifiClients UI; when NO, then the legacy UI is used.
+@property(nonatomic) BOOL enableWifiClients;
 
 - (id)copyWithZone:(NSZone *)zone;
 
