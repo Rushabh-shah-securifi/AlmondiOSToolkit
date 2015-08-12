@@ -1311,8 +1311,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     // sends a series of requests to fetch all the information at once.
     // note ordering might be important to the UI layer, which for now receives the response payloads directly
-    [self in
-    ternalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary];
 }
 
 - (void)internalJSONRequestAlmondWifiClients:(NSString *)almondMac {
