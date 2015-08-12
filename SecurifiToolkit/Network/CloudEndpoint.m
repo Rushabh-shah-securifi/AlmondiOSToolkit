@@ -21,6 +21,13 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
     CloudEndpointConnectionStatus_shutdown,
 };
 
+typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
+    CloudEndpointSocketError_notConnectedState          = 200,
+    CloudEndpointSocketError_unsupportedCommand         = 201,
+    CloudEndpointSocketError_outputStreamNil            = 202,
+    CloudEndpointSocketError_outputStreamWriteFailure   = 203,
+};
+
 #define COMMAND_HEADER_LEN_BYTES 8
 
 @interface CloudEndpoint () <NSStreamDelegate>
@@ -219,22 +226,22 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
     switch (status) {
         case CloudEndpointConnectionStatus_uninitialized:
-            NSLog(@"Connection State: uninitialized");
+            NSLog(@"Mark Connection State: uninitialized");
             break;
         case CloudEndpointConnectionStatus_connecting:
-            NSLog(@"Connection State: connecting");
+            NSLog(@"Mark Connection State: connecting");
             break;
         case CloudEndpointConnectionStatus_established:
-            NSLog(@"Connection State: established");
+            NSLog(@"Mark Connection State: established");
             break;
         case CloudEndpointConnectionStatus_failed:
-            NSLog(@"Connection State: failed");
+            NSLog(@"Mark Connection State: failed");
             break;
         case CloudEndpointConnectionStatus_shutting_down:
-            NSLog(@"Connection State: shutting_down");
+            NSLog(@"Mark Connection State: shutting_down");
             break;
         case CloudEndpointConnectionStatus_shutdown:
-            NSLog(@"Connection State: shutdown");
+            NSLog(@"Mark Connection State: shutdown");
             break;
     }
 
@@ -601,23 +608,22 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 - (BOOL)sendCommand:(GenericCommand *)command error:(NSError **)outError {
     if (!self.isStreamConnected) {
         DLog(@"SendCommand failed: CloudEndpoint is not connected");
-        *outError = [self makeError:@"SubmitCommand failed: CloudEndpoint is not connected"];
+        *outError = [self makeError:@"SubmitCommand failed: CloudEndpoint is not connected" errorCode:CloudEndpointSocketError_notConnectedState];
         return NO;
     }
 
     return [self internalSendToCloud:self command:command error:outError];
 }
 
-- (BOOL)internalSendToCloud:(CloudEndpoint *)socket command:(id)sender error:(NSError **)outError {
+- (BOOL)internalSendToCloud:(CloudEndpoint *)cloudEndpoint command:(GenericCommand*)command error:(NSError **)outError {
     @synchronized (self.syncLocker) {
-        GenericCommand *obj = (GenericCommand *) sender;
-        DLog(@"Sending command, cmd:%@", obj.debugDescription);
+        DLog(@"Sending command, cmd:%@", command.debugDescription);
 
-        unsigned int commandType = htonl(obj.commandType);;
+        CommandType commandType = command.commandType;
         NSString *commandPayload;
 
         @try {
-            switch (obj.commandType) {
+            switch (command.commandType) {
                 case CommandType_LOGIN_COMMAND:
                 case CommandType_LOGIN_TEMPPASS_COMMAND:
                 case CommandType_LOGOUT_ALL_COMMAND:
@@ -646,7 +652,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                 case CommandType_NOTIFICATIONS_SYNC_REQUEST:
                 case CommandType_NOTIFICATIONS_COUNT_REQUEST:
                 case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST: {
-                    id <SecurifiCommand> cmd = obj.command;
+                    id <SecurifiCommand> cmd = command.command;
                     commandPayload = [cmd toXml];
                     break;
                 }
@@ -655,9 +661,9 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                 case CommandType_ALMOND_NAME_CHANGE_REQUEST:
                 case CommandType_ALMOND_MODE_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
-                    id <SecurifiCommand> cmd = obj.command;
+                    id <SecurifiCommand> cmd = command.command;
                     //Send as Command 61
-                    commandType = (unsigned int) htonl(CommandType_MOBILE_COMMAND);
+                    commandType = CommandType_MOBILE_COMMAND;
                     commandPayload = [cmd toXml];
                     break;
                 }
@@ -680,76 +686,92 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
                 }
 
                 case CommandType_DEVICELOG_REQUEST: {
-                    NSData *data = obj.command;
+                    NSData *data = command.command;
                     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
-                    commandType = (unsigned int) htonl(CommandType_DEVICELOG_REQUEST);
                     commandPayload = [NSString stringWithFormat:@"<root>%@</root>", json];
                     break;
                 };
 
                 case CommandType_GET_ALL_SCENES:
                 case CommandType_UPDATE_REQUEST:
-                case CommandType_WIFI_CLIENTS_LIST_REQUEST: {
-                    commandType = (unsigned int) htonl(obj.commandType);
-                    commandPayload = obj.command;
+                case CommandType_WIFI_CLIENTS_LIST_REQUEST:
+                case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+                case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
+                    commandPayload = command.command;
                     break;
                 }
 
-                default:
-                    break;
+                default: {
+                    NSString *description = [NSString stringWithFormat:@"%s: Aborting write, unsupported command, cmd=%@", __PRETTY_FUNCTION__, command.command];
+                    *outError = [self makeError:description errorCode:CloudEndpointSocketError_unsupportedCommand];
+                    return NO;
+                }
             } // end switch
 
-            NSData *sendCommandPayload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
-            unsigned int commandLength = (unsigned int) htonl([sendCommandPayload length]);
+            NSData *write_payload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
+            unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
+            unsigned int header_commandType = (unsigned int) htonl(commandType);
 
             DLog(@"Sending payload: %@", commandPayload);
 
-            NSOutputStream *outputStream = socket.outputStream;
+            NSOutputStream *outputStream = cloudEndpoint.outputStream;
             if (outputStream == nil) {
                 DLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, outputStream);
-                *outError = [self makeError:@"Securifi - Output stream is nil"];
+                *outError = [self makeError:@"Securifi - Output stream is nil" errorCode:CloudEndpointSocketError_outputStreamNil];
                 return NO;
             }
 
             // Wait until socket is open
-            NSStreamStatus type;
+            NSStreamStatus streamStatus;
             do {
-                type = [outputStream streamStatus];
-            } while (type == NSStreamStatusOpening);
+                streamStatus = [outputStream streamStatus];
+            } while (streamStatus == NSStreamStatusOpening);
 
-//            if (socket.isStreamConnected) {
-//                [outputStream streamStatus];
-//            }
+            switch (streamStatus) {
+                case NSStreamStatusNotOpen:
+                case NSStreamStatusAtEnd:
+                case NSStreamStatusClosed:
+                case NSStreamStatusError:
+                    DLog(@"%s: Aborting write, stream status = %li", (long) streamStatus);
+                    goto socket_failure_handler;
 
-            if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
-                if (-1 == [outputStream write:(uint8_t *) &commandLength maxLength:4]) {
+                default:
+                    // pass through and continue processing
+                    break;
+            }
+
+            if (cloudEndpoint.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
+                if (-1 == [outputStream write:(uint8_t *) &header_payloadLength maxLength:4]) {
+                    DLog(@"%s: Failed writing 'payload length' 4 bytes");
                     goto socket_failure_handler;
                 }
             }
 
-            if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
-                if (-1 == [outputStream write:(uint8_t *) &commandType maxLength:4]) {
+            if (cloudEndpoint.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
+                if (-1 == [outputStream write:(uint8_t *) &header_commandType maxLength:4]) {
+                    DLog(@"%s: Failed writing 'command type' 4 bytes");
                     goto socket_failure_handler;
                 }
             }
 
-            if (socket.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
-                if (-1 == [outputStream write:[sendCommandPayload bytes] maxLength:[sendCommandPayload length]]) {
+            if (cloudEndpoint.isStreamConnected && outputStream.streamStatus != NSStreamStatusError) {
+                if (-1 == [outputStream write:[write_payload bytes] maxLength:[write_payload length]]) {
+                    DLog(@"%s: Failed writing 'payload' %i bytes", sendCommandPayload.length);
                     goto socket_failure_handler;
                 }
             }
 
             DLog(@"%s: Exiting sync block", __PRETTY_FUNCTION__);
 
-            if (!socket.isStreamConnected) {
+            if (!cloudEndpoint.isStreamConnected) {
                 DLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, outputStream);
-                *outError = [self makeError:@"Securifi - Output stream is not connected"];
+                *outError = [self makeError:@"Securifi - Output stream is not connected" errorCode:CloudEndpointSocketError_notConnectedState];
                 return NO;
             }
             else if (outputStream.streamStatus == NSStreamStatusError) {
-                DLog(@"%s: Output stream has error status, out=%@", __PRETTY_FUNCTION__, outputStream);
-                *outError = [self makeError:@"Securifi - Output stream has error status"];
+                DLog(@"%s: Output stream has error status, out=%@, err=%@", __PRETTY_FUNCTION__, outputStream, outputStream.streamError);
+                *outError = outputStream.streamError;
                 return NO;
             }
             else {
@@ -759,12 +781,13 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
 
             socket_failure_handler:
             {
-                DLog(@"Socket failure handler invoked");
+                NSLog(@"Socket failure handler invoked");
 
-                [socket markConnectionState:CloudEndpointConnectionStatus_failed];
+                streamStatus = [outputStream streamStatus];
+                NSString *description = [NSString stringWithFormat:@"Securifi Payload - Send Error, stream status=%li", (long) streamStatus];
+                *outError = [self makeError:description errorCode:CloudEndpointSocketError_outputStreamWriteFailure];
 
-                *outError = [self makeError:@"Securifi Payload - Send Error"];
-
+                [cloudEndpoint markConnectionState:CloudEndpointConnectionStatus_failed];
                 return NO;
             }//label socket_failure_handler
         }
@@ -775,11 +798,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
     }//synchronized
 }
 
-- (NSError *)makeError:(NSString *)description {
+- (NSError *)makeError:(NSString *)description errorCode:(enum CloudEndpointSocketError)errorCode {
     NSDictionary *details = @{NSLocalizedDescriptionKey : description};
-    return [NSError errorWithDomain:@"Securifi" code:200 userInfo:details];
+    return [NSError errorWithDomain:@"Securifi" code:errorCode userInfo:details];
 }
-
 
 @end
 
