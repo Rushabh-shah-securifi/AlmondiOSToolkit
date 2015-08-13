@@ -32,7 +32,7 @@
 - (enum TestConnectionResult)testConnection {
     NSString *mac = @"test_almond";
 
-    NetworkConfig *config = [NetworkConfig webSocketConfigAlmond:mac];
+    NetworkConfig *config = [NetworkConfig webSocketConfig:mac];
     config.host = self.host;
     config.port = self.port;
     config.password = self.password;
@@ -280,7 +280,7 @@
     [description appendFormat:@", self.almondplusName=%@", self.almondplusName];
     [description appendFormat:@", self.almondplusMAC=%@", self.almondplusMAC];
     [description appendFormat:@", self.host=%@", self.host];
-    [description appendFormat:@", self.port=%u", self.port];
+    [description appendFormat:@", self.port=%lu", (unsigned long) self.port];
     [description appendFormat:@", self.login=%@", self.login];
     [description appendFormat:@", self.password=%@", self.password];
     [description appendString:@">"];
