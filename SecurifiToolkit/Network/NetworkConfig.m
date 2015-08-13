@@ -5,8 +5,6 @@
 
 #import "NetworkConfig.h"
 #import "SecurifiConfigurator.h"
-#import "SFIAlmondPlus.h"
-
 
 @implementation NetworkConfig
 
@@ -20,9 +18,9 @@
     return config;
 }
 
-+ (instancetype)webSocketConfigAlmond:(NSString *)almond {
++ (instancetype)webSocketConfig:(NSString *)almondMac {
     NetworkConfig *config = [NetworkConfig configWithMode:NetworkEndpointMode_web_socket];
-    config.almondMac = almond;
+    config.almondMac = almondMac;
     return config;
 }
 
@@ -40,7 +38,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    NetworkConfig *copy = [[[self class] allocWithZone:zone] init];
+    NetworkConfig *copy = (NetworkConfig *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy->_mode = _mode;
