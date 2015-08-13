@@ -13,24 +13,30 @@ typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
     NetworkEndpointMode_web_socket,
 };
 
+// Represents the configuration for a Network endpoint
 @interface NetworkConfig : NSObject <NSCopying>
 
 // Factory for making a Network configuration based on the main configurator settings
 + (instancetype)cloudConfig:(SecurifiConfigurator *)configurator useProductionHost:(BOOL)useProductionHost;
 
-+ (instancetype)webSocketConfigAlmond:(NSString *)almondMac;
+// Factory for making a Network configuration for connecting to the web socket server on an Almond
++ (instancetype)webSocketConfig:(NSString *)almondMac;
 
 - (id)copyWithZone:(NSZone *)zone;
 
+// Indicates whether the config is for a Cloud connection or web socket connection
 @property(readonly) enum NetworkEndpointMode mode;
 
 // Optional value: used for web socket mode to inform the socket/callbacks about the Almond
 @property(nonatomic, copy) NSString *almondMac;
 
+// IP address or hostname of the endpoint
 @property(nonatomic, copy) NSString *host;
 
+// TCP port
 @property(nonatomic) NSUInteger port;
 
+// Password used for authenticating with the web socket connection
 @property(nonatomic, copy) NSString *password;
 
 // defaults to NO; when YES, the remote SSL certificate is validated against one stored in the app's bundle
