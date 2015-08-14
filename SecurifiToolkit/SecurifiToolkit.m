@@ -40,7 +40,6 @@
 #import "NotificationPreferenceResponse.h"
 #import "NotificationListRequest.h"
 #import "NotificationListResponse.h"
-#import "NotificationCountRequest.h"
 #import "NotificationCountResponse.h"
 #import "NotificationClearCountResponse.h"
 #import "NotificationClearCountRequest.h"
@@ -117,7 +116,6 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 // tracks only "refresh" request to get new ones
 @property(nonatomic, strong) NotificationListRequest *pendingRefreshNotificationsRequest;
-@property(nonatomic, strong) NotificationCountRequest *pendingNotificationCountRequest;
 @property(nonatomic, strong) NotificationClearCountRequest *pendingClearNotificationCountRequest;
 
 @property(nonatomic, strong) GenericCommandRequest *pendingAlmondStateAndSettingsRequest;
@@ -265,13 +263,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString*)almondMac {
-    enum NetworkConnectionStatus status;
+    enum NetworkConnectionStatus status = NetworkConnectionStatusUninitialized;
 
     if (self.config.enableLocalNetworking) {
         SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
         if (settings.enabled) {
             Network *network = self.localNetwork;
-            status = network ? network.connectionState : NetworkConnectionStatusUninitialized;
+            if (network) {
+                status = network.connectionState;
+            }
         }
         else {
             status = [self cloudNetworkStatus];
@@ -589,7 +589,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     __weak SecurifiToolkit *block_self = self;
     dispatch_async(self.commandDispatchQueue, ^() {
-        BOOL success = [block_self internalSendToCloud:block_self.cloudNetwork command:command];
+        BOOL success = [block_self.cloudNetwork submitCommand:command];
         if (success) {
             DLog(@"[Generic cmd: %d] send success", command.commandType);
         }
@@ -631,11 +631,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 @"value" : newValue.value,
         };
 
-        NSData *data = [bcmd serializeJson:payload];
-
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.command = data;
-        cmd.commandType = CommandType_MOBILE_COMMAND;
+        GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:CommandType_MOBILE_COMMAND];
 
         Network *network = [self localNetworkForAlmond:almondMac];
         [network submitCommand:cmd];
@@ -1761,7 +1757,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.pendingAlmondModeChange = nil;
     self.pendingNotificationPreferenceChange = nil;
     self.pendingRefreshNotificationsRequest = nil;
-    self.pendingNotificationCountRequest = nil;
     self.pendingClearNotificationCountRequest = nil;
     self.pendingAlmondStateAndSettingsRequest = nil;
 
@@ -1780,7 +1775,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
 
-    NetworkConfig *config = [NetworkConfig webSocketConfigAlmond:almondMac];
+    NetworkConfig *config = [NetworkConfig webSocketConfig:almondMac];
     config.host = settings.host;
     config.port = settings.port;
     config.password = settings.password;
@@ -1810,12 +1805,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     Network *network = self.localNetwork;
-    if (network) {
-        NetworkConfig *config = network.config;
-        return [config.almondMac isEqualToString:almondMac];
+    if (!network) {
+        return NO;
     }
 
-    return NO;
+    NetworkConfig *config = network.config;
+    return [config.almondMac isEqualToString:almondMac];
 }
 
 #pragma mark - NetworkDelegate methods
@@ -1869,10 +1864,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (BOOL)internalInitializeCloud:(Network *)network command:(GenericCommand *)command {
     return [network submitCloudInitializationCommand:command];
-}
-
-- (BOOL)internalSendToCloud:(Network *)network command:(GenericCommand *)command {
-    return [network submitCommand:command];
 }
 
 - (void)postNotification:(NSString *)notificationName data:(id)payload {
@@ -2636,7 +2627,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     NSLog(@"onNotificationCountResponse: clearing request tracking");
-    self.pendingNotificationCountRequest = nil;
 
     NotificationCountResponse *res = data[@"data"];
     if (res.error) {
@@ -2660,7 +2650,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     NSLog(@"onNotificationClearCountResponse: clearing request tracking");
-    self.pendingNotificationCountRequest = nil;
 
     NotificationClearCountResponse *res = data[@"data"];
     if (res.error) {
@@ -2712,30 +2701,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     [self internalAsyncFetchNotifications:nil];
-}
-
-- (void)tryFetchNotificationCount {
-    if (!self.config.enableNotifications) {
-        return;
-    }
-
-    NotificationCountRequest *pending = self.pendingNotificationCountRequest;
-    if (pending) {
-        if (![pending shouldExpireAfterSeconds:5]) {
-            // give the request 5 seconds to complete
-            NSLog(@"tryFetchNotificationCount: fail fast; already fetching latest count");
-            return;
-        }
-    }
-
-    NotificationCountRequest *req = [NotificationCountRequest new];
-    self.pendingNotificationCountRequest = req;
-
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_NOTIFICATIONS_COUNT_REQUEST;
-    cmd.command = req;
-
-    [self asyncSendToCloud:cmd];
 }
 
 // sends a command to clear the notification count

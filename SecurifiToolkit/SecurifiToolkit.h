@@ -356,8 +356,6 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 // Posts kSFINotificationDidStore when new notifications have been fetched.
 - (void)tryRefreshNotifications;
 
-- (void)tryFetchNotificationCount;
-
 // Called after all Notifications/Activity have been viewed. The Clear command is sent to the cloud to reset the
 // global state shared across all logged-in devices.
 - (void)tryClearNotificationCount;
