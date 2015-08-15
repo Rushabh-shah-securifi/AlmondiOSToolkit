@@ -146,7 +146,21 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_CAN_COOL,//md01
     SFIDevicePropertyType_CAN_HEAT,//md01
     SFIDevicePropertyType_HAS_FAN,//md01
-    
+    SFIDevicePropertyType_NEST_ID,//md01
+    SFIDevicePropertyType_CO_ALARM_STATE,//md01
+    SFIDevicePropertyType_SMOKE_ALARM_STATE,//md01
+    SFIDevicePropertyType_ISONLINE,//md01
+    SFIDevicePropertyType_AWAY_MODE,//md01
+    SFIDevicePropertyType_RESPONSE_CODE,//md01
+    SFIDevicePropertyType_THERMOSTAT_TARGET,//md01
+    SFIDevicePropertyType_THERMOSTAT_RANGE_LOW,//md01
+    SFIDevicePropertyType_THERMOSTAT_RANGE_HIGH,//md01
+    SFIDevicePropertyType_CURRENT_TEMPERATURE,//md01
+    SFIDevicePropertyType_IS_USING_EMERGENCY_HEAT,//md01
+    SFIDevicePropertyType_HVAC_STATE,//md01
+    SFIDevicePropertyType_HAS_LEAF,//md01
+    SFIDevicePropertyType_NEST_THERMOSTAT_MODE,//md01
+    SFIDevicePropertyType_NEST_THERMOSTAT_FAN_STATE,
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 
