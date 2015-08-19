@@ -37,9 +37,23 @@
 - (void)connect {
     NetworkConfig *config = self.config;
 
+    NSString *password = config.password;
+    NSString *host = config.host;
+
+    if (!host || !password) {
+        [self.delegate networkEndpointDidDisconnect:self];
+        return;
+    }
+
+    password = [password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
     // ws://192.168.1.102:7681/<password>
-    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@", config.host, (unsigned long) config.port, config.password];
+    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@", host, (unsigned long) config.port, password];
     NSURL *url = [NSURL URLWithString:connect_str];
+    if (!url) {
+        [self.delegate networkEndpointDidDisconnect:self];
+        return;
+    }
 
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
 
