@@ -240,6 +240,12 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
 
+//Current Temperature Format for UI
+- (BOOL)isCurrentTemperatureFormatFahrenheit;
+- (void)setCurrentTemperatureFormatFahrenheit:(BOOL)format;
+- (int)convertTemperatureToCurrentFormat:(int)temperature;
+- (NSString*)getTemperatureWithCurrentFormat:(int)temperature;
+
 // Nils out the current Almond selection
 - (void)removeCurrentAlmond;
 
@@ -367,6 +373,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (void)setNotificationsBadgeCount:(NSInteger)count;
 
 - (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId;
+
 
 @end
  
