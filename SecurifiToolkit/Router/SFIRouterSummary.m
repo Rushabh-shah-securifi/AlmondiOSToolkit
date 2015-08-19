@@ -31,16 +31,7 @@
         IV[i] = (char) ((MAC[i] + UPTIME[i]) % 94 + 33);
     }
 
-//    NSLog(@"payload: %@", pwd);
-//    NSLog(@"mac: %@", almondMac);
-//    NSLog(@"uptime: %@", self.uptime);
-//    NSLog(@"iv: %@", [self toHexString:IV length:kCCBlockSizeAES128]);
-
-//    NSData *payload = [self testData];
-//    NSData *encrypted = [self internalAesOp:kCCEncrypt payload:payload iv:IV];
-//    NSData *decrypted = [self internalAesOp:kCCDecrypt payload:encrypted iv:IV];
-
-    // Base64 decode the password
+    // Base64 decode the password and then decrypt
     NSData *payload = [[NSData alloc] initWithBase64EncodedString:pwd options:NSDataBase64DecodingIgnoreUnknownCharacters];
     NSData *decrypted = [self internalAesOp:kCCDecrypt payload:payload iv:IV];
 
@@ -81,28 +72,19 @@
     }
 
     NSData *data = [NSData dataWithBytes:buffer_out length:numBytesProcessed];
-    return data;
+    return [self trimToNull:data];
 }
 
-- (NSString *)toHexString:(int[])val length:(int)length {
-    NSString *out = @"";
-    for (int i = 0; i < length; i++) {
-        out = [out stringByAppendingFormat:@"%x", val[i]];
+- (NSData *)trimToNull:(NSData *)payload {
+    NSUInteger nullIndex = 0;
+    for (nullIndex = 0; nullIndex < payload.length; nullIndex++) {
+        unichar val;
+        [payload getBytes:&val range:NSMakeRange(nullIndex, 1)];
+        if (val == 0) {
+            payload = [payload subdataWithRange:NSMakeRange(0, nullIndex)];
+            break;
+        }
     }
-    return out;
-}
-
-- (NSData *)testData {
-    unichar plainText[kCCBlockSizeAES128];
-    bzero(plainText, kCCBlockSizeAES128);
-
-    plainText[0] = [@"g" characterAtIndex:0];
-    plainText[1] = [@"g" characterAtIndex:0];
-    plainText[2] = [@"g" characterAtIndex:0];
-    plainText[3] = [@"g" characterAtIndex:0];
-    plainText[4] = [@"g" characterAtIndex:0];
-
-    NSData *payload = [NSData dataWithBytes:plainText length:kCCBlockSizeAES128];
     return payload;
 }
 
