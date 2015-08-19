@@ -940,14 +940,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if ([self isCurrentTemperatureFormatFahrenheit]) {
         return temperature;
     }else{
-        return (temperature-32)/1.8;
+        return (int)lround((temperature-32)/1.8);
     }
 }
 - (NSString*)getTemperatureWithCurrentFormat:(int)temperature{
     if ([self isCurrentTemperatureFormatFahrenheit]) {
         return [NSString stringWithFormat:@"%d °F",temperature];
     }else{
-        return [NSString stringWithFormat:@"%d °C",(int)((temperature-32)/1.8)];
+        return [NSString stringWithFormat:@"%d °C",(int)lround((temperature-32)/1.8)];
     }
 }
 
