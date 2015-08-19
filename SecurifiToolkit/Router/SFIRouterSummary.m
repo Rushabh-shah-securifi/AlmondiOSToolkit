@@ -11,10 +11,16 @@
 #import "SFIRouterSummary.h"
 #import "SFIWirelessSetting.h"
 #import "SFIWirelessSummary.h"
-#import "Base64.h"
 
 @implementation SFIRouterSummary
 
+- (NSString *)toHexString:(int[])val length:(int)length {
+    NSString *out = @"";
+    for (int i = 0; i < length; i++) {
+        out = [out stringByAppendingFormat:@"%x", val[i]];
+    }
+    return out;
+}
 
 - (NSString *)decryptPassword:(NSString*)almondMac {
     NSString *pwd = self.password;
@@ -22,72 +28,50 @@
         return nil;
     }
 
+    // Compute the IV
     const char *MAC = [almondMac cStringUsingEncoding:NSUTF8StringEncoding];
     const char *UPTIME = [self.uptime cStringUsingEncoding:NSUTF8StringEncoding];;
 
     int IV[kCCBlockSizeAES128];
     bzero(IV, sizeof(IV));
 
-    NSString *out = @"";
-
-    int i;
-    for (i = 0; i < kCCBlockSizeAES128; i++) {
+    for (int i = 0; i < kCCBlockSizeAES128; i++) {
         IV[i] = ((MAC[i] + UPTIME[i]) % 94 + 33);
-
-        out = [out stringByAppendingFormat:@"%x", IV[i]];
     }
 
     NSLog(@"payload: %@", pwd);
     NSLog(@"mac: %@", almondMac);
     NSLog(@"uptime: %@", self.uptime);
-    NSLog(@"iv: %@", out);
+    NSLog(@"iv: %@", [self toHexString:IV length:kCCBlockSizeAES128]);
 
+    // Base64 decode the password
     NSData *data = [[NSData alloc] initWithBase64EncodedString:pwd options:NSDataBase64DecodingIgnoreUnknownCharacters];
-    return [self internalSecurifiAesOperation:kCCDecrypt payload:data iv:IV];
+    return [self internalAesDecrypt:data iv:IV];
 }
 
-- (NSString *)internalSecurifiAesOperation:(CCOperation)op payload:(NSData *)payload iv:(int[])ivPtr {
-    const CCAlgorithm algorithm = kCCAlgorithmAES128;
-
-    const size_t key_size = kCCKeySizeAES128;
-    const unichar keyPtr[] = {0x6e, 0xcc, 0x94, 0xed, 0x6a, 0x90, 1, 0x3d, 0x30, 0xaf, 0x52, 0xd, 0x18, 0x77, 0x44, 0x2f};
-
+- (NSString *)internalAesDecrypt:(NSData *)payload iv:(int[])iv {
     const size_t payload_length = payload.length;
-    unichar payload_in[payload_length];
-    bzero(payload_in, sizeof(payload_in));
 
-    [payload getBytes:payload_in length:payload_length];
+    // See the doc: For block ciphers, the output size will always be less than or
+    // equal to the input size plus the size of one block.
+    // That's why we need to add the size of one block here
+    const size_t buffer_size = payload_length + kCCBlockSizeAES128;
+    unsigned int buffer_out[buffer_size];
 
-//    NSString *dataStr = [NSString stringWithCharacters:payload.bytes length:payload_length];
-//    NSString *dataStr = [[NSString alloc] initWithData:payload encoding:NSUTF8StringEncoding];
-//    [dataStr getCharacters:payload_in range:NSMakeRange(0, payload_length)];
+    const CCOptions options = 0;  // defaults to CBC without padding
+    const unsigned int key[] = {0x6e, 0xcc, 0x94, 0xed, 0x6a, 0x90, 1, 0x3d, 0x30, 0xaf, 0x52, 0xd, 0x18, 0x77, 0x44, 0x2f};
 
-    const size_t buffer_size = 100;
-    unichar buffer_out[buffer_size];
-    bzero(buffer_out, sizeof(buffer_out));
-
-    size_t numBytesEncrypted = 0;
-
-    CCCryptorStatus cryptStatus = CCCrypt(op,
-            algorithm,
-            0, //kCCOptionPKCS7Padding,
-            keyPtr,
-            key_size,
-            ivPtr /* initialization vector (optional) */,
-            payload.bytes,
-            payload_length, /* input */
-            &buffer_out,
-            buffer_size, /* output */
-            &numBytesEncrypted);
+    size_t numBytesDecrypted = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(kCCDecrypt, kCCAlgorithmAES128, options, key, kCCKeySizeAES128, iv, payload.bytes, payload_length, buffer_out, buffer_size, &numBytesDecrypted);
 
     NSString *resultString;
     if (cryptStatus == kCCSuccess) {
-        resultString = [[NSString alloc] initWithCharacters:buffer_out length:numBytesEncrypted];
+        NSData *data = [NSData dataWithBytes:buffer_out length:numBytesDecrypted];
+        resultString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     }
 
     return resultString;
 }
-
 
 - (void)updateWirelessSummaryWithSettings:(NSArray*)wirelessSettings {
     for (SFIWirelessSummary *sum in self.wirelessSummaries) {
