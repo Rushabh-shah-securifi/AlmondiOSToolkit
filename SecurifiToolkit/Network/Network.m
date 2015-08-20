@@ -387,17 +387,12 @@
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
     if (self.networkConfig.mode == NetworkEndpointMode_web_socket) {
         [self markConnectionState:NetworkConnectionStatusInitialized];
-        if (!self.networkUpNoticePosted) {
-            self.networkUpNoticePosted = YES;
-            [self postData:NETWORK_UP_NOTIFIER data:nil];
-        }
     }
-    else {
-        if (!self.networkUpNoticePosted) {
-            [self.delegate networkConnectionDidEstablish:self];
-            self.networkUpNoticePosted = YES;
-            [self postData:NETWORK_UP_NOTIFIER data:nil];
-        }
+
+    if (!self.networkUpNoticePosted) {
+        [self.delegate networkConnectionDidEstablish:self];
+        self.networkUpNoticePosted = YES;
+        [self postData:NETWORK_UP_NOTIFIER data:nil];
     }
 }
 
