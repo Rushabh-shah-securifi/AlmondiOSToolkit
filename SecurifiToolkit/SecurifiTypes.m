@@ -135,7 +135,21 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"CAN_COOL" : @(SFIDevicePropertyType_CAN_COOL),//md01
                         @"CAN_HEAT" : @(SFIDevicePropertyType_CAN_HEAT),//md01
                         @"HAS_FAN" : @(SFIDevicePropertyType_HAS_FAN),//md01
-                        
+                        @"NEST_ID" : @(SFIDevicePropertyType_NEST_ID),//md01
+                        @"CO_ALARM_STATE" : @(SFIDevicePropertyType_CO_ALARM_STATE),//md01
+                        @"SMOKE_ALARM_STATE" : @(SFIDevicePropertyType_SMOKE_ALARM_STATE),//md01
+                        @"ISONLINE" : @(SFIDevicePropertyType_ISONLINE),//md01
+                        @"AWAY_MODE" : @(SFIDevicePropertyType_AWAY_MODE),//md01
+                        @"RESPONSE_CODE" : @(SFIDevicePropertyType_RESPONSE_CODE),//md01
+                        @"THERMOSTAT_MODE" : @(SFIDevicePropertyType_NEST_THERMOSTAT_MODE),
+                        @"THERMOSTAT_FAN_STATE" : @(SFIDevicePropertyType_NEST_THERMOSTAT_FAN_STATE),
+                        @"THERMOSTAT_TARGET" : @(SFIDevicePropertyType_THERMOSTAT_TARGET),//md01
+                        @"THERMOSTAT_RANGE_LOW" : @(SFIDevicePropertyType_THERMOSTAT_RANGE_LOW),//md01
+                        @"THERMOSTAT_RANGE_HIGH" : @(SFIDevicePropertyType_THERMOSTAT_RANGE_HIGH),//md01
+                        @"CURRENT_TEMPERATURE" : @(SFIDevicePropertyType_CURRENT_TEMPERATURE),//md01
+                        @"IS_USING_EMERGENCY_HEAT" : @(SFIDevicePropertyType_IS_USING_EMERGENCY_HEAT),//md01
+                        @"HVAC_STATE" : @(SFIDevicePropertyType_HVAC_STATE),//md01
+                        @"HAS_LEAF" : @(SFIDevicePropertyType_HAS_LEAF),//md01
                         };
     }
     return
