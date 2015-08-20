@@ -121,6 +121,7 @@
 		1DF0334B41969F41A2277D18 /* NetworkState.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0303DDB9378A8510BC7AA /* NetworkState.m */; };
 		1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03322D3DC410824316347 /* SFINotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03895670DA1C15314D2F8 /* SFINotification.m */; };
+		1DF033E4D5D09E5A6BCD7806 /* NSData+Securifi.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF031159AE3A393A5EC0204 /* NSData+Securifi.h */; };
 		1DF033F86547E8B8555F3561 /* NotificationClearCountResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0302CDB8965A050AD9FE6 /* NotificationClearCountResponse.m */; };
 		1DF034303C37A11B7DC547A6 /* Network.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0350AA74A3E1DB6F0FB69 /* Network.m */; };
 		1DF034D24160AD58745E639A /* Login.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF034839BEB39276F041984 /* Login.h */; };
@@ -150,6 +151,7 @@
 		1DF0391E21650F9E90235929 /* Login.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03C7EBCF2870EE8286168 /* Login.m */; };
 		1DF0394FB68EE0CD0700B060 /* LoginResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF03A406FB6E19CB2451868 /* LoginResponse.m */; };
 		1DF0398177D6DD566A25FA8B /* LogoutResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03E106E165456C1E264EC /* LogoutResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1DF03A369FB69FD247EF53C4 /* NSData+Securifi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0307DE1CC4DB1634A20D6 /* NSData+Securifi.m */; };
 		1DF03A62EE5637C369154114 /* NetworkEndpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03CCE2A1CB575A240FE08 /* NetworkEndpoint.h */; };
 		1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DF0331795B522861FD989FC /* NetworkConfig.m */; };
 		1DF03B1949689A39B13C7D41 /* NetworkConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 1DF03A6156A59D49A942855B /* NetworkConfig.h */; };
@@ -425,7 +427,9 @@
 		1DF0303DDB9378A8510BC7AA /* NetworkState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkState.m; sourceTree = "<group>"; };
 		1DF03048BDC4DD3CB8D3B224 /* DynamicAlmondModeChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicAlmondModeChange.m; sourceTree = "<group>"; };
 		1DF0306BCF4286F284285323 /* LogoutAllResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoutAllResponse.h; sourceTree = "<group>"; };
+		1DF0307DE1CC4DB1634A20D6 /* NSData+Securifi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Securifi.m"; sourceTree = "<group>"; };
 		1DF030ADDC3DE8F3592D6848 /* NotificationCountResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCountResponse.h; sourceTree = "<group>"; };
+		1DF031159AE3A393A5EC0204 /* NSData+Securifi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Securifi.h"; sourceTree = "<group>"; };
 		1DF0314E602EB9928C27AC69 /* CloudEndpoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudEndpoint.m; sourceTree = "<group>"; };
 		1DF031525512886EC02E8E6E /* NotificationCountResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationCountResponse.m; sourceTree = "<group>"; };
 		1DF0317A8DDEF36E96CAE5D1 /* LogoutResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogoutResponse.m; sourceTree = "<group>"; };
@@ -770,6 +774,8 @@
 			children = (
 				1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */,
 				1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */,
+				1DF0307DE1CC4DB1634A20D6 /* NSData+Securifi.m */,
+				1DF031159AE3A393A5EC0204 /* NSData+Securifi.h */,
 			);
 			path = AppKit;
 			sourceTree = "<group>";
@@ -1309,6 +1315,7 @@
 				1DF035F57F29A54222660EEB /* LogoutAllResponse.h in Headers */,
 				1C2F605B1B69D6F3001CCA34 /* MDJSON.h in Headers */,
 				1DF03D24E7252EEB274F79D7 /* CommandTypeScoreboardEvent.h in Headers */,
+				1DF033E4D5D09E5A6BCD7806 /* NSData+Securifi.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1585,6 +1592,7 @@
 				1DF03FE22D7AB1C44290B0BC /* CommandTypeScoreboardEvent.m in Sources */,
 				1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */,
 				1DF030BA38ACE415D8B22060 /* SecurifiTypes.m in Sources */,
+				1DF03A369FB69FD247EF53C4 /* NSData+Securifi.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
