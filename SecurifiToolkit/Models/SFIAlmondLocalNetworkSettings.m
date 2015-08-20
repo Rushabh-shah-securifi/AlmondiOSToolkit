@@ -54,7 +54,7 @@
         NSTimeInterval cid = [NSDate date].timeIntervalSince1970;
         NSDictionary *payload = @{
                 @"MobileInternalIndex" : @(cid),
-                @"CommandType" : @"GetAlmondNameandMAC",
+                @"CommandType" : @"GetAlmondNameAndMAC",
         };
 
         GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:CommandType_ALMOND_NAME_AND_MAC_REQUEST];
@@ -196,7 +196,7 @@
     [coder encodeObject:self.login forKey:@"self.login"];
 
     NSString *password = self.password;
-    if (password) {
+    if (password.length > 0) {
         NSString *serviceName = [self makeKeychainServiceName];
         [KeyChainWrapper createEntryForUser:SEC_PASSWORD entryValue:password forService:serviceName];
     }
