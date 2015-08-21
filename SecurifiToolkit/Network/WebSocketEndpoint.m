@@ -12,6 +12,7 @@
 #import "AlmondModeChangeResponse.h"
 #import "SFIDevicesList.h"
 #import "SFIGenericRouterCommand.h"
+#import "DynamicAlmondModeChange.h"
 
 
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
@@ -113,12 +114,14 @@
     else if ([commandType isEqualToString:@"DeviceUpdated"]) {
         DeviceListResponse *res = [DeviceListResponse parseJson:payload];
         res.type = DeviceListResponseType_updated;
+        res.updatedDevicesOnly = YES;
         res.almondMAC = self.config.almondMac;
 
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
     }
     else if ([commandType isEqualToString:@"DeviceAdded"]) {
         DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        res.updatedDevicesOnly = YES;
         res.type = DeviceListResponseType_added;
         res.almondMAC = self.config.almondMac;
 
@@ -126,6 +129,7 @@
     }
     else if ([commandType isEqualToString:@"DeviceRemoved"]) {
         DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        res.updatedDevicesOnly = YES;
         res.type = DeviceListResponseType_removed;
         res.almondMAC = self.config.almondMac;
 
@@ -140,6 +144,7 @@
     }
     else if ([commandType isEqualToString:@"devicelist"]) {
         DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+        res.type = DeviceListResponseType_updated;
         res.almondMAC = self.config.almondMac;
 
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
@@ -147,6 +152,12 @@
     else if ([commandType isEqualToString:@"updatealmondmode"]) {
         AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
         [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
+    }
+    else if ([commandType isEqualToString:@"AlmondModeUpdated"]) {
+        DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
+        res.almondMAC = self.config.almondMac;
+
+        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
     }
     else if ([commandType isEqualToString:@"ClientsList"]) {
         SFIDevicesList *res = [SFIDevicesList parseJson:payload];
@@ -162,6 +173,9 @@
     else if ([commandType isEqualToString:@"GetAlmondNameandMAC"]) {
         // just send back raw dictionary for now
         [self.delegate networkEndpoint:self dispatchResponse:payload commandType:CommandType_ALMOND_NAME_AND_MAC_RESPONSE];
+    }
+    else {
+        NSLog(@"Unsupported command: %@", str);
     }
 }
 

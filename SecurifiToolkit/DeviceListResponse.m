@@ -142,4 +142,18 @@
     return values;
 }
 
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.type=%d", self.type];
+    [description appendFormat:@", self.isSuccessful=%d", self.isSuccessful];
+    [description appendFormat:@", self.updatedDevicesOnly=%d", self.updatedDevicesOnly];
+    [description appendFormat:@", self.deviceCount=%u", self.deviceCount];
+    [description appendFormat:@", self.reason=%@", self.reason];
+    [description appendFormat:@", self.almondMAC=%@", self.almondMAC];
+    [description appendFormat:@", self.deviceList=%@", self.deviceList];
+    [description appendFormat:@", self.deviceValueList=%@", self.deviceValueList];
+    [description appendString:@">"];
+    return description;
+}
+
 @end

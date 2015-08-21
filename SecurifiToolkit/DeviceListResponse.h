@@ -22,11 +22,14 @@ typedef NS_ENUM(unsigned int, DeviceListResponseType) {
 @property(nonatomic) enum DeviceListResponseType type;
 
 @property(nonatomic) BOOL isSuccessful;
+@property(nonatomic) BOOL updatedDevicesOnly; // when true, the data only represents the devices that were changed and does not represent the complete set of devices; used in web socket mode which only sends partial data; cloud sends all data.
 @property(nonatomic) unsigned int deviceCount;
 @property(nonatomic, copy) NSString *reason;
-@property(nonatomic) NSMutableArray *deviceList; // SFIDevice
-@property(nonatomic, copy) NSString *almondMAC; //For dynamic update
 
+@property(nonatomic, copy) NSString *almondMAC; //For dynamic update
+@property(nonatomic) NSMutableArray *deviceList; // SFIDevice
 @property(nonatomic) NSMutableArray *deviceValueList; // SFIDeviceValue optional list set when processing local connections; this is a hack!
+
+- (NSString *)description;
 
 @end

@@ -476,7 +476,8 @@
         case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DEVICE_LIST_AND_VALUES_NOTIFIER data:payload];
-        };
+            break;
+        }
 
         case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];

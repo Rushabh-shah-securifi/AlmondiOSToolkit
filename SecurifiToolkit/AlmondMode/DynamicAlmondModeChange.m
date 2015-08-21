@@ -6,7 +6,24 @@
 #import "DynamicAlmondModeChange.h"
 
 
-@implementation DynamicAlmondModeChange {
+@implementation DynamicAlmondModeChange
 
++ (DynamicAlmondModeChange *)parseJson:(NSDictionary *)payload {
+    //"{"commandtype":"AlmondModeUpdated","data":{"2":{"emailid":"msd@mingfu.tw"}}}"
+
+    DynamicAlmondModeChange *res = DynamicAlmondModeChange.new;
+    res.success = YES;
+
+    NSDictionary *data = payload[@"data"];
+
+    NSString *modeValue = data.allKeys.firstObject;
+    if (modeValue) {
+        res.mode = (SFIAlmondMode) modeValue.intValue;
+        res.userId = data[modeValue];
+
+    }
+
+    return res;
 }
+
 @end

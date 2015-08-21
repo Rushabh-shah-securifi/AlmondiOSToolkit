@@ -2159,8 +2159,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NSString *almondMAC = obj.almondMAC;
     NSMutableArray *newDeviceList = obj.deviceList;
-    
-    [self processDeviceListChange:almondMAC newDevices:newDeviceList requestValues:YES];
+
+    [self processDeviceListChange:newDeviceList mac:almondMAC requestValues:YES partialList:NO];
+    [self postNotification:kSFIDidChangeDeviceList data:almondMAC];
 }
 
 - (void)onDeviceListResponse:(id)sender {
@@ -2187,7 +2188,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     // values not included in response, so request them
     BOOL requestValues = (obj.deviceValueList == nil);
-    [self processDeviceListChange:mac newDevices:newDevices requestValues:requestValues];
+    [self processDeviceListChange:newDevices mac:mac requestValues:requestValues partialList:NO];
+    [self postNotification:kSFIDidChangeDeviceList data:mac];
 }
 
 - (void)onDeviceListAndValuesResponse:(id)sender {
@@ -2210,21 +2212,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NSString *mac = res.almondMAC;
     
+    const BOOL partialList = res.updatedDevicesOnly;
+    
     switch (res.type) {
         case DeviceListResponseType_updated: {
-            // values not included in response, so request them
-            NSArray *newDevices = res.deviceList;
-            
-            if (res.deviceValueList) {
-                [self processDeviceListChange:mac newDevices:newDevices requestValues:NO];
-                
-                // Update offline storage
-                [self.dataManager writeDeviceValueList:res.deviceValueList almondMac:mac];
-                
-                [self postNotification:kSFIDidChangeDeviceValueList data:mac];
+            NSArray *deviceList = res.deviceList;
+            NSArray *valueList = res.deviceValueList;
+
+            if (valueList) {
+                [self processDeviceListChange:deviceList mac:mac requestValues:NO partialList:partialList];
+                [self processDeviceValueList:valueList mac:mac];
+                [self postNotification:kSFIDidChangeDeviceList data:mac];
             }
             else {
-                [self processDeviceListChange:mac newDevices:newDevices requestValues:YES];
+                // values not included in response, so request them
+                [self processDeviceListChange:deviceList mac:mac requestValues:YES partialList:partialList];
+                [self postNotification:kSFIDidChangeDeviceList data:mac];
             }
             
             break;
@@ -2234,9 +2237,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             for (SFIDevice *device in res.deviceList) {
                 current = [SFIDevice addDevice:device list:current];
             }
-            
-            [self processDeviceListChange:mac newDevices:current requestValues:YES];
-            
+
+            [self processDeviceListChange:current mac:mac requestValues:YES partialList:NO];
+            [self postNotification:kSFIDidChangeDeviceList data:mac];
+
             break;
         };
         case DeviceListResponseType_removed: {
@@ -2244,9 +2248,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             for (SFIDevice *device in res.deviceList) {
                 current = [SFIDevice removeDevice:device list:current];
             }
-            
-            [self processDeviceListChange:mac newDevices:current requestValues:YES];
-            
+
+            [self processDeviceListChange:current mac:mac requestValues:YES partialList:NO];
+            [self postNotification:kSFIDidChangeDeviceList data:mac];
+
             break;
         };
         case DeviceListResponseType_removed_all: {
@@ -2255,21 +2260,44 @@ static SecurifiToolkit *toolkit_singleton = nil;
             break;
         }
     }
-    
 }
 
 // Processes device lists received in dynamic and on-demand updates.
 // After storing the new list, a notification is posted and an updated values list is requested
-- (void)processDeviceListChange:(NSString *)mac newDevices:(NSArray *)newDevices requestValues:(BOOL)requestValues {
-    [self.dataManager writeDeviceList:newDevices almondMac:mac];
+- (void)processDeviceListChange:(NSArray *)changedDevices mac:(NSString *)mac requestValues:(BOOL)requestValues partialList:(BOOL)partialList {
+    if (partialList) {
+        // mix in the devices with the new ones
+        NSArray *devices = [self.dataManager readDeviceList:mac];
+
+        if (devices) {
+            NSMutableArray *new_list = [NSMutableArray array];
+            for (SFIDevice *device in devices) {
+                BOOL foundDevice = NO;
+
+                for (SFIDevice *newDevice in changedDevices) {
+                    if (device.deviceID == newDevice.deviceID) {
+                        // then update
+                        foundDevice = YES;
+                        [new_list addObject:newDevice];
+                        break;
+                    }
+                }
+
+                if (!foundDevice) {
+                    [new_list addObject:device];
+                }
+            }
+
+            changedDevices = new_list;
+        }
+    }
+
+    [self.dataManager writeDeviceList:changedDevices almondMac:mac];
     
     if (requestValues) {
         // Request values for devices
         [self asyncRequestDeviceValueList:mac];
     }
-    
-    // And tell the world there is a new list
-    [self postNotification:kSFIDidChangeDeviceList data:mac];
 }
 
 #pragma mark - Device Value Update callbacks
@@ -2284,7 +2312,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
     NSString *almondMac = obj.almondMAC;
     
-    [self processDynamicDeviceValueChange:obj currentMAC:almondMac];
+    [self processDeviceValueList:obj.deviceValueList mac:almondMac];
 }
 
 - (void)onDeviceValueListChange:(id)sender {
@@ -2308,18 +2336,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 // Processes a dynamic change to a device value
-- (void)processDynamicDeviceValueChange:(DeviceValueResponse *)obj currentMAC:(NSString *)currentMAC {
+- (void)processDeviceValueList:(NSArray*)newDeviceValues mac:(NSString *)currentMAC {
     if (currentMAC.length == 0) {
         return;
     }
-    
-    NSMutableArray *cloudDeviceValueList = obj.deviceValueList;
+
     NSArray *currentDeviceValueList = [self.dataManager readDeviceValueList:currentMAC];
-    
+
     NSMutableArray *newDeviceValueList;
     if (currentDeviceValueList != nil) {
         for (SFIDeviceValue *currentValue in currentDeviceValueList) {
-            for (SFIDeviceValue *cloudValue in cloudDeviceValueList) {
+            for (SFIDeviceValue *cloudValue in newDeviceValues) {
                 if (currentValue.deviceID == cloudValue.deviceID) {
                     cloudValue.isPresent = YES;
                     
@@ -2345,11 +2372,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // Traverse the list and add the new value to offline list
         // If there are new values without corresponding devices, we know to request the device list.
         BOOL isDeviceMissing = NO;
-        if (cloudDeviceValueList.count > 0 && currentDeviceValueList.count == 0) {
+        if (newDeviceValues.count > 0 && currentDeviceValueList.count == 0) {
             isDeviceMissing = YES;
         }
         else {
-            for (SFIDeviceValue *currentCloudValue in cloudDeviceValueList) {
+            for (SFIDeviceValue *currentCloudValue in newDeviceValues) {
                 if (!currentCloudValue.isPresent) {
                     [newDeviceValueList addObject:currentCloudValue];
                     isDeviceMissing = YES;
@@ -2362,14 +2389,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
             GenericCommand *command = [self makeDeviceHashCommand:currentMAC];
             [self asyncSendToCloud:command];
         }
+
+        // replace the list given to us with the combined new list
+        newDeviceValues = newDeviceValueList;
     }
-    else {
-        newDeviceValueList = cloudDeviceValueList;
-    }
-    
+
     // Update offline storage
-    [self.dataManager writeDeviceValueList:newDeviceValueList almondMac:currentMAC];
-    
+    [self.dataManager writeDeviceValueList:newDeviceValues almondMac:currentMAC];
+
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
 
