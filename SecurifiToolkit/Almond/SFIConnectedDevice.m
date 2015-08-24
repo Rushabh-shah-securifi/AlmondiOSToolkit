@@ -64,6 +64,10 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"appletv"]) {
         return @"icon_appleTV";
     }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"camera"]) {
+        return @"icon_camera";
+    }
+    
     return @"";
 }
 
