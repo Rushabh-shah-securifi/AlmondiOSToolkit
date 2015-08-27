@@ -58,7 +58,12 @@
             if (payload[@"client_type"]) {
                 type = payload[@"client_type"];
             }
-            obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],payload[@"alert"]];
+            NSString * alert = payload[@"alert"];
+
+            if ([alert rangeOfString:name].location != NSNotFound) {
+                alert = [alert stringByAppendingString:name];
+            }
+            obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
             obj.deviceType = SFIDeviceType_WIFIClient;
         }
     }
