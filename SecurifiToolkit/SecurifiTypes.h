@@ -65,6 +65,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_GarageDoorOpener_53           = 53,
     SFIDeviceType_NestThermostat_57             = 57,
     SFIDeviceType_NestSmokeDetector_58          = 58,
+    SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
     
     SFIDeviceType_count                         = 55, // always set to the last value; assumes sequence is continuous
 };
