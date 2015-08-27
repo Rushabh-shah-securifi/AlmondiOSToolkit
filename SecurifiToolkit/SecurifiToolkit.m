@@ -47,9 +47,10 @@
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "CommandTypeScoreboardEvent.h"
 
-#define kCURRENT_TEMPERATURE_FORMAT                        @"kCurrentThemperatureFormat"
+#define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
 #define kPREF_USER_DEFAULT_LOGGED_IN_ONCE                   @"kLoggedInOnce"
+#define kPREF_DEFAULT_CONNECTION_MODE                       @"kDefaultConnectionMode"
 
 #define SEC_SERVICE_NAME                                    @"securifiy.login_service"
 #define SEC_EMAIL                                           @"com.securifi.email"
@@ -228,13 +229,31 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - Connection management
 
+- (enum SFIAlmondConnectionMode)defaultConnectionMode {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    enum SFIAlmondConnectionMode mode = (enum SFIAlmondConnectionMode) [defaults integerForKey:kPREF_DEFAULT_CONNECTION_MODE];
+    return mode;
+}
+
+- (void)setDefaultConnectionMode:(enum SFIAlmondConnectionMode)mode {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:mode forKey:kPREF_DEFAULT_CONNECTION_MODE];
+}
+
 - (enum SFIAlmondConnectionMode)connectionModeForAlmond:(NSString *)almondMac {
     if (!self.config.enableLocalNetworking) {
         return SFIAlmondConnectionMode_cloud;
     }
-    
+
+    enum SFIAlmondConnectionMode defaultMode = [self defaultConnectionMode];
+
+    if (defaultMode == SFIAlmondConnectionMode_cloud) {
+        return defaultMode;
+    }
+
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-    return settings.enabled ? SFIAlmondConnectionMode_local: SFIAlmondConnectionMode_cloud;
+    enum SFIAlmondConnectionMode almondMode = settings.enabled ? SFIAlmondConnectionMode_local: SFIAlmondConnectionMode_cloud;
+    return almondMode;
 }
 
 - (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac {
@@ -244,9 +263,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
         settings.enabled = (mode == SFIAlmondConnectionMode_local);
         [self storeLocalNetworkSettings:settings];
     }
-    
+
+    [self setDefaultConnectionMode:mode];
+
     [self tryShutdownAndStartLocalConnection:mode almondMac:almondMac];
-    
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
 
@@ -774,6 +794,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)purgeStoredData {
+    [self setDefaultConnectionMode:SFIAlmondConnectionMode_cloud];
     [self removeCurrentAlmond];
     [self.dataManager purgeAll];
     if (self.configuration.enableNotifications) {
@@ -1352,32 +1373,32 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum SecurifiToolkitAlmondRouterRequest)type {
-    if (type == SecurifiToolkitAlmondRouterRequest_wifi_clients) {
+    if (self.config.enableLocalNetworking && type == SecurifiToolkitAlmondRouterRequest_wifi_clients) {
         BOOL local = [self useLocalNetwork:almondMac];
-        
+
         if (local) {
             BaseCommandRequest *bcmd = [BaseCommandRequest new];
-            
+
             NSDictionary *payload = @{
-                                      @"MobileInternalIndex" : @(bcmd.correlationId).stringValue,
-                                      @"CommandType" : @"ClientsList"
-                                      };
-            
+                    @"MobileInternalIndex" : @(bcmd.correlationId).stringValue,
+                    @"CommandType" : @"ClientsList"
+            };
+
             NSData *data = [bcmd serializeJson:payload];
-            
+
             GenericCommand *cmd = [GenericCommand new];
             cmd.command = data;
             cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
-            
+
             Network *network = [self localNetworkForAlmond:almondMac];
             [network submitCommand:cmd];
-            
+
             return;
         }
-        
+
         // else pass through
     }
-    
+
     NSString *data;
     switch (type) {
         case SecurifiToolkitAlmondRouterRequest_summary:
@@ -1397,16 +1418,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [self internalJSONRequestAlmondWifiClients:almondMac];
             return;
     }
-    
+
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMac;
     request.applicationID = APPLICATION_ID;
     request.data = data;
-    
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
-    
+
     [self asyncSendToCloud:cmd];
 }
 

@@ -199,7 +199,11 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device name:(NSString *)deviceName location:(NSString *)deviceLocation;
 
+// returns the default connection mode
+- (enum SFIAlmondConnectionMode)defaultConnectionMode;
+
 // returns the current connection interface used for communicating with the almond
+// this mode is a logical AND of the default mode and the per-Almond settings.
 - (enum SFIAlmondConnectionMode)connectionModeForAlmond:(NSString *)almondMac;
 
 // configures which connection interface to use for communicating with the almond
