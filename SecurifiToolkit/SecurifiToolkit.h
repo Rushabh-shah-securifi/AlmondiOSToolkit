@@ -85,6 +85,7 @@
 #import <SecurifiToolkit/AlmondVersionChecker.h>
 
 #import <SecurifiToolkit/SFIGenericRouterCommand.h>
+#import <SecurifiToolkit/SFIBlockedContent.h>
 #import <SecurifiToolkit/SFIBlockedDevice.h>
 #import <SecurifiToolkit/SFIConnectedDevice.h>
 #import <SecurifiToolkit/SFIDevicesList.h>
@@ -125,6 +126,9 @@ extern NSString *const kSFIDidCompleteAlmondModeChangeRequest;
 // Notification posted when an Almond Mode has changed;
 // payload contains an instance of SFIAlmondMode
 extern NSString *const kSFIAlmondModeDidChange;
+
+// Notification posted when a response to a generic Almond Router command is received
+extern NSString *const kSFIDidReceiveGenericAlmondRouterResponse;
 
 // Notification posted when a device has been added or removed. Does not post on changes to attributes like device names.
 extern NSString *const kSFIDidChangeDeviceList;

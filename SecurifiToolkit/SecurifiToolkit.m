@@ -46,6 +46,7 @@
 #import "NetworkConfig.h"
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "CommandTypeScoreboardEvent.h"
+#import "RouterCommandParser.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -76,6 +77,7 @@ NSString *const kSFIDidChangeAlmondConnectionMode = @"kSFIDidChangeAlmondConnect
 NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 NSString *const kSFIDidCompleteAlmondModeChangeRequest = @"kSFIDidCompleteAlmondChangeRequest";
 NSString *const kSFIAlmondModeDidChange = @"kSFIAlmondModeDidChange";
+NSString *const kSFIDidReceiveGenericAlmondRouterResponse = @"kSFIDidReceiveGenericAlmondRouterResponse";
 NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
 NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
@@ -186,7 +188,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [center addObserver:self selector:@selector(onDynamicAlmondListAdd:) name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDynamicAlmondListDelete:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDynamicAlmondNameChange:) name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
-        
+
+        [center addObserver:self selector:@selector(onAlmondRouterGenericNotification:) name:GENERIC_COMMAND_CLOUD_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onAlmondRouterGenericCommandResponse:) name:GENERIC_COMMAND_NOTIFIER object:nil];
+        [center addObserver:self selector:@selector(onAlmondRouterCommandResponse:) name:ALMOND_COMMAND_RESPONSE_NOTIFIER object:nil];
+
         [center addObserver:self selector:@selector(onDynamicDeviceListChange:) name:DYNAMIC_DEVICE_DATA_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceListResponse:) name:DEVICE_DATA_NOTIFIER object:nil];
         
@@ -323,6 +329,29 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     [self.dataManager writeAlmondLocalNetworkSettings:settings];
+}
+
+- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString*)almondMac withRouterSummary:(const SFIRouterSummary *)summary {
+    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+    if (!settings) {
+        settings = [SFIAlmondLocalNetworkSettings new];
+        settings.almondplusMAC = almondMac;
+    }
+
+    if (summary.login) {
+        settings.login = summary.login;
+    }
+    if (summary.password) {
+        NSString *decrypted = [summary decryptPassword:almondMac];
+        if (decrypted) {
+            settings.password = decrypted;
+        }
+    }
+    if (summary.url) {
+        settings.host = summary.url;
+    }
+
+    [self setLocalNetworkSettings:settings];
 }
 
 // for changing network settings
@@ -2104,6 +2133,78 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
         return currentAlmond;
     }
+}
+
+#pragma mark - Generic Almond Router commmand callbacks
+
+- (void)onAlmondRouterGenericNotification:(id)sender {
+    self.pendingAlmondStateAndSettingsRequest = nil;
+
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    GenericCommandResponse *response = (GenericCommandResponse *) [data valueForKey:@"data"];
+    if (!response.isSuccessful) {
+        SFIGenericRouterCommand *routerCommand = [SFIGenericRouterCommand new];
+        routerCommand.almondMAC = response.almondMAC;
+        routerCommand.commandSuccess = NO;
+        routerCommand.responseMessage = response.reason;
+
+        [self postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
+    }
+    else {
+        SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:response];
+        routerCommand.almondMAC = response.almondMAC;
+
+        [self internalOnGenericRouterCommandResponse:routerCommand];
+    }
+}
+
+- (void)onAlmondRouterGenericCommandResponse:(id)sender {
+    self.pendingAlmondStateAndSettingsRequest = nil;
+
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    GenericCommandResponse *response = (GenericCommandResponse *) [data valueForKey:@"data"];
+
+    SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:response];
+    routerCommand.almondMAC = response.almondMAC;
+
+    [self internalOnGenericRouterCommandResponse:routerCommand];
+}
+
+- (void)onAlmondRouterCommandResponse:(id)sender {
+    self.pendingAlmondStateAndSettingsRequest = nil;
+
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+
+    SFIGenericRouterCommand *routerCommand = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
+    [self internalOnGenericRouterCommandResponse:routerCommand];
+}
+
+- (void)internalOnGenericRouterCommandResponse:(SFIGenericRouterCommand *)routerCommand {
+    if (routerCommand == nil) {
+        return;
+    }
+
+    if (routerCommand.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
+        // after receiving summary, we update the local wireless connection settings with the current login/password
+        SFIRouterSummary *summary = (SFIRouterSummary *) routerCommand.command;
+        [self tryUpdateLocalNetworkSettingsForAlmond:routerCommand.almondMAC withRouterSummary:summary];
+    }
+
+    [self postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
 }
 
 #pragma mark - Device List Update callbacks
