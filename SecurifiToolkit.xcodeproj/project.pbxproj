@@ -194,7 +194,6 @@
 		221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 221185C2178D371200EE23ED /* SecurifiToolkit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		221185F7178D453A00EE23ED /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 221185F6178D453A00EE23ED /* CoreFoundation.framework */; };
 		221185FD178D453A00EE23ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 221185FB178D453A00EE23ED /* InfoPlist.strings */; };
-		22118603178D4D6600EE23ED /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = 22118602178D4D6600EE23ED /* sample.png */; };
 		2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 2253388317A6B7380051BF0F /* AffiliationUserRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2253388617A6B7380051BF0F /* AffiliationUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253388417A6B7380051BF0F /* AffiliationUserRequest.m */; };
 		22A19D941797AC7A003E6148 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A19D931797AC7A003E6148 /* SystemConfiguration.framework */; };
@@ -516,7 +515,6 @@
 		221185FA178D453A00EE23ED /* SecurifiCloudResources-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SecurifiCloudResources-Info.plist"; sourceTree = "<group>"; };
 		221185FC178D453A00EE23ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		221185FE178D453A00EE23ED /* SecurifiCloudResources-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SecurifiCloudResources-Prefix.pch"; sourceTree = "<group>"; };
-		22118602178D4D6600EE23ED /* sample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sample.png; path = ../sample.png; sourceTree = "<group>"; };
 		2253388317A6B7380051BF0F /* AffiliationUserRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AffiliationUserRequest.h; sourceTree = "<group>"; };
 		2253388417A6B7380051BF0F /* AffiliationUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AffiliationUserRequest.m; sourceTree = "<group>"; };
 		22A19D931797AC7A003E6148 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -1021,7 +1019,6 @@
 		221185F9178D453A00EE23ED /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				22118602178D4D6600EE23ED /* sample.png */,
 				221185FA178D453A00EE23ED /* SecurifiCloudResources-Info.plist */,
 				221185FB178D453A00EE23ED /* InfoPlist.strings */,
 				221185FE178D453A00EE23ED /* SecurifiCloudResources-Prefix.pch */,
@@ -1418,7 +1415,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				221185FD178D453A00EE23ED /* InfoPlist.strings in Resources */,
-				22118603178D4D6600EE23ED /* sample.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
