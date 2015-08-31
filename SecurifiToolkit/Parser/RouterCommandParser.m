@@ -81,16 +81,17 @@
 @synthesize routerSummary, currentWirelessSummary, wirelessSummaryArray;
 
 + (SFIGenericRouterCommand *)parseRouterResponse:(GenericCommandResponse *)response {
-    //todo push all of this parsing and manipulation into the parser or SFIGenericRouterCommand!
+    NSData *data = response.decodedData;
 
-//    DLog(@"Response Data: %@", response.genericData);
-//    DLog(@"Decoded Data: %@", response.decodedData);
-
-    NSData *decoded_data = [response.decodedData copy];
-//    DLog(@"Data: %@", decoded_data);
+    if (data == nil || data.length < 8) {
+        SFIGenericRouterCommand *res = [SFIGenericRouterCommand new];
+        res.commandSuccess = NO;
+        res.responseMessage = response.reason;
+        return res;
+    }
 
     NSMutableData *genericData = [[NSMutableData alloc] init];
-    [genericData appendData:decoded_data];
+    [genericData appendData:data];
 
     unsigned int expectedDataLength;
     unsigned int commandData;
@@ -101,18 +102,22 @@
     //Remove 8 bytes from received command
     [genericData replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
 
-    NSString *decodedString = [[NSString alloc] initWithData:genericData encoding:NSUTF8StringEncoding];
-
     RouterCommandParser *sfiParser = [RouterCommandParser new];
-    return [sfiParser loadDataFromString:decodedString];
+    return [sfiParser internalParseData:genericData];
 }
 
 - (SFIGenericRouterCommand *)loadDataFromString:(NSString *)xmlString {
     NSData *data = [xmlString dataUsingEncoding:NSUTF8StringEncoding];
-    NSXMLParser *xmlparser = [[NSXMLParser alloc] initWithData:data];
+    return [self internalParseData:data];
+}
+
+- (SFIGenericRouterCommand *)internalParseData:(const NSData *)data {
+    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
+    parser.delegate = self;
+
     genericCommandResponse = [[SFIGenericRouterCommand alloc] init];
-    [xmlparser setDelegate:self];
-    [xmlparser parse];
+    [parser parse];
+
     return genericCommandResponse;
 }
 
