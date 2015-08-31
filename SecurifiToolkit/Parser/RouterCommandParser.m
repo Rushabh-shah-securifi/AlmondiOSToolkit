@@ -212,7 +212,7 @@
 
 - (void)parser:(NSXMLParser *)xmlParser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
     if ([elementName isEqualToString:REBOOT]) {
-        self.genericCommandResponse.commandSuccess = ([_currentNodeContent intValue] == 1);
+        self.genericCommandResponse.commandSuccess = ([self.currentNodeContent intValue] == 1);
     }
     else if ([elementName isEqualToString:CONNECTED_DEVICES]) {
         self.connectedDevices.deviceList = self.connectedDevicesArray;
@@ -228,7 +228,7 @@
         self.currentConnectedDevice.deviceIP = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:MAC]) {
-        self.currentConnectedDevice.deviceMAC = self.currentNodeContent; //[_currentNodeContent uppercaseString];
+        self.currentConnectedDevice.deviceMAC = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:BLOCKED_MAC]) {
         self.currentBlockedDevice.deviceMAC = self.currentNodeContent;
@@ -258,7 +258,7 @@
         self.currentWirelessSetting.password = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:CHANNEL]) {
-        self.currentWirelessSetting.channel = [_currentNodeContent intValue];
+        self.currentWirelessSetting.channel = [self.currentNodeContent intValue];
     }
     else if ([elementName isEqualToString:ENCRYPTION_TYPE]) {
         self.currentWirelessSetting.encryptionType = self.currentNodeContent;
