@@ -15,6 +15,7 @@
 #import "SFIRouterSummary.h"
 #import "SFIWirelessSummary.h"
 #import "GenericCommandResponse.h"
+#import "SFIBlockedContent.h"
 
 #define ROUTER_SEND_LOGS_RESPONSE   @"SendLogsResponse"
 #define ROUTER_SEND_LOGS_SUCCESS    @"success"
@@ -34,11 +35,9 @@
 #define MAC @"MAC"
 #define NO_ALMOND @"NO ALMOND"
 
-//PY 121113
 #define BLOCKED_MACS @"AlmondBlockedMACs"
 #define BLOCKED_MAC @"BlockedMAC"
 
-//PY 131113
 #define BLOCKED_CONTENT @"AlmondBlockedContent"
 #define BLOCKED_TEXT @"BlockedText"
 
@@ -54,8 +53,6 @@
 #define INDEX @"index"
 #define ACTION @"action"
 
-//PY 271113 - Router Summary
-
 #define ROUTER_SUMMARY @"AlmondRouterSummary"
 #define ENABLED @"enabled"
 #define ROUTER_UPTIME @"RouterUptime"
@@ -69,16 +66,33 @@
 #define ROUTER_LOGIN @"Login"
 #define ROUTER_PASSWORD @"TempPass"
 
-@implementation RouterCommandParser
+@interface RouterCommandParser () <NSXMLParserDelegate>
+@property(nonatomic, retain) SFIGenericRouterCommand *genericCommandResponse;
+@property(nonatomic, retain) NSMutableString *currentNodeContent;
 
-@synthesize currentNodeContent, parser, sensors;
-@synthesize currentKnownValue, knownValues;
-@synthesize genericCommandResponse;
-@synthesize connectedDevices, connectedDevicesArray, currentConnectedDevice;
-@synthesize blockedDevices, blockedDevicesArray, currentBlockedDevice;
-@synthesize blockedContent, blockedContentArray, currentBlockedContent;
-@synthesize currentWirelessSetting, wirelessSettings, wirelessSettingsArray;
-@synthesize routerSummary, currentWirelessSummary, wirelessSummaryArray;
+@property(nonatomic, retain) SFIDevicesList *connectedDevices;
+@property(nonatomic, retain) NSMutableArray *connectedDevicesArray;
+
+@property(nonatomic, retain) SFIConnectedDevice *currentConnectedDevice;
+
+@property(nonatomic, retain) SFIDevicesList *blockedDevices;
+@property(nonatomic, retain) NSMutableArray *blockedDevicesArray;
+@property(nonatomic, retain) SFIBlockedDevice *currentBlockedDevice;
+
+@property(nonatomic, retain) SFIDevicesList *blockedContent;
+@property(nonatomic, retain) NSMutableArray *blockedContentArray;
+@property(nonatomic, retain) SFIBlockedContent *currentBlockedContent;
+
+@property(nonatomic, retain) SFIDevicesList *wirelessSettings;
+@property(nonatomic, retain) NSMutableArray *wirelessSettingsArray;
+@property(nonatomic, retain) SFIWirelessSetting *currentWirelessSetting;
+
+@property(nonatomic, retain) SFIRouterSummary *routerSummary;
+@property(nonatomic, retain) NSMutableArray *wirelessSummaryArray;
+@property(nonatomic, retain) SFIWirelessSummary *currentWirelessSummary;
+@end
+
+@implementation RouterCommandParser
 
 + (SFIGenericRouterCommand *)parseRouterResponse:(GenericCommandResponse *)response {
     NSData *data = response.decodedData;
@@ -90,7 +104,7 @@
         return res;
     }
 
-    NSMutableData *genericData = [[NSMutableData alloc] init];
+    NSMutableData *genericData = [NSMutableData new];
     [genericData appendData:data];
 
     unsigned int expectedDataLength;
@@ -106,203 +120,200 @@
     return [sfiParser internalParseData:genericData];
 }
 
-- (SFIGenericRouterCommand *)loadDataFromString:(NSString *)xmlString {
-    NSData *data = [xmlString dataUsingEncoding:NSUTF8StringEncoding];
-    return [self internalParseData:data];
-}
+- (SFIGenericRouterCommand *)internalParseData:(NSData *)data {
+    self.genericCommandResponse = [SFIGenericRouterCommand new];
 
-- (SFIGenericRouterCommand *)internalParseData:(const NSData *)data {
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
+    NSXMLParser *parser= [[NSXMLParser alloc] initWithData:data];
     parser.delegate = self;
 
-    genericCommandResponse = [[SFIGenericRouterCommand alloc] init];
     [parser parse];
-
-    return genericCommandResponse;
+    return self.genericCommandResponse;
 }
 
+#pragma mark - NSXMLParserDelegate methods
+
 - (void)parser:(NSXMLParser *)xmlParser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
-    currentNodeContent = [NSMutableString string];
+    self.currentNodeContent = [NSMutableString string];
 
     if ([elementName isEqualToString:REBOOT]) {
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_REBOOT;
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_REBOOT;
     }
     else if ([elementName isEqualToString:CONNECTED_DEVICES]) {
-        connectedDevices = [[SFIDevicesList alloc] init];
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_CONNECTED_DEVICES;
-        connectedDevices.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
-        self.connectedDevicesArray = [[NSMutableArray alloc] init];
+        self.connectedDevices = [SFIDevicesList new];
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_CONNECTED_DEVICES;
+        self.connectedDevices.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
+        self.connectedDevicesArray = [NSMutableArray new];
     }
     else if ([elementName isEqualToString:CONNECTED_DEVICE]) {
-        self.currentConnectedDevice = [[SFIConnectedDevice alloc] init];
+        self.currentConnectedDevice = [SFIConnectedDevice new];
     }
     else if ([elementName isEqualToString:BLOCKED_MACS]) {
-        blockedDevices = [[SFIDevicesList alloc] init];
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_BLOCKED_MACS;
-        blockedDevices.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
-        self.blockedDevicesArray = [[NSMutableArray alloc] init];
+        self.blockedDevices = [SFIDevicesList new];
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_BLOCKED_MACS;
+        self.blockedDevices.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
+        self.blockedDevicesArray = [NSMutableArray new];
     }
     else if ([elementName isEqualToString:BLOCKED_MAC]) {
-        self.currentBlockedDevice = [[SFIBlockedDevice alloc] init];
+        self.currentBlockedDevice = [SFIBlockedDevice new];
     }
     else if ([elementName isEqualToString:BLOCKED_CONTENT]) {
-        blockedContent = [[SFIDevicesList alloc] init];
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_BLOCKED_CONTENT;
-        blockedDevices.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
-        self.blockedContentArray = [[NSMutableArray alloc] init];
+        self.blockedContent = [SFIDevicesList new];
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_BLOCKED_CONTENT;
+        self.blockedDevices.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
+        self.blockedContentArray = [NSMutableArray new];
     }
     else if ([elementName isEqualToString:BLOCKED_TEXT]) {
-        self.currentBlockedContent = [[SFIBlockedContent alloc] init];
+        self.currentBlockedContent = [SFIBlockedContent new];
     }
     else if ([elementName isEqualToString:WIRELESS_SETTINGS]) {
-        wirelessSettings = [[SFIDevicesList alloc] init];
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_WIRELESS_SETTINGS;
-        wirelessSettings.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
-        self.wirelessSettingsArray = [[NSMutableArray alloc] init];
+        self.wirelessSettings = [SFIDevicesList new];
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_WIRELESS_SETTINGS;
+        self.wirelessSettings.deviceCount = (unsigned int) [[attributeDict valueForKey:COUNT] intValue];
+        self.wirelessSettingsArray = [NSMutableArray new];
     }
     else if ([elementName isEqualToString:WIRELESS_SETTING]) {
-        if (genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SETTINGS) {
-            self.currentWirelessSetting = [[SFIWirelessSetting alloc] init];
+        if (self.genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SETTINGS) {
+            self.currentWirelessSetting = [SFIWirelessSetting new];
             self.currentWirelessSetting.index = [[attributeDict valueForKey:INDEX] intValue];;
             self.currentWirelessSetting.enabled = [[attributeDict valueForKey:ENABLED] isEqualToString:@"true"];;
         }
-        else if (genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
-            self.currentWirelessSummary = [[SFIWirelessSummary alloc] init];
+        else if (self.genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
+            self.currentWirelessSummary = [SFIWirelessSummary new];
             self.currentWirelessSummary.wirelessIndex = [[attributeDict valueForKey:INDEX] intValue];;
             self.currentWirelessSummary.enabled = [[attributeDict valueForKey:ENABLED] isEqualToString:@"true"];;
         }
     }
     else if ([elementName isEqualToString:ROUTER_SUMMARY]) {
-        routerSummary = [[SFIRouterSummary alloc] init];
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_WIRELESS_SUMMARY;
+        self.routerSummary = [SFIRouterSummary new];
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_WIRELESS_SUMMARY;
     }
     else if ([elementName isEqualToString:WIRELESS_SETTINGS_SUMMARY]) {
-        routerSummary.wirelessSettingsCount = [[attributeDict valueForKey:COUNT] intValue];
-        self.wirelessSummaryArray = [[NSMutableArray alloc] init];
+        self.routerSummary.wirelessSettingsCount = [[attributeDict valueForKey:COUNT] intValue];
+        self.wirelessSummaryArray = [NSMutableArray new];
     }
     else if ([elementName isEqualToString:CONNECTED_DEVICES_SUMMARY]) {
-        routerSummary.connectedDeviceCount = [[attributeDict valueForKey:COUNT] intValue];
+        self.routerSummary.connectedDeviceCount = [[attributeDict valueForKey:COUNT] intValue];
     }
     else if ([elementName isEqualToString:BLOCKED_MAC_SUMMARY]) {
-        routerSummary.blockedMACCount = [[attributeDict valueForKey:COUNT] intValue];
+        self.routerSummary.blockedMACCount = [[attributeDict valueForKey:COUNT] intValue];
     }
     else if ([elementName isEqualToString:BLOCKED_CONTENT_SUMMARY]) {
-        routerSummary.blockedContentCount = [[attributeDict valueForKey:COUNT] intValue];
+        self.routerSummary.blockedContentCount = [[attributeDict valueForKey:COUNT] intValue];
     }
     else if ([elementName isEqualToString:ROUTER_SEND_LOGS_RESPONSE]) {
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_SEND_LOGS_RESPONSE;
-        genericCommandResponse.commandSuccess = [[attributeDict valueForKey:ROUTER_SEND_LOGS_SUCCESS] isEqualToString:@"true"];
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_SEND_LOGS_RESPONSE;
+        self.genericCommandResponse.commandSuccess = [[attributeDict valueForKey:ROUTER_SEND_LOGS_SUCCESS] isEqualToString:@"true"];
     }
     else if ([elementName isEqualToString:ROUTER_SOFTWARE_UPDATE]) {
-        genericCommandResponse.commandType = SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE;
-        genericCommandResponse.commandSuccess = [[attributeDict valueForKey:ROUTER_SOFTWARE_UPDATE_SUCCESS] isEqualToString:@"true"];
+        self.genericCommandResponse.commandType = SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE;
+        self.genericCommandResponse.commandSuccess = [[attributeDict valueForKey:ROUTER_SOFTWARE_UPDATE_SUCCESS] isEqualToString:@"true"];
     }
 }
 
 - (void)parser:(NSXMLParser *)xmlParser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
     if ([elementName isEqualToString:REBOOT]) {
-        genericCommandResponse.commandSuccess = ([currentNodeContent intValue] == 1);
+        self.genericCommandResponse.commandSuccess = ([_currentNodeContent intValue] == 1);
     }
     else if ([elementName isEqualToString:CONNECTED_DEVICES]) {
-        [connectedDevices setDeviceList:self.connectedDevicesArray];
-        genericCommandResponse.command = connectedDevices;
+        self.connectedDevices.deviceList = self.connectedDevicesArray;
+        self.genericCommandResponse.command = self.connectedDevices;
     }
     else if ([elementName isEqualToString:CONNECTED_DEVICE]) {
         [self.connectedDevicesArray addObject:self.currentConnectedDevice];
     }
     else if ([elementName isEqualToString:NAME]) {
-        self.currentConnectedDevice.name = currentNodeContent;
+        self.currentConnectedDevice.name = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:IP]) {
-        self.currentConnectedDevice.deviceIP = currentNodeContent;
+        self.currentConnectedDevice.deviceIP = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:MAC]) {
-        self.currentConnectedDevice.deviceMAC = currentNodeContent; //[currentNodeContent uppercaseString];
+        self.currentConnectedDevice.deviceMAC = self.currentNodeContent; //[_currentNodeContent uppercaseString];
     }
     else if ([elementName isEqualToString:BLOCKED_MAC]) {
-        self.currentBlockedDevice.deviceMAC = currentNodeContent;
+        self.currentBlockedDevice.deviceMAC = self.currentNodeContent;
         [self.blockedDevicesArray addObject:self.currentBlockedDevice];
     }
     else if ([elementName isEqualToString:BLOCKED_MACS]) {
-        [blockedDevices setDeviceList:self.blockedDevicesArray];
-        genericCommandResponse.command = blockedDevices;
+        self.blockedDevices.deviceList = self.blockedDevicesArray;
+        self.genericCommandResponse.command = self.blockedDevices;
     }
     else if ([elementName isEqualToString:BLOCKED_TEXT]) {
-        self.currentBlockedContent.blockedText = currentNodeContent;
+        self.currentBlockedContent.blockedText = self.currentNodeContent;
         [self.blockedContentArray addObject:self.currentBlockedContent];
     }
     else if ([elementName isEqualToString:BLOCKED_CONTENT]) {
-        [blockedContent setDeviceList:self.blockedContentArray];
-        genericCommandResponse.command = blockedContent;
+        self.blockedContent.deviceList = self.blockedContentArray;
+        self.genericCommandResponse.command = self.blockedContent;
     }
     else if ([elementName isEqualToString:SSID]) {
-        if (genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SETTINGS) {
-            self.currentWirelessSetting.ssid = currentNodeContent;
+        if (self.genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SETTINGS) {
+            self.currentWirelessSetting.ssid = self.currentNodeContent;
         }
-        else if (genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
-            self.currentWirelessSummary.ssid = currentNodeContent;
+        else if (self.genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
+            self.currentWirelessSummary.ssid = self.currentNodeContent;
         }
     }
     else if ([elementName isEqualToString:WIRELESS_PASSWORD]) {
-        self.currentWirelessSetting.password = currentNodeContent;
+        self.currentWirelessSetting.password = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:CHANNEL]) {
-        self.currentWirelessSetting.channel = [currentNodeContent intValue];
+        self.currentWirelessSetting.channel = [_currentNodeContent intValue];
     }
     else if ([elementName isEqualToString:ENCRYPTION_TYPE]) {
-        self.currentWirelessSetting.encryptionType = currentNodeContent;
+        self.currentWirelessSetting.encryptionType = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:SECURITY]) {
-        self.currentWirelessSetting.security = currentNodeContent;
+        self.currentWirelessSetting.security = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:WIRELESS_MODE]) {
-        self.currentWirelessSetting.wirelessMode = currentNodeContent;
+        self.currentWirelessSetting.wirelessMode = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:COUNTRY_REGION]) {
-        self.currentWirelessSetting.countryRegion = currentNodeContent;
+        self.currentWirelessSetting.countryRegion = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:WIRELESS_SETTING]) {
-        if (genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SETTINGS) {
+        if (self.genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SETTINGS) {
             [self.wirelessSettingsArray addObject:self.currentWirelessSetting];
-        }//PY 271113 - Router Summary
-        else if (genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
+        }
+        else if (self.genericCommandResponse.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
             [self.wirelessSummaryArray addObject:self.currentWirelessSummary];
         }
     }
     else if ([elementName isEqualToString:WIRELESS_SETTINGS]) {
-        wirelessSettings.deviceList = self.wirelessSettingsArray;
-        genericCommandResponse.command = wirelessSettings;
+        self.wirelessSettings.deviceList = self.wirelessSettingsArray;
+        self.genericCommandResponse.command = self.wirelessSettings;
     }
     else if ([elementName isEqualToString:WIRELESS_SETTINGS_SUMMARY]) {
-        routerSummary.wirelessSummaries = self.wirelessSummaryArray;
+        self.routerSummary.wirelessSummaries = self.wirelessSummaryArray;
     }
     else if ([elementName isEqualToString:ROUTER_UPTIME]) {
-        routerSummary.routerUptime = currentNodeContent;
+        self.routerSummary.routerUptime = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:ROUTER_UPTIME_RAW]) {
-        routerSummary.uptime = currentNodeContent;
+        self.routerSummary.uptime = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:FIRMWARE_VERSION]) {
-        routerSummary.firmwareVersion = currentNodeContent;
+        self.routerSummary.firmwareVersion = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:ROUTER_URL]) {
-        routerSummary.url = currentNodeContent;
+        self.routerSummary.url = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:ROUTER_LOGIN]) {
-        routerSummary.login = currentNodeContent;
+        self.routerSummary.login = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:ROUTER_PASSWORD]) {
-        routerSummary.password = currentNodeContent;
+        self.routerSummary.password = self.currentNodeContent;
     }
     else if ([elementName isEqualToString:ROUTER_SUMMARY]) {
-        genericCommandResponse.command = routerSummary;
+        self.genericCommandResponse.command = self.routerSummary;
     }
     else if ([elementName isEqualToString:ROUTER_SEND_LOGS_REASON]) {
-        genericCommandResponse.responseMessage = currentNodeContent;
+        self.genericCommandResponse.responseMessage = self.currentNodeContent;
     }
-    else if (genericCommandResponse.commandType == SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE) {
+    else if (self.genericCommandResponse.commandType == SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE) {
         if ([elementName isEqualToString:ROUTER_SOFTWARE_UPDATE_PERCENTAGE]) {
-            NSMutableString *value = currentNodeContent;
+            NSMutableString *value = self.currentNodeContent;
             @try {
                 int num = value.intValue;
                 self.genericCommandResponse.completionPercentage = (unsigned int) num;
@@ -316,7 +327,7 @@
 
 - (void)parser:(NSXMLParser *)xmlParser foundCharacters:(NSString *)string {
     NSString *cleaned = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    [currentNodeContent appendString:cleaned];
+    [self.currentNodeContent appendString:cleaned];
 }
 
 @end
