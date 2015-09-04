@@ -195,8 +195,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_%d", type];
         case CommandType_GET_ALL_SCENES:
             return [NSString stringWithFormat:@"GET_ALL_SCENES_%d", type];
-        case CommandType_LIST_SCENE_RESPONSE:
-            return [NSString stringWithFormat:@"LIST_SCENE_RESPONSE_%d", type];
+//        case CommandType_LIST_SCENE_RESPONSE:
+//            return [NSString stringWithFormat:@"LIST_SCENE_RESPONSE_%d", type];
         case CommandType_DYNAMIC_DELETE_SCENE_REQUEST:
             return [NSString stringWithFormat:@"DYNAMIC_DELETE_SCENE_REQUEST_%d", type];
         case CommandType_WIFI_CLIENTS_LIST_REQUEST:
@@ -321,7 +321,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_UPDATE_REQUEST:
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
         case CommandType_GET_ALL_SCENES:
-        case CommandType_LIST_SCENE_RESPONSE:
+//        case CommandType_LIST_SCENE_RESPONSE:
         case CommandType_DYNAMIC_DELETE_SCENE_REQUEST:
         case CommandType_WIFI_CLIENTS_LIST_REQUEST:
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
@@ -347,7 +347,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
         case CommandType_DEVICELOG_RESPONSE:
-        case CommandType_LIST_SCENE_RESPONSE:
+        case CommandType_GET_ALL_SCENES:
         case CommandType_COMMAND_RESPONSE:
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE:

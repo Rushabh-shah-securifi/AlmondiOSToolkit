@@ -354,7 +354,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                         parsedPayload = YES;
                                         break;
 
-                                    case CommandType_LIST_SCENE_RESPONSE:
+                                    case CommandType_GET_ALL_SCENES:
                                     case CommandType_COMMAND_RESPONSE:
                                     case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
                                     case CommandType_WIFI_CLIENTS_LIST_RESPONSE:

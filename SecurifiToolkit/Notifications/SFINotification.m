@@ -35,9 +35,6 @@
     obj.deviceId = (sfi_id) str.longLongValue;
     
     obj.deviceName = payload[@"devicename"];
-    if ([obj.deviceName isEqualToString:@"Basement (8E69)"]) {
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:obj.time];
-    }
     str = payload[@"devicetype"];
     obj.deviceType = (SFIDeviceType) str.intValue;
     

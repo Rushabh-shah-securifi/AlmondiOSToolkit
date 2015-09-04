@@ -109,8 +109,8 @@ typedef NS_ENUM(unsigned int, CommandType) {
 
     CommandType_UPDATE_REQUEST                          = 1061,
     CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE= 1301,
-    CommandType_GET_ALL_SCENES                          = 1041,
-    CommandType_LIST_SCENE_RESPONSE                     = 1054, //TEST 1042
+    CommandType_GET_ALL_SCENES                          = 1027,//was 1041
+//    CommandType_LIST_SCENE_RESPONSE                     = 1027, //TEST 1042
     CommandType_WIFI_CLIENTS_LIST_REQUEST               = 1523,
     CommandType_DYNAMIC_DELETE_SCENE_REQUEST            = 1053,
     CommandType_WIFI_CLIENTS_LIST_RESPONSE              = 1524,
