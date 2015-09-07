@@ -14,10 +14,12 @@
 #import "SFIGenericRouterCommand.h"
 #import "DynamicAlmondModeChange.h"
 
+typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
 @property(nonatomic, strong) PSWebSocket *socket;
 @property(nonatomic, strong) NetworkConfig *config;
+@property(nonatomic, readonly) NSDictionary *responseHandlers;
 @end
 
 @implementation WebSocketEndpoint
@@ -30,6 +32,7 @@
     self = [super init];
     if (self) {
         self.config = [config copy];
+        _responseHandlers = [self buildResponseHandlers];
     }
 
     return self;
@@ -104,75 +107,14 @@
     if (commandType.length == 0) {
         commandType = payload[@"CommandType"];
     }
-
-    if ([commandType isEqualToString:@"SensorUpdate"]) {
-        DeviceValueResponse *res = [DeviceValueResponse parseJson:payload];
-        res.almondMAC = self.config.almondMac;
-
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DYNAMIC_DEVICE_VALUE_LIST];
+    if (commandType.length == 0) {
+        NSLog(@"No command type specified for payload: %@", payload);
+        return;
     }
-    else if ([commandType isEqualToString:@"DeviceUpdated"]) {
-        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-        res.type = DeviceListResponseType_updated;
-        res.updatedDevicesOnly = YES;
-        res.almondMAC = self.config.almondMac;
 
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-    }
-    else if ([commandType isEqualToString:@"DeviceAdded"]) {
-        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-        res.updatedDevicesOnly = YES;
-        res.type = DeviceListResponseType_added;
-        res.almondMAC = self.config.almondMac;
-
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-    }
-    else if ([commandType isEqualToString:@"DeviceRemoved"]) {
-        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-        res.updatedDevicesOnly = YES;
-        res.type = DeviceListResponseType_removed;
-        res.almondMAC = self.config.almondMac;
-
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-    }
-    else if ([commandType isEqualToString:@"DeviceRemoveAll"]) {
-        DeviceListResponse *res = [DeviceListResponse new];
-        res.type = DeviceListResponseType_removed_all;
-        res.almondMAC = self.config.almondMac;
-
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-    }
-    else if ([commandType isEqualToString:@"devicelist"]) {
-        DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-        res.type = DeviceListResponseType_updated;
-        res.almondMAC = self.config.almondMac;
-
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-    }
-    else if ([commandType isEqualToString:@"updatealmondmode"]) {
-        AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
-    }
-    else if ([commandType isEqualToString:@"AlmondModeUpdated"]) {
-        DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
-        res.almondMAC = self.config.almondMac;
-
-        [self.delegate networkEndpoint:self dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
-    }
-    else if ([commandType isEqualToString:@"ClientsList"]) {
-        SFIDevicesList *res = [SFIDevicesList parseJson:payload];
-
-        SFIGenericRouterCommand *cmd = [SFIGenericRouterCommand new];
-        cmd.almondMAC = self.config.almondMac;
-        cmd.commandSuccess = YES;
-        cmd.commandType = SFIGenericRouterCommandType_CONNECTED_DEVICES;
-        cmd.command = res;
-
-        [self.delegate networkEndpoint:self dispatchResponse:cmd commandType:CommandType_ALMOND_COMMAND_RESPONSE];
-    }
-    else if ([commandType isEqualToString:@"GetAlmondNameandMAC"]) {
-        // just send back raw dictionary for now
-        [self.delegate networkEndpoint:self dispatchResponse:payload commandType:CommandType_ALMOND_NAME_AND_MAC_RESPONSE];
+    WebSocketResponseHandler handler = self.responseHandlers[commandType];
+    if (handler) {
+        handler(self, payload);
     }
     else {
         NSLog(@"Unsupported command: %@", str);
@@ -187,6 +129,84 @@
 - (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
     [self.delegate networkEndpointDidDisconnect:self];
     NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
+}
+
+- (NSDictionary *)buildResponseHandlers {
+    return @{
+            @"SensorUpdate" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                DeviceValueResponse *res = [DeviceValueResponse parseJson:payload];
+                res.almondMAC = endpoint.config.almondMac;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_DEVICE_VALUE_LIST];
+            },
+            @"DeviceUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+                res.type = DeviceListResponseType_updated;
+                res.updatedDevicesOnly = YES;
+                res.almondMAC = endpoint.config.almondMac;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+            },
+            @"DeviceAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+                res.updatedDevicesOnly = YES;
+                res.type = DeviceListResponseType_added;
+                res.almondMAC = endpoint.config.almondMac;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+            },
+            @"DeviceRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+                res.updatedDevicesOnly = YES;
+                res.type = DeviceListResponseType_removed;
+                res.almondMAC = endpoint.config.almondMac;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+            },
+            @"DeviceRemoveAll" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                DeviceListResponse *res = [DeviceListResponse new];
+                res.type = DeviceListResponseType_removed_all;
+                res.almondMAC = endpoint.config.almondMac;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+            },
+            @"devicelist" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                SFIDevicesList *res = [SFIDevicesList parseJson:payload];
+
+                SFIGenericRouterCommand *cmd = [SFIGenericRouterCommand new];
+                cmd.almondMAC = endpoint.config.almondMac;
+                cmd.commandSuccess = YES;
+                cmd.commandType = SFIGenericRouterCommandType_CONNECTED_DEVICES;
+                cmd.command = res;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:cmd commandType:CommandType_ALMOND_COMMAND_RESPONSE];
+            },
+            @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
+            },
+            @"AlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
+                res.almondMAC = endpoint.config.almondMac;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
+            },
+            @"ClientsList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                SFIDevicesList *res = [SFIDevicesList parseJson:payload];
+
+                SFIGenericRouterCommand *cmd = [SFIGenericRouterCommand new];
+                cmd.almondMAC = endpoint.config.almondMac;
+                cmd.commandSuccess = YES;
+                cmd.commandType = SFIGenericRouterCommandType_CONNECTED_DEVICES;
+                cmd.command = res;
+
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:cmd commandType:CommandType_ALMOND_COMMAND_RESPONSE];
+            },
+            @"GetAlmondNameandMAC" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                // just send back raw dictionary for now
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ALMOND_NAME_AND_MAC_RESPONSE];
+            },
+    };
 }
 
 @end
