@@ -5,7 +5,6 @@
 
 #import "SFINotification.h"
 #import "SFIDeviceKnownValues.h"
-#import "MDJSON.h"
 
 @implementation SFINotification
 

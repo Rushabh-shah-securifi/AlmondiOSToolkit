@@ -676,7 +676,7 @@
             break;
         };
 
-        case CommandType_LIST_SCENE_RESPONSE: {
+        case CommandType_GET_ALL_SCENES: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
