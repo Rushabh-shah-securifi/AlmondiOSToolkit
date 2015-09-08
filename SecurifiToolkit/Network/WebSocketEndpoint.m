@@ -76,7 +76,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
     [self.socket send:json];
-    DLog(@"Websocket send: %@", json);
+    NSLog(@"Websocket send: %@", json);
 
     return YES;
 }
@@ -89,7 +89,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
-    DLog(@"Websocket received a message: %@", message);
+    NSLog(@"Websocket receive: %@", message);
 
     NSString *str = message;
     NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
@@ -171,15 +171,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
             },
             @"devicelist" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                SFIDevicesList *res = [SFIDevicesList parseJson:payload];
+                DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+                res.almondMAC = self.config.almondMac;
 
-                SFIGenericRouterCommand *cmd = [SFIGenericRouterCommand new];
-                cmd.almondMAC = endpoint.config.almondMac;
-                cmd.commandSuccess = YES;
-                cmd.commandType = SFIGenericRouterCommandType_CONNECTED_DEVICES;
-                cmd.command = res;
-
-                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:cmd commandType:CommandType_ALMOND_COMMAND_RESPONSE];
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
             },
             @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                 AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
