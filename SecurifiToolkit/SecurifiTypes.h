@@ -59,15 +59,19 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_BinaryPowerSwitch_45          = 45,
     SFIDeviceType_SetPointThermostat_46         = 46,
     SFIDeviceType_HueLamp_48                    = 48,
+    SFIDeviceType_MultiSensor_49                = 49,
     SFIDeviceType_SecurifiSmartSwitch_50        = 50,
     SFIDeviceType_51                            = 51,
     SFIDeviceType_RollerShutter_52              = 52,
     SFIDeviceType_GarageDoorOpener_53           = 53,
+    SFIDeviceType_ZWtoACIRExtender_54           = 54,
+    SFIDeviceType_MultiSoundSiren_55            = 55,
+    SFIDeviceType_EnergyReader_56               = 56,
     SFIDeviceType_NestThermostat_57             = 57,
     SFIDeviceType_NestSmokeDetector_58          = 58,
     SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
     
-    SFIDeviceType_count                         = 55, // always set to the last value; assumes sequence is continuous
+    SFIDeviceType_count                         = 59, // always set to the last value; assumes sequence is continuous
 };
 
 // Converts a type into a standard mnemonic name suitable for event logging
