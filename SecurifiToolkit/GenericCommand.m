@@ -55,6 +55,8 @@
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DEVICE_DATA;
     cmd.command = deviceListCommand;
+    
+    return cmd;
 }
 
 + (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac {
