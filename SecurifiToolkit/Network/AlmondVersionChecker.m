@@ -19,16 +19,19 @@
     NSURLSessionDownloadTask *task = [session
             downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
                 if (error) {
+                    [self.delegate versionCheckerDidQueryVersion:almond result:AlmondVersionCheckerResult_cannotCompare currentVersion:currentVersion latestVersion:nil];
                     return;
                 }
 
                 NSData *data = [NSData dataWithContentsOfURL:location];
                 if (data.length == 0) {
+                    [self.delegate versionCheckerDidQueryVersion:almond result:AlmondVersionCheckerResult_cannotCompare currentVersion:currentVersion latestVersion:nil];
                     return;
                 }
 
                 NSString *latestVersion = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                 if (!latestVersion) {
+                    [self.delegate versionCheckerDidQueryVersion:almond result:AlmondVersionCheckerResult_cannotCompare currentVersion:currentVersion latestVersion:nil];
                     return;
                 }
 
