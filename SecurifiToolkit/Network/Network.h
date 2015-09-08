@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "CommandTypes.h"
 #import "SecurifiTypes.h"
+#import "NetworkConfig.h"
 
 typedef NS_ENUM(NSUInteger, NetworkConnectionStatus) {
     NetworkConnectionStatusUninitialized = 1,
@@ -27,7 +28,6 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 @class GenericCommand;
 @class SecurifiConfigurator;
 @class NetworkState;
-@class NetworkConfig;
 
 @protocol NetworkDelegate
 
@@ -48,6 +48,8 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 
 @property(nonatomic, weak) id <NetworkDelegate> delegate;
 
+// Indicates whether the config is for a Cloud connection or web socket connection
+@property(readonly) enum NetworkEndpointMode mode;
 @property(nonatomic, readonly) NetworkState *networkState;
 @property(nonatomic, readonly) enum NetworkConnectionStatus connectionState;
 @property(nonatomic, readonly) BOOL isStreamConnected;

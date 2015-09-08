@@ -12,7 +12,6 @@
 #import "NetworkState.h"
 #import "NetworkEndpoint.h"
 #import "CloudEndpoint.h"
-#import "NetworkConfig.h"
 #import "WebSocketEndpoint.h"
 
 @interface Network () <NetworkEndpointDelegate>
@@ -171,6 +170,10 @@
 }
 
 #pragma mark - state
+
+- (enum NetworkEndpointMode)mode {
+    return _networkConfig.mode;
+}
 
 - (BOOL)isStreamConnected {
     NetworkConnectionStatus status = self.connectionState;
