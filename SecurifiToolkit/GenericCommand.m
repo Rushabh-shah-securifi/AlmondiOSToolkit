@@ -7,6 +7,9 @@
 //
 
 #import "GenericCommand.h"
+#import "BaseCommandRequest.h"
+#import "DeviceValueRequest.h"
+#import "DeviceListRequest.h"
 
 @implementation GenericCommand
 
@@ -22,6 +25,45 @@
     GenericCommand *cmd = [GenericCommand new];
     cmd.command = data;
     cmd.commandType = commandType;
+
+    return cmd;
+}
+
++ (instancetype)websocketSensorDeviceListCommand {
+    return [self internalWebsocketSensorDeviceListCommand:CommandType_DEVICE_DATA];
+}
+
++ (instancetype)websocketSensorDeviceValueListCommand {
+    return [self internalWebsocketSensorDeviceListCommand:CommandType_DEVICE_VALUE];
+}
+
++ (GenericCommand *)internalWebsocketSensorDeviceListCommand:(enum CommandType)commandType {
+    BaseCommandRequest *bcmd = [BaseCommandRequest new];
+
+    NSDictionary *payload = @{
+            @"mii" : @(bcmd.correlationId).stringValue,
+            @"cmd" : @"devicelist"
+    };
+
+    return [GenericCommand jsonPayloadCommand:payload commandType:commandType];
+}
+
++ (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac {
+    DeviceListRequest *deviceListCommand = [DeviceListRequest new];
+    deviceListCommand.almondMAC = almondMac;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_DEVICE_DATA;
+    cmd.command = deviceListCommand;
+}
+
++ (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac {
+    DeviceValueRequest *command = [DeviceValueRequest new];
+    command.almondMAC = almondMac;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_DEVICE_VALUE;
+    cmd.command = command;
 
     return cmd;
 }
