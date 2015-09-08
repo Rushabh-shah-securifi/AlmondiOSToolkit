@@ -43,7 +43,6 @@
 #import "NotificationCountResponse.h"
 #import "NotificationClearCountResponse.h"
 #import "NotificationClearCountRequest.h"
-#import "NetworkConfig.h"
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "CommandTypeScoreboardEvent.h"
 #import "RouterCommandParser.h"
@@ -272,7 +271,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     [self setDefaultConnectionMode:mode];
 
-    [self tryShutdownAndStartLocalConnection:mode almondMac:almondMac];
+    [self tryShutdownAndStartNetworks:mode almondMac:almondMac];
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
 
@@ -285,7 +284,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     enum SFIAlmondConnectionMode mode = [self connectionModeForAlmond:almondMac];
     
     [self storeLocalNetworkSettings:settings];
-    [self tryShutdownAndStartLocalConnection:mode almondMac:almondMac];
+    [self tryShutdownAndStartNetworks:mode almondMac:almondMac];
 }
 
 - (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString*)almondMac {
@@ -356,21 +355,28 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 // for changing network settings
 // ensures a local connection for the specified almond is shutdown and, if needed, restarted
-- (void)tryShutdownAndStartLocalConnection:(enum SFIAlmondConnectionMode)mode almondMac:(NSString *)almondMac {
+- (void)tryShutdownAndStartNetworks:(enum SFIAlmondConnectionMode)mode almondMac:(NSString *)almondMac {
     if (!self.config.enableLocalNetworking) {
         return;
     }
     
     if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
         [self.localNetwork shutdown];
-        self.localNetwork = nil;
     }
     
     if (mode == SFIAlmondConnectionMode_local) {
         Network *network = [self localNetworkForAlmond:almondMac];
         [network connect];
+
+        [self.cloudNetwork shutdown];
+    }
+    else {
+        [self _asyncInitToolkit];
+        [self.localNetwork shutdown];
     }
 }
+
+#pragma mark - Connection and Network state reporting
 
 - (BOOL)isCloudConnecting {
     BOOL reachable = [self isCloudReachable];
@@ -382,6 +388,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     enum SFIAlmondConnectionStatus status = [self connectionStatusFromNetworkState:state];
     return status == SFIAlmondConnectionStatus_connecting;
+}
+
+- (BOOL)isNetworkOnline {
+    if ([self defaultConnectionMode] == SFIAlmondConnectionMode_cloud) {
+        return [self isCloudOnline];
+    }
+    else {
+        return self.localNetwork.isStreamConnected;
+    }
 }
 
 - (BOOL)isCloudOnline {
@@ -624,6 +639,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)asyncSendToCloud:(GenericCommand *)command {
     if (self.isShutdown) {
         DLog(@"SDK is shutdown. Returning.");
+        return;
+    }
+
+    if (self.defaultConnectionMode != SFIAlmondConnectionMode_cloud) {
         return;
     }
     
@@ -1013,7 +1032,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
-
 - (NSArray *)almondList {
     return [self.dataManager readAlmondList];
 }
@@ -1067,39 +1085,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
     Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
-    
+
     NetworkState *state = network.networkState;
     if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
         return;
     }
     [state markWillFetchDeviceListForAlmond:almondMac];
     
-    enum CommandType commandType = CommandType_DEVICE_DATA;
-    
     if (local) {
-        BaseCommandRequest *bcmd = [BaseCommandRequest new];
-        
-        NSDictionary *payload = @{
-                                  @"mii" : @(bcmd.correlationId).stringValue,
-                                  @"cmd" : @"devicelist"
-                                  };
-        
-        NSData *data = [bcmd serializeJson:payload];
-        
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.command = data;
-        cmd.commandType = commandType;
-        
+        GenericCommand *cmd = [GenericCommand websocketSensorDeviceListCommand];
         [network submitCommand:cmd];
     }
     else {
-        DeviceListRequest *deviceListCommand = [DeviceListRequest new];
-        deviceListCommand.almondMAC = almondMac;
-        
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.commandType = commandType;
-        cmd.command = deviceListCommand;
-        
+        GenericCommand *cmd = [GenericCommand cloudSensorDeviceListCommand:almondMac];
         [self asyncSendToCloud:cmd];
     }
 }
@@ -1107,51 +1105,34 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)asyncRequestDeviceValueList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
     Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
-    
-    enum CommandType commandType = CommandType_DEVICE_VALUE;
-    
+
+    NetworkState *state = network.networkState;
+    [state markDeviceValuesFetchedForAlmond:almondMac];
+
     if (local) {
-        BaseCommandRequest *bcmd = [BaseCommandRequest new];
-        
-        NSDictionary *payload = @{
-                                  @"mii" : @(bcmd.correlationId).stringValue,
-                                  @"cmd" : @"devicelist"
-                                  };
-        
-        NSData *data = [bcmd serializeJson:payload];
-        
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.command = data;
-        cmd.commandType = commandType;
-        
+        GenericCommand *cmd = [GenericCommand websocketSensorDeviceValueListCommand];
         [network submitCommand:cmd];
     }
     else {
-        DeviceValueRequest *command = [DeviceValueRequest new];
-        command.almondMAC = almondMac;
-        
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.commandType = commandType;
-        cmd.command = command;
-        
-        NetworkState *state = network.networkState;
-        [state markDeviceValuesFetchedForAlmond:almondMac];
+        GenericCommand *cmd = [GenericCommand cloudSensorDeviceValueListCommand:almondMac];
         [self asyncSendToCloud:cmd];
-        
         [self asyncRequestNotificationPreferenceList:almondMac];
     }
 }
 
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
-    NetworkState *state = self.cloudNetwork.networkState;
+    BOOL local = [self useLocalNetwork:almondMac];
+    Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
+
+    NetworkState *state = network.networkState;
     if ([state wasDeviceValuesFetchedForAlmond:almondMac]) {
         return NO;
     }
-    
     [state markDeviceValuesFetchedForAlmond:almondMac];
+
     [self asyncRequestDeviceValueList:almondMac];
     [self asyncRequestNotificationPreferenceList:almondMac];
-    
+
     return YES;
 }
 
@@ -1900,8 +1881,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)networkConnectionDidClose:(Network *)network {
     if (network == self.cloudNetwork) {
+        self.cloudNetwork = nil;
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
         [self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
+    }
+    else if (network == self.localNetwork) {
+        self.localNetwork = nil;
     }
 }
 

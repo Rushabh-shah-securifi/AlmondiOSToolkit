@@ -228,6 +228,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (BOOL)isCloudConnecting;
 
+- (BOOL)isNetworkOnline;
+
 - (BOOL)isCloudOnline;
 
 - (BOOL)isCloudReachable;
