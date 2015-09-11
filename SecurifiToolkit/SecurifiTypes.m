@@ -150,6 +150,15 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"IS_USING_EMERGENCY_HEAT" : @(SFIDevicePropertyType_IS_USING_EMERGENCY_HEAT),//md01
                         @"HVAC_STATE" : @(SFIDevicePropertyType_HVAC_STATE),//md01
                         @"HAS_LEAF" : @(SFIDevicePropertyType_HAS_LEAF),//md01
+                        @"AC MODE" : @(SFIDevicePropertyType_AC_MODE),//md01
+                        @"AC SETPOINT COOLING" : @(SFIDevicePropertyType_AC_SETPOINT_COOLING),//md01
+                        @"AC SETPOINT HEATING" : @(SFIDevicePropertyType_AC_SETPOINT_HEATING),//md01
+                        @"AC FAN MODE" : @(SFIDevicePropertyType_AC_FAN_MODE),//md01
+                        @"CONFIGURATION" : @(SFIDevicePropertyType_CONFIGURATION),//md01
+                        @"IR CODE" : @(SFIDevicePropertyType_IR_CODE),//md01
+                        @"AC SWING" : @(SFIDevicePropertyType_AC_SWING),//md01
+                        @"STOP" : @(SFIDevicePropertyType_STOP),//md01
+                        @"UP_DOWN" : @(SFIDevicePropertyType_UP_DOWN),//md01
                         };
     }
     return
