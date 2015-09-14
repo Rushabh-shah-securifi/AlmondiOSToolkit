@@ -178,7 +178,7 @@
         [SFIOfflineDataManager deleteFile:HASH_FILENAME];
         [SFIOfflineDataManager deleteFile:DEVICE_LIST_FILENAME];
         [SFIOfflineDataManager deleteFile:DEVICE_VALUE_FILENAME];
-        [SFIOfflineDataManager deleteFile:ALMOND_LOCAL_NETWORK_SETTINGS_FILENAME];
+//        [SFIOfflineDataManager deleteFile:ALMOND_LOCAL_NETWORK_SETTINGS_FILENAME];
 
         @synchronized (self.notification_syncLocker) {
             [SFIOfflineDataManager deleteFile:NOTIFICATION_PREF_FILENAME];

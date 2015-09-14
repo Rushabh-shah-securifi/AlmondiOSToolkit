@@ -23,6 +23,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.almondplusName = @"Unknown"; // name is not provided in the summary (why not!!!) so we make sure it is not null, but expect it to be properly set
         self.port = 7681; // default web socket port
     }
 
@@ -162,6 +163,15 @@
     dispatch_semaphore_signal(latch);
 
     return timedOut;
+}
+
+- (BOOL)completeSettings {
+    return self.almondplusName.length > 0 &&
+            self.almondplusMAC.length > 0 &&
+            self.host.length > 0 &&
+            self.port > 0 &&
+            self.login.length > 0 &&
+            self.password.length > 0;
 }
 
 - (id)initWithCoder:(NSCoder *)coder {

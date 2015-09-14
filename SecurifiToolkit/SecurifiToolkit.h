@@ -203,7 +203,12 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device name:(NSString *)deviceName location:(NSString *)deviceLocation;
 
-// returns the default connection mode
+// returns the mode being used by the current almond, or the default mode when a current almond is not specified
+- (enum SFIAlmondConnectionMode)currentConnectionMode;
+
+// returns the desired connection mode; this mode is ignored in some cases when the Almond does not support it
+// caller should use currentConnectionMode for actual one being used
+// default mode indicates  the desired system setting and is useful to the UI in some cases
 - (enum SFIAlmondConnectionMode)defaultConnectionMode;
 
 // returns the current connection interface used for communicating with the almond
@@ -225,8 +230,6 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
 
 - (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
-
-- (BOOL)isCloudConnecting;
 
 - (BOOL)isNetworkOnline;
 
@@ -267,6 +270,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // Fetch the local copy of the Almond's attached to the logon account
 - (NSArray *)almondList;
+
+// returns YES if a cloud affiliated almond exists; does not account for locally connected almond
+- (BOOL)almondExists:(NSString*)almondMac;
 
 // List of all Almonds that are locally linked only. Almonds that have both cloud and local links would be provided
 // by almondList method. Can return nil.
@@ -341,8 +347,6 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (void)asyncAlmondSummaryInfoRequest:(NSString *)almondMac;
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
-
-- (sfi_id)asyncSetAlmondWirelessUsersSettings:(NSString *)almondMAC blockedDeviceMacs:(NSArray *)deviceMAC;
 
 - (void)asyncRequestRegisterForNotification:(NSString *)deviceToken;
 
