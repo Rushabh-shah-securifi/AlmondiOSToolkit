@@ -340,6 +340,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     if (self.config.enableLocalNetworking) {
         enum SFIAlmondConnectionMode mode = [self connectionModeForAlmond:almondMac];
+
+        if (![self isCurrentConnectionModeCompatible:mode]) {
+            return SFIAlmondConnectionStatus_error_mode;
+        }
+
         switch (mode) {
             case SFIAlmondConnectionMode_cloud: {
                 status = [self cloudNetworkStatus];
@@ -360,7 +365,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     else {
         status = [self cloudNetworkStatus];
     }
-    
+
     return [self connectionStatusFromNetworkState:status];
 }
 

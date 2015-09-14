@@ -182,10 +182,11 @@ typedef NS_ENUM(unsigned int, SFIAlmondConnectionMode) {
 };
 
 typedef NS_ENUM(unsigned int, SFIAlmondConnectionStatus) {
-    SFIAlmondConnectionStatus_disconnected,
-    SFIAlmondConnectionStatus_connecting,
-    SFIAlmondConnectionStatus_connected,
-    SFIAlmondConnectionStatus_error,
+    SFIAlmondConnectionStatus_disconnected,     // link is down; default state on link instantiation and prior to bring-up
+    SFIAlmondConnectionStatus_connecting,       // link in process of being established and authenticated
+    SFIAlmondConnectionStatus_connected,        // link is established and normally operating
+    SFIAlmondConnectionStatus_error,            // indicates connection error of some sort
+    SFIAlmondConnectionStatus_error_mode,       // indicates that the almond is not compatible with the selected connection mode
 };
 
 // Per almond "mode" setting indicating
