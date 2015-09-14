@@ -59,8 +59,12 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 // makes an SFIAlmondPlus representation marked with SFIAlmondPlusLinkType_local_only
 - (SFIAlmondPlus *)asLocalLinkAlmondPlus;
 
-// indicates whether the settings are basically complete, though it does not indicate whether the login/pwd are valid.
-- (BOOL)completeSettings;
+// indicates whether the settings are basically complete needed for doing an initial connection to test credentials
+// and retrieve the remote Almond's MAC address.
+- (BOOL)hasBasicCompleteSettings;
+
+// indicates whether the settings are complete, though it does not indicate whether the login/pwd are valid.
+- (BOOL)hasCompleteSettings;
 
 - (id)initWithCoder:(NSCoder *)coder;
 

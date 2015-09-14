@@ -165,13 +165,17 @@
     return timedOut;
 }
 
-- (BOOL)completeSettings {
-    return self.almondplusName.length > 0 &&
-            self.almondplusMAC.length > 0 &&
-            self.host.length > 0 &&
+- (BOOL)hasBasicCompleteSettings {
+    return self.host.length > 0 &&
             self.port > 0 &&
             self.login.length > 0 &&
             self.password.length > 0;
+}
+
+- (BOOL)hasCompleteSettings {
+    return self.almondplusName.length > 0 &&
+            self.almondplusMAC.length > 0 &&
+            self.hasBasicCompleteSettings;
 }
 
 - (id)initWithCoder:(NSCoder *)coder {

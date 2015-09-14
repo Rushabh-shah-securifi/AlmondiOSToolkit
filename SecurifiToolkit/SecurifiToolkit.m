@@ -324,7 +324,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
-    if (![settings completeSettings]) {
+    if (![settings hasCompleteSettings]) {
         return;
     }
 
@@ -392,7 +392,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
     // guard against bad data
-    if (![settings completeSettings]) {
+    if (![settings hasCompleteSettings]) {
         return;
     }
     
