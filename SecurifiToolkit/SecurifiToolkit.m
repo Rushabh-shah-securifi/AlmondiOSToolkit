@@ -259,7 +259,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // check current almond config
     SFIAlmondPlus *current = [self currentAlmond];
     if (current) {
-        return current.linkType == mode;
+        if (current.linkType == SFIAlmondPlusLinkType_local_only) {
+            return mode == SFIAlmondConnectionMode_local;
+        }
     }
 
     // if no current almond, then we allow cloud connection (consider "logging in scenario"
