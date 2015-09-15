@@ -50,7 +50,7 @@
 
 - (SFIDevicePropertyType)statePropertyType {
     switch (self.deviceType) {
-        case SFIDeviceType_MultiLevelSwitch_2: {
+        case SFIDeviceType_MultiLevelSwitch_2:{
             return SFIDevicePropertyType_SWITCH_MULTILEVEL;
         }
             
@@ -87,6 +87,7 @@
         case SFIDeviceType_ColorDimmableLight_32:
         case SFIDeviceType_Shade_34:
         case SFIDeviceType_Siren_42:
+        case SFIDeviceType_MultiSwitch_43:
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
@@ -125,7 +126,6 @@
         case SFIDeviceType_PressureSensor_30:
         case SFIDeviceType_FlowSensor_31:
         case SFIDeviceType_HAPump_33:
-        case SFIDeviceType_MultiSwitch_43:
         case SFIDeviceType_SetPointThermostat_46:
         case SFIDeviceType_NestSmokeDetector_58:
         case SFIDeviceType_NestThermostat_57:
