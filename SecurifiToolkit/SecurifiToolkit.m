@@ -2106,28 +2106,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (obj == nil) {
         return;
     }
-    
-    NSArray *currentList = [self almondList];
-    for (SFIAlmondPlus *almond in currentList) {
-        if ([almond.almondplusMAC isEqualToString:obj.almondplusMAC]) {
-            //Change the name of the current almond in the offline list
-            almond.almondplusName = obj.almondplusName;
-            
-            // Save the change
-            [self.dataManager writeAlmondList:currentList];
-            
-            // Update the Current Almond
-            SFIAlmondPlus *plus = [self currentAlmond];
-            if ([plus.almondplusMAC isEqualToString:almond.almondplusMAC]) {
-                almond.colorCodeIndex = plus.colorCodeIndex;
-                [self setCurrentAlmond:almond];
-            }
-            
-            // Tell the world so they can update their view
-            [self postNotification:kSFIDidChangeAlmondName data:almond];
-            
-            return;
+
+    SFIAlmondPlus *changed = [self.dataManager changeAlmondName:obj.almondplusName almondMac:obj.almondplusMAC];
+    if (changed) {
+        SFIAlmondPlus *current = [self currentAlmond];
+        if ([current isEqualAlmondPlus:changed]) {
+            changed.colorCodeIndex = current.colorCodeIndex;
+            [self setCurrentAlmond:changed];
         }
+
+        // Tell the world so they can update their view
+        [self postNotification:kSFIDidChangeAlmondName data:changed];
     }
 }
 
