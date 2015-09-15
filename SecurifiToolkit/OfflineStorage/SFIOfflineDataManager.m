@@ -75,6 +75,32 @@
     return [self readListFromFilePath:self.almondListFp locker:self.syncLocker];
 }
 
+- (SFIAlmondPlus *)changeAlmondName:(NSString *)almondName almondMac:(NSString *)almondMac {
+    @synchronized (self.syncLocker) {
+        NSArray *currentList = [self readAlmondList];
+
+        for (SFIAlmondPlus *almond in currentList) {
+            if ([almond.almondplusMAC isEqualToString:almondMac]) {
+                //Change the name of the current almond in the offline list
+                almond.almondplusName = almondName;
+
+                // Save the change
+                [self writeAlmondList:currentList];
+
+                // update the local network settings also
+                SFIAlmondLocalNetworkSettings *local = [self readAlmondLocalNetworkSettings:almondMac];
+                local.almondplusName = almondName;
+
+                [self writeAlmondLocalNetworkSettings:local];
+
+                return almond;
+            }
+        }
+
+        return nil;
+    }
+}
+
 #pragma mark - Almonds Hash values
 
 // Write HashList for the current user to offline storage
@@ -167,18 +193,34 @@
 }
 
 - (void)deleteLocalNetworkSettingsForAlmond:(NSString *)strAlmondMac {
-    [self removedDictionaryEntryFromFilePath:self.almondLocalNetworkSettingsFp key:strAlmondMac locker:self.syncLocker];
+    SFIAlmondLocalNetworkSettings *settings = [self readAlmondLocalNetworkSettings:strAlmondMac];
+    if (settings) {
+        [settings purgePassword];
+        [self removedDictionaryEntryFromFilePath:self.almondLocalNetworkSettingsFp key:strAlmondMac locker:self.syncLocker];
+    }
 }
 
 #pragma mark - Deletion
 
 - (void)purgeAll {
     @synchronized (self.syncLocker) {
+        // before purging all almonds, we transfer almond names to the local settings to ensure names have a non-null value
+        NSDictionary *local = [self readAllAlmondLocalNetworkSettings];
+        NSArray *currentList = [self readAlmondList];
+
+        for (SFIAlmondPlus *almond in currentList) {
+            SFIAlmondLocalNetworkSettings *settings = local[almond.almondplusMAC];
+            if (settings) {
+                settings.almondplusName = almond.almondplusName;
+                [self writeAlmondLocalNetworkSettings:settings];
+            }
+        }
+
         [SFIOfflineDataManager deleteFile:ALMOND_LIST_FILENAME];
         [SFIOfflineDataManager deleteFile:HASH_FILENAME];
         [SFIOfflineDataManager deleteFile:DEVICE_LIST_FILENAME];
         [SFIOfflineDataManager deleteFile:DEVICE_VALUE_FILENAME];
-//        [SFIOfflineDataManager deleteFile:ALMOND_LOCAL_NETWORK_SETTINGS_FILENAME];
+        // preserve the local network settings as they are retained even when the user has logged out
 
         @synchronized (self.notification_syncLocker) {
             [SFIOfflineDataManager deleteFile:NOTIFICATION_PREF_FILENAME];

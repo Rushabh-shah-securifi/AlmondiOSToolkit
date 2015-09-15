@@ -17,6 +17,8 @@
 
 - (NSArray *)readAlmondList;
 
+- (SFIAlmondPlus *)changeAlmondName:(NSString*)name almondMac:(NSString *)almondMac;
+
 - (void)writeHashList:(NSString *)almondHashValue almondMac:(NSString *)almondMac;
 
 - (NSString *)readHashList:(NSString *)almondMac;
