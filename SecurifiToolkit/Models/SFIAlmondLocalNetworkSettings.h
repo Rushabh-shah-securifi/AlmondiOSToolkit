@@ -66,6 +66,8 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 // indicates whether the settings are complete, though it does not indicate whether the login/pwd are valid.
 - (BOOL)hasCompleteSettings;
 
+- (void)purgePassword;
+
 - (id)initWithCoder:(NSCoder *)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;

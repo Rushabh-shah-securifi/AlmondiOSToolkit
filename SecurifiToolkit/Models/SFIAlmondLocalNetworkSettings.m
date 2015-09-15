@@ -178,6 +178,11 @@
             self.hasBasicCompleteSettings;
 }
 
+- (void)purgePassword {
+    NSString *serviceName = [self makeKeychainServiceName];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_PASSWORD forService:serviceName];
+}
+
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
