@@ -217,14 +217,7 @@
 }
 
 - (NSDictionary *)readAllAlmondLocalNetworkSettings {
-    @synchronized (self.syncLocker) {
-        NSMutableDictionary *dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:self.almondLocalNetworkSettingsFp];
-        if (!dictionary) {
-            return [NSDictionary dictionary];
-        }
-
-        return dictionary;
-    }
+    return [self readDictionaryForFilePath:self.almondLocalNetworkSettingsFp locker:self.syncLocker];
 }
 
 - (void)deleteLocalNetworkSettingsForAlmond:(NSString *)almondMac {
@@ -239,13 +232,11 @@
 
 - (void)purgeAll {
     @synchronized (self.syncLocker) {
-        [self purgeCloudAlmonds];
+        [self purgeLocalSettingsForCloudAlmonds];
+        [self purgeDevicesForCloudAlmonds];
 
         [SFIOfflineDataManager deleteFile:ALMOND_LIST_FILENAME];
         [SFIOfflineDataManager deleteFile:HASH_FILENAME];
-        [SFIOfflineDataManager deleteFile:DEVICE_LIST_FILENAME];
-        [SFIOfflineDataManager deleteFile:DEVICE_VALUE_FILENAME];
-        // preserve the local network settings as they are retained even when the user has logged out
 
         @synchronized (self.notification_syncLocker) {
             [SFIOfflineDataManager deleteFile:NOTIFICATION_PREF_FILENAME];
@@ -253,7 +244,7 @@
     }
 }
 
-- (void)purgeCloudAlmonds {
+- (void)purgeLocalSettingsForCloudAlmonds {
     // before purging all almonds, delete their corresponding local network settings
     NSMutableDictionary *local = [NSMutableDictionary dictionaryWithDictionary:[self readAllAlmondLocalNetworkSettings]];
 
@@ -268,6 +259,29 @@
     }
 
     [self writeDictionary:local filePath:self.almondLocalNetworkSettingsFp];
+}
+
+- (void)purgeDevicesForCloudAlmonds {
+    // remove all devices and device value for cloud almonds; preserve the local-only almonds
+    NSArray *cloud_list = [self readAlmondList];
+
+    NSMutableDictionary *devices = [self readDictionaryForFilePath:self.deviceListFp locker:self.syncLocker];
+    NSMutableDictionary *deviceValues = [self readDictionaryForFilePath:self.deviceValueFp locker:self.syncLocker];
+
+    for (SFIAlmondPlus *almond in cloud_list) {
+        NSString *mac = almond.almondplusMAC;
+        [devices removeObjectForKey:mac];
+        [deviceValues removeObjectForKey:mac];
+    }
+
+    if (devices.count == 0) {
+        [SFIOfflineDataManager deleteFile:DEVICE_LIST_FILENAME];
+        [SFIOfflineDataManager deleteFile:DEVICE_VALUE_FILENAME];
+    }
+    else {
+        [self writeDictionary:devices filePath:self.deviceListFp];
+        [self writeDictionary:deviceValues filePath:self.deviceValueFp];
+    }
 }
 
 - (NSArray *)deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
@@ -328,15 +342,13 @@
 }
 
 - (id)readDictionaryEntryForFilePath:(NSString *)filePath key:(NSString *)dictKey locker:(NSObject *)locker {
-    @synchronized (locker) {
-        NSMutableDictionary *dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+    NSDictionary *dictionary = [self readDictionaryForFilePath:filePath locker:locker];
 
-        id value = nil;
-        if (dictionary != nil) {
-            value = [dictionary valueForKey:dictKey];
-        }
-        return value;
+    id value = nil;
+    if (dictionary != nil) {
+        value = [dictionary valueForKey:dictKey];
     }
+    return value;
 }
 
 - (void)writeDictionaryEntryToFilePath:(NSString *)filePath key:(NSString *)dictKey value:(id)dictValue locker:(NSObject *)locker {
@@ -345,11 +357,7 @@
     }
 
     @synchronized (locker) {
-        //Read the entire dictionary from the list
-        NSMutableDictionary *dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-        if (dictionary == nil) {
-            dictionary = [[NSMutableDictionary alloc] init];
-        }
+        NSMutableDictionary *dictionary = [self readDictionaryForFilePath:filePath locker:locker];
         dictionary[dictKey] = dictValue;
 
         [self writeDictionary:dictionary filePath:filePath];
@@ -362,20 +370,31 @@
     }
 
     @synchronized (locker) {
-        NSMutableDictionary *dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        NSMutableDictionary *dictionary = [self readDictionaryForFilePath:filePath locker:locker];
         [dictionary removeObjectForKey:dictKey];
 
         [self writeDictionary:dictionary filePath:filePath];
     }
 }
 
-- (void)writeDictionary:(NSDictionary*)dict filePath:(NSString*)filePath {
+- (void)writeDictionary:(NSDictionary *)dict filePath:(NSString *)filePath {
     BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dict toFile:filePath];
     if (didWriteSuccessful) {
         [self markExcludeFileFromBackup:filePath];
     }
     else {
         NSLog(@"Faile to write dictionary, fp:%@", filePath);
+    }
+}
+
+- (NSMutableDictionary *)readDictionaryForFilePath:(NSString *)filePath locker:(NSObject *)locker {
+    @synchronized (locker) {
+        NSMutableDictionary *dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+        if (!dictionary) {
+            return [NSMutableDictionary dictionary];
+        }
+
+        return dictionary;
     }
 }
 
