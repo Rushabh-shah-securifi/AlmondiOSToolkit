@@ -66,8 +66,23 @@
 
 #pragma mark - Almonds List
 
-- (void)writeAlmondList:(NSArray *)almondList {
-    [self writeListToFilePath:self.almondListFp list:almondList locker:self.syncLocker];
+- (void)writeAlmondList:(NSArray *)cloudAlmonds {
+    [self writeListToFilePath:self.almondListFp list:cloudAlmonds locker:self.syncLocker];
+
+    // before purging all almonds, delete their corresponding local network settings
+    NSMutableDictionary *local_dict = [NSMutableDictionary dictionaryWithDictionary:[self readAllAlmondLocalNetworkSettings]];
+
+    for (SFIAlmondPlus *almond in cloudAlmonds) {
+        NSString *mac = almond.almondplusMAC;
+
+        SFIAlmondLocalNetworkSettings *settings = local_dict[mac];
+        if (settings) {
+            settings.almondplusName = almond.almondplusName;
+            local_dict[mac] = settings;
+        }
+    }
+
+    [self writeDictionary:local_dict filePath:self.almondLocalNetworkSettingsFp];
 }
 
 // Read AlmondList for the current user from offline storage
@@ -75,7 +90,27 @@
     return [self readListFromFilePath:self.almondListFp locker:self.syncLocker];
 }
 
+- (SFIAlmondPlus *)readAlmond:(NSString *)almondMac {
+    if (almondMac.length == 0) {
+        return nil;
+    }
+
+    NSArray *currentList = [self readAlmondList];
+
+    for (SFIAlmondPlus *almond in currentList) {
+        if ([almond.almondplusMAC isEqualToString:almondMac]) {
+            return almond;
+        }
+    }
+
+    return nil;
+}
+
 - (SFIAlmondPlus *)changeAlmondName:(NSString *)almondName almondMac:(NSString *)almondMac {
+    if (almondName.length == 0) {
+        return nil;
+    }
+
     @synchronized (self.syncLocker) {
         NSArray *currentList = [self readAlmondList];
 
@@ -192,11 +227,11 @@
     }
 }
 
-- (void)deleteLocalNetworkSettingsForAlmond:(NSString *)strAlmondMac {
-    SFIAlmondLocalNetworkSettings *settings = [self readAlmondLocalNetworkSettings:strAlmondMac];
+- (void)deleteLocalNetworkSettingsForAlmond:(NSString *)almondMac {
+    SFIAlmondLocalNetworkSettings *settings = [self readAlmondLocalNetworkSettings:almondMac];
     if (settings) {
         [settings purgePassword];
-        [self removedDictionaryEntryFromFilePath:self.almondLocalNetworkSettingsFp key:strAlmondMac locker:self.syncLocker];
+        [self removedDictionaryEntryFromFilePath:self.almondLocalNetworkSettingsFp key:almondMac locker:self.syncLocker];
     }
 }
 
@@ -204,17 +239,7 @@
 
 - (void)purgeAll {
     @synchronized (self.syncLocker) {
-        // before purging all almonds, we transfer almond names to the local settings to ensure names have a non-null value
-        NSDictionary *local = [self readAllAlmondLocalNetworkSettings];
-        NSArray *currentList = [self readAlmondList];
-
-        for (SFIAlmondPlus *almond in currentList) {
-            SFIAlmondLocalNetworkSettings *settings = local[almond.almondplusMAC];
-            if (settings) {
-                settings.almondplusName = almond.almondplusName;
-                [self writeAlmondLocalNetworkSettings:settings];
-            }
-        }
+        [self purgeCloudAlmonds];
 
         [SFIOfflineDataManager deleteFile:ALMOND_LIST_FILENAME];
         [SFIOfflineDataManager deleteFile:HASH_FILENAME];
@@ -226,6 +251,23 @@
             [SFIOfflineDataManager deleteFile:NOTIFICATION_PREF_FILENAME];
         }
     }
+}
+
+- (void)purgeCloudAlmonds {
+    // before purging all almonds, delete their corresponding local network settings
+    NSMutableDictionary *local = [NSMutableDictionary dictionaryWithDictionary:[self readAllAlmondLocalNetworkSettings]];
+
+    NSArray *cloudList = [self readAlmondList];
+    for (SFIAlmondPlus *almond in cloudList) {
+        NSString *mac = almond.almondplusMAC;
+        SFIAlmondLocalNetworkSettings *settings = local[mac];
+        if (settings) {
+            [settings purgePassword];
+            [local removeObjectForKey:mac];
+        }
+    }
+
+    [self writeDictionary:local filePath:self.almondLocalNetworkSettingsFp];
 }
 
 - (NSArray *)deleteAlmond:(SFIAlmondPlus *)deletedAlmond {
@@ -248,11 +290,8 @@
         [self deleteHashForAlmond:mac];
         [self deleteDeviceDataForAlmond:mac];
         [self deleteDeviceValueForAlmond:mac];
+        [self deleteLocalNetworkSettingsForAlmond:mac];
         [self deleteNotificationPreferenceList:mac];
-
-        @synchronized (self.notification_syncLocker) {
-            [self deleteLocalNetworkSettingsForAlmond:mac];
-        }
 
         return newAlmondList;
     }
@@ -313,13 +352,7 @@
         }
         dictionary[dictKey] = dictValue;
 
-        BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dictionary toFile:filePath];
-        if (didWriteSuccessful) {
-            [self markExcludeFileFromBackup:filePath];
-        }
-        else {
-            NSLog(@"Faile to write device list");
-        }
+        [self writeDictionary:dictionary filePath:filePath];
     }
 }
 
@@ -330,11 +363,19 @@
 
     @synchronized (locker) {
         NSMutableDictionary *dictionary = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-
         [dictionary removeObjectForKey:dictKey];
-        [NSKeyedArchiver archiveRootObject:dictionary toFile:filePath];
 
+        [self writeDictionary:dictionary filePath:filePath];
+    }
+}
+
+- (void)writeDictionary:(NSDictionary*)dict filePath:(NSString*)filePath {
+    BOOL didWriteSuccessful = [NSKeyedArchiver archiveRootObject:dict toFile:filePath];
+    if (didWriteSuccessful) {
         [self markExcludeFileFromBackup:filePath];
+    }
+    else {
+        NSLog(@"Faile to write dictionary, fp:%@", filePath);
     }
 }
 
