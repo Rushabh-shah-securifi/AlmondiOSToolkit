@@ -143,11 +143,13 @@
 
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
-        if (self.connectionState == NetworkConnectionStatusShutdown) {
+        enum NetworkConnectionStatus status = self.connectionState;
+
+        if (status == NetworkConnectionStatusShutdown) {
             NSLog(@"%@. Network was shutdown.", msg);
             break;
         }
-        if (self.connectionState == NetworkConnectionStatusInitialized) {
+        if (status == NetworkConnectionStatusInitialized) {
             NSLog(@"%@. Cloud is initialized.", msg);
             break;
         }
