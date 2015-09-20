@@ -408,7 +408,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         settings.almondplusMAC = almondMac;
 
         // very important: copy name to settings, if possible
-        SFIAlmondPlus *plus = [self.dataManager readAlmond:almondMac];
+        SFIAlmondPlus *plus = [self cloudAlmond:almondMac];
         if (plus) {
             settings.almondplusName = plus.almondplusName;
         }
@@ -1119,6 +1119,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
+- (SFIAlmondPlus *)cloudAlmond:(NSString *)almondMac {
+    return [self.dataManager readAlmond:almondMac];
+}
+
+
 - (NSArray *)almondList {
     return [self.dataManager readAlmondList];
 }
@@ -1139,13 +1144,40 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return nil;
     }
 
+    // Below is an important filtering process:
+    // in effect, we choose to use the Cloud Almond representation for matching
+    // local network configs, because the Almond#linkType property will indicate
+    // the almond supports both local and cloud network connections. This will ensure the
+    // UI can do the right thing and show the right message to the user when connection modes
+    // are switched.
+    //
+    // Note for large lists of almonds, the way the data manger internally manages cloud almond lists
+    // is inefficient for these sorts of operations, and a dictionary data structure would allow for
+    // fast look up, instead of iteration.
+    NSMutableSet *cloud_set = [NSMutableSet setWithArray:[self almondList]];
+
     NSDictionary *local_settings = [self.dataManager readAllAlmondLocalNetworkSettings];
     NSMutableArray *local_almonds = [NSMutableArray array];
 
     for (NSString *mac in local_settings.allKeys) {
-        SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
-        SFIAlmondPlus *local = setting.asLocalLinkAlmondPlus;
-        [local_almonds addObject:local];
+        SFIAlmondPlus *localAlmond;
+
+        for (SFIAlmondPlus *cloud in cloud_set) {
+            if ([cloud.almondplusMAC isEqualToString:mac]) {
+                localAlmond = cloud;
+                [cloud_set removeObject:cloud];
+                break;
+            }
+        }
+
+        if (!localAlmond) {
+            SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
+            localAlmond = setting.asLocalLinkAlmondPlus;
+        }
+
+        if (localAlmond) {
+            [local_almonds addObject:localAlmond];
+        }
     }
 
     if (local_almonds.count == 0) {

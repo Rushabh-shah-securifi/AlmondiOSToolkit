@@ -268,6 +268,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Returns the designated "current" Almond, or nil.
 - (SFIAlmondPlus *)currentAlmond;
 
+- (SFIAlmondPlus *)cloudAlmond:(NSString*)almondMac;
+
 // Fetch the local copy of the Almond's attached to the logon account
 - (NSArray *)almondList;
 
