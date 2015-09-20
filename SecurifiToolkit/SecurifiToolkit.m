@@ -406,6 +406,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!settings) {
         settings = [SFIAlmondLocalNetworkSettings new];
         settings.almondplusMAC = almondMac;
+
+        // very important: copy name to settings, if possible
+        SFIAlmondPlus *plus = [self.dataManager readAlmond:almondMac];
+        if (plus) {
+            settings.almondplusName = plus.almondplusName;
+        }
     }
 
     if (summary.login) {
@@ -1132,32 +1138,25 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return nil;
     }
-    
+
     NSDictionary *local_settings = [self.dataManager readAllAlmondLocalNetworkSettings];
-    NSMutableSet *local_macs = [NSMutableSet setWithArray:local_settings.allKeys];
-    
-    // filter out all Almonds that are linked also with the cloud
-    NSArray *cloudList = [self.dataManager readAlmondList];
-    for (SFIAlmondPlus *plus in cloudList) {
-        NSString *mac = plus.almondplusMAC;
-        if ([local_macs containsObject:mac]) {
-            [local_macs removeObject:mac];
-        }
-    }
-    
-    // the remaining macs are for local-only almonds
     NSMutableArray *local_almonds = [NSMutableArray array];
-    for (NSString *mac in local_macs) {
+
+    for (NSString *mac in local_settings.allKeys) {
         SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
         SFIAlmondPlus *local = setting.asLocalLinkAlmondPlus;
         [local_almonds addObject:local];
     }
-    
+
+    if (local_almonds.count == 0) {
+        return nil;
+    }
+
     // Sort the local Almonds alphabetically
     NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"almondplusName" ascending:YES];
     [local_almonds sortUsingDescriptors:@[sort]];
-    
-    return (local_almonds.count == 0) ? nil : local_almonds;
+
+    return local_almonds;
 }
 
 - (NSArray *)deviceList:(NSString *)almondMac {
@@ -2107,7 +2106,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
 
-    SFIAlmondPlus *changed = [self.dataManager changeAlmondName:obj.almondplusName almondMac:obj.almondplusMAC];
+    NSString *almondName = obj.almondplusName;
+    if (almondName.length == 0) {
+        return;
+    }
+
+    SFIAlmondPlus *changed = [self.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
         SFIAlmondPlus *current = [self currentAlmond];
         if ([current isEqualAlmondPlus:changed]) {
@@ -3089,17 +3093,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     DatabaseStore *store = self.deviceLogsDb;
     NSString *pageState = [store nextTrackedSyncPoint];
-    
+
     NSDictionary *payload = pageState ? @{
-                                          @"mac" : almondMac,
-                                          @"device_id" : @(deviceId),
-                                          @"requestId" : pageState,
-                                          @"pageState" : pageState,
-                                          } : @{
-                                                @"mac" : almondMac,
-                                                @"device_id" : @(deviceId),
-                                                @"requestId" : almondMac,
-                                                };
+            @"mac" : almondMac,
+            @"device_id" : @(deviceId),
+            @"requestId" : pageState,
+            @"pageState" : pageState,
+    } : @{
+            @"mac" : almondMac,
+            @"device_id" : @(deviceId),
+            @"requestId" : almondMac,
+    };
     
     [self internalSendJsonCommand:payload commandType:CommandType_DEVICELOG_REQUEST];
 }
