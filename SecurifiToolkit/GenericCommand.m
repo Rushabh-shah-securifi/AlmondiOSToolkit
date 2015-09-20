@@ -10,6 +10,9 @@
 #import "BaseCommandRequest.h"
 #import "DeviceValueRequest.h"
 #import "DeviceListRequest.h"
+#import "SFIDeviceKnownValues.h"
+#import "SFIDevice.h"
+#import "MobileCommandRequest.h"
 
 @implementation GenericCommand
 
@@ -37,6 +40,20 @@
     return [self internalWebsocketSensorDeviceListCommand:CommandType_DEVICE_VALUE];
 }
 
++ (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
+    BaseCommandRequest *bcmd = [BaseCommandRequest new];
+
+    NSDictionary *payload = @{
+            @"mii" : @(bcmd.correlationId).stringValue,
+            @"cmd" : @"setdeviceindex",
+            @"devid" : @(device.deviceID).stringValue,
+            @"index" : @(newValue.index).stringValue,
+            @"value" : newValue.value,
+    };
+
+    return [GenericCommand jsonPayloadCommand:payload commandType:CommandType_MOBILE_COMMAND];
+}
+
 + (GenericCommand *)internalWebsocketSensorDeviceListCommand:(enum CommandType)commandType {
     BaseCommandRequest *bcmd = [BaseCommandRequest new];
 
@@ -55,7 +72,7 @@
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DEVICE_DATA;
     cmd.command = deviceListCommand;
-    
+
     return cmd;
 }
 
@@ -68,6 +85,19 @@
     cmd.command = command;
 
     return cmd;
+}
+
++ (instancetype)cloudSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue almondMac:(NSString *)almondMac {
+    MobileCommandRequest *request = [MobileCommandRequest new];
+    request.almondMAC = almondMac;
+    request.deviceID = [NSString stringWithFormat:@"%d", device.deviceID];
+    request.deviceType = device.deviceType;
+    request.indexID = [NSString stringWithFormat:@"%d", newValue.index];
+    request.changedValue = newValue.value;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_MOBILE_COMMAND;
+    cmd.command = request;
 }
 
 - (NSString *)description {

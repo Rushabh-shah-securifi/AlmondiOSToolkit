@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "CommandTypes.h"
 
+@class SFIDeviceKnownValues;
+@class SFIDevice;
+
 @interface GenericCommand : NSObject
 
 // convenience method for generating a command structure for sending to a web service that consumes JSON.
@@ -21,11 +24,17 @@
 // constructs a generic command for requesting the sensor values
 + (instancetype)websocketSensorDeviceValueListCommand;
 
+// constructs a generic command for updating a sensor's index value
++ (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue ;
+
 // constructs a generic command for requesting the sensor list for the specified Almond
 + (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac;
 
 // constructs a generic command for requesting the sensor values for the specified Almond
 + (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac;
+
+// constructs a generic command for updating a sensor's index value
++ (instancetype)cloudSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue almondMac:(NSString *)almondMac;
 
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;

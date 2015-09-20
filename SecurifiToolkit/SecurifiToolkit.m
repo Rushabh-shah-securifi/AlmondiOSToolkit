@@ -446,6 +446,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [network connect];
 
         [self.cloudNetwork shutdown];
+
+        [self asyncRequestDeviceList:almondMac];
     }
     else {
         [self _asyncInitToolkit];
@@ -763,39 +765,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
     BOOL local = [self useLocalNetwork:almondMac];
     
     if (local) {
-        BaseCommandRequest *bcmd = [BaseCommandRequest new];
-        
-        NSDictionary *payload = @{
-                                  @"mii" : @(bcmd.correlationId).stringValue,
-                                  @"cmd" : @"setdeviceindex",
-                                  @"devid" : @(device.deviceID).stringValue,
-                                  @"index" : @(newValue.index).stringValue,
-                                  @"value" : newValue.value,
-                                  };
-        
-        GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:CommandType_MOBILE_COMMAND];
-        
+        GenericCommand *cmd = [GenericCommand websocketSetSensorDevice:device value:newValue];
+
         Network *network = [self localNetworkForAlmond:almondMac];
         [network submitCommand:cmd];
-        
-        return bcmd.correlationId;
+
+        return 0;
     }
     else {
-        // Generate internal index between 1 to 100
-        MobileCommandRequest *request = [MobileCommandRequest new];
-        request.almondMAC = almondMac;
-        request.deviceID = [NSString stringWithFormat:@"%d", device.deviceID];
-        request.deviceType = device.deviceType;
-        request.indexID = [NSString stringWithFormat:@"%d", newValue.index];
-        request.changedValue = newValue.value;
-        
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.commandType = CommandType_MOBILE_COMMAND;
-        cmd.command = request;
-        
+        GenericCommand *cmd = [GenericCommand cloudSetSensorDevice:device value:newValue almondMac:almondMac];
         [self asyncSendToCloud:cmd];
-        
-        return request.correlationId;
+
+        return 0;
     }
 }
 
@@ -1914,13 +1895,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (Network *)localNetworkForAlmond:(NSString *)almondMac {
+    Network *network = self.localNetwork;
+
     if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
-        if (self.localNetwork.connectionState == NetworkConnectionStatusInitialized) {
-            return self.localNetwork;
+        if (network.connectionState == NetworkConnectionStatusInitialized) {
+            return network;
         }
         //todo what if NetworkConnectionStatusInitializing ?
     }
-    
+
+    if (network) {
+        [network shutdown];
+    }
+
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
     
     NetworkConfig *config = [NetworkConfig webSocketConfig:almondMac];
@@ -1928,7 +1915,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     config.port = settings.port;
     config.password = settings.password;
     
-    Network *network = [Network networkWithNetworkConfig:config callbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];
+    network = [Network networkWithNetworkConfig:config callbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];
     network.delegate = self;
     
     [network connect];
