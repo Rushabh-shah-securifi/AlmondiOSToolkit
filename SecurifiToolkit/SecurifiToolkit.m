@@ -439,6 +439,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
         [self.localNetwork shutdown];
+        self.localNetwork = nil;
     }
     
     if (mode == SFIAlmondConnectionMode_local) {
@@ -446,12 +447,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [network connect];
 
         [self.cloudNetwork shutdown];
+        self.cloudNetwork = nil;
 
         [self asyncRequestDeviceList:almondMac];
     }
     else {
         [self _asyncInitToolkit];
         [self.localNetwork shutdown];
+        self.localNetwork = nil;
     }
 }
 
