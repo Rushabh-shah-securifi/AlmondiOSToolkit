@@ -86,22 +86,6 @@
     return cmd;
 }
 
-+ (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(CommandType)commandType {
-    NSError *error;
-    NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
-
-    if (error) {
-        NSLog(@"jsonPayloadCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
-        return nil;
-    }
-
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.command = data;
-    cmd.commandType = commandType;
-
-    return cmd;
-}
-
 + (instancetype)websocketSensorDeviceListCommand {
     return [self internalWebsocketSensorDeviceListCommand:CommandType_DEVICE_DATA];
 }
@@ -110,8 +94,19 @@
     return [self internalWebsocketSensorDeviceListCommand:CommandType_DEVICE_VALUE];
 }
 
++ (GenericCommand *)internalWebsocketSensorDeviceListCommand:(enum CommandType)commandType {
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+
+    NSDictionary *payload = @{
+            @"mii" : @(correlationId).stringValue,
+            @"cmd" : @"devicelist"
+    };
+
+    return [GenericCommand jsonPayloadCommand:payload commandType:commandType];
+}
+
 + (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
-    sfi_id correlationId = [GenericCommand nextCorrelationId:1];
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
     
     NSDictionary *payload = @{
             @"mii" : @(correlationId).stringValue,
@@ -122,17 +117,6 @@
     };
 
     return [GenericCommand jsonPayloadCommand:payload commandType:CommandType_MOBILE_COMMAND];
-}
-
-+ (GenericCommand *)internalWebsocketSensorDeviceListCommand:(enum CommandType)commandType {
-    sfi_id correlationId = [GenericCommand nextCorrelationId:1];
-
-    NSDictionary *payload = @{
-            @"mii" : @(correlationId).stringValue,
-            @"cmd" : @"devicelist"
-    };
-
-    return [GenericCommand jsonPayloadCommand:payload commandType:commandType];
 }
 
 + (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac {
@@ -172,6 +156,45 @@
     return cmd;
 }
 
++ (instancetype)websocketRequestAlmondWifiClients {
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+
+    NSDictionary *payload = @{
+            @"MobileInternalIndex" : @(correlationId).stringValue,
+            @"CommandType" : @"ClientsList"
+    };
+
+    return [self jsonPayloadCommand:payload commandType:CommandType_GENERIC_COMMAND_REQUEST];
+}
+
++ (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac {
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+
+    NSDictionary *payload = @{
+            @"MobileInternalIndex" : @(correlationId).stringValue,
+            @"commandtype" : @"WifiClientList",
+            @"AlmondMAC" : almondMac,
+    };
+
+    return [self jsonPayloadCommand:payload commandType:CommandType_WIFI_CLIENTS_LIST_REQUEST];
+}
+
++ (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
+    NSError *error;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
+
+    if (error) {
+        NSLog(@"jsonPayloadCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
+        return nil;
+    }
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.command = data;
+    cmd.commandType = commandType;
+
+    return cmd;
+}
+
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.command=%@", self.command];
@@ -187,7 +210,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _correlationId = [GenericCommand nextCorrelationId:1];
+        _correlationId = [GenericCommand nextCorrelationId];
         _created = [NSDate date];
     }
 
@@ -219,7 +242,7 @@
 }
 
 
-+ (sfi_id)nextCorrelationId:(NSUInteger)change {
++ (sfi_id)nextCorrelationId {
     static int32_t counter = 0;
 
     int32_t localCounter;
@@ -227,7 +250,7 @@
 
     do {
         localCounter = counter;
-        newCounter = localCounter + change;
+        newCounter = localCounter + 1;
         newCounter = newCounter <= 0 ? 0 : newCounter;
     } while (!OSAtomicCompareAndSwap32(localCounter, newCounter, &counter));
 

@@ -29,9 +29,9 @@ typedef void (^NetworkPrecondition)(Network *);
 
 + (instancetype)cloudChangeAlmondMode:(SFIAlmondMode)newMode userId:(NSString *)userId almondMac:(NSString *)almondMac;
 
-// convenience method for generating a command structure for sending to a web service that consumes JSON.
-// the dictionary will be serialized as JSON (NSData)
-+ (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(CommandType)type;
++ (instancetype)websocketRequestAlmondWifiClients;
+
++ (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac;
 
 // constructs a generic command for requesting the sensor list
 + (instancetype)websocketSensorDeviceListCommand;
@@ -50,6 +50,10 @@ typedef void (^NetworkPrecondition)(Network *);
 
 // constructs a generic command for updating a sensor's index value
 + (instancetype)cloudSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue almondMac:(NSString *)almondMac;
+
+// convenience method for generating a command structure for sending to a web service that consumes JSON.
+// the dictionary will be serialized as JSON (NSData)
++ (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(CommandType)type;
 
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;

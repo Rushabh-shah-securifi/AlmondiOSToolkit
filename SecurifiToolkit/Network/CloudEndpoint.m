@@ -628,7 +628,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         DLog(@"Sending command, cmd:%@", command.debugDescription);
 
         CommandType commandType = command.commandType;
-        NSString *commandPayload;
+        id commandPayload;
 
         @try {
             switch (command.commandType) {
@@ -717,7 +717,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 }
             } // end switch
 
-            NSData *write_payload = [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
+            NSData *write_payload = [commandPayload isKindOfClass:NSData.class] ? commandPayload : [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
             unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
             unsigned int header_commandType = (unsigned int) htonl(commandType);
 
