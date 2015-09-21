@@ -98,6 +98,8 @@
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_MOBILE_COMMAND;
     cmd.command = request;
+
+    return cmd;
 }
 
 - (NSString *)description {
