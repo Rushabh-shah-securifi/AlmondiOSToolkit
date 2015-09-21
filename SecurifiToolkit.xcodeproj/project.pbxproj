@@ -50,7 +50,6 @@
 		1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BC31A79F02600C448A4 /* ZHDatabase.m */; };
 		1C414BC81A79F02600C448A4 /* ZHDatabaseStatement.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BC41A79F02600C448A4 /* ZHDatabaseStatement.h */; };
 		1C414BC91A79F02600C448A4 /* ZHDatabaseStatement.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BC51A79F02600C448A4 /* ZHDatabaseStatement.m */; };
-		1C414BCB1A79F0AE00C448A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C414BCA1A79F0AE00C448A4 /* libsqlite3.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BD01A79F2BE00C448A4 /* SFIOfflineDataManager.h */; };
 		1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BD11A79F2BE00C448A4 /* SFIOfflineDataManager.m */; };
 		1C414BE01A79F35D00C448A4 /* SUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BDC1A79F35D00C448A4 /* SUnit.h */; };
@@ -79,10 +78,11 @@
 		1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E91B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m */; };
 		1C4382FE1B2FFA8800F6AB7A /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C4382FD1B2FFA8800F6AB7A /* CFNetwork.framework */; };
 		1C4382FF1B2FFA9400F6AB7A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE15FFAE186844AA00371183 /* Security.framework */; };
-		1C4383011B2FFAA100F6AB7A /* libSystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C4383001B2FFAA100F6AB7A /* libSystem.dylib */; };
-		1C4383031B2FFAAB00F6AB7A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C4383021B2FFAAB00F6AB7A /* libz.dylib */; };
 		1C75820C19B028F70074C601 /* Scoreboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C75820A19B028F70074C601 /* Scoreboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C75820D19B028F70074C601 /* Scoreboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C75820B19B028F70074C601 /* Scoreboard.m */; };
+		1CA80E461BAFA46E002EB836 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA80E451BAFA46E002EB836 /* libz.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
+		1CA80E481BAFA482002EB836 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA80E471BAFA482002EB836 /* libsqlite3.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
+		1CA80E4E1BAFA721002EB836 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA80E4D1BAFA721002EB836 /* libxml2.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */; };
 		1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CD1D5351A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m */; };
 		1CD1D54A1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD1D5361A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h */; };
@@ -401,6 +401,12 @@
 		1C4383021B2FFAAB00F6AB7A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		1C75820A19B028F70074C601 /* Scoreboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scoreboard.h; sourceTree = "<group>"; };
 		1C75820B19B028F70074C601 /* Scoreboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scoreboard.m; sourceTree = "<group>"; };
+		1CA80E3D1BAFA204002EB836 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		1CA80E3F1BAFA20E002EB836 /* libSystem.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libSystem.tbd; path = usr/lib/libSystem.tbd; sourceTree = SDKROOT; };
+		1CA80E411BAFA219002EB836 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		1CA80E451BAFA46E002EB836 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = ../../../../../../usr/lib/libz.dylib; sourceTree = "<group>"; };
+		1CA80E471BAFA482002EB836 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = ../../../../../../usr/lib/libsqlite3.dylib; sourceTree = "<group>"; };
+		1CA80E4D1BAFA721002EB836 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = ../../../../../../usr/lib/libxml2.dylib; sourceTree = "<group>"; };
 		1CD1D5341A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationRequest.h; sourceTree = "<group>"; };
 		1CD1D5351A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationDeleteRegistrationRequest.m; sourceTree = "<group>"; };
 		1CD1D5361A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationDeleteRegistrationResponse.h; sourceTree = "<group>"; };
@@ -638,12 +644,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C4383031B2FFAAB00F6AB7A /* libz.dylib in Frameworks */,
-				1C4383011B2FFAA100F6AB7A /* libSystem.dylib in Frameworks */,
 				1C4382FF1B2FFA9400F6AB7A /* Security.framework in Frameworks */,
 				1C4382FE1B2FFA8800F6AB7A /* CFNetwork.framework in Frameworks */,
-				1C414BCB1A79F0AE00C448A4 /* libsqlite3.dylib in Frameworks */,
 				CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */,
+				1CA80E481BAFA482002EB836 /* libsqlite3.dylib in Frameworks */,
+				1CA80E4E1BAFA721002EB836 /* libxml2.dylib in Frameworks */,
+				1CA80E461BAFA46E002EB836 /* libz.dylib in Frameworks */,
 				22A19D941797AC7A003E6148 /* SystemConfiguration.framework in Frameworks */,
 				221185BE178D371200EE23ED /* Foundation.framework in Frameworks */,
 			);
@@ -955,6 +961,12 @@
 		221185BC178D371200EE23ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1CA80E4D1BAFA721002EB836 /* libxml2.dylib */,
+				1CA80E471BAFA482002EB836 /* libsqlite3.dylib */,
+				1CA80E451BAFA46E002EB836 /* libz.dylib */,
+				1CA80E411BAFA219002EB836 /* libsqlite3.tbd */,
+				1CA80E3F1BAFA20E002EB836 /* libSystem.tbd */,
+				1CA80E3D1BAFA204002EB836 /* libz.tbd */,
 				1C4383021B2FFAAB00F6AB7A /* libz.dylib */,
 				1C4383001B2FFAA100F6AB7A /* libSystem.dylib */,
 				1C4382FD1B2FFA8800F6AB7A /* CFNetwork.framework */,
@@ -1712,6 +1724,7 @@
 			buildSettings = {
 				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /tmp/SecurifiToolkit.dst;
+				ENABLE_BITCODE = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SecurifiToolkit/SecurifiToolkit-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -1736,6 +1749,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /tmp/SecurifiToolkit.dst;
+				ENABLE_BITCODE = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SecurifiToolkit/SecurifiToolkit-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
