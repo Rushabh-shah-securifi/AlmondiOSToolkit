@@ -10,7 +10,6 @@
 #import "NotificationCountResponse.h"
 #import "NotificationClearCountResponse.h"
 #import "Network.h"
-#import "NetworkConfig.h"
 
 typedef NS_ENUM(unsigned int, CloudEndpointConnectionStatus) {
     CloudEndpointConnectionStatus_uninitialized = 1,
@@ -616,6 +615,15 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 }
 
 - (BOOL)internalSendToCloud:(CloudEndpoint *)cloudEndpoint command:(GenericCommand*)command error:(NSError **)outError {
+    if (!cloudEndpoint) {
+        DLog(@"%s: aborting send. endoint is null", __PRETTY_FUNCTION__);
+        return NO;
+    }
+    if (!command) {
+        DLog(@"%s: aborting send. command is null", __PRETTY_FUNCTION__);
+        return NO;
+    }
+
     @synchronized (self.syncLocker) {
         DLog(@"Sending command, cmd:%@", command.debugDescription);
 
