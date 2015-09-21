@@ -41,7 +41,15 @@
 // TRUE if requested. FALSE otherwise.
 - (BOOL)wasDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac;
 
+// stores the currently known almond mode state
 - (void)markModeForAlmond:(NSString*)aAlmondMac mode:(SFIAlmondMode)mode;
+
+// set prior to sending out a change-mode request; the mode is retained and on receipt of a
+// successful change, the pending mode can be "confirmed" via confirmPendingModeForAlmond
+- (void)markPendingModeForAlmond:(NSString*)aAlmondMac mode:(SFIAlmondMode)mode;
+
+// called to confirm that a pending Almond mode; in effect, calls markModeForAlmond:mode:
+- (void)confirmPendingModeForAlmond;
 
 - (SFIAlmondMode)almondMode:(NSString*)aAlmondMac;
 

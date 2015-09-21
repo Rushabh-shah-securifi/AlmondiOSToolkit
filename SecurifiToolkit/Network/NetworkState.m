@@ -16,6 +16,7 @@
 
 @property(nonatomic, readonly) NSObject *almondModeSynLocker;
 @property(nonatomic, readonly) NSMutableDictionary *almondModeTable;
+@property(nonatomic) NSDictionary *pendingModeTable;
 @end
 
 @implementation NetworkState
@@ -98,6 +99,30 @@
     NSNumber *num = @(mode);
     @synchronized (self.almondModeSynLocker) {
         self.almondModeTable[aAlmondMac] = num;
+    }
+}
+
+- (void)markPendingModeForAlmond:(NSString *)aAlmondMac mode:(SFIAlmondMode)mode {
+    @synchronized (self.almondModeSynLocker) {
+        self.pendingModeTable = @{
+                @"mac" : aAlmondMac,
+                @"mode": @(mode),
+        };
+    }
+}
+
+- (void)confirmPendingModeForAlmond {
+    @synchronized (self.almondModeSynLocker) {
+        NSDictionary *table = self.pendingModeTable;
+        if (table) {
+            self.pendingModeTable = nil;
+
+            NSString *almondMac = table[@"mac"];
+            NSNumber *modeNum = table[@"mode"];
+            SFIAlmondMode mode = (SFIAlmondMode) modeNum.intValue;
+
+            [self markModeForAlmond:almondMac mode:mode];
+        }
     }
 }
 

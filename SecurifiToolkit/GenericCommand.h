@@ -8,11 +8,26 @@
 
 #import <Foundation/Foundation.h>
 #import "CommandTypes.h"
+#import "SecurifiTypes.h"
 
 @class SFIDeviceKnownValues;
 @class SFIDevice;
+@class SFIWirelessSetting;
+@class Network;
+
+typedef void (^NetworkPrecondition)(Network *);
 
 @interface GenericCommand : NSObject
+
++ (instancetype)websocketSensorDevice:(SFIDevice *)device name:(NSString *)newName location:(NSString *)newLocation almondMac:(NSString *)almondMac;
+
++ (instancetype)cloudSensorDevice:(SFIDevice *)device name:(NSString *)newName location:(NSString *)newLocation almondMac:(NSString *)almondMac;
+
++ (instancetype)cloudUpdateWirelessSettings:(SFIWirelessSetting *)newSettings almondMac:(NSString*)almondMac;
+
++ (instancetype)websocketChangeAlmondMode:(SFIAlmondMode)newMode userId:(NSString *)userId almondMac:(NSString *)almondMac;
+
++ (instancetype)cloudChangeAlmondMode:(SFIAlmondMode)newMode userId:(NSString *)userId almondMac:(NSString *)almondMac;
 
 // convenience method for generating a command structure for sending to a web service that consumes JSON.
 // the dictionary will be serialized as JSON (NSData)
@@ -38,6 +53,20 @@
 
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
+
+// optional function that will be called upon submission of the command to a network for processing.
+// can be used for storing state
+@property(nonatomic, copy) NetworkPrecondition networkPrecondition;
+
+// property for tracking when this request was made; can be used for expiring it
+@property(nonatomic, readonly) sfi_id correlationId;
+@property(nonatomic, readonly) NSDate *created;
+
+// can be used to determine whether the request should be expired
+- (BOOL)shouldExpireAfterSeconds:(NSTimeInterval)timeOutSecsAfterCreation;
+
+// Called to check against standard expiration time, which is 5 seconds.
+- (BOOL)isExpired;
 
 - (NSString *)description;
 

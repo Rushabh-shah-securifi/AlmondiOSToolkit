@@ -32,7 +32,6 @@
 #import "NotificationRegistrationResponse.h"
 #import "NotificationDeleteRegistrationResponse.h"
 #import "NotificationPreferences.h"
-#import "AlmondModeChangeRequest.h"
 #import "DynamicAlmondModeChange.h"
 #import "AlmondModeRequest.h"
 #import "AlmondModeResponse.h"
@@ -113,7 +112,6 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 // a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
 // update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
 // dynamic update to inform us of actual new state.
-@property(nonatomic, strong) AlmondModeChangeRequest *pendingAlmondModeChange;
 @property(nonatomic, strong) NotificationPreferences *pendingNotificationPreferenceChange;
 
 // tracks only "refresh" request to get new ones
@@ -773,42 +771,34 @@ static SecurifiToolkit *toolkit_singleton = nil;
         Network *network = [self localNetworkForAlmond:almondMac];
         [network submitCommand:cmd];
 
-        return 0;
+        return cmd.correlationId;
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudSetSensorDevice:device value:newValue almondMac:almondMac];
         [self asyncSendToCloud:cmd];
 
-        return 0;
+        return cmd.correlationId;
     }
 }
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus*)almond device:(SFIDevice*)device name:(NSString*)deviceName location:(NSString*)deviceLocation {
     NSString *almondMac = almond.almondplusMAC;
     
-    SensorChangeRequest *request = [SensorChangeRequest new];
-    request.almondMAC = almondMac;
-    request.deviceId = device.deviceID;
-    request.changedName = deviceName;
-    request.changedLocation = deviceLocation;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_MOBILE_COMMAND;
-    
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
-        cmd.command = [request toJson];
-        
+        GenericCommand *cmd = [GenericCommand websocketSensorDevice:device name:deviceName location:deviceLocation almondMac:almondMac];
+
         Network *network = [self localNetworkForAlmond:almondMac];
         [network submitCommand:cmd];
+
+        return cmd.correlationId;
     }
     else {
-        cmd.command = request;
-        
+        GenericCommand *cmd = [GenericCommand cloudSensorDevice:device name:deviceName location:deviceLocation almondMac:almondMac];
         [self asyncSendToCloud:cmd];
+
+        return cmd.correlationId;
     }
-    
-    return request.correlationId;
 }
 
 #pragma mark - Cloud Logon
@@ -1549,16 +1539,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings {
-    GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
-    req.almondMAC = almondMAC;
-    req.data = [settings toXml];
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
-    cmd.command = req;
+    GenericCommand *cmd = [GenericCommand cloudUpdateWirelessSettings:settings almondMac:almondMAC];
     [self asyncSendToCloud:cmd];
     
-    return req.correlationId;
+    return cmd.correlationId;
 }
 
 #pragma mark - Notification Preferences and Almond mode changes
@@ -1633,31 +1617,34 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SLog(@"asyncRequestAlmondModeChange : almond MAC is nil");
         return 0;
     }
-    
-    AlmondModeChangeRequest *request = [AlmondModeChangeRequest new];
-    request.almondMAC = almondMac;
-    request.mode = newMode;
-    request.userId = [self loginEmail];
-    
-    self.pendingAlmondModeChange = request;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
-    
+
+    NSString *userId = [self loginEmail];
+
+    // A closure that will be invoked whne the command is submitted for processing and that
+    // will store the requested almond mode for future reference. When a positive response is
+    // received, the new mode will be confirmed and locked in.
+    void (^precondition)(Network *) = ^void(Network *aNetwork) {
+        [aNetwork.networkState markPendingModeForAlmond:almondMac mode:newMode];
+    };
+
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
-        cmd.command = [request toJson];
-        
+        GenericCommand *cmd = [GenericCommand websocketChangeAlmondMode:newMode userId:userId almondMac:almondMac];
+        cmd.networkPrecondition = precondition;
+
         Network *network = [self localNetworkForAlmond:almondMac];
         [network submitCommand:cmd];
+
+        return cmd.correlationId;
     }
     else {
-        cmd.command = request;
-        
+        GenericCommand *cmd = [GenericCommand cloudChangeAlmondMode:newMode userId:userId almondMac:almondMac];
+        cmd.networkPrecondition = precondition;
+
         [self asyncSendToCloud:cmd];
+
+        return cmd.correlationId;
     }
-    
-    return request.correlationId;
 }
 
 - (SFIAlmondMode)modeForAlmond:(NSString *)almondMac {
@@ -1886,7 +1873,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
     
-    self.pendingAlmondModeChange = nil;
     self.pendingNotificationPreferenceChange = nil;
     self.pendingRefreshNotificationsRequest = nil;
     self.pendingClearNotificationCountRequest = nil;
@@ -3026,13 +3012,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res.success) {
         return;
     }
-    
-    AlmondModeChangeRequest *req = self.pendingAlmondModeChange;
-    if (req) {
-        [self.cloudNetwork.networkState markModeForAlmond:req.almondMAC mode:req.mode];
-        self.pendingAlmondModeChange = nil;
-    }
-    
+
+    Network *network = [data valueForKey:@"network"];
+    [network.networkState confirmPendingModeForAlmond];
+
     NSString *notification = kSFIDidCompleteAlmondModeChangeRequest;
     [self postNotification:notification data:nil];
 }
@@ -3072,8 +3055,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res.success) {
         return;
     }
+
+    Network *network = [data valueForKey:@"network"];
     
-    [self.cloudNetwork.networkState markModeForAlmond:res.almondMAC mode:res.mode];
+    [network.networkState markModeForAlmond:res.almondMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }
 

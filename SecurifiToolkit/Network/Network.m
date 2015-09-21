@@ -235,11 +235,15 @@
 
 - (void)post:(NSString *)notificationName payload:(id)payload queue:(dispatch_queue_t)queue {
     __weak id block_payload = payload;
+    __weak id block_self = self;
 
     dispatch_sync(queue, ^() {
         NSDictionary *data = nil;
         if (payload) {
-            data = @{@"data" : block_payload};
+            data = @{
+                    @"data" : block_payload,
+                    @"network" : block_self,
+            };
         }
 
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
@@ -324,6 +328,12 @@
 
         case NetworkConnectionStatusInitializing:
             break;
+    }
+
+    // fire precondition handler
+    NetworkPrecondition pFunction = command.networkPrecondition;
+    if (pFunction) {
+        pFunction(self);
     }
 
     return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:0];
