@@ -10,6 +10,10 @@
 
 typedef NS_ENUM(unsigned int, ExpirableCommandType) {
     ExpirableCommandType_almondStateAndSettingsRequest,
+    ExpirableCommandType_deviceLogRequest,
+    ExpirableCommandType_notificationListRequest,
+    ExpirableCommandType_notificationClearCountRequest,
+    ExpirableCommandType_notificationPreferencesChangesRequest,
 };
 
 // A value holder for tracking per-connection session state. Every instance of a Network has its own NetworkState,

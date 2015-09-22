@@ -109,16 +109,6 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) Network *cloudNetwork;
 @property(nonatomic, strong) Network *localNetwork;
 
-// a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
-// update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
-// dynamic update to inform us of actual new state.
-@property(nonatomic, strong) NotificationPreferences *pendingNotificationPreferenceChange;
-
-// tracks only "refresh" request to get new ones
-@property(nonatomic, strong) NotificationListRequest *pendingRefreshNotificationsRequest;
-@property(nonatomic, strong) NotificationClearCountRequest *pendingClearNotificationCountRequest;
-
-@property(nonatomic, strong) BaseCommandRequest *pendingDeviceLogRequest;
 @end
 
 @implementation SecurifiToolkit
@@ -1674,12 +1664,20 @@ static SecurifiToolkit *toolkit_singleton = nil;
     req.userID = [self loginEmail];
     req.preferenceCount = (int) [deviceList count];
     req.notificationDeviceList = deviceList;
-    
-    self.pendingNotificationPreferenceChange = req;
-    
+
+    // Use this as a state holder so we can get access to the actual NotificationPreferences when processing the response.
+    // This is a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
+    // update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
+    // dynamic update to inform us of actual new state.
+    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
+        [aNetwork.networkState markExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification" genericCommand:aCmd];
+        return YES;
+    };
+
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
     cmd.command = req;
+    cmd.networkPrecondition = precondition;
     
     [self asyncSendToCloud:cmd];
 }
@@ -1851,10 +1849,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     old.delegate = nil; // no longer interested in callbacks from this instance
     [old shutdown];
     
-    self.pendingNotificationPreferenceChange = nil;
-    self.pendingRefreshNotificationsRequest = nil;
-    self.pendingClearNotificationCountRequest = nil;
-
     self.cloudNetwork = nil;
     
     NSLog(@"Finished tear down of network");
@@ -2566,8 +2560,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res.isSuccessful) {
         return;
     }
-    
-    NotificationPreferences *req = self.pendingNotificationPreferenceChange;
+
+    Network *network = data[@"network"];
+    GenericCommand *cmd = [network.networkState expirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
+    NotificationPreferences *req = cmd.command;
     if (!req) {
         return;
     }
@@ -2590,13 +2586,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     else {
         NSLog(@"Unable to process NotificationPreferenceResponse: action is not recognized, action:'%@'", req.action);
-        self.pendingNotificationPreferenceChange = nil;
+        [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
         return;
     }
     
     [self.dataManager writeNotificationPreferenceList:newPrefs almondMac:almondMac];
-    
-    self.pendingNotificationPreferenceChange = nil;
+
+    [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
     [self postNotification:kSFINotificationPreferencesDidChange data:almondMac];
 }
 
@@ -2701,6 +2697,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NotificationListResponse *res = data[@"data"];
     NSString *requestId = res.requestId;
+
+    Network *network = data[@"network"];
     
     DLog(@"asyncRefreshNotifications: recevied request id:'%@'", requestId);
     
@@ -2710,7 +2708,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // these requests are not the same as "catch up" requests for older sync points that were queued for fetching
         // but not downloaded; see internalTryProcessNotificationSyncPoints.
         NSLog(@"asyncRefreshNotifications: clearing refresh request tracking");
-        self.pendingRefreshNotificationsRequest = nil;
+        [network.networkState clearExpirableRequest:ExpirableCommandType_notificationListRequest namespace:@"notification"];
     }
     
     // Store the notifications and stop tracking the pageState that they were associated with
@@ -2896,16 +2894,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.isCloudLoggedIn) {
         return;
     }
-    
-    NotificationListRequest *pending = self.pendingRefreshNotificationsRequest;
-    if (pending) {
-        if (![pending isExpired]) {
-            // give the request 5 seconds to complete
-            NSLog(@"asyncRefreshNotifications: fail fast; already fetching latest");
-            return;
-        }
-    }
-    
+
     [self internalAsyncFetchNotifications:nil];
 }
 
@@ -2914,26 +2903,34 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableNotifications) {
         return;
     }
-    
-    NotificationClearCountRequest *pending = self.pendingClearNotificationCountRequest;
-    if (pending) {
-        if (![pending shouldExpireAfterSeconds:5]) {
+
+    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
+        enum ExpirableCommandType type = ExpirableCommandType_notificationClearCountRequest;
+        NSString *aNamespace = @"notification";
+
+        GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:type namespace:aNamespace];
+        if (storedCmd) {
+            // clear the lock after execution; next command invocation will be allowed
+            [aNetwork.networkState clearExpirableRequest:type namespace:aNamespace];
             // give the request 5 seconds to complete
-            NSLog(@"tryClearNotificationCount: fail fast; already fetching latest count");
-            return;
+            return !storedCmd.isExpired;
         }
-    }
-    
+        else {
+            [aNetwork.networkState markExpirableRequest:type namespace:aNamespace genericCommand:aCmd];
+            return YES;
+        }
+    };
+
     // reset count internally
     [self setNotificationsBadgeCount:0];
     
     // send the command to the cloud
     NotificationClearCountRequest *req = [NotificationClearCountRequest new];
-    self.pendingClearNotificationCountRequest = req;
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = req.commandType;
     cmd.command = req;
+    cmd.networkPrecondition = precondition;
     
     [self asyncSendToCloud:cmd];
 }
@@ -2974,11 +2971,20 @@ static SecurifiToolkit *toolkit_singleton = nil;
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATIONS_SYNC_REQUEST;
     cmd.command = req;
-    
+
     // nil indicates request is for "refresh; get latest" request
     if (pageState == nil) {
+        cmd.networkPrecondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
+            GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:ExpirableCommandType_notificationListRequest namespace:@"notification"];
+            if (!storedCmd) {
+                [aNetwork.networkState markExpirableRequest:ExpirableCommandType_notificationListRequest namespace:@"notification" genericCommand:aCmd];
+                return YES;
+            }
+            // give the request 5 seconds to complete
+            return !storedCmd.isExpired;
+        };
+
         NSLog(@"asyncRefreshNotifications: tracking refresh request");
-        self.pendingRefreshNotificationsRequest = req;
     }
     
     [self asyncSendToCloud:cmd];
@@ -3055,8 +3061,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     id <SFIDeviceLogStore> store = [db newDeviceLogStore:almondMac deviceId:deviceId delegate:self];
     [store ensureFetchNotifications]; // will callback to self (registered as delegate) to load notifications
-    
-    self.pendingDeviceLogRequest = nil;
+
+    [self.cloudNetwork.networkState clearExpirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac];
+
     return store;
 }
 
@@ -3072,17 +3079,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
      {mac:201243434454, device_id:19, requestId:”dajdasj”, pageState:”12aaa12eee2eeffb1024”}
      </root>
      */
-    
-    // we store a pseudo command object to track timeouts/guard against multiple requests being sent for device logs
-    BaseCommandRequest *pending = self.pendingDeviceLogRequest;
-    if (pending) {
-        if (![pending isExpired]) {
-            // give the request 5 seconds to complete
-            return;
+
+    // track timeouts/guard against multiple requests being sent for device logs
+    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
+        GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac];
+        if (!storedCmd) {
+            [aNetwork.networkState markExpirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac genericCommand:aCmd];
+            return YES;
         }
-    }
-    self.pendingDeviceLogRequest = [BaseCommandRequest new];
-    
+        // give the request 5 seconds to complete
+        return !storedCmd.isExpired;
+    };
+
     DatabaseStore *store = self.deviceLogsDb;
     NSString *pageState = [store nextTrackedSyncPoint];
 
@@ -3097,7 +3105,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             @"requestId" : almondMac,
     };
     
-    [self internalSendJsonCommand:payload commandType:CommandType_DEVICELOG_REQUEST];
+    [self internalSendJsonCommand:payload commandType:CommandType_DEVICELOG_REQUEST precondition:precondition];
 }
 
 - (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore {
@@ -3150,8 +3158,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - JSON command helper
 
-- (void)internalSendJsonCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
+- (void)internalSendJsonCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType precondition:(NetworkPrecondition)precondition {
     GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:commandType];
+    cmd.networkPrecondition = precondition;
     
     if (cmd) {
         [self asyncSendToCloud:cmd];
