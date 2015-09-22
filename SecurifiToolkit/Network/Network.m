@@ -333,7 +333,10 @@
     // fire precondition handler
     NetworkPrecondition pFunction = command.networkPrecondition;
     if (pFunction) {
-        pFunction(self);
+        BOOL okToSubmit = pFunction(self, command);
+        if (!okToSubmit) {
+            return NO;
+        }
     }
 
     return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:0];

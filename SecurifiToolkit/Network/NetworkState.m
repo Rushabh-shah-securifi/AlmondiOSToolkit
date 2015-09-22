@@ -4,6 +4,7 @@
 //
 
 #import "NetworkState.h"
+#import "GenericCommand.h"
 
 
 @interface NetworkState ()
@@ -17,6 +18,9 @@
 @property(nonatomic, readonly) NSObject *almondModeSynLocker;
 @property(nonatomic, readonly) NSMutableDictionary *almondModeTable;
 @property(nonatomic) NSDictionary *pendingModeTable;
+
+@property(nonatomic, readonly) NSObject *expirableCommandsLocker;
+@property(nonatomic, readonly) NSMutableDictionary *expirableCommands;
 @end
 
 @implementation NetworkState
@@ -33,6 +37,9 @@
 
         _almondModeSynLocker = [NSObject new];
         _almondModeTable = [NSMutableDictionary new];
+
+        _expirableCommandsLocker = [NSObject new];
+        _expirableCommands = [NSMutableDictionary new];
     }
 
     return self;
@@ -106,7 +113,7 @@
     @synchronized (self.almondModeSynLocker) {
         self.pendingModeTable = @{
                 @"mac" : aAlmondMac,
-                @"mode": @(mode),
+                @"mode" : @(mode),
         };
     }
 }
@@ -149,6 +156,41 @@
 
     @synchronized (self.almondModeSynLocker) {
         [self.almondModeTable removeObjectForKey:aAlmondMac];
+    }
+}
+
+- (void)markExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace genericCommand:(GenericCommand *)cmd {
+    @synchronized (self.expirableCommandsLocker) {
+        NSNumber *key = @(type);
+        NSMutableDictionary *dict = self.expirableCommands[key];
+        if (!dict) {
+            dict = [NSMutableDictionary dictionary];
+            self.expirableCommands[key] = dict;
+        }
+        dict[namespace] = cmd;
+    }
+}
+
+- (GenericCommand *)expirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace {
+    @synchronized (self.expirableCommandsLocker) {
+        NSNumber *key = @(type);
+
+        NSMutableDictionary *dict = self.expirableCommands[key];
+        if (!dict) {
+            return nil;
+        }
+
+        return dict[namespace];
+    }
+}
+
+- (void)clearExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace {
+    @synchronized (self.expirableCommandsLocker) {
+        NSNumber *key = @(type);
+        NSMutableDictionary *dict = self.expirableCommands[key];
+        if (dict) {
+            [dict removeObjectForKey:namespace];
+        }
     }
 }
 

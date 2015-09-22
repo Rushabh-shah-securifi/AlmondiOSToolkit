@@ -14,8 +14,10 @@
 @class SFIDevice;
 @class SFIWirelessSetting;
 @class Network;
+@class GenericCommand;
 
-typedef void (^NetworkPrecondition)(Network *);
+// return YES to continue processing; NO to halt it
+typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 @interface GenericCommand : NSObject
 
@@ -59,7 +61,7 @@ typedef void (^NetworkPrecondition)(Network *);
 @property(nonatomic) CommandType commandType;
 
 // optional function that will be called upon submission of the command to a network for processing.
-// can be used for storing state
+// can be used for storing state and validating that the command should continue processing.
 @property(nonatomic, copy) NetworkPrecondition networkPrecondition;
 
 // property for tracking when this request was made; can be used for expiring it

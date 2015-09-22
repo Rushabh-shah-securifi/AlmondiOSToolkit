@@ -6,6 +6,12 @@
 #import <Foundation/Foundation.h>
 #import "SecurifiTypes.h"
 
+@class GenericCommand;
+
+typedef NS_ENUM(unsigned int, ExpirableCommandType) {
+    ExpirableCommandType_almondStateAndSettingsRequest,
+};
+
 // A value holder for tracking per-connection session state. Every instance of a Network has its own NetworkState,
 // and therefore when the Network is disposed we are also assured states stored in this helper are also disposed and
 // no special work is needed to clean them up.
@@ -55,5 +61,10 @@
 
 - (void)clearAlmondMode:(NSString*)aAlmondMac;
 
+- (void)markExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString*)namespace genericCommand:(GenericCommand *)cmd;
+
+- (GenericCommand *)expirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace;
+
+- (void)clearExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace;
 
 @end

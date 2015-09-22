@@ -118,7 +118,6 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) NotificationListRequest *pendingRefreshNotificationsRequest;
 @property(nonatomic, strong) NotificationClearCountRequest *pendingClearNotificationCountRequest;
 
-@property(nonatomic, strong) GenericCommandRequest *pendingAlmondStateAndSettingsRequest;
 @property(nonatomic, strong) BaseCommandRequest *pendingDeviceLogRequest;
 @end
 
@@ -1440,7 +1439,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
     
-    [self internalRequestAlmondStatusAndSettings:almondMac command:requestType];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:requestType commandPrecondition:nil];
 }
 
 - (void)asyncAlmondSummaryInfoRequest:(NSString *)almondMac {
@@ -1448,54 +1447,32 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
     
-    GenericCommandRequest *pending = self.pendingAlmondStateAndSettingsRequest;
-    if (pending) {
-        if ([pending.almondMAC isEqualToString:almondMac]) {
-            if (!pending.isExpired) {
-                return;
-            }
+    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
+        GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:almondMac];
+        if (!storedCmd) {
+            [aNetwork.networkState markExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:almondMac genericCommand:aCmd];
+            return YES;
         }
-    }
-    GenericCommandRequest *timeOutTracker = [GenericCommandRequest new];
-    timeOutTracker.almondMAC = almondMac;
-    self.pendingAlmondStateAndSettingsRequest = timeOutTracker;
-    
+        return !storedCmd.isExpired;
+    };
+
     // sends a series of requests to fetch all the information at once.
     // note ordering might be important to the UI layer, which for now receives the response payloads directly
-    [self internalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary];
+    [self internalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary commandPrecondition:precondition];
 }
 
 - (void)internalJSONRequestAlmondWifiClients:(NSString *)almondMac {
-    NSDictionary *payload = @{
-                              @"commandtype" : @"WifiClientList",
-                              @"AlmondMAC" : almondMac,
-                              @"MobileInternalIndex" : @"324"
-                              };
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_WIFI_CLIENTS_LIST_REQUEST;
-    cmd.command = [payload JSONString];
-    
+    GenericCommand *cmd = [GenericCommand cloudRequestAlmondWifiClients:almondMac];
     [self asyncSendToCloud:cmd];
 }
 
-- (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum SecurifiToolkitAlmondRouterRequest)type {
+- (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum SecurifiToolkitAlmondRouterRequest)type commandPrecondition:(NetworkPrecondition)precondition {
     if (self.config.enableLocalNetworking && type == SecurifiToolkitAlmondRouterRequest_wifi_clients) {
         BOOL local = [self useLocalNetwork:almondMac];
 
         if (local) {
-            BaseCommandRequest *bcmd = [BaseCommandRequest new];
-
-            NSDictionary *payload = @{
-                    @"MobileInternalIndex" : @(bcmd.correlationId).stringValue,
-                    @"CommandType" : @"ClientsList"
-            };
-
-            NSData *data = [bcmd serializeJson:payload];
-
-            GenericCommand *cmd = [GenericCommand new];
-            cmd.command = data;
-            cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
+            GenericCommand *cmd = [GenericCommand websocketRequestAlmondWifiClients];
+            cmd.networkPrecondition = precondition;
 
             Network *network = [self localNetworkForAlmond:almondMac];
             [network submitCommand:cmd];
@@ -1534,6 +1511,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
+    cmd.networkPrecondition = precondition;
 
     [self asyncSendToCloud:cmd];
 }
@@ -1623,8 +1601,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // A closure that will be invoked whne the command is submitted for processing and that
     // will store the requested almond mode for future reference. When a positive response is
     // received, the new mode will be confirmed and locked in.
-    void (^precondition)(Network *) = ^void(Network *aNetwork) {
+    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
         [aNetwork.networkState markPendingModeForAlmond:almondMac mode:newMode];
+        return YES;
     };
 
     BOOL local = [self useLocalNetwork:almondMac];
@@ -1649,11 +1628,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (SFIAlmondMode)modeForAlmond:(NSString *)almondMac {
     return [self tryCachedAlmondModeValue:almondMac];
-    
 }
 
 - (SFIAlmondMode)tryCachedAlmondModeValue:(NSString *)almondMac {
-    Network *network = self.cloudNetwork;
+    Network *network = self.cloudNetwork ? self.cloudNetwork : self.localNetwork;
     if (network) {
         return [network.networkState almondMode:almondMac];
     }
@@ -1876,8 +1854,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.pendingNotificationPreferenceChange = nil;
     self.pendingRefreshNotificationsRequest = nil;
     self.pendingClearNotificationCountRequest = nil;
-    self.pendingAlmondStateAndSettingsRequest = nil;
-    
+
     self.cloudNetwork = nil;
     
     NSLog(@"Finished tear down of network");
@@ -2183,8 +2160,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Generic Almond Router commmand callbacks
 
 - (void)onAlmondRouterGenericNotification:(id)sender {
-    self.pendingAlmondStateAndSettingsRequest = nil;
-
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -2192,9 +2167,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     GenericCommandResponse *response = (GenericCommandResponse *) [data valueForKey:@"data"];
+    NSString *mac = response.almondMAC;
+
+    Network *network = [data valueForKey:@"network"];
+    [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
+
     if (!response.isSuccessful) {
         SFIGenericRouterCommand *routerCommand = [SFIGenericRouterCommand new];
-        routerCommand.almondMAC = response.almondMAC;
+        routerCommand.almondMAC = mac;
         routerCommand.commandSuccess = NO;
         routerCommand.responseMessage = response.reason;
 
@@ -2202,15 +2182,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     else {
         SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:response];
-        routerCommand.almondMAC = response.almondMAC;
+        routerCommand.almondMAC = mac;
 
         [self internalOnGenericRouterCommandResponse:routerCommand];
     }
 }
 
 - (void)onAlmondRouterGenericCommandResponse:(id)sender {
-    self.pendingAlmondStateAndSettingsRequest = nil;
-
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
@@ -2218,24 +2196,31 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 
     GenericCommandResponse *response = (GenericCommandResponse *) [data valueForKey:@"data"];
+    NSString *mac = response.almondMAC;
+
+    Network *network = [data valueForKey:@"network"];
+    [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
 
     SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:response];
-    routerCommand.almondMAC = response.almondMAC;
+    routerCommand.almondMAC = mac;
 
     [self internalOnGenericRouterCommandResponse:routerCommand];
 }
 
 - (void)onAlmondRouterCommandResponse:(id)sender {
-    self.pendingAlmondStateAndSettingsRequest = nil;
-
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
         return;
     }
 
-    SFIGenericRouterCommand *routerCommand = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
-    [self internalOnGenericRouterCommandResponse:routerCommand];
+    SFIGenericRouterCommand *response = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
+    NSString *mac = response.almondMAC;
+
+    Network *network = [data valueForKey:@"network"];
+    [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
+
+    [self internalOnGenericRouterCommandResponse:response];
 }
 
 - (void)internalOnGenericRouterCommandResponse:(SFIGenericRouterCommand *)routerCommand {
