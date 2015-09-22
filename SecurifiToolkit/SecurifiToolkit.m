@@ -1352,86 +1352,86 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Account related commands
 
 - (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd {
-    ChangePasswordRequest *changePwdCommand = [ChangePasswordRequest new];
-    changePwdCommand.emailID = [self loginEmail];
-    changePwdCommand.currentPassword = currentPwd;
-    changePwdCommand.changedPassword = changedPwd;
+    ChangePasswordRequest *request = [ChangePasswordRequest new];
+    request.emailID = [self loginEmail];
+    request.currentPassword = currentPwd;
+    request.changedPassword = changedPwd;
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_CHANGE_PASSWORD_REQUEST;
-    cmd.command = changePwdCommand;
+    cmd.command = request;
     
     [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeleteCloudAccount:(NSString *)password {
-    DeleteAccountRequest *delAccountCommand = [DeleteAccountRequest new];
-    delAccountCommand.emailID = [self loginEmail];
-    delAccountCommand.password = password;
+    DeleteAccountRequest *request = [DeleteAccountRequest new];
+    request.emailID = [self loginEmail];
+    request.password = password;
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DELETE_ACCOUNT_REQUEST;
-    cmd.command = delAccountCommand;
+    cmd.command = request;
     
     [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestUnlinkAlmond:(NSString *)almondMAC password:(NSString *)password {
-    UnlinkAlmondRequest *unlinkAlmondCommand = [UnlinkAlmondRequest new];
-    unlinkAlmondCommand.almondMAC = almondMAC;
-    unlinkAlmondCommand.password = password;
-    unlinkAlmondCommand.emailID = [self loginEmail];
+    UnlinkAlmondRequest *request = [UnlinkAlmondRequest new];
+    request.almondMAC = almondMAC;
+    request.password = password;
+    request.emailID = [self loginEmail];
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_UNLINK_ALMOND_REQUEST;
-    cmd.command = unlinkAlmondCommand;
+    cmd.command = request;
     
     [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestInviteForSharingAlmond:(NSString *)almondMAC inviteEmail:(NSString *)inviteEmailID {
-    UserInviteRequest *userInviteCommand = [[UserInviteRequest alloc] init];
-    userInviteCommand.almondMAC = almondMAC;
-    userInviteCommand.emailID = inviteEmailID;
+    UserInviteRequest *request = [UserInviteRequest new];
+    request.almondMAC = almondMAC;
+    request.emailID = inviteEmailID;
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_USER_INVITE_REQUEST;
-    cmd.command = userInviteCommand;
+    cmd.command = request;
     
     [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeleteSecondaryUser:(NSString *)almondMAC email:(NSString *)emailID {
-    DeleteSecondaryUserRequest *delUserCommand = [DeleteSecondaryUserRequest new];
-    delUserCommand.almondMAC = almondMAC;
-    delUserCommand.emailID = emailID;
+    DeleteSecondaryUserRequest *request = [DeleteSecondaryUserRequest new];
+    request.almondMAC = almondMAC;
+    request.emailID = emailID;
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DELETE_SECONDARY_USER_REQUEST;
-    cmd.command = delUserCommand;
+    cmd.command = request;
     
     [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString *)almondMAC {
-    DeleteMeAsSecondaryUserRequest *delUserCommand = [DeleteMeAsSecondaryUserRequest new];
-    delUserCommand.almondMAC = almondMAC;
+    DeleteMeAsSecondaryUserRequest *request = [DeleteMeAsSecondaryUserRequest new];
+    request.almondMAC = almondMAC;
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST;
-    cmd.command = delUserCommand;
+    cmd.command = request;
     
     [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestChangeAlmondName:(NSString *)changedAlmondName almondMAC:(NSString *)almondMAC {
-    AlmondNameChange *req = [AlmondNameChange new];
-    req.almondMAC = almondMAC;
-    req.changedAlmondName = changedAlmondName;
+    AlmondNameChange *request = [AlmondNameChange new];
+    request.almondMAC = almondMAC;
+    request.changedAlmondName = changedAlmondName;
     
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ALMOND_NAME_CHANGE_REQUEST;
-    cmd.command = req;
+    cmd.command = request;
     
     [self asyncSendToCloud:cmd];
 }
@@ -1970,9 +1970,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     id p_cmd = cmd.command;
     if ([p_cmd isKindOfClass:[MobileCommandRequest class]]) {
         NSDictionary *payload = @{
-                                  @"command" : p_cmd,
-                                  @"timing" : @(roundTripTime)
-                                  };
+                @"command" : p_cmd,
+                @"timing" : @(roundTripTime)
+        };
         [self postNotification:kSFIDidCompleteMobileCommandRequest data:payload];
     }
     
