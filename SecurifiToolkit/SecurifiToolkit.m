@@ -732,7 +732,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     });
 }
 
-- (void)asyncSendToWebsocket:(GenericCommand *)command almondMac:(NSString *)almondMac {
+- (void)asyncSendToLocal:(GenericCommand *)command almondMac:(NSString *)almondMac {
     if (self.isShutdown) {
         DLog(@"SDK is shutdown. Returning.");
         return;
@@ -782,7 +782,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSetSensorDevice:device value:newValue];
-        [self asyncSendToWebsocket:cmd almondMac:almondMac];
+        [self asyncSendToLocal:cmd almondMac:almondMac];
 
         return cmd.correlationId;
     }
@@ -800,7 +800,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSensorDevice:device name:deviceName location:deviceLocation almondMac:almondMac];
-        [self asyncSendToWebsocket:cmd almondMac:almondMac];
+        [self asyncSendToLocal:cmd almondMac:almondMac];
 
         return cmd.correlationId;
     }
@@ -1486,7 +1486,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             GenericCommand *cmd = [GenericCommand websocketRequestAlmondWifiClients];
             cmd.networkPrecondition = precondition;
 
-            [self asyncSendToWebsocket:cmd almondMac:almondMac];
+            [self asyncSendToLocal:cmd almondMac:almondMac];
 
             return;
         }
@@ -1622,7 +1622,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         GenericCommand *cmd = [GenericCommand websocketChangeAlmondMode:newMode userId:userId almondMac:almondMac];
         cmd.networkPrecondition = precondition;
 
-        [self asyncSendToWebsocket:cmd almondMac:almondMac];
+        [self asyncSendToLocal:cmd almondMac:almondMac];
 
         return cmd.correlationId;
     }
