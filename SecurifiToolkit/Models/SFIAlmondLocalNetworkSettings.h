@@ -11,6 +11,7 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
     TestConnectionResult_unknown,           // result is not obtained
     TestConnectionResult_success,           // all is good
     TestConnectionResult_macMismatch,       // the mac specified in the settings do not match the mac on the remote host
+    TestConnectionResult_macMissing,        // the mac was missing or not properly formed
     TestConnectionResult_unknownError,      // some error here or there prevented the test from completing
 };
 

@@ -75,7 +75,7 @@
     return self.testResult;
 }
 
-- (void)processTestConnectionResponsePayload:(NSDictionary*)payload {
+- (void)processTestConnectionResponsePayload:(NSDictionary *)payload {
     NSString *str = payload[@"Success"];
 
     BOOL success = [str isEqualToString:@"true"];
@@ -85,7 +85,13 @@
         return;
     }
 
-    NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:payload[@"MAC"]];
+    NSString *mac_hex = payload[@"MAC"];
+    if (![self validMac:mac_hex]) {
+        self.testResult = TestConnectionResult_macMissing;
+        return;
+    }
+
+    NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
 
     if (self.almondplusMAC) {
         // if a MAC is specified then let's compare and make sure the almond to which we connected is the same one specified
@@ -174,8 +180,12 @@
 
 - (BOOL)hasCompleteSettings {
     return self.almondplusName.length > 0 &&
-            self.almondplusMAC.length > 0 &&
+            [self validMac:self.almondplusMAC] &&
             self.hasBasicCompleteSettings;
+}
+
+- (BOOL)validMac:(NSString *)mac {
+    return mac.length > 0 && ![mac isEqualToString:@"<no_mac>"];
 }
 
 - (void)purgePassword {
