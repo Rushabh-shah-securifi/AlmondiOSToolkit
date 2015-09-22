@@ -103,8 +103,8 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
 @property(nonatomic, readonly) id <SFINotificationStore> notificationsStore;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
-@property(nonatomic, readonly) dispatch_queue_t socketCallbackQueue;
-@property(nonatomic, readonly) dispatch_queue_t socketDynamicCallbackQueue;
+@property(nonatomic, readonly) dispatch_queue_t networkCallbackQueue;
+@property(nonatomic, readonly) dispatch_queue_t networkDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
 @property(nonatomic, strong) Network *cloudNetwork;
 @property(nonatomic, strong) Network *localNetwork;
@@ -158,8 +158,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self setupReachability:config.productionCloudHost];
         self.useProductionCloud = YES;
         
-        _socketCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
-        _socketDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
+        _networkCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
+        _networkDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
         _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
         
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -423,26 +423,28 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return;
     }
-    
-    if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
-        [self.localNetwork shutdown];
-        self.localNetwork = nil;
-    }
-    
-    if (mode == SFIAlmondConnectionMode_local) {
-        Network *network = [self localNetworkForAlmond:almondMac];
-        [network connect];
 
-        [self.cloudNetwork shutdown];
-        self.cloudNetwork = nil;
+    dispatch_async(self.commandDispatchQueue, ^() {
+        if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
+            [self.localNetwork shutdown];
+            self.localNetwork = nil;
+        }
 
-        [self asyncRequestDeviceList:almondMac];
-    }
-    else {
-        [self _asyncInitToolkit];
-        [self.localNetwork shutdown];
-        self.localNetwork = nil;
-    }
+        if (mode == SFIAlmondConnectionMode_local) {
+            Network *network = [self localNetworkForAlmond:almondMac];
+            [network connect];
+
+            [self.cloudNetwork shutdown];
+            self.cloudNetwork = nil;
+
+            [self asyncRequestDeviceList:almondMac];
+        }
+        else {
+            [self _asyncInitToolkit];
+            [self.localNetwork shutdown];
+            self.localNetwork = nil;
+        }
+    });
 }
 
 #pragma mark - Connection and Network state reporting
@@ -630,7 +632,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     SecurifiToolkit __weak *block_self = self;
     
-    dispatch_async(self.socketCallbackQueue, ^(void) {
+    dispatch_async(self.networkCallbackQueue, ^(void) {
         [block_self tearDownCloudNetwork];
     });
 }
@@ -730,6 +732,30 @@ static SecurifiToolkit *toolkit_singleton = nil;
     });
 }
 
+- (void)asyncSendToWebsocket:(GenericCommand *)command almondMac:(NSString *)almondMac {
+    if (self.isShutdown) {
+        DLog(@"SDK is shutdown. Returning.");
+        return;
+    }
+
+    if (![self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_local]) {
+        return;
+    }
+
+    __weak SecurifiToolkit *block_self = self;
+    dispatch_async(self.commandDispatchQueue, ^() {
+        Network *network = [block_self localNetworkForAlmond:almondMac];
+        BOOL success = [network submitCommand:command];
+
+        if (success) {
+            DLog(@"[Generic cmd: %d] send success", command.commandType);
+        }
+        else {
+            DLog(@"[Generic cmd: %d] send error", command.commandType);
+        }
+    });
+}
+
 - (sfi_id)asyncSendAlmondAffiliationRequest:(NSString *)linkCode {
     if (!linkCode) {
         return 0;
@@ -756,9 +782,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSetSensorDevice:device value:newValue];
-
-        Network *network = [self localNetworkForAlmond:almondMac];
-        [network submitCommand:cmd];
+        [self asyncSendToWebsocket:cmd almondMac:almondMac];
 
         return cmd.correlationId;
     }
@@ -776,9 +800,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSensorDevice:device name:deviceName location:deviceLocation almondMac:almondMac];
-
-        Network *network = [self localNetworkForAlmond:almondMac];
-        [network submitCommand:cmd];
+        [self asyncSendToWebsocket:cmd almondMac:almondMac];
 
         return cmd.correlationId;
     }
@@ -1464,8 +1486,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             GenericCommand *cmd = [GenericCommand websocketRequestAlmondWifiClients];
             cmd.networkPrecondition = precondition;
 
-            Network *network = [self localNetworkForAlmond:almondMac];
-            [network submitCommand:cmd];
+            [self asyncSendToWebsocket:cmd almondMac:almondMac];
 
             return;
         }
@@ -1601,8 +1622,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         GenericCommand *cmd = [GenericCommand websocketChangeAlmondMode:newMode userId:userId almondMac:almondMac];
         cmd.networkPrecondition = precondition;
 
-        Network *network = [self localNetworkForAlmond:almondMac];
-        [network submitCommand:cmd];
+        [self asyncSendToWebsocket:cmd almondMac:almondMac];
 
         return cmd.correlationId;
     }
@@ -1832,7 +1852,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NetworkConfig *networkConfig = [NetworkConfig cloudConfig:self.config useProductionHost:self.useProductionCloud];
     
-    Network *network = [Network networkWithNetworkConfig:networkConfig callbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];
+    Network *network = [Network networkWithNetworkConfig:networkConfig callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
     
     _cloudNetwork = network;
@@ -1875,7 +1895,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     config.port = settings.port;
     config.password = settings.password;
     
-    network = [Network networkWithNetworkConfig:config callbackQueue:self.socketCallbackQueue dynamicCallbackQueue:self.socketDynamicCallbackQueue];
+    network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
     
     [network connect];
@@ -1972,7 +1992,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     __weak id block_payload = payload;
     
-    dispatch_sync(self.socketCallbackQueue, ^() {
+    dispatch_sync(self.networkCallbackQueue, ^() {
         NSDictionary *data = nil;
         if (payload) {
             data = @{@"data" : block_payload};
@@ -3104,8 +3124,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
             @"device_id" : @(deviceId),
             @"requestId" : almondMac,
     };
-    
-    [self internalSendJsonCommand:payload commandType:CommandType_DEVICELOG_REQUEST precondition:precondition];
+
+    [self internalSendJsonCommandToCloud:payload commandType:CommandType_DEVICELOG_REQUEST precondition:precondition];
 }
 
 - (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore {
@@ -3158,7 +3178,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - JSON command helper
 
-- (void)internalSendJsonCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType precondition:(NetworkPrecondition)precondition {
+- (void)internalSendJsonCommandToCloud:(NSDictionary *)payload commandType:(enum CommandType)commandType precondition:(NetworkPrecondition)precondition {
     GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:commandType];
     cmd.networkPrecondition = precondition;
     
