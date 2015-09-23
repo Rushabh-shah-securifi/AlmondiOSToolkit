@@ -159,6 +159,7 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"AC SWING" : @(SFIDevicePropertyType_AC_SWING),//md01
                         @"STOP" : @(SFIDevicePropertyType_STOP),//md01
                         @"UP_DOWN" : @(SFIDevicePropertyType_UP_DOWN),//md01
+                        @"LUMINANCE_PERCENT" : @(SFIDevicePropertyType_LUMINANCE_PERCENT),//md01
                         };
     }
     return

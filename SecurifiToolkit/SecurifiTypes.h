@@ -175,6 +175,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_IR_CODE,//md01
     SFIDevicePropertyType_STOP,//md01
     SFIDevicePropertyType_UP_DOWN,//md01
+    SFIDevicePropertyType_LUMINANCE_PERCENT,//md01
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 

@@ -18,6 +18,7 @@
 @property(nonatomic, retain) NSString *deviceConnection;
 @property(nonatomic, retain) NSString *deviceID;
 @property(nonatomic, retain) NSString *deviceType;
+@property(nonatomic, assign) NSInteger timeout;
 @property(nonatomic, retain) NSString *deviceLastActiveTime;
 @property(nonatomic, assign) BOOL deviceUseAsPresence;
 @property(nonatomic, assign) BOOL isActive;
