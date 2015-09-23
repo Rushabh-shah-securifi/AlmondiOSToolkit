@@ -232,7 +232,13 @@
 }
 
 - (NSString *)makeKeychainServiceName {
-    return [NSString stringWithFormat:@"almond_local_settings:%@", self.almondplusMAC];
+    NSString *mac = self.almondplusMAC;
+
+    if (mac.length == 0) {
+        NSLog(@"makeKeychainServiceName: local settings mac is nil");
+    }
+
+    return [NSString stringWithFormat:@"almond_local_settings:%@", mac];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
