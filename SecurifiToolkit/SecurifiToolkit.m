@@ -2015,6 +2015,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)networkConnectionDidClose:(Network *)network {
+    network.delegate = nil;
+
     if (network == self.cloudNetwork) {
         self.cloudNetwork = nil;
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
