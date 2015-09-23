@@ -424,25 +424,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
 
+    __weak SecurifiToolkit *block_self = self;
+
     dispatch_async(self.commandDispatchQueue, ^() {
-        if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
-            [self.localNetwork shutdown];
-            self.localNetwork = nil;
-        }
-
         if (mode == SFIAlmondConnectionMode_local) {
-            Network *network = [self localNetworkForAlmond:almondMac];
-            [network connect];
-
-            [self.cloudNetwork shutdown];
-            self.cloudNetwork = nil;
-
-            [self asyncRequestDeviceList:almondMac];
+            [block_self _asyncInitLocal:almondMac];
+            [block_self tearDownCloudNetwork];
         }
         else {
-            [self _asyncInitToolkit];
-            [self.localNetwork shutdown];
-            self.localNetwork = nil;
+            [block_self _asyncInitCloud];
+            [block_self tearDownLocalNetwork];
         }
     });
 }
@@ -503,7 +494,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (NetworkConnectionStatus)cloudNetworkStatus {
-    Network *network = self.cloudNetwork;
+    return [self networkStatus:self.cloudNetwork];
+}
+
+- (NetworkConnectionStatus)networkStatus:(Network*)network {
     if (network) {
         return network.connectionState;
     }
@@ -529,10 +523,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void)initToolkit {
-    [self _asyncInitToolkit];
+    [self _asyncInitCloud];
+
+    SFIAlmondPlus *plus = self.currentAlmond;
+    if (plus) {
+        [self _asyncInitLocal:plus.almondplusMAC];
+    }
 }
 
-- (void)_asyncInitToolkit {
+- (void)_asyncInitCloud {
     if (self.isShutdown) {
         DLog(@"guard: INIT SDK. Already shutdown. Returning.");
         return;
@@ -548,26 +547,26 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
         // fail fast if mode is set for Local
         //
-        if (![self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_cloud]) {
+        if (![block_self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_cloud]) {
             return;
         }
 
         NetworkConnectionStatus state = [block_self cloudNetworkStatus];
         switch (state) {
             case NetworkConnectionStatusInitialized: {
-                DLog(@"INIT SDK. Connection established already. Returning.");
+                DLog(@"INIT SDK. Cloud connection established already. Returning.");
                 return;
             };
                 
             case NetworkConnectionStatusInitializing: {
-                DLog(@"INIT SDK. Already initializing. Returning.");
+                DLog(@"INIT SDK. Cloud connection already initializing. Returning.");
                 return;
             };
                 
             case NetworkConnectionStatusUninitialized:
             case NetworkConnectionStatusShutdown:
             default: {
-                DLog(@"INIT SDK. Connection needs establishment. Passing thru");
+                DLog(@"INIT SDK. Cloud connection needs establishment. Passing thru");
             };
         }
         
@@ -622,6 +621,52 @@ static SecurifiToolkit *toolkit_singleton = nil;
     });
 }
 
+- (void)_asyncInitLocal:(NSString *)almondMac {
+    if (self.isShutdown) {
+        DLog(@"guard: INIT SDK. Already shutdown. Returning.");
+        return;
+    }
+
+    __weak SecurifiToolkit *block_self = self;
+
+    dispatch_async(self.commandDispatchQueue, ^() {
+        if (block_self.isShutdown) {
+            DLog(@"INIT SDK. SDK is already shutdown. Returning.");
+            return;
+        }
+
+        // fail fast if mode is set for Local
+        //
+        if (![block_self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_local]) {
+            return;
+        }
+
+        if ([block_self isCurrentLocalNetworkForAlmond:almondMac]) {
+            NetworkConnectionStatus state = [block_self networkStatus:block_self.localNetwork];
+            switch (state) {
+                case NetworkConnectionStatusInitialized: {
+                    DLog(@"INIT SDK. Local connection established already. Returning.");
+                    return;
+                };
+
+                case NetworkConnectionStatusInitializing: {
+                    DLog(@"INIT SDK. Local connection already initializing. Returning.");
+                    return;
+                };
+
+                case NetworkConnectionStatusUninitialized:
+                case NetworkConnectionStatusShutdown:
+                default: {
+                    DLog(@"INIT SDK. Local connection needs establishment. Passing thru");
+                };
+            }
+        }
+
+        [block_self setupLocalNetworkForAlmond:almondMac];
+        [block_self asyncRequestDeviceList:almondMac];
+    });
+}
+
 // Shutdown the SDK. No further work may be done after this method has been invoked.
 - (void)shutdownToolkit {
     if (self.isShutdown) {
@@ -634,6 +679,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     dispatch_async(self.networkCallbackQueue, ^(void) {
         [block_self tearDownCloudNetwork];
+        [block_self tearDownLocalNetwork];
     });
 }
 
@@ -717,7 +763,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // Set up network and wait
         //
         NSLog(@"Waiting to initialize socket");
-        [self _asyncInitToolkit];
+        [self _asyncInitCloud];
     }
     
     __weak SecurifiToolkit *block_self = self;
@@ -744,7 +790,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     __weak SecurifiToolkit *block_self = self;
     dispatch_async(self.commandDispatchQueue, ^() {
-        Network *network = [block_self localNetworkForAlmond:almondMac];
+        Network *network = [block_self setupLocalNetworkForAlmond:almondMac];
         BOOL success = [network submitCommand:command];
 
         if (success) {
@@ -1192,7 +1238,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
-    Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
+    Network *network = local ? [self setupLocalNetworkForAlmond:almondMac] : self.cloudNetwork;
 
     NetworkState *state = network.networkState;
     if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
@@ -1212,7 +1258,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)asyncRequestDeviceValueList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
-    Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
+    Network *network = local ? [self setupLocalNetworkForAlmond:almondMac] : self.cloudNetwork;
 
     NetworkState *state = network.networkState;
     [state markDeviceValuesFetchedForAlmond:almondMac];
@@ -1230,7 +1276,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
-    Network *network = local ? [self localNetworkForAlmond:almondMac] : self.cloudNetwork;
+    Network *network = local ? [self setupLocalNetworkForAlmond:almondMac] : self.cloudNetwork;
 
     NetworkState *state = network.networkState;
     if ([state wasDeviceValuesFetchedForAlmond:almondMac]) {
@@ -1846,7 +1892,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Network management
 
 - (Network *)setupCloudNetwork {
-    NSLog(@"Setting up network");
+    NSLog(@"Setting up cloud network");
     
     [self tearDownCloudNetwork];
     
@@ -1862,46 +1908,69 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return network;
 }
 
-- (void)tearDownCloudNetwork {
-    NSLog(@"Starting tear down of network");
-    
-    Network *old = self.cloudNetwork;
-    old.delegate = nil; // no longer interested in callbacks from this instance
-    [old shutdown];
-    
-    self.cloudNetwork = nil;
-    
-    NSLog(@"Finished tear down of network");
-}
-
-- (Network *)localNetworkForAlmond:(NSString *)almondMac {
+- (Network *)setupLocalNetworkForAlmond:(NSString *)almondMac {
     Network *network = self.localNetwork;
 
     if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
-        if (network.connectionState == NetworkConnectionStatusInitialized) {
-            return network;
+        NetworkConnectionStatus state = [self networkStatus:network];
+        switch (state) {
+            case NetworkConnectionStatusInitializing:
+            case NetworkConnectionStatusInitialized:
+                return network;
+            case NetworkConnectionStatusUninitialized:
+            case NetworkConnectionStatusShutdown:
+                // pass through and set up connection
+                break;
         }
-        //todo what if NetworkConnectionStatusInitializing ?
     }
 
-    if (network) {
-        [network shutdown];
-    }
+    [self tearDownLocalNetwork];
 
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-    
+
     NetworkConfig *config = [NetworkConfig webSocketConfig:almondMac];
     config.host = settings.host;
     config.port = settings.port;
     config.password = settings.password;
-    
+
     network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
-    
+
+    _localNetwork = network;
+
     [network connect];
-    
-    self.localNetwork = network;
+
     return network;
+}
+
+- (void)tearDownCloudNetwork {
+    Network *old = self.cloudNetwork;
+
+    if (old) {
+        NSLog(@"Starting tear down of cloud network");
+
+        old.delegate = nil; // no longer interested in callbacks from this instance
+        [old shutdown];
+
+        self.cloudNetwork = nil;
+
+        NSLog(@"Finished tear down of cloud network");
+    }
+}
+
+- (void)tearDownLocalNetwork {
+    Network *old = self.localNetwork;
+
+    if (old) {
+        NSLog(@"Starting tear down of local network");
+
+        old.delegate = nil; // no longer interested in callbacks from this instance
+        [old shutdown];
+
+        self.localNetwork = nil;
+
+        NSLog(@"Finished tear down of local network");
+    }
 }
 
 - (BOOL)useLocalNetwork:(NSString *)almondMac {
@@ -1940,11 +2009,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (network == self.cloudNetwork) {
         self.cloudNetwork = nil;
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
-        [self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
     }
     else if (network == self.localNetwork) {
         self.localNetwork = nil;
+        DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing local connection", __PRETTY_FUNCTION__);
     }
+
+    [self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
 }
 
 - (void)networkDidSendCommand:(Network *)network command:(GenericCommand *)command {
