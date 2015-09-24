@@ -197,8 +197,6 @@
     self = [super init];
     if (self) {
         self.enabled = [coder decodeBoolForKey:@"self.enabled"];
-        self.ssid2 = [coder decodeObjectForKey:@"self.ssid2"];
-        self.ssid5 = [coder decodeObjectForKey:@"self.ssid5"];
         self.almondplusName = [coder decodeObjectForKey:@"self.almondplusName"];
         self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
         self.host = [coder decodeObjectForKey:@"self.host"];
@@ -216,8 +214,6 @@
     [coder encodeInt32:1 forKey:@"self.schemaVersion"]; // for future use/expansion; version this schema
 
     [coder encodeBool:self.enabled forKey:@"self.enabled"];
-    [coder encodeObject:self.ssid2 forKey:@"self.ssid2"];
-    [coder encodeObject:self.ssid5 forKey:@"self.ssid5"];
     [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
     [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
     [coder encodeObject:self.host forKey:@"self.host"];
@@ -246,8 +242,6 @@
 
     if (copy != nil) {
         copy.enabled = self.enabled;
-        copy.ssid2 = self.ssid2;
-        copy.ssid5 = self.ssid5;
         copy.almondplusName = self.almondplusName;
         copy.almondplusMAC = self.almondplusMAC;
         copy.host = self.host;
@@ -275,10 +269,6 @@
         return NO;
     if (self.enabled != settings.enabled)
         return NO;
-    if (self.ssid2 != settings.ssid2 && ![self.ssid2 isEqualToString:settings.ssid2])
-        return NO;
-    if (self.ssid5 != settings.ssid5 && ![self.ssid5 isEqualToString:settings.ssid5])
-        return NO;
     if (self.almondplusName != settings.almondplusName && ![self.almondplusName isEqualToString:settings.almondplusName])
         return NO;
     if (self.almondplusMAC != settings.almondplusMAC && ![self.almondplusMAC isEqualToString:settings.almondplusMAC])
@@ -296,8 +286,6 @@
 
 - (NSUInteger)hash {
     NSUInteger hash = (NSUInteger) self.enabled;
-    hash = hash * 31u + [self.ssid2 hash];
-    hash = hash * 31u + [self.ssid5 hash];
     hash = hash * 31u + [self.almondplusName hash];
     hash = hash * 31u + [self.almondplusMAC hash];
     hash = hash * 31u + [self.host hash];
@@ -310,8 +298,6 @@
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.enabled=%d", self.enabled];
-    [description appendFormat:@", self.ssid2=%@", self.ssid2];
-    [description appendFormat:@", self.ssid5=%@", self.ssid5];
     [description appendFormat:@", self.almondplusName=%@", self.almondplusName];
     [description appendFormat:@", self.almondplusMAC=%@", self.almondplusMAC];
     [description appendFormat:@", self.host=%@", self.host];

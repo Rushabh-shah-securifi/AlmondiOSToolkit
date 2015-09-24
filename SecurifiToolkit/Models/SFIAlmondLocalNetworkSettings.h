@@ -31,12 +31,6 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 // used as a master switch for toggling between Cloud and Local mode; that is, when disabled, the Cloud mode is indicated.
 @property(nonatomic) BOOL enabled;
 
-// name for SSID 2.5ghz
-@property(nonatomic, copy) NSString *ssid2;
-
-// name for SSID 5ghz
-@property(nonatomic, copy) NSString *ssid5;
-
 // almond MAC id
 @property(nonatomic, copy) NSString *almondplusName; // null unless testConnection succeeds;
 
