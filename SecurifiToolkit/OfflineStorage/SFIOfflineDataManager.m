@@ -73,6 +73,7 @@
 
     NSMutableDictionary *local_dict = [self readDictionaryForFilePath:self.almondLocalNetworkSettingsFp locker:locker];
 
+    // keep the local settings synced with changes to almond names
     for (SFIAlmondPlus *almond in cloudAlmonds) {
         NSString *mac = almond.almondplusMAC;
 
@@ -232,9 +233,16 @@
 #pragma mark - Deletion
 
 - (void)purgeAll {
-    @synchronized (self.syncLocker) {
-        [self purgeLocalSettingsForCloudAlmonds];
-        [self purgeDevicesForCloudAlmonds];
+    NSObject *locker = self.syncLocker;
+
+    @synchronized (locker) {
+        NSArray *cloud_list = [self readAlmondList];
+        NSMutableDictionary *local_list = [self readDictionaryForFilePath:self.almondLocalNetworkSettingsFp locker:locker];
+
+        [self preserveCloudAlmondNames:cloud_list localList:local_list];
+        [self purgeDevicesForCloudAlmonds:cloud_list localList:local_list];
+
+        [self writeDictionary:local_list filePath:self.almondLocalNetworkSettingsFp locker:locker];
 
         [SFIOfflineDataManager deleteFile:ALMOND_LIST_FILENAME];
         [SFIOfflineDataManager deleteFile:HASH_FILENAME];
@@ -245,38 +253,34 @@
     }
 }
 
-- (void)purgeLocalSettingsForCloudAlmonds {
-    // before purging all almonds, delete their corresponding local network settings
-    NSObject *locker = self.syncLocker;
-
-    NSMutableDictionary *local = [self readDictionaryForFilePath:self.almondLocalNetworkSettingsFp locker:locker];
-
-    NSArray *cloudList = [self readAlmondList];
-    for (SFIAlmondPlus *almond in cloudList) {
+- (void)preserveCloudAlmondNames:(NSArray *)cloud_list localList:(NSMutableDictionary *)localList {
+    for (SFIAlmondPlus *almond in cloud_list) {
         NSString *mac = almond.almondplusMAC;
-        SFIAlmondLocalNetworkSettings *settings = local[mac];
+
+        SFIAlmondLocalNetworkSettings *settings = localList[mac];
         if (settings) {
-            [settings purgePassword];
-            [local removeObjectForKey:mac];
+            // we also ensure the local settings have the latest known almond name
+            settings.almondplusName = almond.almondplusName;
         }
     }
-
-    [self writeDictionary:local filePath:self.almondLocalNetworkSettingsFp locker:locker];
 }
 
-- (void)purgeDevicesForCloudAlmonds {
-    // remove all devices and device value for cloud almonds; preserve the local-only almonds
-    NSArray *cloud_list = [self readAlmondList];
-
+- (void)purgeDevicesForCloudAlmonds:(NSArray *)cloud_list localList:(NSMutableDictionary *)localList {
     NSObject *locker = self.syncLocker;
 
     NSMutableDictionary *devices = [self readDictionaryForFilePath:self.deviceListFp locker:locker];
     NSMutableDictionary *deviceValues = [self readDictionaryForFilePath:self.deviceValueFp locker:locker];
 
+    // remove all devices and device value for cloud almonds; preserve the local-only almonds
     for (SFIAlmondPlus *almond in cloud_list) {
         NSString *mac = almond.almondplusMAC;
-        [devices removeObjectForKey:mac];
-        [deviceValues removeObjectForKey:mac];
+        SFIAlmondLocalNetworkSettings *settings = localList[mac];
+
+        // do not delete indexes for almonds that already have local settings; we preserve local settings
+        if (!settings) {
+            [devices removeObjectForKey:mac];
+            [deviceValues removeObjectForKey:mac];
+        }
     }
 
     if (devices.count == 0) {
