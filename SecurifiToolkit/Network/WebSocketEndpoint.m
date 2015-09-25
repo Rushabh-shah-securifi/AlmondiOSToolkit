@@ -13,6 +13,7 @@
 #import "SFIDevicesList.h"
 #import "SFIGenericRouterCommand.h"
 #import "DynamicAlmondModeChange.h"
+#import "DynamicAlmondNameChangeResponse.h"
 
 typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
@@ -199,6 +200,12 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
             @"GetAlmondNameandMAC" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                 // just send back raw dictionary for now
                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ALMOND_NAME_AND_MAC_RESPONSE];
+            },
+            @"AlmondNameUpdated":  ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                DynamicAlmondNameChangeResponse *res = [DynamicAlmondNameChangeResponse new];
+                res.almondplusMAC = endpoint.config.almondMac;
+                res.almondplusName = payload[@"Name"];
+                [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_NAME_CHANGE];
             },
     };
 }
