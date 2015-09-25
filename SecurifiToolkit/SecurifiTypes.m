@@ -160,6 +160,11 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"STOP" : @(SFIDevicePropertyType_STOP),//md01
                         @"UP_DOWN" : @(SFIDevicePropertyType_UP_DOWN),//md01
                         @"LUMINANCE_PERCENT" : @(SFIDevicePropertyType_LUMINANCE_PERCENT),//md01
+                        @"ENERGY" : @(SFIDevicePropertyType_ENERGY),//md01
+                        @"CLAMP1_POWER" : @(SFIDevicePropertyType_CLAMP1_POWER),//md01
+                        @"CLAMP1_ENERGY" : @(SFIDevicePropertyType_CLAMP1_ENERGY),//md01
+                        @"CLAMP2_POWER" : @(SFIDevicePropertyType_CLAMP2_POWER),//md01
+                        @"CLAMP2_ENERGY" : @(SFIDevicePropertyType_CLAMP2_ENERGY),//md01
                         };
     }
     return
