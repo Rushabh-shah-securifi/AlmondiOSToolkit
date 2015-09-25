@@ -160,6 +160,9 @@
 }
 
 - (void)markExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace genericCommand:(GenericCommand *)cmd {
+    if (!namespace) {
+        return;
+    }
     @synchronized (self.expirableCommandsLocker) {
         NSNumber *key = @(type);
         NSMutableDictionary *dict = self.expirableCommands[key];
@@ -172,6 +175,9 @@
 }
 
 - (GenericCommand *)expirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace {
+    if (!namespace) {
+        return nil;
+    }
     @synchronized (self.expirableCommandsLocker) {
         NSNumber *key = @(type);
 
@@ -185,6 +191,9 @@
 }
 
 - (void)clearExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace {
+    if (!namespace) {
+        return;
+    }
     @synchronized (self.expirableCommandsLocker) {
         NSNumber *key = @(type);
         NSMutableDictionary *dict = self.expirableCommands[key];
