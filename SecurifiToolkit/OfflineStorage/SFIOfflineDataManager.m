@@ -113,9 +113,12 @@
         return nil;
     }
 
-    @synchronized (self.syncLocker) {
+    NSObject *locker = self.syncLocker;
+
+    @synchronized (locker) {
         NSArray *currentList = [self readAlmondList];
 
+        // try the cloud list
         for (SFIAlmondPlus *almond in currentList) {
             if ([almond.almondplusMAC isEqualToString:almondMac]) {
                 //Change the name of the current almond in the offline list
@@ -134,6 +137,16 @@
             }
         }
 
+        // didn't find almond in the cloud list: try the local settings list
+        NSMutableDictionary *local_list = [self readDictionaryForFilePath:self.almondLocalNetworkSettingsFp locker:locker];
+        SFIAlmondLocalNetworkSettings *settings = local_list[almondMac];
+        if (settings) {
+            settings.almondplusName = almondName;
+            [self writeDictionary:local_list filePath:self.almondLocalNetworkSettingsFp locker:locker];
+            return settings.asLocalLinkAlmondPlus;
+        }
+
+        // did not find any matching almond
         return nil;
     }
 }
