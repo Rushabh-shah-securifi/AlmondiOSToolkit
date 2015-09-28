@@ -230,7 +230,21 @@
     // UI can easily become confused. This needs to be sorted out.
     SLog(@"Posting dynamic %@", notificationName);
     [self post:notificationName payload:payload queue:self.dynamicCallbackQueue];
-    [self.delegate networkDidReceiveDynamicUpdate:self commandType:commandType];
+    [self.delegate networkDidReceiveDynamicUpdate:self response:payload responseType:commandType];
+}
+
+- (void)delegateData:(id)payload commandType:(CommandType)commandType {
+    __weak Network *block_self = self;
+    dispatch_sync(self.callbackQueue, ^() {
+        [block_self.delegate networkDidReceiveResponse:block_self response:payload responseType:commandType];
+    });
+}
+
+- (void)delegateDataDynamic:(id)payload commandType:(CommandType)commandType {
+    __weak Network *block_self = self;
+    dispatch_sync(self.dynamicCallbackQueue, ^() {
+        [block_self.delegate networkDidReceiveDynamicUpdate:block_self response:payload responseType:commandType];
+    });
 }
 
 - (void)post:(NSString *)notificationName payload:(id)payload queue:(dispatch_queue_t)queue {
@@ -461,18 +475,6 @@
             [self postData:AFFILIATION_COMPLETE_NOTIFIER data:payload];
             break;
         }
-            //                                        case AFFILIATION_CODE_RESPONSE:
-            //                                        {
-            //                                            // [SNLog Log:@"%s: Received Affiliation Code", __PRETTY_FUNCTION__];
-            //                                            AffiliationUserRequest *obj = (AffiliationUserRequest *)temp.command;
-            //
-            //                                            NSDictionary *data = [NSDictionary dictionaryWithObject:obj forKey:@"data"];
-            //
-            //                                            [[NSNotificationCenter defaultCenter] postNotificationName:AFFILIATION_CODE_NOTIFIER object:self userInfo:data];
-            //                                            tempObj=nil;
-            //                                            temp=nil;
-            //                                        }
-            //                                            break;
         case CommandType_ALMOND_LIST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ALMOND_LIST_NOTIFIER data:payload];
@@ -507,14 +509,6 @@
             [self postData:MOBILE_COMMAND_NOTIFIER data:payload];
             break;
         }
-        case CommandType_DYNAMIC_DEVICE_DATA: {
-            [self postDataDynamic:DYNAMIC_DEVICE_DATA_NOTIFIER data:payload commandType:commandType];
-            break;
-        }
-        case CommandType_DYNAMIC_DEVICE_VALUE_LIST: {
-            [self postDataDynamic:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER data:payload commandType:commandType];
-            break;
-        }
         case CommandType_GENERIC_COMMAND_RESPONSE: {
             GenericCommandResponse *obj = (GenericCommandResponse *) payload;
             [self tryMarkUnitCompletion:YES responseType:commandType];
@@ -522,7 +516,6 @@
             break;
         }
         case CommandType_GENERIC_COMMAND_NOTIFICATION: {
-//                                            [self tryMarkUnitCompletion:YES responseType:GENERIC_COMMAND_NOTIFICATION];
             [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:payload];
             break;
         }
@@ -536,28 +529,11 @@
             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:payload];
             break;
         }
-        case CommandType_DYNAMIC_ALMOND_ADD: {
-            [self postDataDynamic:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER data:payload commandType:commandType];
-            break;
-        }
-        case CommandType_DYNAMIC_ALMOND_DELETE: {
-            [self postDataDynamic:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER data:payload commandType:commandType];
-            break;
-        }
         case CommandType_SENSOR_CHANGE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:SENSOR_CHANGE_NOTIFIER data:payload];
             break;
         }
-        case CommandType_DYNAMIC_ALMOND_NAME_CHANGE: {
-            [self postDataDynamic:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER data:payload commandType:commandType];
-            break;
-        }
-        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
-            [self postDataDynamic:DYNAMIC_ALMOND_MODE_CHANGE_NOTIFIER data:payload commandType:commandType];
-            break;
-        }
-
         case CommandType_USER_PROFILE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:USER_PROFILE_NOTIFIER data:payload];
@@ -648,12 +624,6 @@
             break;
         }
 
-        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER data:payload];
-            break;
-        }
-
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:payload];
@@ -704,8 +674,6 @@
             break;
         };
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
-            //md01
-            [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
             break;
         };
@@ -716,26 +684,18 @@
             break;
         };
         case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST: {
-            //md01
-            [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_UPDATE_REQUEST_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST: {
-            //md01
-            [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_JOIN_REQUEST_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST: {
-            //md01
-            [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_LEFT_REQUEST_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_ADD_REQUEST: {
-            //md01
-            [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_ADD_REQUEST_NOTIFIER data:payload commandType:commandType];
             break;
         };
@@ -763,6 +723,32 @@
             [self postData:NOTIFICATION_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_NOTIFIER data:payload];
             break;
         };
+
+        // =========================
+
+        case CommandType_DYNAMIC_ALMOND_ADD:
+        case CommandType_DYNAMIC_ALMOND_DELETE:
+        case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:
+        case CommandType_DYNAMIC_DEVICE_DATA:
+        case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
+        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:
+        {
+            [self delegateDataDynamic:payload commandType:commandType];
+            break;
+        }
+
+        // =========================
+
+        case CommandType_ALMOND_NAME_AND_MAC_RESPONSE:
+        {
+            // posted from web socket only; payload is dictionary
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self delegateData:payload commandType:commandType];
+            break;
+        }
+
+        // =========================
 
         default:
             break;

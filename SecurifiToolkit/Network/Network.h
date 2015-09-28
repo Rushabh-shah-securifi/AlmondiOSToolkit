@@ -35,11 +35,13 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 
 - (void)networkConnectionDidClose:(Network *)network;
 
-- (void)networkDidReceiveDynamicUpdate:(Network *)network commandType:(enum CommandType)type;
-
 - (void)networkDidSendCommand:(Network *)network command:(GenericCommand *)command;
 
 - (void)networkDidReceiveCommandResponse:(Network *)network command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime responseType:(enum CommandType)type;
+
+- (void)networkDidReceiveResponse:(Network*)network response:(id)payload responseType:(enum CommandType)commandType;
+
+- (void)networkDidReceiveDynamicUpdate:(Network*)network response:(id)payload responseType:(enum CommandType)commandType;
 
 @end
 

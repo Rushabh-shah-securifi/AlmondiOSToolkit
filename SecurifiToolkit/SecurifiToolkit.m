@@ -171,18 +171,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [center addObserver:self selector:@selector(onLogoutAllResponse:) name:LOGOUT_ALL_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeleteAccountResponse:) name:DELETE_ACCOUNT_RESPONSE_NOTIFIER object:nil];
 
-        [center addObserver:self selector:@selector(onDynamicAlmondListAdd:) name:DYNAMIC_ALMOND_LIST_ADD_NOTIFIER object:nil];
-        [center addObserver:self selector:@selector(onDynamicAlmondListDelete:) name:DYNAMIC_ALMOND_LIST_DELETE_NOTIFIER object:nil];
-        [center addObserver:self selector:@selector(onDynamicAlmondNameChange:) name:DYNAMIC_ALMOND_NAME_CHANGE_NOTIFIER object:nil];
-
         [center addObserver:self selector:@selector(onAlmondRouterGenericNotification:) name:GENERIC_COMMAND_CLOUD_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onAlmondRouterGenericCommandResponse:) name:GENERIC_COMMAND_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onAlmondRouterCommandResponse:) name:ALMOND_COMMAND_RESPONSE_NOTIFIER object:nil];
 
-        [center addObserver:self selector:@selector(onDynamicDeviceListChange:) name:DYNAMIC_DEVICE_DATA_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceListResponse:) name:DEVICE_DATA_NOTIFIER object:nil];
-
-        [center addObserver:self selector:@selector(onDynamicDeviceValueListChange:) name:DYNAMIC_DEVICE_VALUE_LIST_NOTIFIER object:nil];
         [center addObserver:self selector:@selector(onDeviceValueListChange:) name:DEVICE_VALUE_LIST_NOTIFIER object:nil];
 
         [center addObserver:self selector:@selector(onAlmondListResponse:) name:ALMOND_LIST_NOTIFIER object:nil];
@@ -194,7 +187,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [center addObserver:self selector:@selector(onNotificationRegistrationResponseCallback:) name:NOTIFICATION_REGISTRATION_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onNotificationDeregistrationResponseCallback:) name:NOTIFICATION_DEREGISTRATION_NOTIFIER object:nil];
             [center addObserver:self selector:@selector(onNotificationPrefListChange:) name:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER object:nil];
-            [center addObserver:self selector:@selector(onDynamicNotificationPrefListChange:) name:DYNAMIC_NOTIFICATION_PREFERENCE_LIST_NOTIFIER object:nil];
 
             [center addObserver:self selector:@selector(onDeviceNotificationPreferenceChangeResponseCallback:) name:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER object:nil];
 
@@ -2047,13 +2039,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
-- (void)networkDidReceiveDynamicUpdate:(Network *)network commandType:(enum CommandType)commandType {
-    if (network == self.cloudNetwork) {
-        self.scoreboard.dynamicUpdateCount++;
-        [self markCommandEvent:commandType];
-    }
-}
-
 - (void)networkDidReceiveCommandResponse:(Network *)network command:(GenericCommand *)cmd timeToCompletion:(NSTimeInterval)roundTripTime responseType:(enum CommandType)commandType {
     if (network == self.cloudNetwork) {
         self.scoreboard.commandResponseCount++;
@@ -2071,6 +2056,79 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     DLog(@"Command completion: cmd:%@, %0.3f secs", cmd, roundTripTime);
 }
+
+- (void)networkDidReceiveResponse:(Network*)network response:(id)payload responseType:(enum CommandType)commandType {
+    if (network == self.cloudNetwork) {
+        self.scoreboard.commandResponseCount++;
+        [self markCommandEvent:commandType];
+    }
+
+    switch (commandType) {
+        case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: {
+            NSDictionary *dict = payload;
+            NSString *name = dict[@"Name"];
+
+            NSString *mac_hex = dict[@"MAC"];
+            NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
+
+            SFIAlmondPlus *current = [self currentAlmond];
+            if ([current.almondplusMAC isEqualToString:mac]) {
+                if ([current.almondplusName isEqualToString:name]) {
+                    return; // name is the same
+                }
+
+                DynamicAlmondNameChangeResponse *res = DynamicAlmondNameChangeResponse.new;
+                res.almondplusMAC = mac;
+                res.almondplusName = name;
+
+                [self onDynamicAlmondNameChange:res];
+            }
+
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+- (void)networkDidReceiveDynamicUpdate:(Network*)network response:(id)payload responseType:(enum CommandType)commandType {
+    if (network == self.cloudNetwork) {
+        self.scoreboard.dynamicUpdateCount++;
+        [self markCommandEvent:commandType];
+    }
+
+    switch (commandType) {
+        case CommandType_DYNAMIC_DEVICE_DATA:
+            [self onDynamicDeviceListChange:payload network:network];
+            break;
+        case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
+            [self onDynamicDeviceValueListChange:payload];
+            break;
+        case CommandType_DYNAMIC_ALMOND_ADD:
+            [self onDynamicAlmondListAdd:payload];
+            break;
+        case CommandType_DYNAMIC_ALMOND_DELETE:
+            [self onDynamicAlmondListDelete:payload];
+            break;
+        case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
+            [self onDynamicAlmondNameChange:payload];
+            break;
+        case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
+            if (self.config.enableNotifications) {
+                [self onDynamicNotificationPrefListChange:payload];
+            }
+            break;
+        }
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:
+            [self onDynamicAlmondModeChange:payload network:network];
+            break;
+
+        default:
+            break;
+    }
+}
+
 
 #pragma mark - Internal Command Dispatch and Notification
 
@@ -2128,14 +2186,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
-- (void)onDynamicAlmondListAdd:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
+- (void)onDynamicAlmondListAdd:(AlmondListResponse*)obj {
+    if (obj == nil) {
         return;
     }
-
-    AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
     if (!obj.isSuccessful) {
         return;
     }
@@ -2186,14 +2240,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
-- (void)onDynamicAlmondNameChange:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-
-    DynamicAlmondNameChangeResponse *obj = (DynamicAlmondNameChangeResponse *) [data valueForKey:@"data"];
+- (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse*)obj {
     if (obj == nil) {
         return;
     }
@@ -2401,16 +2448,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
-- (void)onDynamicDeviceListChange:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
+- (void)onDynamicDeviceListChange:(DeviceListResponse*)obj network:(Network*)network {
+    if (!obj) {
         return;
     }
 
-    DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
-
-    Network *network = [data valueForKey:@"network"];;
     [network.networkState clearWillFetchDeviceListForAlmond:obj.almondMAC];
 
     if (!obj.isSuccessful) {
@@ -2564,14 +2606,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - Device Value Update callbacks
 
-- (void)onDynamicDeviceValueListChange:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
+- (void)onDynamicDeviceValueListChange:(DeviceValueResponse *)obj {
+    if (obj == nil) {
         return;
     }
 
-    DeviceValueResponse *obj = (DeviceValueResponse *) [data valueForKey:@"data"];
     NSString *almondMac = obj.almondMAC;
 
     [self processDeviceValueList:obj.deviceValueList mac:almondMac];
@@ -2771,16 +2810,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
-- (void)onDynamicNotificationPrefListChange:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
+- (void)onDynamicNotificationPrefListChange:(DynamicNotificationPreferenceList*)obj {
+    if (obj == nil) {
         return;
     }
 
-    DynamicNotificationPreferenceList *obj = (DynamicNotificationPreferenceList *) [data valueForKey:@"data"];
     NSString *currentMAC = obj.almondMAC;
-
     if (currentMAC.length == 0) {
         return;
     }
@@ -3147,14 +3182,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }
 
-- (void)onDynamicAlmondModeChange:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-
-    DynamicAlmondModeChange *res = [data valueForKey:@"data"];
+- (void)onDynamicAlmondModeChange:(DynamicAlmondModeChange*)res network:(Network*)network {
     if (res == nil) {
         return;
     }
@@ -3162,8 +3190,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res.success) {
         return;
     }
-
-    Network *network = [data valueForKey:@"network"];
 
     [network.networkState markModeForAlmond:res.almondMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
