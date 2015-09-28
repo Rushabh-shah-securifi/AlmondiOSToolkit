@@ -656,6 +656,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
 
         [block_self setupLocalNetworkForAlmond:almondMac];
+        [block_self asyncSendToLocal:[GenericCommand websocketAlmondNameAndMac] almondMac:almondMac];
         [block_self asyncRequestDeviceList:almondMac];
     });
 }
@@ -1231,38 +1232,48 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Device and Device Value Management
 
 - (void)asyncRequestDeviceList:(NSString *)almondMac {
+    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
+        NetworkState *state = aNetwork.networkState;
+        if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
+            return NO;
+        }
+
+        [state markWillFetchDeviceListForAlmond:almondMac];
+        return YES;
+    };
+
     BOOL local = [self useLocalNetwork:almondMac];
-    Network *network = local ? [self setupLocalNetworkForAlmond:almondMac] : self.cloudNetwork;
-
-    NetworkState *state = network.networkState;
-    if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
-        return;
-    }
-    [state markWillFetchDeviceListForAlmond:almondMac];
-
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSensorDeviceListCommand];
-        [network submitCommand:cmd];
+        cmd.networkPrecondition = precondition;
+
+        [self asyncSendToLocal:cmd almondMac:almondMac];
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudSensorDeviceListCommand:almondMac];
+        cmd.networkPrecondition = precondition;
+
         [self asyncSendToCloud:cmd];
     }
 }
 
 - (void)asyncRequestDeviceValueList:(NSString *)almondMac {
+    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
+        [aNetwork.networkState markDeviceValuesFetchedForAlmond:almondMac];
+        return YES;
+    };
+
     BOOL local = [self useLocalNetwork:almondMac];
-    Network *network = local ? [self setupLocalNetworkForAlmond:almondMac] : self.cloudNetwork;
-
-    NetworkState *state = network.networkState;
-    [state markDeviceValuesFetchedForAlmond:almondMac];
-
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSensorDeviceValueListCommand];
-        [network submitCommand:cmd];
+        cmd.networkPrecondition = precondition;
+
+        [self asyncSendToLocal:cmd almondMac:almondMac];
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudSensorDeviceValueListCommand:almondMac];
+        cmd.networkPrecondition = precondition;
+
         [self asyncSendToCloud:cmd];
         [self asyncRequestNotificationPreferenceList:almondMac];
     }
@@ -2160,9 +2171,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
         if (self.config.enableNotifications) {
             // clear out Notification settings
-            Network *network = self.cloudNetwork;
+            Network *network = [data valueForKey:@"network"];;
             if (network) {
-                [self.cloudNetwork.networkState clearAlmondMode:deleted.almondplusMAC];
+                [network.networkState clearAlmondMode:deleted.almondplusMAC];
             }
 
             [self.notificationsDb deleteNotificationsForAlmond:deleted.almondplusMAC];
@@ -2399,7 +2410,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     DeviceListResponse *obj = (DeviceListResponse *) [data valueForKey:@"data"];
 
-    [self.cloudNetwork.networkState clearWillFetchDeviceListForAlmond:obj.almondMAC];
+    Network *network = [data valueForKey:@"network"];;
+    [network.networkState clearWillFetchDeviceListForAlmond:obj.almondMAC];
 
     if (!obj.isSuccessful) {
         return;
@@ -2425,7 +2437,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     NSString *mac = obj.almondMAC;
 
-    [self.cloudNetwork.networkState clearWillFetchDeviceListForAlmond:mac];
+    Network *network = [data valueForKey:@"network"];;
+    [network.networkState clearWillFetchDeviceListForAlmond:mac];
 
     if (!obj.isSuccessful) {
         NSLog(@"Device list response was not successful; stopping");
@@ -2451,7 +2464,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
     DeviceListResponse *res = (DeviceListResponse *) [data valueForKey:@"data"];
 
-    [self.cloudNetwork.networkState clearWillFetchDeviceListForAlmond:res.almondMAC];
+    Network *network = [data valueForKey:@"network"];;
+    [network.networkState clearWillFetchDeviceListForAlmond:res.almondMAC];
 
     if (!res.isSuccessful) {
         NSLog(@"Device list response was not successful; stopping");
