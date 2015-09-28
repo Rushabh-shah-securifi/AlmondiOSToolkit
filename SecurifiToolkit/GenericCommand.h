@@ -21,6 +21,8 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 @interface GenericCommand : NSObject
 
++ (instancetype)websocketAlmondNameAndMac;
+
 + (instancetype)websocketSensorDevice:(SFIDevice *)device name:(NSString *)newName location:(NSString *)newLocation almondMac:(NSString *)almondMac;
 
 + (instancetype)cloudSensorDevice:(SFIDevice *)device name:(NSString *)newName location:(NSString *)newLocation almondMac:(NSString *)almondMac;

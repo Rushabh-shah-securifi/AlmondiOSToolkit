@@ -20,6 +20,17 @@
 
 @implementation GenericCommand
 
++ (instancetype)websocketAlmondNameAndMac {
+    sfi_id cid = [GenericCommand nextCorrelationId];
+
+    NSDictionary *payload = @{
+            @"MobileInternalIndex" : @(cid),
+            @"CommandType" : @"GetAlmondNameAndMAC",
+    };
+
+    return [GenericCommand jsonPayloadCommand:payload commandType:CommandType_ALMOND_NAME_AND_MAC_REQUEST];
+}
+
 + (instancetype)websocketSensorDevice:(SFIDevice *)device name:(NSString *)newName location:(NSString *)newLocation almondMac:(NSString *)almondMac {
     SensorChangeRequest *request = [SensorChangeRequest new];
     request.almondMAC = almondMac;

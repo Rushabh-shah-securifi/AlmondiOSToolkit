@@ -52,13 +52,7 @@
         self.testResult = TestConnectionResult_unknown;
         _test_command_latch = dispatch_semaphore_create(0);
 
-        NSTimeInterval cid = [NSDate date].timeIntervalSince1970;
-        NSDictionary *payload = @{
-                @"MobileInternalIndex" : @(cid),
-                @"CommandType" : @"GetAlmondNameAndMAC",
-        };
-
-        GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:CommandType_ALMOND_NAME_AND_MAC_REQUEST];
+        GenericCommand *cmd = [GenericCommand websocketAlmondNameAndMac];
         NSError *error = nil;
         if ([endpoint sendCommand:cmd error:&error]) {
             [self waitOnLatch:self.test_command_latch timeout:3 logMsg:@"Failed to send GetAlmondNameandMAC to web socket"];
