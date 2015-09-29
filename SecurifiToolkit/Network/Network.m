@@ -85,7 +85,7 @@
     else {
         self.endpoint = [WebSocketEndpoint endpointWithConfig:config];
     }
-    
+
     self.endpoint.delegate = self;
     [self.endpoint connect];
 }
@@ -435,14 +435,6 @@
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
     switch (commandType) {
-        case CommandType_LOGIN_RESPONSE: {
-            LoginResponse *obj = (LoginResponse *) payload;
-            [self markLoggedInState:obj.isSuccessful];
-            [self tryMarkUnitCompletion:obj.isSuccessful responseType:commandType];
-            [self postData:LOGIN_NOTIFIER data:obj];
-            break;
-        }
-
         case CommandType_SIGNUP_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:SIGN_UP_NOTIFIER data:payload];
@@ -458,72 +450,24 @@
             break;
         }
 
-        case CommandType_LOGOUT_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:LOGOUT_NOTIFIER data:payload];
-            break;
-        }
-
-        case CommandType_LOGOUT_ALL_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:LOGOUT_ALL_NOTIFIER data:payload];
-            break;
-        }
-
         case CommandType_AFFILIATION_USER_COMPLETE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:AFFILIATION_COMPLETE_NOTIFIER data:payload];
             break;
         }
-        case CommandType_ALMOND_LIST_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ALMOND_LIST_NOTIFIER data:payload];
-            break;
-        }
 
-        case CommandType_DEVICE_DATA_HASH_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DEVICEDATA_HASH_NOTIFIER data:payload];
-            break;
-        }
-
-        case CommandType_DEVICE_DATA_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DEVICE_DATA_NOTIFIER data:payload];
-            break;
-        }
-
-        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DEVICE_LIST_AND_VALUES_NOTIFIER data:payload];
-            break;
-        }
-
-        case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DEVICE_VALUE_LIST_NOTIFIER data:payload];
-            break;
-        }
         case CommandType_MOBILE_COMMAND_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:MOBILE_COMMAND_NOTIFIER data:payload];
             break;
         }
-        case CommandType_GENERIC_COMMAND_RESPONSE: {
-            GenericCommandResponse *obj = (GenericCommandResponse *) payload;
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:GENERIC_COMMAND_NOTIFIER data:obj];
-            break;
-        }
-        case CommandType_GENERIC_COMMAND_NOTIFICATION: {
-            [self postData:GENERIC_COMMAND_CLOUD_NOTIFIER data:payload];
-            break;
-        }
+
         case CommandType_VALIDATE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:VALIDATE_RESPONSE_NOTIFIER data:payload];
             break;
         }
+
         case CommandType_RESET_PASSWORD_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:payload];
@@ -548,6 +492,8 @@
 
         case CommandType_DELETE_ACCOUNT_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self delegateData:payload commandType:commandType];
+            // fix me: some UI code still dependent on this notification
             [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:payload];
             break;
         }
@@ -582,24 +528,6 @@
             break;
         }
 
-        case CommandType_ALMOND_NAME_CHANGE_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ALMOND_NAME_CHANGE_NOTIFIER data:payload];
-            break;
-        }
-
-        case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ALMOND_MODE_CHANGE_NOTIFIER data:payload];
-            break;
-        }
-
-        case CommandType_ALMOND_MODE_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ALMOND_MODE_RESPONSE_NOTIFIER data:payload];
-            break;
-        }
-
         case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:payload];
@@ -617,49 +545,6 @@
             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:payload];
             break;
         }
-
-        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_DEREGISTRATION_NOTIFIER data:payload];
-            break;
-        }
-
-        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_PREFERENCE_LIST_RESPONSE_NOTIFIER data:payload];
-            break;
-        }
-        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_PREFERENCE_CHANGE_RESPONSE_NOTIFIER data:payload];
-            break;
-        }
-        case CommandType_NOTIFICATIONS_SYNC_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_LIST_SYNC_RESPONSE_NOTIFIER data:payload];
-            break;
-        };
-        case CommandType_NOTIFICATIONS_COUNT_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_COUNT_RESPONSE_NOTIFIER data:payload];
-            break;
-        };
-        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_CLEAR_COUNT_RESPONSE_NOTIFIER data:payload];
-            break;
-        };
-        case CommandType_DEVICELOG_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DEVICELOG_LIST_SYNC_RESPONSE_NOTIFIER data:payload];
-            break;
-        };
-
-        case CommandType_ALMOND_COMMAND_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ALMOND_COMMAND_RESPONSE_NOTIFIER data:payload];
-            break;
-        };
 
         case CommandType_GET_ALL_SCENES: {
             //md01
@@ -740,9 +625,34 @@
 
         // =========================
 
-        case CommandType_ALMOND_NAME_AND_MAC_RESPONSE:
+        case CommandType_LOGIN_RESPONSE: {
+            LoginResponse *obj = (LoginResponse *) payload;
+            [self markLoggedInState:obj.isSuccessful];
+            // pass through to normal handler below
+        }
+
+        case CommandType_LOGOUT_RESPONSE:
+        case CommandType_LOGOUT_ALL_RESPONSE:
+        case CommandType_ALMOND_LIST_RESPONSE:
+        case CommandType_DEVICE_DATA_HASH_RESPONSE:
+        case CommandType_DEVICE_DATA_RESPONSE:
+        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE:
+        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
+        case CommandType_GENERIC_COMMAND_RESPONSE:
+        case CommandType_GENERIC_COMMAND_NOTIFICATION:
+        case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
+        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:
+        case CommandType_ALMOND_MODE_RESPONSE:
+        case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:
+        case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
+        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:
+        case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
+        case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
+        case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
+        case CommandType_DEVICELOG_RESPONSE:
+        case CommandType_ALMOND_COMMAND_RESPONSE:
+        case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: // posted from web socket only; payload is dictionary
         {
-            // posted from web socket only; payload is dictionary
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self delegateData:payload commandType:commandType];
             break;
