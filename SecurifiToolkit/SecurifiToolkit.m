@@ -905,7 +905,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
-- (void)onLoginResponse:(LoginResponse *)res {
+- (void)onLoginResponse:(LoginResponse *)res network:(Network *)network {
     if (res.isSuccessful) {
         // Password is always cleared prior to submitting a fresh login from the UI.
         if (![self hasSecPassword]) {
@@ -919,7 +919,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
         // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
         // But the client was not logged in. Send them now...
-        [self asyncInitializeConnection1:self.cloudNetwork];
+        [self asyncInitializeConnection1:network];
     }
     else {
         // Logon failed:
@@ -2021,7 +2021,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     switch (commandType) {
         case CommandType_LOGIN_RESPONSE: {
             LoginResponse *obj = (LoginResponse *) payload;
-            [self onLoginResponse:obj];
+            [self onLoginResponse:obj network:network];
             break;
         }
 
@@ -2044,7 +2044,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
         case CommandType_ALMOND_LIST_RESPONSE: {
             AlmondListResponse *res = payload;
-            [self onAlmondListResponse:res];
+            [self onAlmondListResponse:res network:network];
             break;
         }
 
@@ -2249,10 +2249,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - Almond Updates
 
-- (void)onAlmondListResponse:(AlmondListResponse*)obj {
+- (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network {
     NSLog(@"Received Almond list response");
 
-    [self.cloudNetwork markCloudInitialized];
+    [network markCloudInitialized];
 
     if (!obj.isSuccessful) {
         return;
@@ -2267,7 +2267,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
 
     // After requesting the Almond list, we then want to get additional info
-    [self asyncInitializeConnection2:self.cloudNetwork];
+    [self asyncInitializeConnection2:network];
 
     // Tell the world
     [self postNotification:kSFIDidUpdateAlmondList data:plus];
