@@ -110,7 +110,31 @@
     obj.value = payload[@"value"];
     
     obj.externalId = payload[@"pk"];
-    
+    //md01<<<<
+    str = payload[@"client_id"];
+    if ([str isKindOfClass:[NSString class]]) {
+        if (str.length>0) {
+            obj.deviceId = (sfi_id) str.longLongValue;
+            
+            NSString * name = @"";
+            if (payload[@"client_name"]) {
+                name = payload[@"client_name"];
+            }
+            NSString * type = @"other";
+            if (payload[@"client_type"]) {
+                type = payload[@"client_type"];
+            }
+            NSString * alert = payload[@"value"];
+            
+            if ([alert rangeOfString:name].location != NSNotFound) {
+                alert = [alert stringByReplacingOccurrencesOfString:name withString:@""];;
+            }
+            obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
+            obj.deviceType = SFIDeviceType_WIFIClient;
+        }
+    }
+    //md01>>>
+
     return obj;
 }
 

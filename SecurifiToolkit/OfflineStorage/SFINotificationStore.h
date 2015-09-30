@@ -22,7 +22,7 @@
 - (NSArray *)fetchDateBuckets:(NSUInteger)limit;
 
 // Called when the last records are being displayed to signal more should be fetched/loaded, if possible
-- (void)ensureFetchNotifications;
+- (void)ensureFetchNotifications:(BOOL)isForWifiClients;
 
 - (SFINotification *)fetchNotificationForBucket:(NSDate *)bucket index:(NSUInteger)pos;
 
@@ -40,7 +40,7 @@
 
 @protocol SFIDeviceLogStoreDelegate
 
-- (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore;
+- (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore forWiFiClient:(BOOL)isForWifiClients;
 
 @end
 
