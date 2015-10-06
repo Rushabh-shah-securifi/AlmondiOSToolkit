@@ -321,6 +321,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (currentAlmond) {
         if ([currentAlmond.almondplusMAC isEqualToString:almondMac]) {
             [self removeCurrentAlmond];
+
+            NSArray *cloud = self.almondList;
+            if (cloud.count > 0) {
+                [self setCurrentAlmond:cloud.firstObject];
+            }
+            else {
+                NSArray *local = self.localLinkedAlmondList;
+                if (local.count > 0) {
+                    [self setCurrentAlmond:local.firstObject];
+                }
+            }
         }
     }
 
