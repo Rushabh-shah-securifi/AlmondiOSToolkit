@@ -2,6 +2,7 @@
 
 NSString *securifi_name_to_device_type(SFIDeviceType type) {
     switch (type) {
+        case SFIDeviceType_BinarySwitch_0:return @"0_BinarySwitch";
         case SFIDeviceType_UnknownDevice_0:return @"0_UnknownDevice";
         case SFIDeviceType_BinarySwitch_1:return @"1_BinarySwitch";
         case SFIDeviceType_MultiLevelSwitch_2:return @"2_MultiLevelSwitch";
@@ -49,12 +50,18 @@ NSString *securifi_name_to_device_type(SFIDeviceType type) {
         case SFIDeviceType_BinaryPowerSwitch_45:return @"45_BinaryPowerSwitch";
         case SFIDeviceType_SetPointThermostat_46:return @"46_SetPointThermostat";
         case SFIDeviceType_HueLamp_48:return @"48_HueLamp";
-        case SFIDeviceType_NestThermostat_57:return @"57_NestThermostat";
-        case SFIDeviceType_NestSmokeDetector_58:return @"58_NestSmokeDetector";
+        case SFIDeviceType_MultiSensor_49:return @"49_MultiSensor";
         case SFIDeviceType_SecurifiSmartSwitch_50:return @"50_SecurifiSmartSwitch";
         case SFIDeviceType_51:return @"51_SFIDeviceType";
         case SFIDeviceType_RollerShutter_52:return @"52_RollerShutter";
         case SFIDeviceType_GarageDoorOpener_53:return @"53_GarageDoorOpener";
+        case SFIDeviceType_ZWtoACIRExtender_54:return @"54_ZWtoACIRExtender";
+        case SFIDeviceType_MultiSoundSiren_55:return @"55_MultiSoundSiren";
+        case SFIDeviceType_EnergyReader_56:return @"56_EnergyReader";
+        case SFIDeviceType_NestThermostat_57:return @"57_NestThermostat";
+        case SFIDeviceType_NestSmokeDetector_58:return @"58_NestSmokeDetector";
+        case SFIDeviceType_WIFIClient:return @"WIFIClient";
+        case SFIDeviceType_count:return @"count_iterator_FIX_ME!";
         default: return [NSString stringWithFormat:@"%d_UnknownDevice", type];
     }
 }
