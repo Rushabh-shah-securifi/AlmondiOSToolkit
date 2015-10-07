@@ -83,11 +83,16 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_UNKNOWN = 0,
     SFIDevicePropertyType_AC_CURRENTDIVISOR,
     SFIDevicePropertyType_AC_CURRENTMULTIPLIER,
+    SFIDevicePropertyType_AC_FAN_MODE,
     SFIDevicePropertyType_AC_FREQUENCY,
     SFIDevicePropertyType_AC_FREQUENCYDIVISOR,
     SFIDevicePropertyType_AC_FREQUENCYMULTIPLIER,
+    SFIDevicePropertyType_AC_MODE,
     SFIDevicePropertyType_AC_POWERDIVISOR,
     SFIDevicePropertyType_AC_POWERMULTIPLIER,
+    SFIDevicePropertyType_AC_SETPOINT_HEATING,
+    SFIDevicePropertyType_AC_SETPOINT_COOLING,
+    SFIDevicePropertyType_AC_SWING,
     SFIDevicePropertyType_AC_VOLTAGEDIVISOR,
     SFIDevicePropertyType_AC_VOLTAGEMULTIPLIER,
     SFIDevicePropertyType_ACTIVE_POWER,
@@ -99,6 +104,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_BRIGHTNESS,
     SFIDevicePropertyType_COLOR_HUE,
     SFIDevicePropertyType_COLOR_TEMPERATURE,
+    SFIDevicePropertyType_CONFIGURATION,
     SFIDevicePropertyType_CURRENT_POSITION,
     SFIDevicePropertyType_CURRENT_HUE,
     SFIDevicePropertyType_CURRENT_SATURATION,
@@ -118,6 +124,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_EMER_ALARM,
     SFIDevicePropertyType_HUMIDITY,
     SFIDevicePropertyType_ILLUMINANCE,
+    SFIDevicePropertyType_ILLUMINANCE_PERCENT,
+    SFIDevicePropertyType_IR_CODE,
     SFIDevicePropertyType_LOCK_CONF,
     SFIDevicePropertyType_LOCK_STATE,
     SFIDevicePropertyType_LOW_BATTERY,
@@ -166,13 +174,6 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_HAS_LEAF,//md01
     SFIDevicePropertyType_NEST_THERMOSTAT_MODE,//md01
     SFIDevicePropertyType_NEST_THERMOSTAT_FAN_STATE,//md01
-    SFIDevicePropertyType_AC_MODE,//md01
-    SFIDevicePropertyType_AC_SETPOINT_COOLING,//md01
-    SFIDevicePropertyType_AC_SETPOINT_HEATING,//md01
-    SFIDevicePropertyType_AC_FAN_MODE,//md01
-    SFIDevicePropertyType_CONFIGURATION,//md01
-    SFIDevicePropertyType_AC_SWING,//md01
-    SFIDevicePropertyType_IR_CODE,//md01
     SFIDevicePropertyType_STOP,//md01
     SFIDevicePropertyType_UP_DOWN,//md01
     SFIDevicePropertyType_LUMINANCE_PERCENT,//md01
