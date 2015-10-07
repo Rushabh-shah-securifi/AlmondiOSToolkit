@@ -119,7 +119,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 + (void)initialize:(SecurifiConfigurator *)config {
     static dispatch_once_t once_predicate;
-
+    
     dispatch_once(&once_predicate, ^{
         toolkit_singleton = [[SecurifiToolkit alloc] initWithConfig:config];
     });
@@ -137,35 +137,35 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self = [super init];
     if (self) {
         _config = [config copy];
-
+        
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
-
+        
         if (config.enableNotifications) {
             {
                 DatabaseStore *store = [DatabaseStore notificationsDatabase];
                 _notificationsDb = store;
                 _notificationsStore = [_notificationsDb newNotificationStore];
             }
-
+            
             {
                 DatabaseStore *store = [DatabaseStore deviceLogsDatabase];
                 _deviceLogsDb = store;
             }
         }
-
+        
         // default; do not change
         [self setupReachability:config.productionCloudHost];
         self.useProductionCloud = YES;
-
+        
         _networkCallbackQueue = dispatch_queue_create("socket_callback", DISPATCH_QUEUE_CONCURRENT);
         _networkDynamicCallbackQueue = dispatch_queue_create("socket_dynamic_callback", DISPATCH_QUEUE_CONCURRENT);
         _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
-
+        
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(onReachabilityChanged:) name:kSFIReachabilityChangedNotification object:nil];
     }
-
+    
     return self;
 }
 
@@ -178,16 +178,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (enum SFIAlmondConnectionMode)currentConnectionMode {
     return self.defaultConnectionMode;
-/*
-    SFIAlmondPlus *plus = self.currentAlmond;
-    if (plus) {
-        // account for when app is not yet logged into the cloud and does not have an almond list
-        return [self connectionModeForAlmond:plus.almondplusMAC];
-    }
-    else {
-        return self.defaultConnectionMode;
-    }
-*/
+    /*
+     SFIAlmondPlus *plus = self.currentAlmond;
+     if (plus) {
+     // account for when app is not yet logged into the cloud and does not have an almond list
+     return [self connectionModeForAlmond:plus.almondplusMAC];
+     }
+     else {
+     return self.defaultConnectionMode;
+     }
+     */
 }
 
 // tests that the system configuration and current almond's link type are compatible with the specified mode
@@ -197,7 +197,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (defaultMode != mode) {
         return NO;
     }
-
+    
     // check current almond config
     SFIAlmondPlus *current = [self currentAlmond];
     if (current) {
@@ -205,7 +205,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             return mode == SFIAlmondConnectionMode_local;
         }
     }
-
+    
     // if no current almond, then we allow cloud connection (consider "logging in scenario"
     return YES;
 }
@@ -225,32 +225,32 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return SFIAlmondConnectionMode_cloud;
     }
-
+    
     enum SFIAlmondConnectionMode defaultMode = [self defaultConnectionMode];
-
-/*
-    // Find the Almond; check current one first for "fail fast" scenario, as it is likely the one we want.
-    // The scenario we need to avoid: returning Cloud mode for an Almond that is local only.
-    // In effect, the logic will auto-switch the connection mode for local-only almonds; or otherwise,
-    // honor the default mode.
-    SFIAlmondPlus *current = [self currentAlmond];
-    if (current && [current.almondplusMAC isEqualToString:almondMac]) {
-        if (current.linkType == SFIAlmondPlusLinkType_local_only) {
-            return SFIAlmondConnectionMode_local;
-        }
-    }
-    else if ([self almondExists:almondMac]) {
-        // check whether the almond exists in the cloud list
-        return defaultMode; // any mode is OK for an almond affiliated with the cloud
-    }
-    else {
-        SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-        if (settings) {
-            return SFIAlmondConnectionMode_local;
-        }
-    }
-*/
-
+    
+    /*
+     // Find the Almond; check current one first for "fail fast" scenario, as it is likely the one we want.
+     // The scenario we need to avoid: returning Cloud mode for an Almond that is local only.
+     // In effect, the logic will auto-switch the connection mode for local-only almonds; or otherwise,
+     // honor the default mode.
+     SFIAlmondPlus *current = [self currentAlmond];
+     if (current && [current.almondplusMAC isEqualToString:almondMac]) {
+     if (current.linkType == SFIAlmondPlusLinkType_local_only) {
+     return SFIAlmondConnectionMode_local;
+     }
+     }
+     else if ([self almondExists:almondMac]) {
+     // check whether the almond exists in the cloud list
+     return defaultMode; // any mode is OK for an almond affiliated with the cloud
+     }
+     else {
+     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+     if (settings) {
+     return SFIAlmondConnectionMode_local;
+     }
+     }
+     */
+    
     return defaultMode;
 }
 
@@ -264,24 +264,24 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (![settings hasCompleteSettings]) {
         return;
     }
-
+    
     NSString *almondMac = settings.almondplusMAC;
     enum SFIAlmondConnectionMode mode = [self connectionModeForAlmond:almondMac];
-
+    
     [self storeLocalNetworkSettings:settings];
     [self tryShutdownAndStartNetworks:mode almondMac:almondMac];
 }
 
 - (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString *)almondMac {
     enum NetworkConnectionStatus status = NetworkConnectionStatusUninitialized;
-
+    
     if (self.config.enableLocalNetworking) {
         enum SFIAlmondConnectionMode mode = [self connectionModeForAlmond:almondMac];
-
+        
         if (![self isCurrentConnectionModeCompatible:mode]) {
             return SFIAlmondConnectionStatus_error_mode;
         }
-
+        
         switch (mode) {
             case SFIAlmondConnectionMode_cloud: {
                 status = [self cloudNetworkStatus];
@@ -302,7 +302,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     else {
         status = [self cloudNetworkStatus];
     }
-
+    
     return [self connectionStatusFromNetworkState:status];
 }
 
@@ -314,9 +314,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!almondMac) {
         return;
     }
-
+    
     [self.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
-
+    
     SFIAlmondPlus *currentAlmond = self.currentAlmond;
     if (currentAlmond) {
         if ([currentAlmond.almondplusMAC isEqualToString:almondMac]) {
@@ -334,7 +334,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
         }
     }
-
+    
     [self postNotification:kSFIDidUpdateAlmondList data:nil];
 }
 
@@ -343,7 +343,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (![settings hasCompleteSettings]) {
         return;
     }
-
+    
     [self.dataManager writeAlmondLocalNetworkSettings:settings];
 }
 
@@ -352,14 +352,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!settings) {
         settings = [SFIAlmondLocalNetworkSettings new];
         settings.almondplusMAC = almondMac;
-
+        
         // very important: copy name to settings, if possible
         SFIAlmondPlus *plus = [self cloudAlmond:almondMac];
         if (plus) {
             settings.almondplusName = plus.almondplusName;
         }
     }
-
+    
     if (summary.login) {
         settings.login = summary.login;
     }
@@ -372,7 +372,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (summary.url) {
         settings.host = summary.url;
     }
-
+    
     [self setLocalNetworkSettings:settings];
 }
 
@@ -382,9 +382,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return;
     }
-
+    
     __weak SecurifiToolkit *block_self = self;
-
+    
     dispatch_async(self.commandDispatchQueue, ^() {
         if (mode == SFIAlmondConnectionMode_local) {
             [block_self _asyncInitLocal:almondMac];
@@ -413,9 +413,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!reachable) {
         return NO;
     }
-
+    
     NetworkConnectionStatus state = [self cloudNetworkStatus];
-
+    
     enum SFIAlmondConnectionStatus status = [self connectionStatusFromNetworkState:state];
     return status == SFIAlmondConnectionStatus_connected;
 }
@@ -483,7 +483,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void)initToolkit {
     [self _asyncInitCloud];
-
+    
     SFIAlmondPlus *plus = self.currentAlmond;
     if (plus) {
         [self _asyncInitLocal:plus.almondplusMAC];
@@ -495,53 +495,53 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"guard: INIT SDK. Already shutdown. Returning.");
         return;
     }
-
+    
     __weak SecurifiToolkit *block_self = self;
-
+    
     dispatch_async(self.commandDispatchQueue, ^() {
         if (block_self.isShutdown) {
             DLog(@"INIT SDK. SDK is already shutdown. Returning.");
             return;
         }
-
+        
         // fail fast if mode is set for Local
         //
         if (![block_self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_cloud]) {
             return;
         }
-
+        
         NetworkConnectionStatus state = [block_self cloudNetworkStatus];
         switch (state) {
             case NetworkConnectionStatusInitialized: {
                 DLog(@"INIT SDK. Cloud connection established already. Returning.");
                 return;
             };
-
+                
             case NetworkConnectionStatusInitializing: {
                 DLog(@"INIT SDK. Cloud connection already initializing. Returning.");
                 return;
             };
-
+                
             case NetworkConnectionStatusUninitialized:
             case NetworkConnectionStatusShutdown:
             default: {
                 DLog(@"INIT SDK. Cloud connection needs establishment. Passing thru");
             };
         }
-
+        
         NSLog(@"INIT SDK");
-
+        
         Network *network = [block_self setupCloudNetwork];
-
+        
         // After setting up the network, we need to do some basic things
         // 1. send sanity cmd to test the socket
         // 2. logon
         // 3. update the devices list
         // 4. check hashes etc.
-
+        
         GenericCommand *cmd;
         BOOL cmdSendSuccess;
-
+        
         // Send sanity command testing network connection
         cmd = [block_self makeCloudSanityCommand];
         cmdSendSuccess = [block_self internalInitializeCloud:network command:cmd];
@@ -549,32 +549,32 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"%s: init SDK: send sanity failed:", __PRETTY_FUNCTION__);
             return;
         }
-
+        
         DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
         DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-
+        
         // If no logon credentials, then initialization is completed.
         if (![block_self hasLoginCredentials]) {
             DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
             network.loginStatus = NetworkLoginStatusNotLoggedIn;
             [network markCloudInitialized]; //todo fix me: this is fouling up the Network control logic, but removing it then prevents normal commands from being sent...
-
+            
             // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
             // We probably should track things down and find a way to remove a dependency on this event in the UI.
             [block_self postNotification:kSFIDidLogoutNotification data:nil];
             return;
         }
-
+        
         // Send logon credentials
         network.loginStatus = NetworkLoginStatusInProcess;
-
+        
         DLog(@"%s: sending temp pass credentials", __PRETTY_FUNCTION__);
         cmd = [block_self makeTempPassLoginCommand];
         cmdSendSuccess = [block_self internalInitializeCloud:network command:cmd];
         if (!cmdSendSuccess) {
             DLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
         }
-
+        
         // Request updates to the almond; See onLoginResponse handler for logic handling first-time login and follow-on requests.
         [block_self asyncInitializeConnection1:network];
     });
@@ -585,21 +585,21 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"guard: INIT SDK. Already shutdown. Returning.");
         return;
     }
-
+    
     __weak SecurifiToolkit *block_self = self;
-
+    
     dispatch_async(self.commandDispatchQueue, ^() {
         if (block_self.isShutdown) {
             DLog(@"INIT SDK. SDK is already shutdown. Returning.");
             return;
         }
-
+        
         // fail fast if mode is set for Local
         //
         if (![block_self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_local]) {
             return;
         }
-
+        
         if ([block_self isCurrentLocalNetworkForAlmond:almondMac]) {
             NetworkConnectionStatus state = [block_self networkStatus:block_self.localNetwork];
             switch (state) {
@@ -607,12 +607,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
                     DLog(@"INIT SDK. Local connection established already. Returning.");
                     return;
                 };
-
+                    
                 case NetworkConnectionStatusInitializing: {
                     DLog(@"INIT SDK. Local connection already initializing. Returning.");
                     return;
                 };
-
+                    
                 case NetworkConnectionStatusUninitialized:
                 case NetworkConnectionStatusShutdown:
                 default: {
@@ -620,7 +620,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 };
             }
         }
-
+        
         [block_self setupLocalNetworkForAlmond:almondMac];
         [block_self asyncSendToLocal:[GenericCommand websocketAlmondNameAndMac] almondMac:almondMac];
         [block_self asyncRequestDeviceList:almondMac];
@@ -634,9 +634,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     self.isShutdown = YES;
     NSLog(@"Shutdown SDK");
-
+    
     SecurifiToolkit __weak *block_self = self;
-
+    
     dispatch_async(self.networkCallbackQueue, ^(void) {
         [block_self tearDownCloudNetwork];
         [block_self tearDownLocalNetwork];
@@ -652,7 +652,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // After successful login, refresh the Almond list and hash values.
     // This routine is important because the UI will listen for outcomes to these requests.
     // Specifically, the event kSFIDidUpdateAlmondList.
-
+    
     __weak SecurifiToolkit *block_self = self;
     dispatch_async(self.commandDispatchQueue, ^() {
         DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
@@ -666,27 +666,27 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // After successful login, refresh the Almond list and hash values.
     // This routine is important because the UI will listen for outcomes to these requests.
     // Specifically, the event kSFIDidUpdateAlmondList.
-
+    
     __weak SecurifiToolkit *block_self = self;
     dispatch_async(self.commandDispatchQueue, ^() {
         SFIAlmondPlus *plus = [block_self currentAlmond];
         if (plus != nil) {
             NSString *mac = plus.almondplusMAC;
-
+            
             NetworkState *state = network.networkState;
             if (![state wasHashFetchedForAlmond:mac]) {
                 [state markHashFetchedForAlmond:mac];
-
+                
                 DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
                 [block_self internalInitializeCloud:network command:cmd];
             }
-
+            
             [block_self tryRequestAlmondMode:mac];
         }
-
+        
         [block_self tryRefreshNotifications];
-
+        
         [network markCloudInitialized];
     });
 }
@@ -712,11 +712,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"SDK is shutdown. Returning.");
         return;
     }
-
+    
     if (![self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_cloud]) {
         return;
     }
-
+    
     // Initialize network if need be
     Network *network = self.cloudNetwork;
     if (network == nil || (!network.isStreamConnected && network.connectionState != NetworkConnectionStatusInitializing)) {
@@ -725,7 +725,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         NSLog(@"Waiting to initialize socket");
         [self _asyncInitCloud];
     }
-
+    
     __weak SecurifiToolkit *block_self = self;
     dispatch_async(self.commandDispatchQueue, ^() {
         BOOL success = [block_self.cloudNetwork submitCommand:command];
@@ -743,16 +743,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"SDK is shutdown. Returning.");
         return;
     }
-
+    
     if (![self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_local]) {
         return;
     }
-
+    
     __weak SecurifiToolkit *block_self = self;
     dispatch_async(self.commandDispatchQueue, ^() {
         Network *network = [block_self setupLocalNetworkForAlmond:almondMac];
         BOOL success = [network submitCommand:command];
-
+        
         if (success) {
             DLog(@"[Generic cmd: %d] send success", command.commandType);
         }
@@ -766,54 +766,54 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!linkCode) {
         return 0;
     }
-
+    
     // ensure we are in the correct connection mode
     [self setDefaultConnectionMode:SFIAlmondConnectionMode_cloud];
-
+    
     AffiliationUserRequest *request = [[AffiliationUserRequest alloc] init];
     request.Code = linkCode;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_AFFILIATION_CODE_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
-
+    
     return request.correlationId;
 }
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
     NSString *almondMac = almond.almondplusMAC;
     BOOL local = [self useLocalNetwork:almondMac];
-
+    
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSetSensorDevice:device value:newValue];
         [self asyncSendToLocal:cmd almondMac:almondMac];
-
+        
         return cmd.correlationId;
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudSetSensorDevice:device value:newValue almondMac:almondMac];
         [self asyncSendToCloud:cmd];
-
+        
         return cmd.correlationId;
     }
 }
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device name:(NSString *)deviceName location:(NSString *)deviceLocation {
     NSString *almondMac = almond.almondplusMAC;
-
+    
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSensorDevice:device name:deviceName location:deviceLocation almondMac:almondMac];
         [self asyncSendToLocal:cmd almondMac:almondMac];
-
+        
         return cmd.correlationId;
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudSensorDevice:device name:deviceName location:deviceLocation almondMac:almondMac];
         [self asyncSendToCloud:cmd];
-
+        
         return cmd.correlationId;
     }
 }
@@ -825,23 +825,23 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"SDK is shutdown. Returning.");
         return;
     }
-
+    
     self.scoreboard.loginCount++;
-
+    
     [self tearDownLoginSession];
     [self setSecEmail:email];
-
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setBool:YES forKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
-
+    
     Login *loginCommand = [Login new];
     loginCommand.UserID = email;
     loginCommand.Password = password;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_LOGIN_COMMAND;
     cmd.command = loginCommand;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -854,14 +854,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"SDK is shutdown. Returning.");
         return;
     }
-
+    
     if (self.isCloudOnline) {
         [self asyncRequestDeregisterForNotification];
-
+        
         GenericCommand *cmd = [GenericCommand new];
         cmd.commandType = CommandType_LOGOUT_COMMAND;
         cmd.command = nil;
-
+        
         [self asyncSendToCloud:cmd];
     }
     else {
@@ -874,21 +874,21 @@ static SecurifiToolkit *toolkit_singleton = nil;
     LogoutAllRequest *request = [LogoutAllRequest new];
     request.UserID = [NSString stringWithString:email];
     request.Password = [NSString stringWithString:password];
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_LOGOUT_ALL_COMMAND;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
 - (void)storeLoginCredentials:(LoginResponse *)response {
     NSString *tempPass = response.tempPass;
     NSString *userId = response.userID;
-
+    
     [self setSecPassword:tempPass];
     [self setSecUserId:userId];
-
+    
     [self storeAccountActivationCredentials:response];
 }
 
@@ -896,7 +896,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     //PY: 101014 - Not activated accounts can be accessed for 7 days
     BOOL activated = response.isAccountActivated;
     NSUInteger remaining = response.minsRemainingForUnactivatedAccount;
-
+    
     [self setSecAccountActivationStatus:activated];
     [self setSecMinsRemainingForUnactivatedAccount:remaining];
 }
@@ -924,10 +924,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             // The response will contain the TempPass token, which we store in the keychain. The original password is not stored.
             [self storeLoginCredentials:res];
         }
-
+        
         //PY 141014: Store account activation information every time the user logs in
         [self storeAccountActivationCredentials:res];
-
+        
         // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
         // But the client was not logged in. Send them now...
         [self asyncInitializeConnection1:network];
@@ -938,7 +938,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self tearDownLoginSession];
         [self tearDownCloudNetwork];
     }
-
+    
     // In any case, notify the UI about the login result
     [self postNotification:kSFIDidCompleteLoginNotification data:res];
 }
@@ -957,7 +957,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self tearDownCloudNetwork];
         [self resetCurrentAlmond];
     }
-
+    
     [self postNotification:kSFIDidLogoutAllNotification data:res];
 }
 
@@ -996,10 +996,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!almond) {
         return;
     }
-
+    
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
-
+    
     [self postNotification:kSFIDidChangeCurrentAlmond data:almond];
 }
 
@@ -1007,7 +1007,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!almond) {
         return;
     }
-
+    
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
@@ -1018,18 +1018,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!almond) {
         return;
     }
-
+    
     NSString *mac = almond.almondplusMAC;
-
+    
     // reset connections
     [self tryShutdownAndStartNetworks:self.defaultConnectionMode almondMac:mac];
-
+    
     NSArray *devices = [self deviceList:mac];
     if (devices.count == 0) {
         DLog(@"%s: devices empty: requesting device list for current almond: %@", __PRETTY_FUNCTION__, mac);
         [self asyncRequestDeviceList:mac];
     }
-
+    
     if (almond.linkType == SFIAlmondPlusLinkType_cloud_local) {
         // If the network is down, then do not send Hash request:
         // 1. it's not needed
@@ -1037,16 +1037,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // 3. sending it now will stimulate connection establishment and sending the command prior to other normal-bring up
         // commands will cause the connection to fail IF the currently selected almond is no longer linked to the account.
         Network *network = self.cloudNetwork;
-
+        
         if (network == nil) {
             DLog(@"%s: network is down; not sending request for hash or mode: %@", __PRETTY_FUNCTION__, mac);
             return;
         }
-
+        
         NetworkState *state = network.networkState;
         if (![state wasHashFetchedForAlmond:mac]) {
             [state markHashFetchedForAlmond:mac];
-
+            
             DLog(@"%s: hash not checked on this connection: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
             GenericCommand *cmd = [self makeDeviceHashCommand:mac];
             [self asyncSendToCloud:cmd];
@@ -1055,10 +1055,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             DLog(@"%s: hash already checked on this connection for current almond: %@", __PRETTY_FUNCTION__, mac);
         }
     }
-
+    
     // Fetch the Almond Mode
     [self tryRequestAlmondMode:mac];
-
+    
     // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
     [self asyncRequestNotificationPreferenceList:mac];
 }
@@ -1119,7 +1119,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             return YES;
         }
     }
-
+    
     return NO;
 }
 
@@ -1127,7 +1127,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return nil;
     }
-
+    
     // Below is an important filtering process:
     // in effect, we choose to use the Cloud Almond representation for matching
     // local network configs, because the Almond#linkType property will indicate
@@ -1139,13 +1139,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // is inefficient for these sorts of operations, and a dictionary data structure would allow for
     // fast look up, instead of iteration.
     NSMutableSet *cloud_set = [NSMutableSet setWithArray:[self almondList]];
-
+    
     NSDictionary *local_settings = [self.dataManager readAllAlmondLocalNetworkSettings];
     NSMutableArray *local_almonds = [NSMutableArray array];
-
+    
     for (NSString *mac in local_settings.allKeys) {
         SFIAlmondPlus *localAlmond;
-
+        
         for (SFIAlmondPlus *cloud in cloud_set) {
             if ([cloud.almondplusMAC isEqualToString:mac]) {
                 localAlmond = cloud;
@@ -1153,25 +1153,25 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 break;
             }
         }
-
+        
         if (!localAlmond) {
             SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
             localAlmond = setting.asLocalLinkAlmondPlus;
         }
-
+        
         if (localAlmond) {
             [local_almonds addObject:localAlmond];
         }
     }
-
+    
     if (local_almonds.count == 0) {
         return nil;
     }
-
+    
     // Sort the local Almonds alphabetically
     NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"almondplusName" ascending:YES];
     [local_almonds sortUsingDescriptors:@[sort]];
-
+    
     return local_almonds;
 }
 
@@ -1195,22 +1195,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
         if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
             return NO;
         }
-
+        
         [state markWillFetchDeviceListForAlmond:almondMac];
         return YES;
     };
-
+    
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSensorDeviceListCommand];
         cmd.networkPrecondition = precondition;
-
+        
         [self asyncSendToLocal:cmd almondMac:almondMac];
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudSensorDeviceListCommand:almondMac];
         cmd.networkPrecondition = precondition;
-
+        
         [self asyncSendToCloud:cmd];
     }
 }
@@ -1220,18 +1220,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [aNetwork.networkState markDeviceValuesFetchedForAlmond:almondMac];
         return YES;
     };
-
+    
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketSensorDeviceValueListCommand];
         cmd.networkPrecondition = precondition;
-
+        
         [self asyncSendToLocal:cmd almondMac:almondMac];
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudSensorDeviceValueListCommand:almondMac];
         cmd.networkPrecondition = precondition;
-
+        
         [self asyncSendToCloud:cmd];
         [self asyncRequestNotificationPreferenceList:almondMac];
     }
@@ -1240,16 +1240,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
     Network *network = local ? [self setupLocalNetworkForAlmond:almondMac] : self.cloudNetwork;
-
+    
     NetworkState *state = network.networkState;
     if ([state wasDeviceValuesFetchedForAlmond:almondMac]) {
         return NO;
     }
     [state markDeviceValuesFetchedForAlmond:almondMac];
-
+    
     [self asyncRequestDeviceValueList:almondMac];
     [self asyncRequestNotificationPreferenceList:almondMac];
-
+    
     return YES;
 }
 
@@ -1291,17 +1291,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [writer addElement:@"Version" text:firmwareVersion];
     [writer endElement];;
     [writer endElement];;
-
+    
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMAC;
     request.data = [writer toString];
-
+    
     GenericCommand *cmd = [[GenericCommand alloc] init];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
-
+    
     return request.correlationId;
 }
 
@@ -1310,17 +1310,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [writer startElement:@"root"];
     [writer addElement:@"Reboot" text:@"1"];
     [writer endElement];;
-
+    
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMAC;
     request.data = [writer toString];
-
+    
     GenericCommand *cmd = [[GenericCommand alloc] init];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
-
+    
     return request.correlationId;
 }
 
@@ -1344,17 +1344,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [writer addElement:@"Reason" text:description];
     [writer endElement];;
     [writer endElement];;
-
+    
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMAC;
     request.data = [writer toString];
-
+    
     GenericCommand *cmd = [[GenericCommand alloc] init];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
-
+    
     return request.correlationId;
 }
 
@@ -1365,11 +1365,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     request.emailID = [self loginEmail];
     request.currentPassword = currentPwd;
     request.changedPassword = changedPwd;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_CHANGE_PASSWORD_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1377,11 +1377,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     DeleteAccountRequest *request = [DeleteAccountRequest new];
     request.emailID = [self loginEmail];
     request.password = password;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DELETE_ACCOUNT_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1390,11 +1390,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     request.almondMAC = almondMAC;
     request.password = password;
     request.emailID = [self loginEmail];
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_UNLINK_ALMOND_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1402,11 +1402,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     UserInviteRequest *request = [UserInviteRequest new];
     request.almondMAC = almondMAC;
     request.emailID = inviteEmailID;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_USER_INVITE_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1414,22 +1414,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
     DeleteSecondaryUserRequest *request = [DeleteSecondaryUserRequest new];
     request.almondMAC = almondMAC;
     request.emailID = emailID;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DELETE_SECONDARY_USER_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
 - (void)asyncRequestDeleteMeAsSecondaryUser:(NSString *)almondMAC {
     DeleteMeAsSecondaryUserRequest *request = [DeleteMeAsSecondaryUserRequest new];
     request.almondMAC = almondMAC;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1437,11 +1437,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     AlmondNameChange *request = [AlmondNameChange new];
     request.almondMAC = almondMAC;
     request.changedAlmondName = changedAlmondName;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ALMOND_NAME_CHANGE_REQUEST;
     cmd.command = request;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1449,7 +1449,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ME_AS_SECONDARY_USER_REQUEST;
     cmd.command = [MeAsSecondaryUserRequest new];
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1459,7 +1459,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (almondMac.length == 0) {
         return;
     }
-
+    
     [self internalRequestAlmondStatusAndSettings:almondMac command:requestType commandPrecondition:nil];
 }
 
@@ -1467,7 +1467,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (almondMac.length == 0) {
         return;
     }
-
+    
     NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
         GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:almondMac];
         if (!storedCmd) {
@@ -1476,7 +1476,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
         return !storedCmd.isExpired;
     };
-
+    
     // sends a series of requests to fetch all the information at once.
     // note ordering might be important to the UI layer, which for now receives the response payloads directly
     [self internalRequestAlmondStatusAndSettings:almondMac command:SecurifiToolkitAlmondRouterRequest_summary commandPrecondition:precondition];
@@ -1490,19 +1490,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum SecurifiToolkitAlmondRouterRequest)type commandPrecondition:(NetworkPrecondition)precondition {
     if (self.config.enableLocalNetworking && type == SecurifiToolkitAlmondRouterRequest_wifi_clients) {
         BOOL local = [self useLocalNetwork:almondMac];
-
+        
         if (local) {
             GenericCommand *cmd = [GenericCommand websocketRequestAlmondWifiClients];
             cmd.networkPrecondition = precondition;
-
+            
             [self asyncSendToLocal:cmd almondMac:almondMac];
-
+            
             return;
         }
-
+        
         // else pass through
     }
-
+    
     NSString *data;
     switch (type) {
         case SecurifiToolkitAlmondRouterRequest_summary:
@@ -1522,24 +1522,24 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [self internalJSONRequestAlmondWifiClients:almondMac];
             return;
     }
-
+    
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMac;
     request.applicationID = APPLICATION_ID;
     request.data = data;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = request;
     cmd.networkPrecondition = precondition;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings {
     GenericCommand *cmd = [GenericCommand cloudUpdateWirelessSettings:settings almondMac:almondMAC];
     [self asyncSendToCloud:cmd];
-
+    
     return cmd.correlationId;
 }
 
@@ -1550,7 +1550,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SLog(@"asyncRequestRegisterForNotification : device toke is nil");
         return;
     }
-
+    
     if ([self isSecApnTokenRegistered]) {
         NSString *oldToken = [self secRegisteredApnToken];
         if ([deviceToken isEqualToString:oldToken]) {
@@ -1559,15 +1559,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
     }
     [self setSecRegisteredApnToken:deviceToken];
-
+    
     NotificationRegistration *req = [NotificationRegistration new];
     req.regID = deviceToken;
     req.platform = @"iOS";
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_REGISTRATION;
     cmd.command = req;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1576,21 +1576,21 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SLog(@"asyncRequestRegisterForNotification : no device token to deregister");
         return;
     }
-
+    
     NSString *deviceToken = [self secRegisteredApnToken];
     if (deviceToken == nil) {
         SLog(@"asyncRequestRegisterForNotification : device toke is nil");
         return;
     }
-
+    
     NotificationDeleteRegistrationRequest *req = [NotificationDeleteRegistrationRequest new];
     req.regID = deviceToken;
     req.platform = @"iOS";
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_DEREGISTRATION;
     cmd.command = req;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1599,14 +1599,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;
     }
-
+    
     NotificationPreferenceListRequest *req = [NotificationPreferenceListRequest new];
     req.almondplusMAC = almondMAC;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST;
     cmd.command = req;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1615,9 +1615,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SLog(@"asyncRequestAlmondModeChange : almond MAC is nil");
         return 0;
     }
-
+    
     NSString *userId = [self loginEmail];
-
+    
     // A closure that will be invoked whne the command is submitted for processing and that
     // will store the requested almond mode for future reference. When a positive response is
     // received, the new mode will be confirmed and locked in.
@@ -1625,22 +1625,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [aNetwork.networkState markPendingModeForAlmond:almondMac mode:newMode];
         return YES;
     };
-
+    
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
         GenericCommand *cmd = [GenericCommand websocketChangeAlmondMode:newMode userId:userId almondMac:almondMac];
         cmd.networkPrecondition = precondition;
-
+        
         [self asyncSendToLocal:cmd almondMac:almondMac];
-
+        
         return cmd.correlationId;
     }
     else {
         GenericCommand *cmd = [GenericCommand cloudChangeAlmondMode:newMode userId:userId almondMac:almondMac];
         cmd.networkPrecondition = precondition;
-
+        
         [self asyncSendToCloud:cmd];
-
+        
         return cmd.correlationId;
     }
 }
@@ -1654,7 +1654,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (network) {
         return [network.networkState almondMode:almondMac];
     }
-
+    
     return SFIAlmondMode_unknown;
 }
 
@@ -1664,20 +1664,20 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (almondMac == nil) {
         return;
     }
-
+    
     SFIAlmondMode mode = [self tryCachedAlmondModeValue:almondMac];
     if (mode != SFIAlmondMode_unknown) {
         // a valid value already exists
         return;
     }
-
+    
     AlmondModeRequest *req = [AlmondModeRequest new];
     req.almondMAC = almondMac;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_ALMOND_MODE_REQUEST;
     cmd.command = req;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1686,14 +1686,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;
     }
-
+    
     NotificationPreferences *req = [NotificationPreferences new];
     req.action = action;
     req.almondMAC = almondMAC;
     req.userID = [self loginEmail];
     req.preferenceCount = (int) [deviceList count];
     req.notificationDeviceList = deviceList;
-
+    
     // Use this as a state holder so we can get access to the actual NotificationPreferences when processing the response.
     // This is a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
     // update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
@@ -1702,12 +1702,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [aNetwork.networkState markExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification" genericCommand:aCmd];
         return YES;
     };
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATION_PREF_CHANGE_REQUEST;
     cmd.command = req;
     cmd.networkPrecondition = precondition;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -1724,11 +1724,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     LoginTempPass *req = [LoginTempPass new];
     req.UserID = [self secUserId];
     req.TempPass = [self secPassword];
-
+    
     GenericCommand *command = [GenericCommand new];
     command.commandType = CommandType_LOGIN_COMMAND; // use Login command type
     command.command = req;
-
+    
     return command;
 }
 
@@ -1742,11 +1742,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (GenericCommand *)makeDeviceHashCommand:(NSString *)almondMac {
     DeviceDataHashRequest *req = [DeviceDataHashRequest new];
     req.almondMAC = almondMac;
-
+    
     GenericCommand *command = [GenericCommand new];
     command.commandType = CommandType_DEVICE_DATA_HASH;
     command.command = req;
-
+    
     return command;
 }
 
@@ -1757,7 +1757,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // we keep track of whether this is a new install by storing a value in user defaults.
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     BOOL logged_in_once = [defaults boolForKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
-
+    
     return logged_in_once && [self hasSecEmail] && [self hasSecPassword];
 }
 
@@ -1827,7 +1827,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (value.length == 0) {
         return 0;
     }
-
+    
     NSInteger mins = value.integerValue;
     return (NSUInteger) mins;
 }
@@ -1856,24 +1856,24 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (Network *)setupCloudNetwork {
     NSLog(@"Setting up cloud network");
-
+    
     [self tearDownCloudNetwork];
-
+    
     NetworkConfig *networkConfig = [NetworkConfig cloudConfig:self.config useProductionHost:self.useProductionCloud];
-
+    
     Network *network = [Network networkWithNetworkConfig:networkConfig callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
-
+    
     _cloudNetwork = network;
-
+    
     [network connect];
-
+    
     return network;
 }
 
 - (Network *)setupLocalNetworkForAlmond:(NSString *)almondMac {
     Network *network = self.localNetwork;
-
+    
     if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
         NetworkConnectionStatus state = [self networkStatus:network];
         switch (state) {
@@ -1886,52 +1886,52 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 break;
         }
     }
-
+    
     [self tearDownLocalNetwork];
-
+    
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-
+    
     NetworkConfig *config = [NetworkConfig webSocketConfig:almondMac];
     config.host = settings.host;
     config.port = settings.port;
     config.password = settings.password;
-
+    
     network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
-
+    
     _localNetwork = network;
-
+    
     [network connect];
-
+    
     return network;
 }
 
 - (void)tearDownCloudNetwork {
     Network *old = self.cloudNetwork;
-
+    
     if (old) {
         NSLog(@"Starting tear down of cloud network");
-
+        
         old.delegate = nil; // no longer interested in callbacks from this instance
         [old shutdown];
-
+        
         self.cloudNetwork = nil;
-
+        
         NSLog(@"Finished tear down of cloud network");
     }
 }
 
 - (void)tearDownLocalNetwork {
     Network *old = self.localNetwork;
-
+    
     if (old) {
         NSLog(@"Starting tear down of local network");
-
+        
         old.delegate = nil; // no longer interested in callbacks from this instance
         [old shutdown];
-
+        
         self.localNetwork = nil;
-
+        
         NSLog(@"Finished tear down of local network");
     }
 }
@@ -1941,19 +1941,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return NO;
     }
-
+    
     // if in cloud mode, then fail fast
     if (![self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_local]) {
         return NO;
     }
-
+    
     // if network is set up, make sure it is for the specified almond
     Network *local = self.localNetwork;
     if (local) {
         NSString *mac = local.config.almondMac;
         return mac && [mac isEqualToString:almondMac];
     }
-
+    
     // if network not set up then check that settings are complete; the network will be set up on calling
     // asyncSubmitLocal command.
     //todo need a fast cache for this; very expensive to hit the file system constantly
@@ -1965,12 +1965,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return NO;
     }
-
+    
     Network *network = self.localNetwork;
     if (!network) {
         return NO;
     }
-
+    
     NetworkConfig *config = network.config;
     return [config.almondMac isEqualToString:almondMac];
 }
@@ -1985,7 +1985,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)networkConnectionDidClose:(Network *)network {
     network.delegate = nil;
-
+    
     if (network == self.cloudNetwork) {
         self.cloudNetwork = nil;
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);
@@ -1994,7 +1994,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         self.localNetwork = nil;
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing local connection", __PRETTY_FUNCTION__);
     }
-
+    
     [self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
 }
 
@@ -2010,16 +2010,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
         self.scoreboard.commandResponseCount++;
         [self markCommandEvent:commandType];
     }
-
+    
     id p_cmd = cmd.command;
     if ([p_cmd isKindOfClass:[MobileCommandRequest class]]) {
         NSDictionary *payload = @{
-                @"command" : p_cmd,
-                @"timing" : @(roundTripTime)
-        };
+                                  @"command" : p_cmd,
+                                  @"timing" : @(roundTripTime)
+                                  };
         [self postNotification:kSFIDidCompleteMobileCommandRequest data:payload];
     }
-
+    
     DLog(@"Command completion: cmd:%@, %0.3f secs", cmd, roundTripTime);
 }
 
@@ -2028,85 +2028,85 @@ static SecurifiToolkit *toolkit_singleton = nil;
         self.scoreboard.commandResponseCount++;
         [self markCommandEvent:commandType];
     }
-
+    
     switch (commandType) {
         case CommandType_LOGIN_RESPONSE: {
             LoginResponse *obj = (LoginResponse *) payload;
             [self onLoginResponse:obj network:network];
             break;
         }
-
+            
         case CommandType_LOGOUT_RESPONSE: {
             [self onLogoutResponse];
             break;
         }
-
+            
         case CommandType_LOGOUT_ALL_RESPONSE: {
             LoginResponse *res = payload;
             [self onLogoutAllResponse:res];
             break;
         }
-
+            
         case CommandType_DELETE_ACCOUNT_RESPONSE: {
             DeleteAccountResponse *res = payload;
             [self onDeleteAccountResponse:res];
             break;
         }
-
+            
         case CommandType_ALMOND_LIST_RESPONSE: {
             AlmondListResponse *res = payload;
             [self onAlmondListResponse:res network:network];
             break;
         }
-
+            
         case CommandType_DEVICE_DATA_HASH_RESPONSE: {
             DeviceDataHashResponse *res = payload;
             [self onDeviceHashResponse:res];
             break;
         }
-
+            
         case CommandType_DEVICE_DATA_RESPONSE: {
             DeviceListResponse *res = payload;
             [self onDeviceListResponse:res network:network];
             break;
         }
-
+            
         case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE: {
             DeviceListResponse *res = payload;
             [self onDeviceListAndValuesResponse:res network:network];
             break;
         }
-
+            
         case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
             DeviceValueResponse *res = payload;
             [self onDeviceValueListChange:res];
             break;
         }
-
+            
         case CommandType_GENERIC_COMMAND_RESPONSE: {
             GenericCommandResponse *res = payload;
             [self onAlmondRouterGenericCommandResponse:res network:network];
             break;
         }
-
+            
         case CommandType_GENERIC_COMMAND_NOTIFICATION: {
             GenericCommandResponse *res = payload;
             [self onAlmondRouterGenericNotification:res network:network];
             break;
         }
-
+            
         case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
             AlmondModeChangeResponse *res = payload;
             [self onAlmondModeChangeCompletion:res network:network];
             break;
         }
-
+            
         case CommandType_ALMOND_MODE_RESPONSE: {
             AlmondModeResponse *res = payload;
             [self onAlmondModeResponse:res network:network];
             break;
         }
-
+            
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationRegistrationResponse *res = payload;
@@ -2114,7 +2114,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         }
-
+            
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationPreferenceListResponse *res = payload;
@@ -2122,7 +2122,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         }
-
+            
         case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationPreferenceResponse *res = payload;
@@ -2130,7 +2130,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         }
-
+            
         case CommandType_NOTIFICATIONS_SYNC_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationListResponse *res = payload;
@@ -2138,7 +2138,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
-
+            
         case CommandType_NOTIFICATIONS_COUNT_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationCountResponse *res = payload;
@@ -2146,7 +2146,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
-
+            
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationClearCountResponse *res = payload;
@@ -2154,7 +2154,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
-
+            
         case CommandType_DEVICELOG_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationListResponse *res = payload;
@@ -2162,36 +2162,36 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
-
+            
         case CommandType_ALMOND_COMMAND_RESPONSE: {
             SFIGenericRouterCommand *res = payload;
             [self onAlmondRouterCommandResponse:res network:network];
             break;
         };
-
+            
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: {
             NSDictionary *dict = payload;
             NSString *name = dict[@"Name"];
-
+            
             NSString *mac_hex = dict[@"MAC"];
             NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
-
+            
             SFIAlmondPlus *current = [self currentAlmond];
             if ([current.almondplusMAC isEqualToString:mac]) {
                 if ([current.almondplusName isEqualToString:name]) {
                     return; // name is the same
                 }
-
+                
                 DynamicAlmondNameChangeResponse *res = DynamicAlmondNameChangeResponse.new;
                 res.almondplusMAC = mac;
                 res.almondplusName = name;
-
+                
                 [self onDynamicAlmondNameChange:res];
             }
-
+            
             break;
         }
-
+            
         default:
             break;
     }
@@ -2202,7 +2202,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         self.scoreboard.dynamicUpdateCount++;
         [self markCommandEvent:commandType];
     }
-
+    
     switch (commandType) {
         case CommandType_DYNAMIC_DEVICE_DATA:
             [self onDynamicDeviceListChange:payload network:network];
@@ -2228,7 +2228,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:
             [self onDynamicAlmondModeChange:payload network:network];
             break;
-
+            
         default:
             break;
     }
@@ -2245,15 +2245,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
     // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
     // UI can easily become confused. This needs to be sorted out.
-
+    
     __weak id block_payload = payload;
-
+    
     dispatch_sync(self.networkCallbackQueue, ^() {
         NSDictionary *data = nil;
         if (payload) {
             data = @{@"data" : block_payload};
         }
-
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
     });
 }
@@ -2262,24 +2262,24 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network {
     NSLog(@"Received Almond list response");
-
+    
     [network markCloudInitialized];
-
+    
     if (!obj.isSuccessful) {
         return;
     }
-
+    
     NSArray *almondList = obj.almondPlusMACList;
-
+    
     // Store the new list
     [self.dataManager writeAlmondList:almondList];
-
+    
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
-
+    
     // After requesting the Almond list, we then want to get additional info
     [self asyncInitializeConnection2:network];
-
+    
     // Tell the world
     [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
@@ -2291,15 +2291,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!obj.isSuccessful) {
         return;
     }
-
+    
     NSArray *almondList = obj.almondPlusMACList;
-
+    
     // Store the new list
     [self.dataManager writeAlmondList:almondList];
-
+    
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:YES];
-
+    
     // Tell the world that this happened
     [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
@@ -2310,31 +2310,31 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (data == nil) {
         return;
     }
-
+    
     AlmondListResponse *obj = (AlmondListResponse *) [data valueForKey:@"data"];
     if (!obj.isSuccessful) {
         return;
     }
-
+    
     NSArray *newAlmondList = @[];
     for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
         // remove cached data about the Almond and sensors
         newAlmondList = [self.dataManager deleteAlmond:deleted];
-
+        
         if (self.config.enableNotifications) {
             // clear out Notification settings
             Network *network = [data valueForKey:@"network"];;
             if (network) {
                 [network.networkState clearAlmondMode:deleted.almondplusMAC];
             }
-
+            
             [self.notificationsDb deleteNotificationsForAlmond:deleted.almondplusMAC];
         }
     }
-
+    
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
-
+    
     [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
@@ -2342,12 +2342,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (obj == nil) {
         return;
     }
-
+    
     NSString *almondName = obj.almondplusName;
     if (almondName.length == 0) {
         return;
     }
-
+    
     SFIAlmondPlus *changed = [self.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
         SFIAlmondPlus *current = [self currentAlmond];
@@ -2355,7 +2355,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             changed.colorCodeIndex = current.colorCodeIndex;
             [self setCurrentAlmond:changed];
         }
-
+        
         // Tell the world so they can update their view
         [self postNotification:kSFIDidChangeAlmondName data:changed];
     }
@@ -2370,7 +2370,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (current.linkType == SFIAlmondPlusLinkType_local_only) {
         return current;
     }
-
+    
     // Manage the "Current selected Almond" value
     if (almondList.count == 0) {
         [self purgeStoredData];
@@ -2395,7 +2395,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 }
             }
         }
-
+        
         // Current one is not in new list.
         // Just pick the first one in this case
         SFIAlmondPlus *currentAlmond = almondList[0];
@@ -2415,23 +2415,23 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res) {
         return;
     }
-
+    
     NSString *mac = res.almondMAC;
-
+    
     [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
-
+    
     if (!res.isSuccessful) {
         SFIGenericRouterCommand *routerCommand = [SFIGenericRouterCommand new];
         routerCommand.almondMAC = mac;
         routerCommand.commandSuccess = NO;
         routerCommand.responseMessage = res.reason;
-
+        
         [self postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
     }
     else {
         SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:res];
         routerCommand.almondMAC = mac;
-
+        
         [self internalOnGenericRouterCommandResponse:routerCommand];
     }
 }
@@ -2440,14 +2440,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res) {
         return;
     }
-
+    
     NSString *mac = res.almondMAC;
-
+    
     [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
-
+    
     SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:res];
     routerCommand.almondMAC = mac;
-
+    
     [self internalOnGenericRouterCommandResponse:routerCommand];
 }
 
@@ -2455,7 +2455,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res) {
         return;
     }
-
+    
     NSString *mac = res.almondMAC;
     [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
     [self internalOnGenericRouterCommandResponse:res];
@@ -2465,13 +2465,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (routerCommand == nil) {
         return;
     }
-
+    
     if (routerCommand.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
         // after receiving summary, we update the local wireless connection settings with the current login/password
         SFIRouterSummary *summary = (SFIRouterSummary *) routerCommand.command;
         [self tryUpdateLocalNetworkSettingsForAlmond:routerCommand.almondMAC withRouterSummary:summary];
     }
-
+    
     [self postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
 }
 
@@ -2479,37 +2479,37 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onDeviceHashResponse:(DeviceDataHashResponse*)res {
     NSLog(@"Received Almond hash response");
-
+    
     if (!res) {
         return;
     }
-
+    
     NSString *reportedHash = res.almondHash;
     if (!res.isSuccessful) {
         // We assume, on failure, the Almond is no longer associated with this account and
         // our list of Almonds is out of date. Therefore, issue a request for the Almond list.
         NSLog(@"Device hash response failed; requesting Almond list");
-
+        
         SFIAlmondPlus *currentAlmond = [self currentAlmond];
         if (currentAlmond.linkType == SFIAlmondPlusLinkType_cloud_local) {
             [self removeCurrentAlmond];
-
+            
             GenericCommand *cmd = [self makeAlmondListCommand];
             [self asyncSendToCloud:cmd];
         }
-
+        
         return;
     }
-
+    
     SFIAlmondPlus *currentAlmond = [self currentAlmond];
     if (currentAlmond == nil) {
         NSLog(@"Device Hash Response failed: No current Almond");
         return;
     }
-
+    
     NSString *currentMac = currentAlmond.almondplusMAC;
     NSString *storedHash = [self.dataManager readHashList:currentMac];
-
+    
     if (reportedHash.length == 0 || [reportedHash isEqualToString:@"null"]) {
         //Hash sent by cloud as null - No Device
         NSLog(@"Device Hash Response: null; request devices");
@@ -2533,37 +2533,37 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!obj) {
         return;
     }
-
+    
     [network.networkState clearWillFetchDeviceListForAlmond:obj.almondMAC];
-
+    
     if (!obj.isSuccessful) {
         return;
     }
-
+    
     NSString *almondMAC = obj.almondMAC;
     NSMutableArray *newDeviceList = obj.deviceList;
-
+    
     [self processDeviceListChange:newDeviceList mac:almondMAC requestValues:YES partialList:NO];
     [self postNotification:kSFIDidChangeDeviceList data:almondMAC];
 }
 
 - (void)onDeviceListResponse:(DeviceListResponse*)res network:(Network*)network {
     NSLog(@"Received device list response");
-
+    
     if (!res) {
         return;
     }
-
+    
     NSString *mac = res.almondMAC;
     [network.networkState clearWillFetchDeviceListForAlmond:mac];
-
+    
     if (!res.isSuccessful) {
         NSLog(@"Device list response was not successful; stopping");
         return;
     }
-
+    
     NSArray *newDevices = res.deviceList;
-
+    
     // values not included in response, so request them
     BOOL requestValues = (res.deviceValueList == nil);
     [self processDeviceListChange:newDevices mac:mac requestValues:requestValues partialList:NO];
@@ -2572,26 +2572,26 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network {
     NSLog(@"Received device list response");
-
+    
     if (!res) {
         return;
     }
-
+    
     NSString *mac = res.almondMAC;
     [network.networkState clearWillFetchDeviceListForAlmond:mac];
-
+    
     if (!res.isSuccessful) {
         NSLog(@"Device list response was not successful; stopping");
         return;
     }
-
+    
     const BOOL partialList = res.updatedDevicesOnly;
-
+    
     switch (res.type) {
         case DeviceListResponseType_updated: {
             NSArray *deviceList = res.deviceList;
             NSArray *valueList = res.deviceValueList;
-
+            
             if (valueList) {
                 [self processDeviceListChange:deviceList mac:mac requestValues:NO partialList:partialList];
                 [self processDeviceValueList:valueList mac:mac];
@@ -2602,7 +2602,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 [self processDeviceListChange:deviceList mac:mac requestValues:YES partialList:partialList];
                 [self postNotification:kSFIDidChangeDeviceList data:mac];
             }
-
+            
             break;
         };
         case DeviceListResponseType_added: {
@@ -2610,10 +2610,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             for (SFIDevice *device in res.deviceList) {
                 current = [SFIDevice addDevice:device list:current];
             }
-
+            
             [self processDeviceListChange:current mac:mac requestValues:YES partialList:NO];
             [self postNotification:kSFIDidChangeDeviceList data:mac];
-
+            
             break;
         };
         case DeviceListResponseType_removed: {
@@ -2621,10 +2621,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             for (SFIDevice *device in res.deviceList) {
                 current = [SFIDevice removeDevice:device list:current];
             }
-
+            
             [self processDeviceListChange:current mac:mac requestValues:YES partialList:NO];
             [self postNotification:kSFIDidChangeDeviceList data:mac];
-
+            
             break;
         };
         case DeviceListResponseType_removed_all: {
@@ -2641,12 +2641,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (partialList) {
         // mix in the devices with the new ones
         NSArray *devices = [self.dataManager readDeviceList:mac];
-
+        
         if (devices) {
             NSMutableArray *new_list = [NSMutableArray array];
             for (SFIDevice *device in devices) {
                 BOOL foundDevice = NO;
-
+                
                 for (SFIDevice *newDevice in changedDevices) {
                     if (device.deviceID == newDevice.deviceID) {
                         // then update
@@ -2655,18 +2655,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
                         break;
                     }
                 }
-
+                
                 if (!foundDevice) {
                     [new_list addObject:device];
                 }
             }
-
+            
             changedDevices = new_list;
         }
     }
-
+    
     [self.dataManager writeDeviceList:changedDevices almondMac:mac];
-
+    
     if (requestValues) {
         // Request values for devices
         [self asyncRequestDeviceValueList:mac];
@@ -2679,9 +2679,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (obj == nil) {
         return;
     }
-
+    
     NSString *almondMac = obj.almondMAC;
-
+    
     [self processDeviceValueList:obj.deviceValueList mac:almondMac];
 }
 
@@ -2689,15 +2689,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!obj) {
         return;
     }
-
+    
     NSString *almondMac = obj.almondMAC;
     if (almondMac.length == 0) {
         return;
     }
-
+    
     // Update offline storage
     [self.dataManager writeDeviceValueList:obj.deviceValueList almondMac:almondMac];
-
+    
     [self postNotification:kSFIDidChangeDeviceValueList data:almondMac];
 }
 
@@ -2706,19 +2706,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (currentMAC.length == 0) {
         return;
     }
-
+    
     NSArray *currentDeviceValueList = [self.dataManager readDeviceValueList:currentMAC];
-
+    
     NSMutableArray *newDeviceValueList;
     if (currentDeviceValueList != nil) {
         for (SFIDeviceValue *currentValue in currentDeviceValueList) {
             for (SFIDeviceValue *cloudValue in newDeviceValues) {
                 if (currentValue.deviceID == cloudValue.deviceID) {
                     cloudValue.isPresent = YES;
-
+                    
                     NSArray *currentValues = [currentValue knownDevicesValues];
                     NSArray *cloudValues = [cloudValue knownDevicesValues];
-
+                    
                     for (SFIDeviceKnownValues *currentMobileKnownValue in currentValues) {
                         for (SFIDeviceKnownValues *currentCloudKnownValue in cloudValues) {
                             if (currentMobileKnownValue.index == currentCloudKnownValue.index) {
@@ -2727,14 +2727,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
                             }
                         }
                     }
-
+                    
                     [currentValue replaceKnownDeviceValues:currentValues];
                 }
             }
         }
-
+        
         newDeviceValueList = [NSMutableArray arrayWithArray:currentDeviceValueList];
-
+        
         // Traverse the list and add the new value to offline list
         // If there are new values without corresponding devices, we know to request the device list.
         BOOL isDeviceMissing = NO;
@@ -2749,20 +2749,20 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 }
             }
         }
-
+        
         if (isDeviceMissing) {
             NSLog(@"Missing devices for values. Requesting device hash for %@", currentMAC);
             GenericCommand *command = [self makeDeviceHashCommand:currentMAC];
             [self asyncSendToCloud:command];
         }
-
+        
         // replace the list given to us with the combined new list
         newDeviceValues = newDeviceValueList;
     }
-
+    
     // Update offline storage
     [self.dataManager writeDeviceValueList:newDeviceValues almondMac:currentMAC];
-
+    
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
 
@@ -2773,22 +2773,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res.isSuccessful) {
         return;
     }
-
+    
     GenericCommand *cmd = [network.networkState expirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
     NotificationPreferences *req = cmd.command;
     if (!req) {
         return;
     }
-
+    
     int res_correlationId = res.internalIndex.intValue;
     if (res_correlationId != req.correlationId) {
         NSLog(@"Unable to process NotificationPreferenceResponse: correlation IDs do not match, expected:'%u', received:'%@'", req.correlationId, res.internalIndex);
         return;
     }
-
+    
     NSString *almondMac = req.almondMAC;
     NSArray *currentPrefs = [self notificationPrefList:almondMac];
-
+    
     NSArray *newPrefs;
     if ([req.action isEqualToString:kSFINotificationPreferenceChangeActionAdd]) {
         newPrefs = [SFINotificationDevice addNotificationDevices:req.notificationDeviceList to:currentPrefs];
@@ -2801,9 +2801,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
         return;
     }
-
+    
     [self.dataManager writeNotificationPreferenceList:newPrefs almondMac:almondMac];
-
+    
     [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
     [self postNotification:kSFINotificationPreferencesDidChange data:almondMac];
 }
@@ -2822,7 +2822,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             notification = kSFIDidFailToRegisterForNotifications;
             break;
     }
-
+    
     [self postNotification:notification data:nil];
 }
 
@@ -2832,7 +2832,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (data == nil) {
         return;
     }
-
+    
     NotificationDeleteRegistrationResponse *obj = (NotificationDeleteRegistrationResponse *) [data valueForKey:@"data"];
     NSString *notification = obj.isSuccessful ? kSFIDidDeregisterForNotifications : kSFIDidFailToDeregisterForNotifications;
     [self postNotification:notification data:nil];
@@ -2842,12 +2842,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res) {
         return;
     }
-
+    
     NSString *currentMAC = res.almondMAC;
     if (currentMAC.length == 0) {
         return;
     }
-
+    
     if ([res.notificationDeviceList count] != 0) {
         // Update offline storage
         [self.dataManager writeNotificationPreferenceList:res.notificationDeviceList almondMac:currentMAC];
@@ -2859,18 +2859,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (obj == nil) {
         return;
     }
-
+    
     NSString *currentMAC = obj.almondMAC;
     if (currentMAC.length == 0) {
         return;
     }
-
+    
     // Get the email id of current user
     NSString *loggedInUser = [self loginEmail];
-
+    
     // Get the notification list of that current user from offline storage
     NSMutableArray *notificationPrefUserList = obj.notificationUserList;
-
+    
     NSArray *notificationList = obj.notificationUserList;
     for (SFINotificationUser *currentUser in notificationPrefUserList) {
         if ([currentUser.userID isEqualToString:loggedInUser]) {
@@ -2878,7 +2878,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             break;
         }
     }
-
+    
     // Update offline storage
     [self.dataManager writeNotificationPreferenceList:notificationList almondMac:currentMAC];
     [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
@@ -2888,11 +2888,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res) {
         return;
     }
-
+    
     NSString *requestId = res.requestId;
-
+    
     DLog(@"asyncRefreshNotifications: recevied request id:'%@'", requestId);
-
+    
     // Remove the guard preventing more refresh notifications
     if (requestId.length == 0) {
         // note: we are only tracking "refresh" requests to prevent more than one of them to be processed at a time.
@@ -2901,18 +2901,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
         NSLog(@"asyncRefreshNotifications: clearing refresh request tracking");
         [network.networkState clearExpirableRequest:ExpirableCommandType_notificationListRequest namespace:@"notification"];
     }
-
+    
     // Store the notifications and stop tracking the pageState that they were associated with
     //
     // As implemented, iteration will continue until a duplicate notification is detected. This procedure
     // ensures that if the system is missing some notifications, it will catch up eventually.
     // Notifications are delivered newest to oldest, making it likely all new ones are fetched in the first call.
     DatabaseStore *store = self.notificationsDb;
-
+    
     NSUInteger newCount = res.newCount;
     NSArray *notificationsToStore = res.notifications;
     NSUInteger totalCount = notificationsToStore.count;
-
+    
     // Set viewed state:
     // for new notifications...
     NSUInteger rangeEnd = newCount > totalCount ? totalCount : newCount;
@@ -2926,69 +2926,69 @@ static SecurifiToolkit *toolkit_singleton = nil;
     for (SFINotification *notification in [notificationsToStore subarrayWithRange:oldNotificationRange]) {
         notification.viewed = YES;
     }
-
+    
     NSInteger storedCount = [store storeNotifications:notificationsToStore syncPoint:requestId];
     BOOL allStored = (storedCount == totalCount);
-
+    
     if (allStored) {
         DLog(@"asyncRefreshNotifications: stored:%li", (long) totalCount);
     }
     else {
         DLog(@"asyncRefreshNotifications: stored partial notifications:%li of %li", (long) storedCount, (long) totalCount);
     }
-
+    
     if (storedCount == 0) {
         [self setNotificationsBadgeCount:newCount];
-
+        
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
-
+        
         // if nothing stored, then no need to tell the world
         return;
     }
-
+    
     if (!allStored) {
         // stopped early
         // nothing more to do
         [self setNotificationsBadgeCount:newCount];
-
+        
         // Let the world know there are new notifications
         [self postNotification:kSFINotificationDidStore data:nil];
-
+        
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
-
+        
         return;
     }
-
+    
     // Let the world know there are new notifications
     [self postNotification:kSFINotificationDidStore data:nil];
-
+    
     // Keep syncing until page state is no longer provided
     if (res.isPageStateDefined) {
         // There are more pages to fetch
         NSString *nextPageState = res.pageState;
-
+        
         // Guard against bug in Cloud sending back same page state, causing us to go into infinite loop
         // requesting the same page over and over.
         BOOL alreadyTracked = [store isTrackedSyncPoint:nextPageState];
         if (alreadyTracked) {
             // remove the state and halt further processing
             [store removeSyncPoint:nextPageState];
-
+            
             NSLog(@"Already tracking sync point; halting further processing: %@", nextPageState);
         }
         else {
             // Keep track of this page state until the response has been processed
             [store trackSyncPoint:nextPageState];
-
+            
             // and try to download it now
             [self internalAsyncFetchNotifications:nextPageState];
         }
     }
     else {
         [self setNotificationsBadgeCount:newCount];
-
+        
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
     }
@@ -2999,14 +2999,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
 // run completed fetching all pages.
 - (void)internalTryProcessNotificationSyncPoints {
     DatabaseStore *store = self.notificationsDb;
-
+    
     NSInteger count = store.countTrackedSyncPoints;
     if (count == 0) {
         return;
     }
-
+    
     DLog(@"internalTryProcessNotificationSyncPoints: queued sync points: %li", (long) count);
-
+    
     NSString *nextPageState = [store nextTrackedSyncPoint];
     if (nextPageState.length > 0) {
         DLog(@"internalTryProcessNotificationSyncPoints: fetching sync point: %@", nextPageState);
@@ -3016,19 +3016,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onNotificationCountResponse:(NotificationCountResponse *)res {
     NSLog(@"onNotificationCountResponse: clearing request tracking");
-
+    
     if (!res) {
         return;
     }
-
+    
     if (res.error) {
         NSLog(@"onNotificationCountResponse: error response");
         return;
     }
-
+    
     // Store the notifications and stop tracking the pageState that they were associated with
     [self setNotificationsBadgeCount:res.badgeCount];
-
+    
     if (res.badgeCount > 0) {
         [self tryRefreshNotifications];
     }
@@ -3036,11 +3036,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onNotificationClearCountResponse:(NotificationClearCountResponse*)res {
     NSLog(@"onNotificationClearCountResponse: clearing request tracking");
-
+    
     if (!res) {
         return;
     }
-
+    
     if (res.error) {
         NSLog(@"onNotificationClearCountResponse: error response");
     }
@@ -3075,11 +3075,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableNotifications) {
         return;
     }
-
+    
     if (!self.isCloudLoggedIn) {
         return;
     }
-
+    
     [self internalAsyncFetchNotifications:nil];
 }
 
@@ -3088,11 +3088,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableNotifications) {
         return;
     }
-
+    
     NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
         enum ExpirableCommandType type = ExpirableCommandType_notificationClearCountRequest;
         NSString *aNamespace = @"notification";
-
+        
         GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:type namespace:aNamespace];
         if (storedCmd) {
             // clear the lock after execution; next command invocation will be allowed
@@ -3105,18 +3105,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
             return YES;
         }
     };
-
+    
     // reset count internally
     [self setNotificationsBadgeCount:0];
-
+    
     // send the command to the cloud
     NotificationClearCountRequest *req = [NotificationClearCountRequest new];
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = req.commandType;
     cmd.command = req;
     cmd.networkPrecondition = precondition;
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -3124,7 +3124,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableNotifications) {
         return 0;
     }
-
+    
     return self.notificationsDb.badgeCount;
 }
 
@@ -3132,11 +3132,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableNotifications) {
         return;
     }
-
+    
     if (!self.isCloudLoggedIn) {
         return;
     }
-
+    
     [self.notificationsDb storeBadgeCount:count];
     [self postNotification:kSFINotificationBadgeCountDidChange data:nil];
 }
@@ -3148,15 +3148,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableNotifications) {
         return;
     }
-
+    
     NotificationListRequest *req = [NotificationListRequest new];
     req.pageState = pageState;
     req.requestId = pageState;
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = CommandType_NOTIFICATIONS_SYNC_REQUEST;
     cmd.command = req;
-
+    
     // nil indicates request is for "refresh; get latest" request
     if (pageState == nil) {
         cmd.networkPrecondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
@@ -3168,10 +3168,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             // give the request 5 seconds to complete
             return !storedCmd.isExpired;
         };
-
+        
         NSLog(@"asyncRefreshNotifications: tracking refresh request");
     }
-
+    
     [self asyncSendToCloud:cmd];
 }
 
@@ -3181,9 +3181,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res.success) {
         return;
     }
-
+    
     [network.networkState confirmPendingModeForAlmond];
-
+    
     NSString *notification = kSFIDidCompleteAlmondModeChangeRequest;
     [self postNotification:notification data:nil];
 }
@@ -3192,11 +3192,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (res == nil) {
         return;
     }
-
+    
     if (!res.success) {
         return;
     }
-
+    
     [network.networkState markModeForAlmond:res.almondMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }
@@ -3205,30 +3205,30 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (res == nil) {
         return;
     }
-
+    
     if (!res.success) {
         return;
     }
-
+    
     [network.networkState markModeForAlmond:res.almondMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }
 
 #pragma mark - Device Log processing and SFIDeviceLogStoreDelegate methods
 
-- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId {
+- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId forWifiClients:(BOOL)isForWifiClients {
     DatabaseStore *db = self.deviceLogsDb;
     [db purgeAll];
-
+    
     id <SFIDeviceLogStore> store = [db newDeviceLogStore:almondMac deviceId:deviceId delegate:self];
-    [store ensureFetchNotifications]; // will callback to self (registered as delegate) to load notifications
-
+    [store ensureFetchNotifications:isForWifiClients]; // will callback to self (registered as delegate) to load notifications
+    
     [self.cloudNetwork.networkState clearExpirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac];
-
+    
     return store;
 }
 
-- (void)tryRefreshDeviceLog:(NSString *)almondMac deviceId:(sfi_id)deviceId {
+- (void)tryRefreshDeviceLog:(NSString *)almondMac deviceId:(sfi_id)deviceId forWiFiClient:(BOOL)isForWifiClients {
     /*
      Mobile +++++++++>>>>  Cloud 804
      [For the first time send for first logs]
@@ -3240,7 +3240,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
      {mac:201243434454, device_id:19, requestId:”dajdasj”, pageState:”12aaa12eee2eeffb1024”}
      </root>
      */
-
+    
     // track timeouts/guard against multiple requests being sent for device logs
     NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
         GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac];
@@ -3251,60 +3251,75 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // give the request 5 seconds to complete
         return !storedCmd.isExpired;
     };
-
+    
     DatabaseStore *store = self.deviceLogsDb;
     NSString *pageState = [store nextTrackedSyncPoint];
-
-    NSDictionary *payload = pageState ? @{
-            @"mac" : almondMac,
-            @"device_id" : @(deviceId),
-            @"requestId" : pageState,
-            @"pageState" : pageState,
-    } : @{
-            @"mac" : almondMac,
-            @"device_id" : @(deviceId),
-            @"requestId" : almondMac,
-    };
-
+    
+    NSDictionary *payload;
+    if (isForWifiClients) {
+        payload = pageState ? @{
+                                @"mac" : almondMac,
+                                @"client_id" : @(deviceId),
+                                @"requestId" : pageState,
+                                @"pageState" : pageState,
+                                @"type" : @"wifi_client",
+                                } : @{
+                                      @"mac" : almondMac,
+                                      @"client_id" : @(deviceId),
+                                      @"requestId" : almondMac,
+                                      @"type" : @"wifi_client",
+                                      };
+    }else{
+        payload = pageState ? @{
+                                @"mac" : almondMac,
+                                @"device_id" : @(deviceId),
+                                @"requestId" : pageState,
+                                @"pageState" : pageState,
+                                } : @{
+                                      @"mac" : almondMac,
+                                      @"device_id" : @(deviceId),
+                                      @"requestId" : almondMac,
+                                      };
+    }
     [self internalSendJsonCommandToCloud:payload commandType:CommandType_DEVICELOG_REQUEST precondition:precondition];
 }
 
-- (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore {
-    [self tryRefreshDeviceLog:deviceLogStore.almondMac deviceId:deviceLogStore.deviceID];
+- (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore forWiFiClient:(BOOL)isForWifiClients {
+    [self tryRefreshDeviceLog:deviceLogStore.almondMac deviceId:deviceLogStore.deviceID forWiFiClient:isForWifiClients];
 }
 
 - (void)onDeviceLogSyncResponse:(NotificationListResponse *)res {
     if (!res) {
         return;
     }
-
+    
     NSString *requestId = res.requestId;
-
+    
     // Store the notifications and stop tracking the pageState that they were associated with
     DatabaseStore *store = self.deviceLogsDb;
-
+    
     NSArray *notificationsToStore = res.notifications;
     for (SFINotification *n in notificationsToStore) {
         n.viewed = YES;
     }
-
+    
     [store storeNotifications:notificationsToStore syncPoint:requestId];
-
+    
     // Let the world know there are new notifications
     [self postNotification:kSFINotificationDidStore data:nil];
-
+    
     // Keep syncing until page state is no longer provided
     if (res.isPageStateDefined) {
         // There are more pages to fetch
         NSString *nextPageState = res.pageState;
-
+        
         // Guard against bug in Cloud sending back same page state, causing us to go into infinite loop
         // requesting the same page over and over.
         BOOL alreadyTracked = [store isTrackedSyncPoint:nextPageState];
         if (alreadyTracked) {
             // remove the state and halt further processing
             [store removeSyncPoint:nextPageState];
-
+            
             DLog(@"Already tracking sync point; halting further processing: %@", nextPageState);
         }
         else {
@@ -3319,7 +3334,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)internalSendJsonCommandToCloud:(NSDictionary *)payload commandType:(enum CommandType)commandType precondition:(NetworkPrecondition)precondition {
     GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:commandType];
     cmd.networkPrecondition = precondition;
-
+    
     if (cmd) {
         [self asyncSendToCloud:cmd];
     }

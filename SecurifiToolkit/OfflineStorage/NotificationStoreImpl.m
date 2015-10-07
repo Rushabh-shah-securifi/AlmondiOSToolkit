@@ -158,10 +158,10 @@
     return results;
 }
 
-- (void)ensureFetchNotifications {
+- (void)ensureFetchNotifications:(BOOL)isForWifiClients {
     id <SFIDeviceLogStoreDelegate> d = self.delegate;
     if (d) {
-        [d deviceLogStoreTryFetchRecords:self];
+        [d deviceLogStoreTryFetchRecords:self forWiFiClient:isForWifiClients];
     }
 }
 

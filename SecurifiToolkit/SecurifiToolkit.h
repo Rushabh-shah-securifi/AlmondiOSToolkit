@@ -388,7 +388,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (void)setNotificationsBadgeCount:(NSInteger)count;
 
-- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId;
+- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId  forWifiClients:(BOOL)isForWifiClients;
 
 
 @end
