@@ -165,6 +165,8 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"CLAMP1_ENERGY" : @(SFIDevicePropertyType_CLAMP1_ENERGY),//md01
                         @"CLAMP2_POWER" : @(SFIDevicePropertyType_CLAMP2_POWER),//md01
                         @"CLAMP2_ENERGY" : @(SFIDevicePropertyType_CLAMP2_ENERGY),//md01
+                        @"SWITCH_BINARY1" : @(SFIDevicePropertyType_SWITCH_BINARY1),//md01
+                        @"SWITCH_BINARY2" : @(SFIDevicePropertyType_SWITCH_BINARY2),//md01
                         };
     }
     return
