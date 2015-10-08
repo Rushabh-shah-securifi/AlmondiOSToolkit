@@ -309,7 +309,11 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (sfi_id)asyncSendAlmondLogs:(NSString *)almondMAC problemDescription:(NSString *)description;
 
-//PY 150914 - Accounts
+// Send a command to the cloud requesting an account be set up with the specified email and password
+- (void)asyncSendCloudSignupWithEmail:(NSString *)email password:(NSString *)password;
+
+- (void)asyncSendValidateCloudAccount:(NSString *)email;
+
 // Send a command to the cloud requesting to change the password for cloud account
 - (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
 

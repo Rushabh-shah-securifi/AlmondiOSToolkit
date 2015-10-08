@@ -506,6 +506,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         // fail fast if mode is set for Local
         //
+        if (block_self.defaultConnectionMode != SFIAlmondConnectionMode_cloud) {
+            return;
+        }
         if (![block_self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_cloud]) {
             return;
         }
@@ -1356,6 +1359,49 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self asyncSendToCloud:cmd];
     
     return request.correlationId;
+}
+
+- (void)asyncSendCloudSignupWithEmail:(NSString *)email password:(NSString *)password {
+    if (email.length == 0) {
+        return;
+    }
+
+    if (password.length == 0) {
+        return;
+    }
+
+    Signup *req = [Signup new];
+    req.UserID = email;
+    req.Password = password;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_SIGNUP_COMMAND;
+    cmd.command = req;
+
+    // make sure cloud connection is set up
+    [self tearDownLoginSession];
+    [self setSecEmail:email];
+
+    [self asyncSendToCloud:cmd];
+}
+
+- (void)asyncSendValidateCloudAccount:(NSString *)email {
+    if (email.length == 0) {
+        return;
+    }
+
+    ValidateAccountRequest *req = [ValidateAccountRequest new];
+    req.email = email;
+
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_VALIDATE_REQUEST;
+    cmd.command = req;
+
+    // make sure cloud connection is set up
+    [self tearDownLoginSession];
+    [self setSecEmail:email];
+
+    [self asyncSendToCloud:cmd];
 }
 
 #pragma mark - Account related commands
