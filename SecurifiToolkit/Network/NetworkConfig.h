@@ -7,6 +7,7 @@
 
 @class SecurifiConfigurator;
 @class SFIAlmondPlus;
+@class SFIAlmondLocalNetworkSettings;
 
 typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
     NetworkEndpointMode_cloud,
@@ -20,7 +21,7 @@ typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
 + (instancetype)cloudConfig:(SecurifiConfigurator *)configurator useProductionHost:(BOOL)useProductionHost;
 
 // Factory for making a Network configuration for connecting to the web socket server on an Almond
-+ (instancetype)webSocketConfig:(NSString *)almondMac;
++ (instancetype)webSocketConfig:(SFIAlmondLocalNetworkSettings *)settings almondMac:(NSString *)almondMac;
 
 - (id)copyWithZone:(NSZone *)zone;
 

@@ -1936,12 +1936,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self tearDownLocalNetwork];
     
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-    
-    NetworkConfig *config = [NetworkConfig webSocketConfig:almondMac];
-    config.host = settings.host;
-    config.port = settings.port;
-    config.login = settings.login;
-    config.password = settings.password;
+
+    NetworkConfig *config = [NetworkConfig webSocketConfig:settings almondMac:almondMac];
 
     network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;

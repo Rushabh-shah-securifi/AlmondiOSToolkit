@@ -5,6 +5,7 @@
 
 #import "NetworkConfig.h"
 #import "SecurifiConfigurator.h"
+#import "SFIAlmondLocalNetworkSettings.h"
 
 @implementation NetworkConfig
 
@@ -18,9 +19,13 @@
     return config;
 }
 
-+ (instancetype)webSocketConfig:(NSString *)almondMac {
++ (instancetype)webSocketConfig:(SFIAlmondLocalNetworkSettings *)settings almondMac:(NSString *)almondMac {
     NetworkConfig *config = [NetworkConfig configWithMode:NetworkEndpointMode_web_socket];
     config.almondMac = almondMac;
+    config.host = settings.host;
+    config.port = settings.port;
+    config.login = settings.login;
+    config.password = settings.password;
     return config;
 }
 

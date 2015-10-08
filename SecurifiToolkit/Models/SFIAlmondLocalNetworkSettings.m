@@ -33,11 +33,7 @@
 - (enum TestConnectionResult)testConnection {
     NSString *mac = @"test_almond";
 
-    NetworkConfig *config = [NetworkConfig webSocketConfig:mac];
-    config.host = self.host;
-    config.port = self.port;
-    config.login = self.login;
-    config.password = self.password;
+    NetworkConfig *config = [NetworkConfig webSocketConfig:self almondMac:mac];
 
     self.testResult = TestConnectionResult_unknown;
     _test_connection_latch = dispatch_semaphore_create(0);
