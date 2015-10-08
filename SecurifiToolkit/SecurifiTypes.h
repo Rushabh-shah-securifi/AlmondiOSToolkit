@@ -182,6 +182,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_CLAMP1_ENERGY,//md01
     SFIDevicePropertyType_CLAMP2_POWER,//md01
     SFIDevicePropertyType_CLAMP2_ENERGY,//md01
+    SFIDevicePropertyType_SWITCH_BINARY1,
+    SFIDevicePropertyType_SWITCH_BINARY2,
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 

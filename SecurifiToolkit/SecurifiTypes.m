@@ -155,6 +155,8 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"STATUS" : @(SFIDevicePropertyType_STATUS),
                         @"STOP" : @(SFIDevicePropertyType_STOP),
                         @"SWITCH BINARY" : @(SFIDevicePropertyType_SWITCH_BINARY),
+                        @"SWITCH_BINARY1" : @(SFIDevicePropertyType_SWITCH_BINARY1),
+                        @"SWITCH_BINARY2" : @(SFIDevicePropertyType_SWITCH_BINARY2),
                         @"SWITCH MULTILEVEL" : @(SFIDevicePropertyType_SWITCH_MULTILEVEL),
                         @"TAMPER" : @(SFIDevicePropertyType_TAMPER),
                         @"TEMPERATURE" : @(SFIDevicePropertyType_TEMPERATURE),
