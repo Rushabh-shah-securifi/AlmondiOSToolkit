@@ -36,6 +36,7 @@
     NetworkConfig *config = [NetworkConfig webSocketConfig:mac];
     config.host = self.host;
     config.port = self.port;
+    config.login = self.login;
     config.password = self.password;
 
     self.testResult = TestConnectionResult_unknown;

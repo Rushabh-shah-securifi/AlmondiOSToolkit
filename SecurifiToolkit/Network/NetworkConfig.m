@@ -45,6 +45,7 @@
         copy.almondMac = self.almondMac;
         copy.host = self.host;
         copy.port = self.port;
+        copy.login = self.login;
         copy.password = self.password;
         copy.enableCertificateValidation = self.enableCertificateValidation;
         copy.enableCertificateChainValidation = self.enableCertificateChainValidation;

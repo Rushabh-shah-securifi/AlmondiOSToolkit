@@ -36,6 +36,9 @@ typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
 // TCP port
 @property(nonatomic) NSUInteger port;
 
+// User used for authenticating with the web socket connection
+@property(nonatomic, copy) NSString *login;
+
 // Password used for authenticating with the web socket connection
 @property(nonatomic, copy) NSString *password;
 

@@ -1940,8 +1940,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NetworkConfig *config = [NetworkConfig webSocketConfig:almondMac];
     config.host = settings.host;
     config.port = settings.port;
+    config.login = settings.login;
     config.password = settings.password;
-    
+
     network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
     

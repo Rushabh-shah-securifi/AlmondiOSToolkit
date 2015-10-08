@@ -42,10 +42,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (void)connect {
     NetworkConfig *config = self.config;
 
+    NSString *login = config.login;
     NSString *password = config.password;
     NSString *host = config.host;
 
-    if (!host || !password) {
+    if (!host || !login || !password) {
         [self.delegate networkEndpointDidDisconnect:self];
         return;
     }
@@ -53,7 +54,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     password = [password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 
     // ws://192.168.1.102:7681/<password>
-    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@", host, (unsigned long) config.port, password];
+    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@/%@", host, (unsigned long) config.port, login, password];
     NSURL *url = [NSURL URLWithString:connect_str];
     if (!url) {
         [self.delegate networkEndpointDidDisconnect:self];
