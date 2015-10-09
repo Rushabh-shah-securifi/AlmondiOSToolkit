@@ -45,6 +45,12 @@
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "CommandTypeScoreboardEvent.h"
 #import "RouterCommandParser.h"
+#import "Signup.h"
+#import "ValidateAccountRequest.h"
+#import "AlmondListRequest.h"
+#import "DeviceDataHashRequest.h"
+#import "AffiliationUserRequest.h"
+#import "ResetPasswordRequest.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -1416,6 +1422,25 @@ static SecurifiToolkit *toolkit_singleton = nil;
     cmd.commandType = CommandType_CHANGE_PASSWORD_REQUEST;
     cmd.command = request;
     
+    [self asyncSendToCloud:cmd];
+}
+
+- (void)asyncRequestResetCloudPassword:(NSString *)email {
+    if (email.length == 0) {
+        return;
+    }
+
+    ResetPasswordRequest *req = [ResetPasswordRequest new];
+    req.email = email;
+
+    GenericCommand *cmd = [[GenericCommand alloc] init];
+    cmd.commandType = CommandType_RESET_PASSWORD_REQUEST;
+    cmd.command = req;
+
+    // make sure cloud connection is set up
+    [self tearDownLoginSession];
+    [self setSecEmail:email];
+
     [self asyncSendToCloud:cmd];
 }
 

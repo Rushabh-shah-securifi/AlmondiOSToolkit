@@ -21,17 +21,11 @@
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>
 
 #import <SecurifiToolkit/CommandTypes.h>
-#import <SecurifiToolkit/AffiliationUserRequest.h>
 #import <SecurifiToolkit/AffiliationUserComplete.h>
-#import <SecurifiToolkit/Signup.h>
 #import <SecurifiToolkit/SignupResponse.h>
-#import <SecurifiToolkit/AlmondListRequest.h>
 #import <SecurifiToolkit/AlmondListResponse.h>
-#import <SecurifiToolkit/DeviceDataHashRequest.h>
 #import <SecurifiToolkit/DeviceDataHashResponse.h>
-#import <SecurifiToolkit/DeviceListRequest.h>
 #import <SecurifiToolkit/DeviceListResponse.h>
-#import <SecurifiToolkit/DeviceValueRequest.h>
 #import <SecurifiToolkit/DeviceValueResponse.h>
 
 #import <SecurifiToolkit/LoginResponse.h>
@@ -43,12 +37,9 @@
 #import <SecurifiToolkit/MobileCommandResponse.h>
 #import <SecurifiToolkit/GenericCommandRequest.h>
 #import <SecurifiToolkit/GenericCommandResponse.h>
-#import <SecurifiToolkit/ValidateAccountRequest.h>
 #import <SecurifiToolkit/ValidateAccountResponse.h>
-#import <SecurifiToolkit/ResetPasswordRequest.h>
 #import <SecurifiToolkit/ResetPasswordResponse.h>
 #import <SecurifiToolkit/SensorForcedUpdateRequest.h>
-#import <SecurifiToolkit/SensorChangeRequest.h>
 #import <SecurifiToolkit/ScenesListRequest.h>
 
 #import <SecurifiToolkit/SensorChangeResponse.h>
@@ -316,6 +307,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // Send a command to the cloud requesting to change the password for cloud account
 - (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
+
+// Send a command to the cloud requesting to change the password for cloud account
+- (void)asyncRequestResetCloudPassword:(NSString *)email;
 
 // Send a command to the cloud requesting to delete cloud account
 - (void)asyncRequestDeleteCloudAccount:(NSString *)password;
