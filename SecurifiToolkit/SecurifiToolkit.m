@@ -1545,7 +1545,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [aNetwork.networkState markExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:almondMac genericCommand:aCmd];
             return YES;
         }
-        return !storedCmd.isExpired;
+        
+        return storedCmd.isExpired;
     };
     
     // sends a series of requests to fetch all the information at once.
@@ -3168,7 +3169,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             // clear the lock after execution; next command invocation will be allowed
             [aNetwork.networkState clearExpirableRequest:type namespace:aNamespace];
             // give the request 5 seconds to complete
-            return !storedCmd.isExpired;
+            return storedCmd.isExpired;
         }
         else {
             [aNetwork.networkState markExpirableRequest:type namespace:aNamespace genericCommand:aCmd];
@@ -3236,7 +3237,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 return YES;
             }
             // give the request 5 seconds to complete
-            return !storedCmd.isExpired;
+            return storedCmd.isExpired;
         };
 
         NSLog(@"asyncRefreshNotifications: tracking refresh request");
@@ -3319,7 +3320,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             return YES;
         }
         // give the request 5 seconds to complete
-        return !storedCmd.isExpired;
+        return storedCmd.isExpired;
     };
 
     DatabaseStore *store = self.deviceLogsDb;
