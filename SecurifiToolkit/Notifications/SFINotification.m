@@ -122,7 +122,9 @@
             }
             NSString * type = @"other";
             if (payload[@"client_type"]) {
-                type = payload[@"client_type"];
+                if (![[payload[@"client_type"] lowercaseString] isEqualToString:@"unknown"]) {
+                    type = payload[@"client_type"];
+                }
             }
             NSString * alert = payload[@"value"];
             
