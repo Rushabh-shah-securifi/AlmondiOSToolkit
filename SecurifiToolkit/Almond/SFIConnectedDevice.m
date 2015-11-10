@@ -68,7 +68,7 @@
         return @"icon_camera";
     }
     
-    return @"";
+    return @"icon_help";
 }
 
 - (NSString *)getNotificationTypeByName:(NSString *)name {

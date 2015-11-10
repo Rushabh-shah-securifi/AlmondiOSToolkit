@@ -48,7 +48,7 @@
     
     
     //md01<<<<
-    str = payload[@"client_id"];
+    str = payload[@"client_type"];
     if ([str isKindOfClass:[NSString class]]) {
         if (str.length>0) {
             NSString * name = @"";
@@ -61,11 +61,9 @@
             }
             NSString * alert = payload[@"alert"];
 
-//            if ([alert rangeOfString:name].location == NSNotFound) {
-//                alert = [alert stringByAppendingString:name];
-//            }
             obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
-            obj.deviceType = SFIDeviceType_WIFIClient;
+       
+        obj.deviceType = SFIDeviceType_WIFIClient;
         }
     }
     //md01>>>
@@ -128,9 +126,10 @@
             }
             NSString * alert = payload[@"value"];
             
-            if ([alert rangeOfString:name].location != NSNotFound) {
-                alert = [alert stringByReplacingOccurrencesOfString:name withString:@""];;
-            }
+//            if ([alert rangeOfString:name].location != NSNotFound) {
+//                alert = [alert stringByReplacingOccurrencesOfString:name withString:@""];;
+//            }
+            NSLog(@"alert - sfinotification: %@", alert);
             obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
             obj.deviceType = SFIDeviceType_WIFIClient;
         }
