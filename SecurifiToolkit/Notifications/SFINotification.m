@@ -49,8 +49,8 @@
     
     //md01<<<<
     str = payload[@"client_type"];
-    if ([str isKindOfClass:[NSString class]]) {
-        if (str.length>0) {
+    if ([str length] > 0 || [payload[@"client_id"] length] > 0) {
+       
             NSString * name = @"";
             if (payload[@"client_name"]) {
                 name = payload[@"client_name"];
@@ -64,7 +64,7 @@
             obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
        
         obj.deviceType = SFIDeviceType_WIFIClient;
-        }
+        
     }
     //md01>>>
     
