@@ -63,6 +63,12 @@
 // Controls whether the app uses the new WifiClients UI; when NO, then the legacy UI is used.
 @property(nonatomic) BOOL enableWifiClients;
 
+// Controls whether the app will perform an Almond firmware version check and alert the user.
+@property(nonatomic) BOOL enableAlmondVersionRemoteUpdate;
+
+// Controls whether hidden controls will be enabled on the Sensor Tile
+@property(nonatomic) BOOL enableSensorTileDebugInfo;
+
 - (id)copyWithZone:(NSZone *)zone;
 
 @end

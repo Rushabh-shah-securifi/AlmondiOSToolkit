@@ -34,6 +34,8 @@
         self.enableLocalNetworking = NO;
         self.enableScenes = NO;
         self.enableWifiClients = NO;
+        self.enableAlmondVersionRemoteUpdate = NO;
+        self.enableSensorTileDebugInfo = NO;
     }
 
     return self;
@@ -58,6 +60,8 @@
         copy.enableLocalNetworking = self.enableLocalNetworking;
         copy.enableScenes = self.enableScenes;
         copy.enableWifiClients = self.enableWifiClients;
+        copy.enableAlmondVersionRemoteUpdate = self.enableAlmondVersionRemoteUpdate;
+        copy.enableSensorTileDebugInfo = self.enableSensorTileDebugInfo;
     }
 
     return copy;
