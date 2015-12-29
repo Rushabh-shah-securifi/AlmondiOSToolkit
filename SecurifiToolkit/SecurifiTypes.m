@@ -60,6 +60,7 @@ NSString *securifi_name_to_device_type(SFIDeviceType type) {
         case SFIDeviceType_EnergyReader_56:return @"56_EnergyReader";
         case SFIDeviceType_NestThermostat_57:return @"57_NestThermostat";
         case SFIDeviceType_NestSmokeDetector_58:return @"58_NestSmokeDetector";
+//        case SFIDeviceType_BuiltInSiren_60: return @"60_BuiltInSiren";
         case SFIDeviceType_WIFIClient:return @"WIFIClient";
         case SFIDeviceType_count:return @"count_iterator_FIX_ME!";
         default: return [NSString stringWithFormat:@"%d_UnknownDevice", type];
@@ -68,7 +69,7 @@ NSString *securifi_name_to_device_type(SFIDeviceType type) {
 
 NSDictionary *securifi_property_name_to_type_dictionary() {
     static NSDictionary *lookupTable;
-    
+    NSLog(@"lookuptable");
     if (lookupTable == nil) {
                 lookupTable = @{
                         // Normalize all names to upper case.
@@ -176,6 +177,7 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"UNITS" : @(SFIDevicePropertyType_UNITS),
                         @"UP_DOWN" : @(SFIDevicePropertyType_UP_DOWN),
                         @"USER_CODE" : @(SFIDevicePropertyType_USER_CODE),
+                        @"TONE_SELECTED" : @(SFIDevicePropertyType_TONE_SELECTED)
                         };
     }
     return
@@ -195,6 +197,7 @@ SFIDevicePropertyType securifi_name_to_property_type(NSString *valueName) {
     if (!o) {
         return SFIDevicePropertyType_UNKNOWN;
     }
+    NSLog(@"property type: %d", [o intValue]);
     return (SFIDevicePropertyType) [o intValue];
 }
 

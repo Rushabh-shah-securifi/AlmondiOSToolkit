@@ -2142,6 +2142,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             
         case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE: {
             DeviceListResponse *res = payload;
+            NSLog(@"res: %@", res);
             [self onDeviceListAndValuesResponse:res network:network];
             break;
         }
@@ -2662,7 +2663,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case DeviceListResponseType_updated: {
             NSArray *deviceList = res.deviceList;
             NSArray *valueList = res.deviceValueList;
-
+            NSLog(@"toolkit - onDeviceListDidChange: %@", res.deviceValueList);
             if (valueList) {
                 [self processDeviceListChange:deviceList mac:mac requestValues:NO partialList:partialList];
                 [self processDeviceValueList:valueList mac:mac];
@@ -2774,12 +2775,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 // Processes a dynamic change to a device value
 - (void)processDeviceValueList:(NSArray *)newDeviceValues mac:(NSString *)currentMAC {
+    
     if (currentMAC.length == 0) {
         return;
     }
 
     NSArray *currentDeviceValueList = [self.dataManager readDeviceValueList:currentMAC];
-
+    NSLog(@"toolkit - currnetmac: %@, currentValueList: %@", currentMAC, currentDeviceValueList);
     NSMutableArray *newDeviceValueList;
     if (currentDeviceValueList != nil) {
         for (SFIDeviceValue *currentValue in currentDeviceValueList) {
