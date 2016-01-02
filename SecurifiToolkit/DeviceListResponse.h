@@ -13,6 +13,8 @@ typedef NS_ENUM(unsigned int, DeviceListResponseType) {
     DeviceListResponseType_added,
     DeviceListResponseType_removed,
     DeviceListResponseType_removed_all,
+    DeviceListResponseType_deviceList,
+    DeviceListResponseType_websocket_added
 };
 
 @interface DeviceListResponse : NSObject

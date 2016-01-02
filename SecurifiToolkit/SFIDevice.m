@@ -22,14 +22,20 @@
 @implementation SFIDevice
 
 + (NSArray *)addDevice:(SFIDevice *)device list:(NSArray *)list {
+    SFIDevice *toBeRemoved;
     for (SFIDevice *old in list) {
         if (device.deviceID == old.deviceID) {
-            // already in list; do nothing
-            return list;
+            toBeRemoved = old;
+            break;
         }
+        
     }
     
+    
     NSMutableArray *new_list = [NSMutableArray arrayWithArray:list];
+    if(toBeRemoved != nil){
+        [new_list removeObject:toBeRemoved];
+    }
     [new_list addObject:device];
     
     return new_list;
@@ -41,12 +47,15 @@
     for (SFIDevice *old in list) {
         if (device.deviceID != old.deviceID) {
             // already in list; do nothing
-            [new_list addObject:device];
+            [new_list addObject:old];
         }
     }
-    
+    NSLog(@"new_list: %@", new_list);
     return new_list;
+    
 }
+
+
 
 - (SFIDevicePropertyType)statePropertyType {
     switch (self.deviceType) {
@@ -206,8 +215,6 @@
         }
     }
 }
-
-
 
 
 - (SFIDeviceKnownValues *)switchBinaryState:(SFIDeviceValue *)value {

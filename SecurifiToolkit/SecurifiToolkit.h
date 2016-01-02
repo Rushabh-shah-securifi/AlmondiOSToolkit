@@ -390,5 +390,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (BOOL)useLocalNetwork:(NSString *)almondMac;
 
+
+- (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network;
 @end
  
