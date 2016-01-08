@@ -13,6 +13,7 @@
 #import "NetworkEndpoint.h"
 #import "CloudEndpoint.h"
 #import "WebSocketEndpoint.h"
+#import "SceneListener.h"
 
 @interface Network () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
@@ -548,12 +549,14 @@
 
         case CommandType_GET_ALL_SCENES: {
             //md01
+            SceneListener *sceneListener = [[SceneListener alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
             break;
         };
         case CommandType_COMMAND_RESPONSE: {
             //md01
+            SceneListener *sceneListener = [[SceneListener alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_COMMAND_RESPONSE_NOTIFIER data:payload];
             break;

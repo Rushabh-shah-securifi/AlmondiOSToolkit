@@ -116,6 +116,16 @@
     return [GenericCommand jsonPayloadCommand:payload commandType:commandType];
 }
 
++ (instancetype)websocketRequestAlmondSceneList{
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+    
+    NSDictionary *payload = @{
+         @"MobileInternalIndex" : @(correlationId).stringValue,
+         @"CommandType" : @"DynamicSceneList"
+    };
+    return [self jsonPayloadCommand:payload commandType:CommandType_GET_ALL_SCENES];
+}
+
 + (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     
