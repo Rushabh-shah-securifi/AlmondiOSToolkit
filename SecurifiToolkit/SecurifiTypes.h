@@ -69,9 +69,10 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_EnergyReader_56               = 56,
     SFIDeviceType_NestThermostat_57             = 57,
     SFIDeviceType_NestSmokeDetector_58          = 58,
+    SFIDeviceType_BuiltInSiren_60               = 60,
     SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
     
-    SFIDeviceType_count                         = 59, // always set to the last value; assumes sequence is continuous
+    SFIDeviceType_count                         = 61, // always set to the last value; assumes sequence is continuous
 };
 
 // Converts a type into a standard mnemonic name suitable for event logging
@@ -184,6 +185,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_CLAMP2_ENERGY,//md01
     SFIDevicePropertyType_SWITCH_BINARY1,
     SFIDevicePropertyType_SWITCH_BINARY2,
+    SFIDevicePropertyType_TONE_SELECTED, //mk
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 

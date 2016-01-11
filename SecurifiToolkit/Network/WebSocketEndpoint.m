@@ -14,6 +14,8 @@
 #import "SFIGenericRouterCommand.h"
 #import "DynamicAlmondModeChange.h"
 #import "DynamicAlmondNameChangeResponse.h"
+#import "SecurifiToolkit.h"
+#import "GenericCommand.h"
 
 typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
@@ -75,22 +77,27 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
     NSData *data = obj.command;
-
     [self.socket send:data];
-    NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-
     return YES;
 }
+
+-(void)requestForSceneList{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *plus = [toolkit currentAlmond];
+    GenericCommand *cmd = [GenericCommand websocketRequestAlmondSceneList];
+    [[SecurifiToolkit sharedInstance] asyncSendToLocal:cmd almondMac:plus.almondplusMAC];
+}
+
 
 #pragma mark - PSWebSocketDelegate methods
 
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     [self.delegate networkEndpointDidConnect:self];
-    DLog(@"Websocket did open");
+    [self requestForSceneList];
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
-    NSLog(@"Websocket receive: %@", message);
+   
 
     NSString *str = message;
     NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
@@ -98,7 +105,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSError *error;
     id obj = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
     if (error) {
-        NSLog(@"Error decoding websocket message: %@", error);
+       
         return;
     }
 
@@ -109,7 +116,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         commandType = payload[@"CommandType"];
     }
     if (commandType.length == 0) {
-        NSLog(@"No command type specified for payload: %@", payload);
+        
         return;
     }
 
@@ -118,22 +125,61 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         handler(self, payload);
     }
     else {
-        NSLog(@"Unsupported command: %@", str);
-    }
+            }
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
     [self.delegate networkEndpointDidDisconnect:self];
-    NSLog(@"The websocket did fail with error: %@", error.description);
-}
+    }
 
 - (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
     [self.delegate networkEndpointDidDisconnect:self];
-    NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
+    
 }
 
 - (NSDictionary *)buildResponseHandlers {
     return @{
+             @"DynamicSceneList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_GET_ALL_SCENES];
+             },
+             
+             @"AddScene" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
+             },
+             
+             @"ActivateScene" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
+             },
+             
+             @"UpdateScene" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
+             },
+             
+             @"RemoveScene" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
+             },
+             
+             
+             @"DynamicSceneAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE];
+             },
+             
+             @"DynamicSceneActivated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE];
+             },
+             
+             @"DynamicSceneUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE];
+             },
+             
+             @"DynamicSceneRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE];
+             },
+             
+             @"DynamicAllScenesRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE];
+             },
+             
             @"SensorUpdate" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                 DeviceValueResponse *res = [DeviceValueResponse parseJson:payload];
                 res.almondMAC = endpoint.config.almondMac;
@@ -149,9 +195,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
             },
             @"DeviceAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+               
                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
                 res.updatedDevicesOnly = YES;
-                res.type = DeviceListResponseType_added;
+                res.type = DeviceListResponseType_websocket_added;
                 res.almondMAC = endpoint.config.almondMac;
 
                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
@@ -172,9 +219,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
             },
             @"devicelist" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+               
                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
                 res.almondMAC = self.config.almondMac;
-
+                res.type = DeviceListResponseType_deviceList;
                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
             },
             @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {

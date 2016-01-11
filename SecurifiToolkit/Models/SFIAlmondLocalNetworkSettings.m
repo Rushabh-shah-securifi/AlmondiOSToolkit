@@ -77,10 +77,10 @@
     }
 
     NSString *mac_hex = payload[@"MAC"];
-    if (![self validMac:mac_hex]) {
-        self.testResult = TestConnectionResult_macMissing;
-        return;
-    }
+//    if (![self validMac:mac_hex]) {
+//        self.testResult = TestConnectionResult_macMissing;
+//        return;
+//    }
 
     NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
 

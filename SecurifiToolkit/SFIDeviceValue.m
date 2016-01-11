@@ -56,6 +56,21 @@
     return copy;
 }
 
++ (NSArray *)removeDeviceValue:(unsigned int)deviceId list:(NSArray *)list {
+    NSMutableArray *new_list = [NSMutableArray array];
+    
+    for (SFIDeviceValue *old in list) {
+        if (deviceId != old.deviceID) {
+            // already in list; do nothing
+            [new_list addObject:old];
+        }
+    }
+    return new_list;
+}
+
+
+
+
 - (SFIDeviceKnownValues*)knownValuesForProperty:(SFIDevicePropertyType)propertyType {
     SFIDeviceKnownValues *values = [self internalKnownValuesForProperty:propertyType];
     return [values copy];

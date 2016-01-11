@@ -22,14 +22,20 @@
 @implementation SFIDevice
 
 + (NSArray *)addDevice:(SFIDevice *)device list:(NSArray *)list {
+    SFIDevice *toBeRemoved;
     for (SFIDevice *old in list) {
         if (device.deviceID == old.deviceID) {
-            // already in list; do nothing
-            return list;
+            toBeRemoved = old;
+            break;
         }
+        
     }
     
+    
     NSMutableArray *new_list = [NSMutableArray arrayWithArray:list];
+    if(toBeRemoved != nil){
+        [new_list removeObject:toBeRemoved];
+    }
     [new_list addObject:device];
     
     return new_list;
@@ -41,12 +47,15 @@
     for (SFIDevice *old in list) {
         if (device.deviceID != old.deviceID) {
             // already in list; do nothing
-            [new_list addObject:device];
+            [new_list addObject:old];
         }
     }
-    
+    NSLog(@"new_list: %@", new_list);
     return new_list;
+    
 }
+
+
 
 - (SFIDevicePropertyType)statePropertyType {
     switch (self.deviceType) {
@@ -59,7 +68,8 @@
             return SFIDevicePropertyType_LOCK_STATE;
         }
             
-        case SFIDeviceType_StandardWarningDevice_21: {
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_BuiltInSiren_60:{
             return SFIDevicePropertyType_ALARM_STATE;
         }
             
@@ -166,7 +176,8 @@
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
-        case SFIDeviceType_GarageDoorOpener_53: {
+        case SFIDeviceType_GarageDoorOpener_53:
+        case SFIDeviceType_BuiltInSiren_60: {
             return YES;
         }
             
@@ -194,7 +205,8 @@
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
-        case SFIDeviceType_NestThermostat_57:{
+        case SFIDeviceType_NestThermostat_57:
+        case SFIDeviceType_BuiltInSiren_60:{
             return YES;
         }
             
@@ -203,8 +215,6 @@
         }
     }
 }
-
-
 
 
 - (SFIDeviceKnownValues *)switchBinaryState:(SFIDeviceValue *)value {
@@ -310,7 +320,8 @@
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
         case SFIDeviceType_NestThermostat_57:
-        case SFIDeviceType_NestSmokeDetector_58: {
+        case SFIDeviceType_NestSmokeDetector_58:
+        case SFIDeviceType_BuiltInSiren_60: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             if (deviceValues.hasValue) {
                 [deviceValues setBoolValue:!deviceValues.boolValue];

@@ -165,6 +165,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Changes take effect on next connection attempt. Use closeConnection to force a connection change.
 @property(nonatomic) BOOL useProductionCloud;
 
+//has all the scenes
+@property(nonatomic)NSMutableArray* scenesArray;
+
 + (BOOL)isInitialized;
 
 + (void)initialize:(SecurifiConfigurator *)config;
@@ -193,6 +196,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue;
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device name:(NSString *)deviceName location:(NSString *)deviceLocation;
+
+
+- (void)asyncSendToLocal:(GenericCommand *)command almondMac:(NSString *)almondMac;
 
 // returns the mode being used by the current almond, or the default mode when a current almond is not specified
 - (enum SFIAlmondConnectionMode)currentConnectionMode;
@@ -388,6 +394,9 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId  forWifiClients:(BOOL)isForWifiClients;
 
+- (BOOL)useLocalNetwork:(NSString *)almondMac;
 
+
+- (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network;
 @end
  
