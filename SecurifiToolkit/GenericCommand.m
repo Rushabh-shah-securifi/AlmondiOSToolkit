@@ -22,12 +22,12 @@
 
 + (instancetype)websocketAlmondNameAndMac {
     sfi_id cid = [GenericCommand nextCorrelationId];
-
+    
     NSDictionary *payload = @{
-            @"MobileInternalIndex" : @(cid),
-            @"CommandType" : @"GetAlmondNameAndMAC",
-    };
-
+                              @"MobileInternalIndex" : @(cid),
+                              @"CommandType" : @"GetAlmondNameAndMAC",
+                              };
+    
     return [GenericCommand jsonPayloadCommand:payload commandType:CommandType_ALMOND_NAME_AND_MAC_REQUEST];
 }
 
@@ -37,11 +37,11 @@
     request.deviceId = device.deviceID;
     request.changedName = newName;
     request.changedLocation = newLocation;
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_MOBILE_COMMAND;
     cmd.command = [request toJson];
-
+    
     return cmd;
 }
 
@@ -51,11 +51,11 @@
     request.deviceId = device.deviceID;
     request.changedName = newName;
     request.changedLocation = newLocation;
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_MOBILE_COMMAND;
     cmd.command = request;
-
+    
     return cmd;
 }
 
@@ -63,11 +63,11 @@
     GenericCommandRequest *req = [[GenericCommandRequest alloc] init];
     req.almondMAC = almondMac;
     req.data = [newSettings toXml];
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:req.correlationId];
     cmd.commandType = CommandType_GENERIC_COMMAND_REQUEST;
     cmd.command = req;
-
+    
     return cmd;
 }
 
@@ -76,11 +76,11 @@
     request.almondMAC = almondMac;
     request.mode = newMode;
     request.userId = userId;
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
     cmd.command = request.toJson;
-
+    
     return cmd;
 }
 
@@ -89,11 +89,11 @@
     request.almondMAC = almondMac;
     request.mode = newMode;
     request.userId = userId;
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
     cmd.command = request;
-
+    
     return cmd;
 }
 
@@ -107,12 +107,12 @@
 
 + (GenericCommand *)internalWebsocketSensorDeviceListCommand:(enum CommandType)commandType {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
-
+    
     NSDictionary *payload = @{
-            @"mii" : @(correlationId).stringValue,
-            @"cmd" : @"devicelist"
-    };
-
+                              @"mii" : @(correlationId).stringValue,
+                              @"cmd" : @"devicelist"
+                              };
+    
     return [GenericCommand jsonPayloadCommand:payload commandType:commandType];
 }
 
@@ -120,45 +120,46 @@
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     
     NSDictionary *payload = @{
-         @"MobileInternalIndex" : @(correlationId).stringValue,
-         @"CommandType" : @"DynamicSceneList"
-    };
+                              @"MobileInternalIndex" : @(correlationId).stringValue,
+                              @"CommandType" : @"DynamicSceneList"
+                              };
     return [self jsonPayloadCommand:payload commandType:CommandType_GET_ALL_SCENES];
 }
+
 
 + (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     
     NSDictionary *payload = @{
-            @"mii" : @(correlationId).stringValue,
-            @"cmd" : @"setdeviceindex",
-            @"devid" : @(device.deviceID).stringValue,
-            @"index" : @(newValue.index).stringValue,
-            @"value" : newValue.value,
-    };
-
+                              @"mii" : @(correlationId).stringValue,
+                              @"cmd" : @"setdeviceindex",
+                              @"devid" : @(device.deviceID).stringValue,
+                              @"index" : @(newValue.index).stringValue,
+                              @"value" : newValue.value,
+                              };
+    
     return [GenericCommand jsonPayloadCommand:payload commandType:CommandType_MOBILE_COMMAND];
 }
 
 + (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac {
     DeviceListRequest *request = [DeviceListRequest new];
     request.almondMAC = almondMac;
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_DEVICE_DATA;
     cmd.command = request;
-
+    
     return cmd;
 }
 
 + (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac {
     DeviceValueRequest *request = [DeviceValueRequest new];
     request.almondMAC = almondMac;
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_DEVICE_VALUE;
     cmd.command = request;
-
+    
     return cmd;
 }
 
@@ -169,50 +170,88 @@
     request.deviceType = device.deviceType;
     request.indexID = [NSString stringWithFormat:@"%d", newValue.index];
     request.changedValue = newValue.value;
-
+    
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_MOBILE_COMMAND;
     cmd.command = request;
-
+    
     return cmd;
 }
 
+
+
 + (instancetype)websocketRequestAlmondWifiClients {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
-
+    
     NSDictionary *payload = @{
-            @"MobileInternalIndex" : @(correlationId).stringValue,
-            @"CommandType" : @"ClientsList"
-    };
-
+                              @"MobileInternalIndex" : @(correlationId).stringValue,
+                              @"CommandType" : @"ClientsList"
+                              };
+    
     return [self jsonPayloadCommand:payload commandType:CommandType_GENERIC_COMMAND_REQUEST];
 }
 
-+ (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac {
+
++ (instancetype)websocketRequestAlmondWifiClients:(NSString *)almondMac {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
-
+    
     NSDictionary *payload = @{
-            @"MobileInternalIndex" : @(correlationId).stringValue,
-            @"commandtype" : @"WifiClientList",
-            @"AlmondMAC" : almondMac,
-    };
-
+                              @"MobileInternalIndex" : @(correlationId).stringValue,
+                              @"CommandType" : @"ClientList",
+//                              @"AlmondMAC" : almondMac
+                              };
+    
     return [self jsonPayloadCommand:payload commandType:CommandType_WIFI_CLIENTS_LIST_REQUEST];
+}
+
++ (instancetype)websocketRequestAlmondSceneList:(NSString *)almondMac {
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+    
+    NSDictionary *payload = @{
+                              @"MobileInternalIndex" : @(correlationId).stringValue,
+                              @"CommandType" : @"DynamicSceneList",
+                              @"AlmondMAC" : almondMac
+                              };
+    
+    return [self jsonPayloadCommand:payload commandType:CommandType_GET_ALL_SCENES];
+}
+
++ (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac {
+    
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+    NSDictionary *payload = @{
+                              @"MobileInternalIndex" : @(correlationId).stringValue,
+                              @"commandtype" : @"WifiClientList",
+                              @"AlmondMAC" : almondMac,
+                              };
+    
+    return [self jsonPayloadCommand:payload commandType:CommandType_WIFI_CLIENTS_LIST_REQUEST];
+}
+
+//Rules
++ (instancetype)websocketRequestAlmondRules{
+    NSLog(@"websocketRequestAlmondRules");
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+    NSDictionary *payload = @{
+                              @"CommandType" : @"RuleList",
+                              @"MobileInternalIndex" : @(correlationId).stringValue
+                              };
+    NSLog(@"payload :%@",payload);
+    return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST_REQUEST];
 }
 
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
     NSError *error;
     NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];
-
+    
     if (error) {
         NSLog(@"jsonPayloadCommand: Error serializing JSON, command:%i, payload:%@, error:%@", commandType, payload, error.description);
         return nil;
     }
-
+    
     GenericCommand *cmd = [GenericCommand new];
     cmd.command = data;
     cmd.commandType = commandType;
-
     return cmd;
 }
 
@@ -234,7 +273,7 @@
         _correlationId = [GenericCommand nextCorrelationId];
         _created = [NSDate date];
     }
-
+    
     return self;
 }
 
@@ -244,7 +283,7 @@
         _correlationId = correlationId;
         _created = [NSDate date];
     }
-
+    
     return self;
 }
 
@@ -265,16 +304,16 @@
 
 + (sfi_id)nextCorrelationId {
     static int32_t counter = 0;
-
+    
     int32_t localCounter;
     int32_t newCounter;
-
+    
     do {
         localCounter = counter;
         newCounter = localCounter + 1;
         newCounter = newCounter <= 0 ? 0 : newCounter;
     } while (!OSAtomicCompareAndSwap32(localCounter, newCounter, &counter));
-
+    
     return (sfi_id) counter;
 }
 

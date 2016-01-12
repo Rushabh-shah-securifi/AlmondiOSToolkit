@@ -14,6 +14,8 @@
 #import "CloudEndpoint.h"
 #import "WebSocketEndpoint.h"
 #import "SceneListener.h"
+#import "Parser.h"
+#import "RuleParser.h"
 
 @interface Network () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
@@ -45,17 +47,17 @@
         _networkConfig = networkConfig;
         _callbackQueue = callbackQueue;
         _dynamicCallbackQueue = dynamicCallbackQueue;
-
+        
         [self markConnectionState:NetworkConnectionStatusUninitialized];
         self.loginStatus = NetworkLoginStatusNotLoggedIn;
-
+        
         _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
         _cloud_initialized_latch = dispatch_semaphore_create(0);
-
+        
         _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
         _networkState = [NetworkState new];
     }
-
+    
     return self;
 }
 
@@ -72,13 +74,13 @@
 
 - (void)connect {
     NSLog(@"Initialzing network communication");
-
+    
     [self markConnectionState:NetworkConnectionStatusInitializing];
-
+    
     if (self.endpoint) {
         return;
     }
-
+    
     NetworkConfig *config = self.networkConfig;
     if (config.mode == NetworkEndpointMode_cloud) {
         self.endpoint = [CloudEndpoint endpointWithConfig:config];
@@ -86,33 +88,33 @@
     else {
         self.endpoint = [WebSocketEndpoint endpointWithConfig:config];
     }
-
+    
     self.endpoint.delegate = self;
     [self.endpoint connect];
 }
 
 - (void)shutdown {
     NSLog(@"Shutting down network Network");
-
+    
     if (!self.endpoint) {
         return;
     }
-
+    
     NSLog(@"[%@] Network is shutting down", self.debugDescription);
-
+    
     // Signal shutdown
     //
     [self markConnectionState:NetworkConnectionStatusShutdown];
     [self markLoggedInState:NO];
-
+    
     // Clean up command queue
     //
     [self tryAbortUnit];
     dispatch_semaphore_signal(self.cloud_initialized_latch);
-
+    
     [self.endpoint shutdown];
     self.endpoint = nil;
-
+    
     // Tell delegate of shutdown
     [self.delegate networkConnectionDidClose:self];
 }
@@ -125,7 +127,7 @@
 - (BOOL)waitForCloudInitialization:(int)numSecsToWait {
     dispatch_semaphore_t latch = self.cloud_initialized_latch;
     NSString *msg = @"Giving up on endpoint initialization";
-
+    
     BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
     if (timedOut) {
         NSLog(@"%@. Issuing shutdown on timeout", msg);
@@ -139,13 +141,13 @@
 // Returns NO when the signal has been received before the timeout.
 - (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString *)msg {
     dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
-
+    
     BOOL timedOut = NO;
-
+    
     dispatch_time_t blockingSleepSecondsIfNotDone;
     do {
         enum NetworkConnectionStatus status = self.connectionState;
-
+        
         if (status == NetworkConnectionStatusShutdown) {
             NSLog(@"%@. Network was shutdown.", msg);
             break;
@@ -154,10 +156,10 @@
             NSLog(@"%@. Cloud is initialized.", msg);
             break;
         }
-
+        
         const int waitMs = 5;
         blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, waitMs * NSEC_PER_MSEC);
-
+        
         timedOut = blockingSleepSecondsIfNotDone > max_time;
         if (timedOut) {
             NSLog(@"%@. Timeout reached.", msg);
@@ -165,10 +167,10 @@
         }
     }
     while (0 != dispatch_semaphore_wait(latch, blockingSleepSecondsIfNotDone));
-
+    
     // make sure...
     dispatch_semaphore_signal(latch);
-
+    
     return timedOut;
 }
 
@@ -195,7 +197,7 @@
 
 - (void)tryMarkUnitCompletion:(BOOL)success responseType:(CommandType)responseType {
     SUnit *unit = self.currentUnit;
-
+    
     if (unit) {
         [unit markResponse:success];
         [self.delegate networkDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess responseType:responseType];
@@ -208,7 +210,7 @@
 
 - (void)tryAbortUnit {
     SUnit *unit = self.currentUnit;
-
+    
     if (unit) {
         DLog(@"Marking unit as aborted: %@", unit.description);
         [unit abort];
@@ -251,16 +253,16 @@
 - (void)post:(NSString *)notificationName payload:(id)payload queue:(dispatch_queue_t)queue {
     __weak id block_payload = payload;
     __weak id block_self = self;
-
+    
     dispatch_sync(queue, ^() {
         NSDictionary *data = nil;
         if (payload) {
             data = @{
-                    @"data" : block_payload,
-                    @"network" : block_self,
-            };
+                     @"data" : block_payload,
+                     @"network" : block_self,
+                     };
         }
-
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
     });
 }
@@ -282,13 +284,13 @@
     if (cloudStatus == NetworkConnectionStatusShutdown) {
         return;
     }
-
+    
     // There may be other commands in the initialization queue still waiting for responses.
     // Let them complete or timeout before opening up the main command queue.
     // Therefore, queue a command to make the state change and start the main queue's processing.
-
+    
     NSLog(@"Queuing cloud initialization completed command");
-
+    
     __weak Network *block_self = self;
     dispatch_async(self.initializationQueue, ^() {
         NetworkConnectionStatus status = block_self.connectionState;
@@ -298,9 +300,9 @@
         if (status == NetworkConnectionStatusShutdown) {
             return;
         }
-
+        
         [block_self markConnectionState:NetworkConnectionStatusInitialized];
-
+        
         dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
         if (latch) {
             NSInteger limit = self.currentUnitCounter;
@@ -315,9 +317,9 @@
 - (BOOL)submitCloudInitializationCommand:(GenericCommand *)command {
     if (self.connectionState == NetworkConnectionStatusInitialized) {
         NSLog(@"Rejected cloud initialization command submission: already marked as initialized");
-//        return NO; //todo fix me.
+        //        return NO; //todo fix me.
     }
-
+    
     dispatch_queue_t queue = self.initializationQueue;
     BOOL waitForInit = NO;
     return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:5];
@@ -326,25 +328,25 @@
 - (BOOL)submitCommand:(GenericCommand *)command {
     dispatch_queue_t queue = self.commandQueue;
     BOOL waitForInit = YES;
-
+    
     if (!self.isStreamConnected) {
         return NO;
     }
-
+    
     switch (self.connectionState) {
         case NetworkConnectionStatusUninitialized:
         case NetworkConnectionStatusShutdown:
             // don't even queue; just get out
             return NO;
-
+            
         case NetworkConnectionStatusInitialized:
             waitForInit = NO;
             break;
-
+            
         case NetworkConnectionStatusInitializing:
             break;
     }
-
+    
     // fire precondition handler
     NetworkPrecondition pFunction = command.networkPrecondition;
     if (pFunction) {
@@ -353,7 +355,7 @@
             return NO;
         }
     }
-
+    
     return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:0];
 }
 
@@ -365,9 +367,9 @@
         DLog(@"SubmitCommand failed: network is shutdown");
         return NO;
     }
-
+    
     DLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
-
+    
     __weak Network *block_self = self;
     dispatch_async(queue, ^() {
         if (!block_self.isStreamConnected) {
@@ -382,15 +384,15 @@
             SLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
-
+        
         NSInteger tag = [block_self nextUnitCounter];
-
+        
         SUnit *unit = [[SUnit alloc] initWithCommand:command];
         [unit markWorking:tag];
         block_self.currentUnit = unit;
-
+        
         SLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
-
+        
         NSError *error;
         BOOL success = [block_self.endpoint sendCommand:command error:&error];
         if (!success) {
@@ -399,15 +401,15 @@
             return;
         }
         [block_self.delegate networkDidSendCommand:block_self command:command];
-
+        
         SLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
-
-//        int const waitAtMostSecs = 1;
+        
+        //        int const waitAtMostSecs = 1;
         [unit waitForResponse:waitAtMostSecs];
-
+        
         SLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
     });
-
+    
     return YES;
 }
 
@@ -421,7 +423,7 @@
     if (self.networkConfig.mode == NetworkEndpointMode_web_socket) {
         [self markConnectionState:NetworkConnectionStatusInitialized];
     }
-
+    
     if (!self.networkUpNoticePosted) {
         [self.delegate networkConnectionDidEstablish:self];
         self.networkUpNoticePosted = YES;
@@ -435,40 +437,41 @@
 }
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
+    NSLog(@" command type %d",commandType);
     switch (commandType) {
         case CommandType_SIGNUP_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:SIGN_UP_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_KEEP_ALIVE: {
             break;
         }
-
+            
         case CommandType_CLOUD_SANITY_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             break;
         }
-
+            
         case CommandType_AFFILIATION_USER_COMPLETE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:AFFILIATION_COMPLETE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_MOBILE_COMMAND_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:MOBILE_COMMAND_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_VALIDATE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:VALIDATE_RESPONSE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_RESET_PASSWORD_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:payload];
@@ -484,13 +487,13 @@
             [self postData:USER_PROFILE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_CHANGE_PASSWORD_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:CHANGE_PWD_RESPONSE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DELETE_ACCOUNT_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self delegateData:payload commandType:commandType];
@@ -498,57 +501,58 @@
             [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_UPDATE_USER_PROFILE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:UPDATE_USER_PROFILE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ALMOND_AFFILIATION_DATA_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_UNLINK_ALMOND_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:UNLINK_ALMOND_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_USER_INVITE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:USER_INVITE_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DELETE_SECONDARY_USER_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DELETE_SECONDARY_USER_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:payload];
             break;
         }
-
+            
         case CommandType_GET_ALL_SCENES: {
             //md01
+            NSLog(@" get all scene");
             SceneListener *sceneListener = [[SceneListener alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
@@ -567,6 +571,7 @@
         };
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
             //md01
+            Parser *parser = [[Parser alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE data:payload];
             break;
@@ -611,9 +616,54 @@
             [self postData:NOTIFICATION_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_NOTIFIER data:payload];
             break;
         };
-
-        // =========================
-
+            
+            //rules
+        case CommandType_RULE_LIST_RESPONSE: {
+            RuleParser *ruleParser = [[RuleParser alloc]init];
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:RULE_LIST_NOTIFIER data:payload];
+            break;
+        };
+            
+        case CommandType_RULE_COMMAND_RESPONSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:RULE_COMMAND_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+            
+        case CommandType_RULE_COMMAND_DYNAMICREMOVE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_RULE_REMOVE_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_RULE_COMMAND_DYNAMICUPDATE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_RULE_UPDATED data:payload];
+            break;
+        };
+            
+        case CommandType_RULE_COMMAND_DELETEALL: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_RULE_REMOVEALL data:payload];
+            break;
+        };
+        case CommandType_RULE_COMMAND_DYNAMICADD:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_RULE_LISTCHANGED data:payload];
+            break;
+        }
+        case CommandType_RULE_COMMAND_RULLCHANGED:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_RULE_LISTCHANGED data:payload];
+            
+        }
+        case CommandType_RULE_COMMAND_DYNAMICDELETEALL:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_RULE_LISTCHANGED data:payload];
+            
+        }//CommandType_RULE_COMMAND_DYNAMICDELETEALL
+            // =========================
+            
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
@@ -625,15 +675,15 @@
             [self delegateDataDynamic:payload commandType:commandType];
             break;
         }
-
-        // =========================
-
+            
+            // =========================
+            
         case CommandType_LOGIN_RESPONSE: {
             LoginResponse *obj = (LoginResponse *) payload;
             [self markLoggedInState:obj.isSuccessful];
             // pass through to normal handler below
         }
-
+            
         case CommandType_LOGOUT_RESPONSE:
         case CommandType_LOGOUT_ALL_RESPONSE:
         case CommandType_ALMOND_LIST_RESPONSE:
@@ -660,9 +710,9 @@
             [self delegateData:payload commandType:commandType];
             break;
         }
-
-        // =========================
-
+            
+            // =========================
+            
         default:
             break;
     }

@@ -35,7 +35,13 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)websocketRequestAlmondWifiClients;
 
++ (instancetype)websocketRequestAlmondWifiClients:(NSString *)almondMac;//temprarily tried it, we dont need mac in local connection
+
 + (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac;
+
+//Rules
++ (instancetype)websocketRequestAlmondRules;
++ (instancetype)websocketRequestAlmondSceneList:(NSString *)almondMac;
 
 // constructs a generic command for requesting the sensor list
 + (instancetype)websocketSensorDeviceListCommand;
@@ -61,6 +67,7 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 //scene list request
 + (instancetype)websocketRequestAlmondSceneList;
+
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
 
