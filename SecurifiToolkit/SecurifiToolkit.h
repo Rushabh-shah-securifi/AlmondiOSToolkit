@@ -82,6 +82,7 @@
 #import <SecurifiToolkit/SFIDevicesList.h>
 
 #import <SecurifiToolkit/MDJSON.h>
+#import <SecurifiToolkit/Parser.h>
 
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
@@ -168,6 +169,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 //has all the scenes
 @property(nonatomic)NSMutableArray* scenesArray;
 
+@property(nonatomic)NSMutableArray *wifiClientParser;
+@property(nonatomic)NSMutableArray *ruleList;
+
 + (BOOL)isInitialized;
 
 + (void)initialize:(SecurifiConfigurator *)config;
@@ -196,7 +200,6 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue;
 
 - (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device name:(NSString *)deviceName location:(NSString *)deviceLocation;
-
 
 - (void)asyncSendToLocal:(GenericCommand *)command almondMac:(NSString *)almondMac;
 
@@ -398,5 +401,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 
 - (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network;
+
+- (BOOL)useLocalNetwork:(NSString *)almondMac;
+
 @end
- 
