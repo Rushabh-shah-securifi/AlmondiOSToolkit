@@ -198,7 +198,7 @@
     NSDictionary *payload = @{
                               @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"CommandType" : @"ClientList",
-//                              @"AlmondMAC" : almondMac
+//                              @"AlmondMAC" : almondMac //if almond mac is null it would crash
                               };
     
     return [self jsonPayloadCommand:payload commandType:CommandType_WIFI_CLIENTS_LIST_REQUEST];

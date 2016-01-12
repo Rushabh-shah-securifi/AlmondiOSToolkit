@@ -146,6 +146,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
+        self.scenesArray = [NSMutableArray new];
+        self.wifiClientParser = [NSMutableArray new];
         
         if (config.enableNotifications) {
             {
@@ -1567,21 +1569,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)internalRequestAlmondStatusAndSettings:(NSString *)almondMac command:(enum SecurifiToolkitAlmondRouterRequest)type commandPrecondition:(NetworkPrecondition)precondition {
-    if (self.config.enableLocalNetworking && type == SecurifiToolkitAlmondRouterRequest_wifi_clients) {
-        BOOL local = [self useLocalNetwork:almondMac];
         
-        if (local) {
-            GenericCommand *cmd = [GenericCommand websocketRequestAlmondWifiClients];
-            cmd.networkPrecondition = precondition;
-            
-            [self asyncSendToLocal:cmd almondMac:almondMac];
-            
-            return;
-        }
-        
-        // else pass through
-    }
-    
     NSString *data;
     switch (type) {
         case SecurifiToolkitAlmondRouterRequest_summary:
