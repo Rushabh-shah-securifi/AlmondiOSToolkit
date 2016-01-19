@@ -21,7 +21,7 @@
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver:self
                selector:@selector(getAllScenesCallback:)
-                   name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER
+                   name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
                  object:nil];
 
     [center addObserver:self
@@ -57,7 +57,7 @@
     if(local){
         mainDict = [data valueForKey:@"data"];
     }else{
-        return;//till cloud changes are integrated
+        //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }// required for switching local<=>cloud
     NSLog(@"main dict - %@", mainDict);
@@ -82,7 +82,6 @@
     
 }
 
-
 - (void)onScenesListChange:(id)sender{
     NSLog(@"listner - onScenesListChange");
     NSNotification *notifier = (NSNotification *) sender;
@@ -94,7 +93,7 @@
     if(local){
         mainDict = [data valueForKey:@"data"];
     }else{
-        return; //till cloud changes are integrated
+         //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     NSDictionary *dict;

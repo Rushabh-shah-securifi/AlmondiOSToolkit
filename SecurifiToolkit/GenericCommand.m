@@ -17,6 +17,7 @@
 #import "SFIWirelessSetting.h"
 #import "GenericCommandRequest.h"
 #import "AlmondModeChangeRequest.h"
+#import "MDJSON.h"
 
 @implementation GenericCommand
 
@@ -151,6 +152,36 @@
     
     return cmd;
 }
++ (instancetype)cloudSceneListCommand:(NSString *)almondMac{
+
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = CommandType_GET_ALL_SCENES;
+    
+    NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
+                               @"AlmondMAC":almondMac};
+    
+    NSLog(@"%@",testDict);
+    
+    cloudCommand.command = [testDict JSONString];
+    
+    return cloudCommand;
+}
+
++ (instancetype)cloudClientListCommand:(NSString *)almondMac{
+    
+    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
+    cloudCommand.commandType = CommandType_GET_ALL_SCENES;
+    
+    NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
+                               @"AlmondMAC":almondMac};
+    
+    NSLog(@"%@",testDict);
+    
+    cloudCommand.command = [testDict JSONString];
+    
+    return cloudCommand;
+}
+
 
 + (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac {
     DeviceValueRequest *request = [DeviceValueRequest new];

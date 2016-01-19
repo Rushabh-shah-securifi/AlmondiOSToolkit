@@ -394,6 +394,7 @@
         SLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
         
         NSError *error;
+        
         BOOL success = [block_self.endpoint sendCommand:command error:&error];
         if (!success) {
             NSLog(@"Command Queue: send error, command:%@, error:%@, tag:%ld", command, error.description, (long) tag);
@@ -560,12 +561,12 @@
         };
         case CommandType_COMMAND_RESPONSE: {
             //md01
-            SceneListener *sceneListener = [[SceneListener alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_COMMAND_RESPONSE_NOTIFIER data:payload];
             break;
         };
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
+            SceneListener *sceneListener = [[SceneListener alloc]init];
             [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
             break;
         };
