@@ -13,12 +13,9 @@
 
 @property (nonatomic,strong) NSMutableArray *triggers;
 @property (nonatomic,strong) NSMutableArray *actions;
-@property (nonatomic,strong) NSMutableArray *wifiClients;
 @property (nonatomic, strong) RulesTimeElement *time;
 @property (nonatomic) BOOL isActive;
 @property (nonatomic, strong) NSString* name;
 @property (nonatomic, strong) NSString* lastActivated;
 @property (nonatomic, strong) NSString* ID;
-//@property (nonatomic ,strong) NSMutableArray *wificlientArray;
-
 @end

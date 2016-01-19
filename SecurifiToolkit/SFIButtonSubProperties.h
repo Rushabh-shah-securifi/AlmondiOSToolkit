@@ -15,5 +15,8 @@
 @property(nonatomic) NSString* matchData;
 @property(nonatomic) NSString *delay; //to be used for actions
 @property(nonatomic) NSString *eventType;
-@property(nonatomic) int positionId; //for actioins
+@property(nonatomic) int positionId; //for actions and triggers
+
+@property(nonatomic) NSString *deviceName; //for rules view
+@property(nonatomic) SFIDeviceType deviceType; //for rules view
 @end
