@@ -14,8 +14,24 @@
     self = [super init];
     if(self){
         self.delay = @"0";
+        self.eventType=nil;
+        
     }
     return self;
+}
+
+- (SFIButtonSubProperties *)createNew{
+    SFIButtonSubProperties *butProperties = [[SFIButtonSubProperties alloc]init];
+    butProperties.deviceId = self.deviceId;
+    butProperties.index = self.index;
+    butProperties.delay = self.delay;
+    butProperties.eventType = self.eventType;
+    butProperties.positionId = self.positionId;
+    butProperties.deviceType = self.deviceType;
+    butProperties.deviceName = self.deviceName;
+    
+    
+    return butProperties;
 }
 
 @end

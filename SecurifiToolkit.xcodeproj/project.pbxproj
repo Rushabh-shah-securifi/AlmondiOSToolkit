@@ -739,6 +739,7 @@
 		1C3EEFB81B37999300DFCF62 /* Almond */ = {
 			isa = PBXGroup;
 			children = (
+				1C414BE71A7B625400C448A4 /* AppKit */,
 				1C3EEFB91B37999300DFCF62 /* SFIBlockedDevice.h */,
 				1C3EEFBA1B37999300DFCF62 /* SFIBlockedDevice.m */,
 				1C3EEFBB1B37999300DFCF62 /* SFIConnectedDevice.h */,
@@ -817,7 +818,8 @@
 				1DF0307DE1CC4DB1634A20D6 /* NSData+Securifi.m */,
 				1DF031159AE3A393A5EC0204 /* NSData+Securifi.h */,
 			);
-			path = AppKit;
+			name = AppKit;
+			path = ../AppKit;
 			sourceTree = "<group>";
 		};
 		1C4382D61B2FDD5200F6AB7A /* PocketSocket */ = {
@@ -1014,7 +1016,6 @@
 				A54EAF981C44D8C700CF2837 /* WiFiClients */,
 				1C3EEFB81B37999300DFCF62 /* Almond */,
 				1CE67A2E1A91D7670004E68C /* AlmondMode */,
-				1C414BE71A7B625400C448A4 /* AppKit */,
 				CE7EA7DB18978910005DCBA3 /* Base64 */,
 				1C414BC11A79F02600C448A4 /* Db */,
 				1C2F60581B69D6F3001CCA34 /* JSON */,

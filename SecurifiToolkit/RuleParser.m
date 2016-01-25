@@ -46,19 +46,7 @@
             NSArray *dDictArray = [mainDict valueForKey:@"Rules"];
             
             for (NSDictionary *dict in dDictArray) {
-                Rule *rule = [Rule new];
-                rule.name = [dict valueForKey:@"Name"];
-                rule.ID = [dict valueForKey:@"ID"];
-                rule.triggers = [self getTriggersList:[dict valueForKey:@"Triggers"]];
-                rule.wifiClients = [self getWifiClientsList:[dict valueForKey:@"Triggers"]];
-                rule.time = [self getTime:[dict valueForKey:@"Triggers"]];
-                rule.actions = [self getActionsList:[dict valueForKey:@"Results"]];
-                if (rule.isActive) {
-                    //                    activeClientsCount++;
-                }else{
-                    //                    inActiveClientsCount++;
-                }
-                [self.rules addObject:rule];
+                [self.rules addObject:[self createRule:dict]];
             }
         }
         toolkit.ruleList = self.rules;
@@ -73,52 +61,38 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:postData];
     NSLog(@" rulesList in ruleParser %@",toolkit.ruleList);
 }
-
--(NSMutableArray*)getTriggersList:(NSArray*)triggers{
-    NSMutableArray *triggersArray;
-    triggersArray = [NSMutableArray new];
-    for(NSDictionary *triggersDict in triggers){
-        if([[triggersDict valueForKey:@"Type"] isEqualToString:@"EventTrigger"]){
-            if([[triggersDict valueForKey:@"EventType"] isEqualToString:@"AlmondModeUpdated"]){
-                SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
-                subProperties.deviceId = 0;
-                subProperties.index = 1;
-                subProperties.matchData = [triggersDict valueForKey:@"Value"];
-                [triggersArray addObject:subProperties];
-            }
-        }
-        if([[triggersDict valueForKey:@"Type"] isEqualToString:@"DeviceTrigger"]){
-            SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
-            subProperties.deviceId = [[triggersDict valueForKey:@"ID"] intValue];
-            subProperties.index = [[triggersDict valueForKey:@"Index"] intValue];
-            subProperties.matchData = [triggersDict valueForKey:@"Value"];
-            [triggersArray addObject:subProperties];
-        }
-    }
+-(Rule *)createRule:(NSDictionary*)dict{
+    Rule *rule = [Rule new];
+    rule.name = [dict valueForKey:@"Name"];
+    rule.ID = [dict valueForKey:@"ID"];
     
-    return triggersArray;
+    rule.triggers= [NSMutableArray new];
+    
+    SFIButtonSubProperties *timeProperty=[SFIButtonSubProperties new];
+    timeProperty.time=[self getTime:[dict valueForKey:@"Triggers"]];
+    [rule.triggers addObject:timeProperty];
+    
+    [self getTriggersList:[dict valueForKey:@"Triggers"] list:rule.triggers];
+    
+    rule.actions= [NSMutableArray new];
+    [self getTriggersList:[dict valueForKey:@"Results"] list:rule.actions];
+    NSLog(@" rule action list count %ld",(unsigned long)rule.actions.count);
+    return rule;
+    
 }
--(NSMutableArray*)getWifiClientsList:(NSArray*)triggers{
-    NSMutableArray *clientsArray = [NSMutableArray new];
-    
-    //    "{"Type":"EventTrigger","ID":"%d","EventType":"%s","Value":"%s","Grouping":"%s","Validation":"%s","Condition":"%s"}"
-    for(NSDictionary *clientsDict in triggers){
-        
-        if([[clientsDict valueForKey:@"Type"] isEqualToString:@"EventTrigger"]){
-            if([[clientsDict valueForKey:@"EventType"] isEqualToString:@"AlmondModeUpdated"]){
-                continue;
-            }
-            SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
-            subProperties.deviceId = [[clientsDict valueForKey:@"ID"] intValue];
-            subProperties.index = [[clientsDict valueForKey:@"Index"] intValue];
-            subProperties.matchData = [clientsDict valueForKey:@"Value"];
-            subProperties.eventType = [clientsDict valueForKey:@"EventType"];
-            [clientsArray addObject:subProperties];
-            NSLog( @" client dict %@ ",clientsDict);
-        }
+
+-(void)getTriggersList:(NSArray*)triggers list:(NSMutableArray *)list{
+   
+    for(NSDictionary *triggersDict in triggers){
+        SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
+        subProperties.deviceId = [[triggersDict valueForKey:@"ID"] intValue];
+        subProperties.index = [[triggersDict valueForKey:@"Index"] intValue];
+        subProperties.matchData = [triggersDict valueForKey:@"Value"];
+        subProperties.eventType = [triggersDict valueForKey:@"EventType"];
+        NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.index);
+        [list addObject:subProperties];
     }
-    NSLog( @" client list %@",clientsArray);
-    return clientsArray;
+    
 }
 
 -(RulesTimeElement*)getTime:(NSArray*)triggers{
@@ -142,9 +116,6 @@
                 
             }
             
-            //assign segment
-            //if range is nil construct date
-            //else construct datefrom and dateto
         }
     }
     return time;
@@ -163,31 +134,7 @@
 //"{"Type":"DeviceResult","ID":"%d","Index":"%d","Value":"%s","PreDelay":"%d","Validation":"%s"}"
 
 
--(NSMutableArray*)getActionsList:(NSArray*)actions{
-    NSMutableArray *actionsArray = [NSMutableArray new];
-    for(NSDictionary *actionsDict in actions){
-        if([[actionsDict valueForKey:@"Type"] isEqualToString:@"EventResult"]){
-            if([[actionsDict valueForKey:@"EventType"] isEqualToString:@"AlmondModeUpdated"]){
-                SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
-                subProperties.deviceId = 0;
-                subProperties.index = 1;
-                subProperties.matchData = [actionsDict valueForKey:@"Value"];
-                subProperties.delay = [actionsDict valueForKey:@"PreDelay"];
-                [actionsArray addObject:subProperties];
-            }
-        }
-        if([[actionsDict valueForKey:@"Type"] isEqualToString:@"DeviceResult"]){
-            SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
-            subProperties.deviceId = [[actionsDict valueForKey:@"ID"] intValue];
-            subProperties.delay = [actionsDict valueForKey:@"PreDelay"];
-            subProperties.index = [[actionsDict valueForKey:@"Index"] intValue];
-            subProperties.matchData = [actionsDict valueForKey:@"Value"];
-            [actionsArray addObject:subProperties];
-        }
-    }
-    
-    return actionsArray;
-}
+
 -(void)onDynamicRuleUpdateParser:(id)sender{
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
@@ -200,27 +147,27 @@
     if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicRuleUpdated"] || [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicRuleAdded"]){
         if ([[mainDict valueForKey:@"Rules"] isKindOfClass:[NSArray class]]) {
             NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
-            self.rules = [NSMutableArray new];
-            Rule *rule = [Rule new];
-            rule.name = [dDict valueForKey:@"Name"];
-            rule.ID = [dDict valueForKey:@"ID"];
-            rule.triggers = [self getTriggersList:[dDict valueForKey:@"Triggers"]];
-            rule.wifiClients = [self getWifiClientsList:[dDict valueForKey:@"Triggers"]];
-            rule.time = [self getTime:[dDict valueForKey:@"Triggers"]];
-            rule.actions = [self getActionsList:[dDict valueForKey:@"Results"]];
-            if (rule.isActive) {
-                //                    activeClientsCount++;
-            }else{
-                //                    inActiveClientsCount++;
-            }
-            [toolkit.ruleList addObject:rule];
-            NSDictionary *postData = nil;
-            if (rule) {
-                data = @{
-                         @"data" : rule,
-                         };
-            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_DYNAMIC_RULE_UPDATED object:nil userInfo:postData];
+//            self.rules = [NSMutableArray new];
+//            Rule *rule = [Rule new];
+//            rule.name = [dDict valueForKey:@"Name"];
+//            rule.ID = [dDict valueForKey:@"ID"];
+//            rule.triggers = [self getTriggersList:[dDict valueForKey:@"Triggers"] ];
+//            rule.wifiClients = [self getWifiClientsList:[dDict valueForKey:@"Triggers"]];
+//            rule.time = [self getTime:[dDict valueForKey:@"Triggers"]];
+//            rule.actions = [self getTriggersList:[dDict valueForKey:@"Results"]];
+//            if (rule.isActive) {
+//                //                    activeClientsCount++;
+//            }else{
+//                //                    inActiveClientsCount++;
+//            }
+//            [toolkit.ruleList addObject:rule];
+//            NSDictionary *postData = nil;
+//            if (rule) {
+//                data = @{
+//                         @"data" : rule,
+//                         };
+//            }
+//            [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_DYNAMIC_RULE_UPDATED object:nil userInfo:postData];
 
         }
         
@@ -291,28 +238,7 @@
     if([[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleUpdated"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleAdded"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RemoveRule"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleRemoveAll"]){//RemoveRule
         NSLog(@" rulelist update sended");
         [self requestForRuleList];
-        
-//        if ([[mainDict valueForKey:@"Rules"] isKindOfClass:[NSArray class]]) {
-//            NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
-//            self.rules = [NSMutableArray new];
-//            Rule *rule = [Rule new];
-//            rule.name = [dDict valueForKey:@"Name"];
-//            rule.ID = [dDict valueForKey:@"ID"];
-//            rule.triggers = [self getTriggersList:[dDict valueForKey:@"Triggers"]];
-//            rule.wifiClients = [self getWifiClientsList:[dDict valueForKey:@"Triggers"]];
-//            rule.time = [self getTime:[dDict valueForKey:@"Triggers"]];
-//            rule.actions = [self getActionsList:[dDict valueForKey:@"Results"]];
-//            if (rule.isActive) {
-//                //                    activeClientsCount++;
-//            }else{
-//                //                    inActiveClientsCount++;
-//            }
-//            [toolkit.ruleList addObject:rule];
-//        }
-//        
-//        NSLog(@" rule dynamic added %@",toolkit.ruleList);
-//    }
-//
+
     }
     
     return;
