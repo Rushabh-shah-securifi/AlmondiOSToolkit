@@ -23,7 +23,7 @@
     [center addObserver:self selector:@selector(onDynamicRuleRemovedParser:) name:DYNAMIC_RULE_REMOVE_NOTIFIER object:nil];
     [center addObserver:self selector:@selector(onDynamicRuleRemoveAllParser:) name:DYNAMIC_RULE_REMOVEALL object:nil];//DYNAMIC_RULE_ADDED
     [center addObserver:self selector:@selector(onDynamicRuleChanged:) name:DYNAMIC_RULE_LISTCHANGED object:nil];
-
+    
 }
 
 
@@ -53,8 +53,8 @@
         
         if (self.rules) {
             postData = @{
-                     @"data" : self.rules,
-                     };
+                         @"data" : self.rules,
+                         };
         }
         
     }
@@ -82,7 +82,8 @@
 }
 
 -(void)getTriggersList:(NSArray*)triggers list:(NSMutableArray *)list{
-   
+    
+    
     for(NSDictionary *triggersDict in triggers){
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
         subProperties.deviceId = [[triggersDict valueForKey:@"ID"] intValue];
@@ -94,7 +95,6 @@
     }
     
 }
-
 -(RulesTimeElement*)getTime:(NSArray*)triggers{
     RulesTimeElement *time = [[RulesTimeElement alloc]init];
     for(NSDictionary *timeDict in triggers){
@@ -141,40 +141,40 @@
     if (data == nil) {
         return;
     }
-     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     NSDictionary *mainDict = [data valueForKey:@"data"];
     NSLog(@"dynamaic updated : %@",mainDict);
     if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicRuleUpdated"] || [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicRuleAdded"]){
         if ([[mainDict valueForKey:@"Rules"] isKindOfClass:[NSArray class]]) {
             NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
-//            self.rules = [NSMutableArray new];
-//            Rule *rule = [Rule new];
-//            rule.name = [dDict valueForKey:@"Name"];
-//            rule.ID = [dDict valueForKey:@"ID"];
-//            rule.triggers = [self getTriggersList:[dDict valueForKey:@"Triggers"] ];
-//            rule.wifiClients = [self getWifiClientsList:[dDict valueForKey:@"Triggers"]];
-//            rule.time = [self getTime:[dDict valueForKey:@"Triggers"]];
-//            rule.actions = [self getTriggersList:[dDict valueForKey:@"Results"]];
-//            if (rule.isActive) {
-//                //                    activeClientsCount++;
-//            }else{
-//                //                    inActiveClientsCount++;
-//            }
-//            [toolkit.ruleList addObject:rule];
-//            NSDictionary *postData = nil;
-//            if (rule) {
-//                data = @{
-//                         @"data" : rule,
-//                         };
-//            }
-//            [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_DYNAMIC_RULE_UPDATED object:nil userInfo:postData];
-
+            //            self.rules = [NSMutableArray new];
+            //            Rule *rule = [Rule new];
+            //            rule.name = [dDict valueForKey:@"Name"];
+            //            rule.ID = [dDict valueForKey:@"ID"];
+            //            rule.triggers = [self getTriggersList:[dDict valueForKey:@"Triggers"] ];
+            //            rule.wifiClients = [self getWifiClientsList:[dDict valueForKey:@"Triggers"]];
+            //            rule.time = [self getTime:[dDict valueForKey:@"Triggers"]];
+            //            rule.actions = [self getTriggersList:[dDict valueForKey:@"Results"]];
+            //            if (rule.isActive) {
+            //                //                    activeClientsCount++;
+            //            }else{
+            //                //                    inActiveClientsCount++;
+            //            }
+            //            [toolkit.ruleList addObject:rule];
+            //            NSDictionary *postData = nil;
+            //            if (rule) {
+            //                data = @{
+            //                         @"data" : rule,
+            //                         };
+            //            }
+            //            [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_DYNAMIC_RULE_UPDATED object:nil userInfo:postData];
+            
         }
         
         
-      
         
-       
+        
+        
         NSLog(@" rule dynamic updated %@",toolkit.ruleList);
     }
     
@@ -201,7 +201,7 @@
         }
         [toolkit.ruleList removeObject:deleteRule];
     }
-   // toolkit.ruleList = self.rules;
+    // toolkit.ruleList = self.rules;
     
     return ;
     
@@ -238,11 +238,11 @@
     if([[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleUpdated"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleAdded"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RemoveRule"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleRemoveAll"]){//RemoveRule
         NSLog(@" rulelist update sended");
         [self requestForRuleList];
-
+        
     }
     
     return;
-
+    
 }
 -(void)requestForRuleList{
     
