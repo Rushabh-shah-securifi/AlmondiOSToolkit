@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #include "SecurifiToolkit/SecurifiTypes.h"
 #import "RulesTimeElement.h"
+
 typedef NS_ENUM(int , Type) {
     Mode,
     Wifi,

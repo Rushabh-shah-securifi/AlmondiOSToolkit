@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-//#import "AddTriggers.h"
 
 @interface RulesTimeElement : NSObject
 @property (nonatomic)NSInteger range;
@@ -15,7 +14,7 @@
 @property (nonatomic)NSInteger mins;
 
 @property (nonatomic)NSString *monthOfYear;
-@property (nonatomic)NSString *dayOfWeek;  //0 - 6 sun - mon
+@property (nonatomic)NSMutableArray *dayOfWeek;  //0 - 6 sun - mon - (0,1,4. .)
 @property (nonatomic)NSString *dayOfMonth;//1 - 30/31
 @property (nonatomic) BOOL isPresent;
 
