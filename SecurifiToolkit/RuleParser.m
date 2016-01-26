@@ -109,11 +109,9 @@
             time.dateFrom = time.date;
             time.segmentType = 1;
             if(time.range > 0){
-                
                 NSDate *timeTo = [time.dateFrom dateByAddingTimeInterval:((time.range+1)*60)];
                 time.dateTo = timeTo;
                 time.segmentType = 2;
-                
             }
             
         }
