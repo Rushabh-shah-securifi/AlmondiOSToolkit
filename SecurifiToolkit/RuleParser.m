@@ -65,40 +65,34 @@
     Rule *rule = [Rule new];
     rule.name = [dict valueForKey:@"Name"];
     rule.ID = [dict valueForKey:@"ID"];
-    
     rule.triggers= [NSMutableArray new];
-    
-    SFIButtonSubProperties *timeProperty=[SFIButtonSubProperties new];
-    timeProperty.time=[self getTime:[dict valueForKey:@"Triggers"]];
-    [rule.triggers addObject:timeProperty];
-    
+    [self addTime:[dict valueForKey:@"Triggers"] list:rule.triggers];
     [self getTriggersList:[dict valueForKey:@"Triggers"] list:rule.triggers];
     
     rule.actions= [NSMutableArray new];
     [self getTriggersList:[dict valueForKey:@"Results"] list:rule.actions];
-    NSLog(@" rule action list count %ld",(unsigned long)rule.actions.count);
     return rule;
     
 }
 
 -(void)getTriggersList:(NSArray*)triggers list:(NSMutableArray *)list{
-    
-    
     for(NSDictionary *triggersDict in triggers){
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
         subProperties.deviceId = [[triggersDict valueForKey:@"ID"] intValue];
         subProperties.index = [[triggersDict valueForKey:@"Index"] intValue];
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
-        NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.index);
+        NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.deviceId);
         [list addObject:subProperties];
     }
-    
 }
--(RulesTimeElement*)getTime:(NSArray*)triggers{
-    RulesTimeElement *time = [[RulesTimeElement alloc]init];
+
+-(void)addTime:(NSArray*)triggers list:(NSMutableArray*)list{
     for(NSDictionary *timeDict in triggers){
         if([[timeDict valueForKey:@"Type"] isEqualToString:@"TimeTrigger"]){
+            SFIButtonSubProperties *timeProperty=[SFIButtonSubProperties new];
+            RulesTimeElement *time = [[RulesTimeElement alloc]init];
+            
             time.range = [[timeDict valueForKey:@"Range"] intValue];
             time.hours = [[timeDict valueForKey:@"Hour"] intValue];
             time.mins = [[timeDict valueForKey:@"Minutes"] intValue];
@@ -114,9 +108,10 @@
                 time.segmentType = 2;
             }
             
+            timeProperty.time = time;
+            [list addObject:timeProperty];
         }
     }
-    return time;
 }
 
 -(NSDate *)getDateFrom:(NSInteger)hour minutes:(NSInteger)mins{
