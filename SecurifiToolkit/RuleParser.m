@@ -11,9 +11,14 @@
 #import "SecurifiToolkit.h"
 
 @implementation RuleParser
+NSArray *deviceArray;\
+SecurifiToolkit *toolkit;
 - (instancetype)init {
     self = [super init];
     [self initNotification];
+    toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *plus = [toolkit currentAlmond];
+    deviceArray=[toolkit deviceList:plus.almondplusMAC];
     return self;
 }
 -(void)initNotification{
@@ -28,77 +33,93 @@
 
 
 -(void)onRuleListResponse:(id)sender{
-    
-    self.rules = [NSMutableArray new];
-    NSDictionary *postData = nil;
-    
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
+    if(sender==nil)
         return;
-    }
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSDictionary *data = [(NSNotification *) sender userInfo];
+    if (data == nil)
+        return;
     NSDictionary *mainDict = [data valueForKey:@"data"];
+    if(mainDict==nil)
+        return;
+    
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    toolkit.ruleList = [NSMutableArray new];
     NSLog(@"onRuleList: %@",mainDict);
-    self.rules = [NSMutableArray new];
     if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"RuleList"]){
-        if ([[mainDict valueForKey:@"Rules"] isKindOfClass:[NSArray class]]) {
-            NSArray *dDictArray = [mainDict valueForKey:@"Rules"];
-            
+        NSArray *dDictArray = [mainDict valueForKey:@"Rules"];
+        if (dDictArray)
             for (NSDictionary *dict in dDictArray) {
-                [self.rules addObject:[self createRule:dict]];
+                [toolkit.ruleList  addObject:[self createRule:dict]];
             }
-        }
-        toolkit.ruleList = self.rules;
-        
-        if (self.rules) {
-            postData = @{
-                         @"data" : self.rules,
-                         };
-        }
         
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:postData];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
     NSLog(@" rulesList in ruleParser %@",toolkit.ruleList);
 }
 -(Rule *)createRule:(NSDictionary*)dict{
     Rule *rule = [Rule new];
-    rule.name = [dict valueForKey:@"Name"];
+    rule.name = [dict valueForKey:@"Name"]==nil?@"":[dict valueForKey:@"Name"];
     rule.ID = [dict valueForKey:@"ID"];
     rule.triggers= [NSMutableArray new];
     [self addTime:[dict valueForKey:@"Triggers"] list:rule.triggers];
-    [self getTriggersList:[dict valueForKey:@"Triggers"] list:rule.triggers];
+    [self getEntriesList:[dict valueForKey:@"Triggers"] list:rule.triggers];
     
     rule.actions= [NSMutableArray new];
-    [self getTriggersList:[dict valueForKey:@"Results"] list:rule.actions];
+    [self getEntriesList:[dict valueForKey:@"Results"] list:rule.actions];
     return rule;
     
 }
+-(void)getDeviceTypeFor:(SFIButtonSubProperties*)buttonSubProperty{
+    
+    NSLog(@" eventType :- %@ index :%d device id -: %d",buttonSubProperty.eventType,buttonSubProperty.index,buttonSubProperty.deviceId);
+    buttonSubProperty.deviceType = SFIDeviceType_UnknownDevice_0;
+    if((buttonSubProperty.deviceId  == 1) && [buttonSubProperty.eventType isEqualToString:@"AlmondModeUpdated"]){
+        buttonSubProperty.deviceType= SFIDeviceType_BinarySwitch_0;
+        buttonSubProperty.deviceName = @"Mode";
+    }else if(buttonSubProperty.index == 0 && buttonSubProperty.eventType !=nil && toolkit.wifiClientParser!=nil){
+        for(SFIConnectedDevice *connectedClient in toolkit.wifiClientParser){
+            if(buttonSubProperty.deviceId == connectedClient.deviceID.intValue){
+                buttonSubProperty.deviceType = SFIDeviceType_WIFIClient;
+                buttonSubProperty.deviceName = connectedClient.name;
+            }
+        }
+    }else{
+        for(SFIDevice *device in deviceArray){
+            if(buttonSubProperty.deviceId == device.deviceID){
+                buttonSubProperty.deviceType = device.deviceType;
+                buttonSubProperty.deviceName = device.deviceName;
+            }
+        }
+    }
+    NSLog(@" id :%d,name :%@ ",buttonSubProperty.deviceId,buttonSubProperty.deviceName);
+}
 
--(void)getTriggersList:(NSArray*)triggers list:(NSMutableArray *)list{
+-(void)getEntriesList:(NSArray*)triggers list:(NSMutableArray *)list{
     for(NSDictionary *triggersDict in triggers){
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
-        subProperties.deviceId = [[triggersDict valueForKey:@"ID"] intValue];
-        subProperties.index = [[triggersDict valueForKey:@"Index"] intValue];
+        subProperties.deviceId = [self getIntegerValue:[triggersDict valueForKey:@"ID"]];
+        subProperties.index = [self getIntegerValue:[triggersDict valueForKey:@"Index"]];
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.deviceId);
+        [self getDeviceTypeFor:subProperties];
         [list addObject:subProperties];
     }
 }
 
 -(void)addTime:(NSArray*)triggers list:(NSMutableArray*)list{
     for(NSDictionary *timeDict in triggers){
-        if([[timeDict valueForKey:@"Type"] isEqualToString:@"TimeTrigger"]){
+        NSString *type=[timeDict valueForKey:@"Type"];
+        if(type!=nil && [type isEqualToString:@"TimeTrigger"]){
             SFIButtonSubProperties *timeProperty=[SFIButtonSubProperties new];
             RulesTimeElement *time = [[RulesTimeElement alloc]init];
             
-            time.range = [[timeDict valueForKey:@"Range"] intValue];
-            time.hours = [[timeDict valueForKey:@"Hour"] intValue];
-            time.mins = [[timeDict valueForKey:@"Minutes"] intValue];
-            time.dayOfMonth = [timeDict valueForKey:@"DayOfMonth"] ;
-            time.dayOfWeek = [timeDict valueForKey:@"DayOfWeek"];
-            time.monthOfYear = [timeDict valueForKey:@"MonthOfYear"];
+            time.range = [self getIntegerValue:[timeDict valueForKey:@"Range"]];
+            time.hours = [self getIntegerValue:[timeDict valueForKey:@"Hour"]];
+            time.mins = [self getIntegerValue:[timeDict valueForKey:@"Minutes"]];
+            //time.dayOfMonth = [self getIntegerValue:[timeDict valueForKey:@"DayOfMonth"]];
+            //time.dayOfWeek = [self getIntegerValue:[timeDict valueForKey:@"DayOfWeek"]];
+            //time.monthOfYear = [self getIntegerValue:[timeDict valueForKey:@"MonthOfYear"]];
             time.date = [self getDateFrom:time.hours minutes:time.mins];
             time.dateFrom = time.date;
             time.segmentType = 1;
@@ -109,11 +130,24 @@
             }
             
             timeProperty.time = time;
+            timeProperty.eventType = @"TimeTrigger";
             [list addObject:timeProperty];
+            break;
         }
     }
 }
 
+-(int)getIntegerValue:(NSString *) stringValue{
+    @try {
+        return [stringValue intValue];
+    }
+    @catch (NSException * e) {
+        return [stringValue intValue];
+    }
+}
+-(int)getStringValue:(NSString *) stringValue{
+    return stringValue==nil?@"":stringValue;
+}
 -(NSDate *)getDateFrom:(NSInteger)hour minutes:(NSInteger)mins{
     
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
