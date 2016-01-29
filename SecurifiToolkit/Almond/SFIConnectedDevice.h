@@ -9,6 +9,11 @@
 #import <Foundation/Foundation.h>
 
 //todo badly named; something more descriptive and accurate like AlmondConnectedClient
+typedef NS_ENUM(NSInteger, DeviceAllowedType){
+    DeviceAllowed_Always,
+    DeviceAllowed_OnSchedule,
+    DeviceAllowed_Blocked
+};
 
 @interface SFIConnectedDevice : NSObject
 //<ConnectedDevice><Name>ashutosh</Name><IP>1678379540</IP><MAC>10:60:4b:d9:60:84</MAC></ConnectedDevice>
@@ -22,6 +27,9 @@
 @property(nonatomic, retain) NSString *deviceLastActiveTime;
 @property(nonatomic, assign) BOOL deviceUseAsPresence;
 @property(nonatomic, assign) BOOL isActive;
+
+@property(nonatomic) DeviceAllowedType deviceAllowedType;
+@property(nonatomic) NSString *deviceSchedule;
 
 - (NSString *)iconName;
 
