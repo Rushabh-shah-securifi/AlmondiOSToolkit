@@ -13,9 +13,7 @@
 #import "NetworkEndpoint.h"
 #import "CloudEndpoint.h"
 #import "WebSocketEndpoint.h"
-#import "SceneListener.h"
-#import "Parser.h"
-#import "RuleParser.h"
+
 
 @interface Network () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
@@ -31,6 +29,7 @@
 
 @property(nonatomic) BOOL networkUpNoticePosted;
 @property(nonatomic) id <NetworkEndpoint> endpoint;
+
 
 @end
 
@@ -50,6 +49,8 @@
         
         [self markConnectionState:NetworkConnectionStatusUninitialized];
         self.loginStatus = NetworkLoginStatusNotLoggedIn;
+        
+        
         
         _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
         _cloud_initialized_latch = dispatch_semaphore_create(0);
@@ -554,7 +555,6 @@
         case CommandType_GET_ALL_SCENES: {
             //md01
             NSLog(@" get all scene");
-            SceneListener *sceneListener = [[SceneListener alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
             break;
@@ -566,13 +566,10 @@
             break;
         };
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
-            SceneListener *sceneListener = [[SceneListener alloc]init];
             [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
-            //md01
-            Parser *parser = [[Parser alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE data:payload];
             break;
@@ -620,7 +617,6 @@
             
             //rules
         case CommandType_RULE_LIST_RESPONSE: {
-            RuleParser *ruleParser = [[RuleParser alloc]init];
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:RULE_LIST_NOTIFIER data:payload];
             break;

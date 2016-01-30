@@ -51,6 +51,9 @@
 #import "DeviceDataHashRequest.h"
 #import "AffiliationUserRequest.h"
 #import "ResetPasswordRequest.h"
+#import "Parser.h"
+#import "SceneListener.h"
+#import "RuleParser.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -115,6 +118,9 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) Network *cloudNetwork;
 @property(nonatomic, strong) Network *localNetwork;
 
+@property(nonatomic, strong) RuleParser *ruleParser;
+@property(nonatomic, strong) SceneListener *sceneListener;
+@property(nonatomic, strong) Parser *clientParser;
 @end
 
 @implementation SecurifiToolkit
@@ -148,6 +154,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
         _dataManager = [SFIOfflineDataManager new];
         self.scenesArray = [NSMutableArray new];
         self.wifiClientParser = [NSMutableArray new];
+        
+        self.ruleParser=[[RuleParser alloc]init];
+        self.sceneListener=[[SceneListener alloc]init];
+        self.clientParser=[[Parser alloc]init];
         
         if (config.enableNotifications) {
             {

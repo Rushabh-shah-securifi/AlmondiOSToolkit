@@ -25,5 +25,19 @@
     }
     return self;
 }
+-(id)createNew{
+    RulesTimeElement *element=[RulesTimeElement new];
+    element.range=self.range;
+    element.hours=self.hours;
+    element.mins=self.mins;
+    element.dayOfMonth=self.dayOfMonth;
+    element.dayOfWeek=self.dayOfWeek;
+    element.monthOfYear=self.monthOfYear;
+    element.date=self.date;
+    element.dateFrom=self.dateFrom;
+    element.dateTo=self.dateTo;
+    element.segmentType=self.segmentType;
 
+    return element;
+}
 @end

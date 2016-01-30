@@ -16,9 +16,7 @@ SecurifiToolkit *toolkit;
 - (instancetype)init {
     self = [super init];
     [self initNotification];
-    toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    deviceArray=[toolkit deviceList:plus.almondplusMAC];
+   
     return self;
 }
 -(void)initNotification{
@@ -69,30 +67,7 @@ SecurifiToolkit *toolkit;
     return rule;
     
 }
--(void)getDeviceTypeFor:(SFIButtonSubProperties*)buttonSubProperty{
-    
-    NSLog(@" eventType :- %@ index :%d device id -: %d",buttonSubProperty.eventType,buttonSubProperty.index,buttonSubProperty.deviceId);
-    buttonSubProperty.deviceType = SFIDeviceType_UnknownDevice_0;
-    if((buttonSubProperty.deviceId  == 1) && [buttonSubProperty.eventType isEqualToString:@"AlmondModeUpdated"]){
-        buttonSubProperty.deviceType= SFIDeviceType_BinarySwitch_0;
-        buttonSubProperty.deviceName = @"Mode";
-    }else if(buttonSubProperty.index == 0 && buttonSubProperty.eventType !=nil && toolkit.wifiClientParser!=nil){
-        for(SFIConnectedDevice *connectedClient in toolkit.wifiClientParser){
-            if(buttonSubProperty.deviceId == connectedClient.deviceID.intValue){
-                buttonSubProperty.deviceType = SFIDeviceType_WIFIClient;
-                buttonSubProperty.deviceName = connectedClient.name;
-            }
-        }
-    }else{
-        for(SFIDevice *device in deviceArray){
-            if(buttonSubProperty.deviceId == device.deviceID){
-                buttonSubProperty.deviceType = device.deviceType;
-                buttonSubProperty.deviceName = device.deviceName;
-            }
-        }
-    }
-    NSLog(@" id :%d,name :%@ ",buttonSubProperty.deviceId,buttonSubProperty.deviceName);
-}
+
 
 -(void)getEntriesList:(NSArray*)triggers list:(NSMutableArray *)list{
     for(NSDictionary *triggersDict in triggers){
@@ -102,7 +77,7 @@ SecurifiToolkit *toolkit;
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.deviceId);
-        [self getDeviceTypeFor:subProperties];
+        
         [list addObject:subProperties];
     }
 }

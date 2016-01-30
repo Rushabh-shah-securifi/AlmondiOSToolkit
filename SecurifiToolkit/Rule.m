@@ -7,6 +7,7 @@
 //
 
 #import "Rule.h"
+#import "SFIButtonSubProperties.h"
 
 @implementation Rule
 
@@ -36,4 +37,24 @@
 
      return copy;
  }
+- (NSMutableArray *)copyEntries:(NSArray *)entries{
+    NSMutableArray *newEntries= [NSMutableArray new];
+    for(SFIButtonSubProperties *properties in entries){
+        [newEntries addObject:[properties createNew]];
+    }
+    return newEntries;
+}
+- (id)createNew{
+    Rule *copy = [Rule new];
+    
+    copy.triggers = [self copyEntries:self.triggers];
+    copy.actions = [self copyEntries:self.actions];
+    copy.isActive = self.isActive;
+    copy.name = self.name;
+    copy.lastActivated = self.lastActivated;
+    copy.ID = self.ID;
+    
+    return copy;
+}
+
 @end

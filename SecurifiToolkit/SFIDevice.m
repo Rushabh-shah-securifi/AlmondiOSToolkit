@@ -206,7 +206,12 @@
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
         case SFIDeviceType_NestThermostat_57:
-        case SFIDeviceType_BuiltInSiren_60:{
+        case SFIDeviceType_BuiltInSiren_60:
+        case SFIDeviceType_RollerShutter_52:
+        case SFIDeviceType_GarageDoorOpener_53:
+        case SFIDeviceType_ZWtoACIRExtender_54:
+        case SFIDeviceType_MultiSwitch_43:
+        case SFIDeviceType_SetPointThermostat_46:{
             return YES;
         }
             

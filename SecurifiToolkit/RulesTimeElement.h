@@ -24,4 +24,5 @@
 
 @property (nonatomic)int segmentType;
 
+-(id)createNew;
 @end

@@ -29,8 +29,9 @@
     butProperties.positionId = self.positionId;
     butProperties.deviceType = self.deviceType;
     butProperties.deviceName = self.deviceName;
-    
-    
+    if(butProperties.time!=nil)
+        butProperties.time=[self.time createNew];
+
     return butProperties;
 }
 

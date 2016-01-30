@@ -18,4 +18,6 @@
 @property (nonatomic, strong) NSString* name;
 @property (nonatomic, strong) NSString* lastActivated;
 @property (nonatomic, strong) NSString* ID;
+
+-(id)createNew;
 @end
