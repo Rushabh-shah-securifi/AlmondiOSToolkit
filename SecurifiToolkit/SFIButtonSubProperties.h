@@ -29,7 +29,7 @@ typedef NS_ENUM(int , Type) {
 @property(nonatomic) NSString *deviceName;
 @property(nonatomic) NSString *iconName;
 @property(nonatomic) NSString *displayText;
-@property(nonatomic) enum Type type;
+@property(nonatomic) NSString *type;
 @property(nonatomic) RulesTimeElement *time;
 
 @property bool isMode;

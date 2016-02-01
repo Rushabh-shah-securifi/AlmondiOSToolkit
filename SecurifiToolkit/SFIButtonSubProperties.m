@@ -30,8 +30,9 @@
     butProperties.positionId = self.positionId;
     butProperties.deviceType = self.deviceType;
     butProperties.deviceName = self.deviceName;
+    butProperties.type=self.type;
     
-    if(butProperties.time!=nil)
+    if([self.eventType isEqualToString: @"TimeTrigger"])
         butProperties.time=[self.time createNew];
 
     return butProperties;

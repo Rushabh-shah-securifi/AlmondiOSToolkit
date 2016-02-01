@@ -21,7 +21,6 @@
         self.dayOfMonth = [NSString new];
         self.dayOfWeek = [NSMutableArray new];
         self.monthOfYear = [NSString new];
-        self.date = [NSDate new];
         self.dateFrom = [NSDate new];
         self.dateTo = [NSDate new];
         self.segmentType = 0;
@@ -36,11 +35,9 @@
     element.dayOfMonth=self.dayOfMonth;
     element.dayOfWeek=self.dayOfWeek;
     element.monthOfYear=self.monthOfYear;
-    element.date=self.date;
     element.dateFrom=self.dateFrom;
     element.dateTo=self.dateTo;
     element.segmentType=self.segmentType;
-
     return element;
 }
 @end

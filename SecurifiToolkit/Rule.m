@@ -15,9 +15,7 @@
     if(self == [super init]){
         self.triggers = [[NSMutableArray alloc]init];
         self.actions = [[NSMutableArray alloc]init];
-        self.time = [[RulesTimeElement alloc]init];
         self.name = [[NSString alloc]init];
-//        self.wificlientArray = [[NSMutableArray alloc]init];
     }
     return self;
 }
@@ -28,7 +26,6 @@
      if (copy != nil) {
          copy.triggers = [NSMutableArray arrayWithArray:self.triggers];
          copy.actions = [NSMutableArray arrayWithArray:self.actions];
-         copy.time = self.time;
          copy.isActive = self.isActive;
          copy.name = self.name;
          copy.lastActivated = self.lastActivated;

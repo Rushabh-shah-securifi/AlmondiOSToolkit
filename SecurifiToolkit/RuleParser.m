@@ -15,7 +15,7 @@
 
 - (instancetype)init {
     self = [super init];
-        [self initNotification];
+    [self initNotification];
     
     return self;
 }
@@ -50,7 +50,7 @@
         if(toolkit.ruleList!=nil && toolkit.ruleList.count>0)
             [toolkit.ruleList removeObject:deleteRule];
     }else if([commandType isEqualToString:@"DynamicAllRulesRemoved"] && toolkit.ruleList!=nil && toolkit.ruleList.count>0)
-            [toolkit.ruleList removeAllObjects];
+        [toolkit.ruleList removeAllObjects];
     
     
     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
@@ -75,7 +75,7 @@
     rule.name = [dict valueForKey:@"Name"]==nil?@"":[dict valueForKey:@"Name"];
     
     rule.triggers= [NSMutableArray new];
-    [self addTime:[dict valueForKey:@"Triggers"] list:rule.triggers];
+    
     [self getEntriesList:[dict valueForKey:@"Triggers"] list:rule.triggers];
     
     rule.actions= [NSMutableArray new];
@@ -99,7 +99,7 @@
     newRule.ID=id;
     [toolkit.ruleList addObject:newRule];
     //[checkRules addObject:newRule];
-     NSLog(@"findRule %lu",toolkit.ruleList.count);
+    NSLog(@"findRule %lu",toolkit.ruleList.count);
     return newRule;
 }
 
@@ -110,40 +110,35 @@
         subProperties.index = [self getIntegerValue:[triggersDict valueForKey:@"Index"]];
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
+        subProperties.type = [triggersDict valueForKey:@"Type"];
         NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.deviceId);
-        
+        [self addTime:triggersDict timeProperty:subProperties];
         [list addObject:subProperties];
     }
 }
 
--(void)addTime:(NSArray*)triggers list:(NSMutableArray*)list{
-    for(NSDictionary *timeDict in triggers){
-        NSString *type=[timeDict valueForKey:@"Type"];
-        if(type!=nil && [type isEqualToString:@"TimeTrigger"]){
-            SFIButtonSubProperties *timeProperty=[SFIButtonSubProperties new];
-            RulesTimeElement *time = [[RulesTimeElement alloc]init];
-            
-            time.range = [self getIntegerValue:[timeDict valueForKey:@"Range"]];
-            time.hours = [self getIntegerValue:[timeDict valueForKey:@"Hour"]];
-            time.mins = [self getIntegerValue:[timeDict valueForKey:@"Minutes"]];
-            //time.dayOfMonth = [self getIntegerValue:[timeDict valueForKey:@"DayOfMonth"]];
-            //time.dayOfWeek = [self getIntegerValue:[timeDict valueForKey:@"DayOfWeek"]];
-            //time.monthOfYear = [self getIntegerValue:[timeDict valueForKey:@"MonthOfYear"]];
-            time.date = [self getDateFrom:time.hours minutes:time.mins];
-            time.dateFrom = time.date;
-            time.segmentType = 1;
-            if(time.range > 0){
-                NSDate *timeTo = [time.dateFrom dateByAddingTimeInterval:((time.range+1)*60)];
-                time.dateTo = timeTo;
-                time.segmentType = 2;
-            }
-            
-            timeProperty.time = time;
-            timeProperty.eventType = @"TimeTrigger";
-            [list addObject:timeProperty];
-            break;
-        }
+-(void)addTime:(NSDictionary*)timeDict timeProperty:(SFIButtonSubProperties *)timeProperty{
+    
+    if(![[timeDict valueForKey:@"Type"] isEqualToString:@"TimeTrigger"])
+        return;
+    RulesTimeElement *time = [[RulesTimeElement alloc]init];
+    
+    time.range = [self getIntegerValue:[timeDict valueForKey:@"Range"]];
+    time.hours = [self getIntegerValue:[timeDict valueForKey:@"Hour"]];
+    time.mins = [self getIntegerValue:[timeDict valueForKey:@"Minutes"]];
+    //time.dayOfMonth = [self getIntegerValue:[timeDict valueForKey:@"DayOfMonth"]];
+    //time.dayOfWeek = [self getIntegerValue:[timeDict valueForKey:@"DayOfWeek"]];
+    //time.monthOfYear = [self getIntegerValue:[timeDict valueForKey:@"MonthOfYear"]];
+    time.dateFrom = [self getDateFrom:time.hours minutes:time.mins];
+    time.segmentType = 1;
+    if(time.range > 0){
+        time.dateTo =[time.dateFrom dateByAddingTimeInterval:((time.range)*60)];
+        time.segmentType = 2;
     }
+    
+    timeProperty.time = time;
+    timeProperty.eventType = @"TimeTrigger";
+    
 }
 
 -(int)getIntegerValue:(NSString *) stringValue{
@@ -154,21 +149,13 @@
         return [stringValue intValue];
     }
 }
--(int)getStringValue:(NSString *) stringValue{
-    return stringValue==nil?@"":stringValue;
-}
+
 -(NSDate *)getDateFrom:(NSInteger)hour minutes:(NSInteger)mins{
-    
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
     NSDateComponents *components = [gregorian components:NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit fromDate:[NSDate date]];
     [components setHour:hour];
     [components setMinute:mins];
-    NSDate * date = [gregorian dateFromComponents:components];
-    return date;
+    return [gregorian dateFromComponents:components];
 }
-//{"CommandType":"DynamicRuleRemoved","Rules":{"ID""7"}}
-//{"CommandType":"DynamicAllRulesRemoved"}
-//"{"Type":"DeviceResult","ID":"%d","Index":"%d","Value":"%s","PreDelay":"%d","Validation":"%s"}"
-
 
 @end

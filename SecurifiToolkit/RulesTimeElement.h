@@ -18,7 +18,6 @@
 @property (nonatomic)NSString *dayOfMonth;//1 - 30/31
 @property (nonatomic) BOOL isPresent;
 
-@property (nonatomic)NSDate *date;
 @property (nonatomic)NSDate *dateFrom;
 @property (nonatomic)NSDate *dateTo;
 
