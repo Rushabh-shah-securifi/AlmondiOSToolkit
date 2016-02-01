@@ -2682,7 +2682,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     switch (res.type) {
         case DeviceListResponseType_deviceList: {
             [self storeDeviceAndDeviceValueList:res.deviceList deviceValueList:res.deviceValueList mac:mac];
-            [self postNotification:kSFIDidChangeDeviceList data:mac];
+            [self postNotification:kSFIDidChangeDeviceValueList data:mac];
             break;
         }
         case DeviceListResponseType_updated: {
