@@ -52,7 +52,7 @@
     NSLog(@"onWiFiClientsListResCallback ");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
+    if (data == nil || [data valueForKey:@"data"]==nil ) {
         return;
     }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];

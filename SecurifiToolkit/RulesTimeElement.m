@@ -12,9 +12,12 @@
 
 -(id)init{
     if(self == [super init]){
+        NSDate *currentDate = [[NSDate alloc]init];
+        NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier: NSGregorianCalendar];
+        NSDateComponents *components = [gregorian components: NSUIntegerMax fromDate: currentDate];
         self.range = 0;
-        self.hours = 0;
-        self.mins = 0;
+        self.hours = [components hour];
+        self.mins = [components minute];
         self.dayOfMonth = [NSString new];
         self.dayOfWeek = [NSMutableArray new];
         self.monthOfYear = [NSString new];

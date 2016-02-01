@@ -211,7 +211,8 @@
         case SFIDeviceType_GarageDoorOpener_53:
         case SFIDeviceType_ZWtoACIRExtender_54:
         case SFIDeviceType_MultiSwitch_43:
-        case SFIDeviceType_SetPointThermostat_46:{
+        case SFIDeviceType_SetPointThermostat_46:
+        case SFIDeviceType_MultiSoundSiren_55:{
             return YES;
         }
             

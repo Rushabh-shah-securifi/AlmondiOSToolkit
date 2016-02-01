@@ -11,63 +11,97 @@
 #import "SecurifiToolkit.h"
 
 @implementation RuleParser
-NSArray *deviceArray;\
-SecurifiToolkit *toolkit;
+
+
 - (instancetype)init {
     self = [super init];
-    [self initNotification];
-   
+        [self initNotification];
+    
     return self;
 }
 -(void)initNotification{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver:self selector:@selector(onRuleListResponse:) name:RULE_LIST_NOTIFIER object:nil];
-    [center addObserver:self selector:@selector(onDynamicRuleUpdateParser:) name:DYNAMIC_RULE_UPDATED object:nil];
-    [center addObserver:self selector:@selector(onDynamicRuleRemovedParser:) name:DYNAMIC_RULE_REMOVE_NOTIFIER object:nil];
-    [center addObserver:self selector:@selector(onDynamicRuleRemoveAllParser:) name:DYNAMIC_RULE_REMOVEALL object:nil];//DYNAMIC_RULE_ADDED
-    [center addObserver:self selector:@selector(onDynamicRuleChanged:) name:DYNAMIC_RULE_LISTCHANGED object:nil];
-    
 }
 
 
 -(void)onRuleListResponse:(id)sender{
-    if(sender==nil)
+    if(![self validateResponse:sender])
         return;
-    NSDictionary *data = [(NSNotification *) sender userInfo];
-    if (data == nil)
-        return;
-    NSDictionary *mainDict = [data valueForKey:@"data"];
-    if(mainDict==nil)
-        return;
-    
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    toolkit.ruleList = [NSMutableArray new];
+    NSDictionary *mainDict = [[(NSNotification *) sender userInfo] valueForKey:@"data"];
+    NSString *commandType=[mainDict valueForKey:@"CommandType"] ;
     NSLog(@"onRuleList: %@",mainDict);
-    if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"RuleList"]){
+    SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
+    //RuleList
+    if([commandType isEqualToString:@"RuleList"]){
         NSArray *dDictArray = [mainDict valueForKey:@"Rules"];
         if (dDictArray)
             for (NSDictionary *dict in dDictArray) {
-                [toolkit.ruleList  addObject:[self createRule:dict]];
+                [self createRule:dict];
             }
         
-    }
+    }else if([commandType isEqualToString:@"DynamicRuleUpdated"] || [commandType isEqualToString:@"DynamicRuleAdded"]){
+        NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
+        NSLog(@"onRuleListResponse Rule is %@",dDict);
+        [self createRule:dDict];
+    }else if([commandType isEqualToString:@"DynamicRuleRemoved"]){
+        NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
+        Rule *deleteRule = [self findRule:[dDict valueForKey:@"ID"]];
+        if(toolkit.ruleList!=nil && toolkit.ruleList.count>0)
+            [toolkit.ruleList removeObject:deleteRule];
+    }else if([commandType isEqualToString:@"DynamicAllRulesRemoved"] && toolkit.ruleList!=nil && toolkit.ruleList.count>0)
+            [toolkit.ruleList removeAllObjects];
+    
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
     NSLog(@" rulesList in ruleParser %@",toolkit.ruleList);
 }
+-(BOOL)validateResponse:(id)sender{
+    NSLog(@"validateResponse: ");
+    if(sender==nil)
+        return NO;
+    NSDictionary *data = [(NSNotification *) sender userInfo];
+    if (data == nil)
+        return NO;
+    NSDictionary *mainDict = [data valueForKey:@"data"];
+    if(mainDict==nil)
+        return NO;
+    if([mainDict valueForKey:@"CommandType"]==nil)
+        return NO;
+    return YES;
+}
 -(Rule *)createRule:(NSDictionary*)dict{
-    Rule *rule = [Rule new];
+    Rule *rule = [self findRule:[dict valueForKey:@"ID"]];
     rule.name = [dict valueForKey:@"Name"]==nil?@"":[dict valueForKey:@"Name"];
-    rule.ID = [dict valueForKey:@"ID"];
+    
     rule.triggers= [NSMutableArray new];
     [self addTime:[dict valueForKey:@"Triggers"] list:rule.triggers];
     [self getEntriesList:[dict valueForKey:@"Triggers"] list:rule.triggers];
     
     rule.actions= [NSMutableArray new];
     [self getEntriesList:[dict valueForKey:@"Results"] list:rule.actions];
+    NSLog(@"CreateRule Rule is %d",rule);
     return rule;
     
 }
-
+-(Rule*)findRule:(NSString *)id{
+    SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
+    toolkit.ruleList=toolkit.ruleList==nil?[NSMutableArray new]:toolkit.ruleList;
+    
+    for(Rule *rule  in toolkit.ruleList){
+        if([rule.ID isEqualToString:id]){
+            NSLog(@"findRule match %@",toolkit.ruleList);
+            return rule;
+        }
+    }
+    //Add New Rule
+    Rule *newRule=[Rule new];
+    newRule.ID=id;
+    [toolkit.ruleList addObject:newRule];
+    //[checkRules addObject:newRule];
+     NSLog(@"findRule %lu",toolkit.ruleList.count);
+    return newRule;
+}
 
 -(void)getEntriesList:(NSArray*)triggers list:(NSMutableArray *)list{
     for(NSDictionary *triggersDict in triggers){
@@ -132,127 +166,9 @@ SecurifiToolkit *toolkit;
     NSDate * date = [gregorian dateFromComponents:components];
     return date;
 }
-
+//{"CommandType":"DynamicRuleRemoved","Rules":{"ID""7"}}
+//{"CommandType":"DynamicAllRulesRemoved"}
 //"{"Type":"DeviceResult","ID":"%d","Index":"%d","Value":"%s","PreDelay":"%d","Validation":"%s"}"
-
-
-
--(void)onDynamicRuleUpdateParser:(id)sender{
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSDictionary *mainDict = [data valueForKey:@"data"];
-    NSLog(@"dynamaic updated : %@",mainDict);
-    if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicRuleUpdated"] || [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicRuleAdded"]){
-        if ([[mainDict valueForKey:@"Rules"] isKindOfClass:[NSArray class]]) {
-            NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
-            //            self.rules = [NSMutableArray new];
-            //            Rule *rule = [Rule new];
-            //            rule.name = [dDict valueForKey:@"Name"];
-            //            rule.ID = [dDict valueForKey:@"ID"];
-            //            rule.triggers = [self getTriggersList:[dDict valueForKey:@"Triggers"] ];
-            //            rule.wifiClients = [self getWifiClientsList:[dDict valueForKey:@"Triggers"]];
-            //            rule.time = [self getTime:[dDict valueForKey:@"Triggers"]];
-            //            rule.actions = [self getTriggersList:[dDict valueForKey:@"Results"]];
-            //            if (rule.isActive) {
-            //                //                    activeClientsCount++;
-            //            }else{
-            //                //                    inActiveClientsCount++;
-            //            }
-            //            [toolkit.ruleList addObject:rule];
-            //            NSDictionary *postData = nil;
-            //            if (rule) {
-            //                data = @{
-            //                         @"data" : rule,
-            //                         };
-            //            }
-            //            [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_DYNAMIC_RULE_UPDATED object:nil userInfo:postData];
-            
-        }
-        
-        
-        
-        
-        
-        NSLog(@" rule dynamic updated %@",toolkit.ruleList);
-    }
-    
-    return;
-}
--(void)onDynamicRuleRemovedParser:(id)sender{
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSDictionary *mainDict = [data valueForKey:@"data"];
-    NSLog(@"dynamaic removed: %@",mainDict);
-    if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicRuleRemoved"]){
-        NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
-        NSString *RemoveRuleID = [dDict valueForKey:@"ID"];
-        Rule *deleteRule = [Rule new];
-        for(Rule *toBeDeleteRule in self.rules){
-            if([toBeDeleteRule.ID isEqualToString:RemoveRuleID])
-            {
-                deleteRule = toBeDeleteRule;
-            }
-        }
-        [toolkit.ruleList removeObject:deleteRule];
-    }
-    // toolkit.ruleList = self.rules;
-    
-    return ;
-    
-}
--(void)onDynamicRuleRemoveAllParser:(id)sender{
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSDictionary *mainDict = [data valueForKey:@"data"];
-    NSLog(@"dynamaic removed: %@",mainDict);
-    if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"RemoveAllRules"]){
-        if([[mainDict valueForKey:@"Success"] isEqualToString:@"true"]){
-            [toolkit.ruleList removeAllObjects];
-        }
-        
-    }
-    return;
-}
--(void)onDynamicRuleChanged:(id)sender{
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSDictionary *mainDict = [data valueForKey:@"data"];
-    NSLog(@"dynamaic added in parser : %@",mainDict);
-    
-    
-    
-    if([[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleUpdated"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleAdded"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RemoveRule"] || [[mainDict valueForKey:@"commandtype"] isEqualToString:@"RuleRemoveAll"]){//RemoveRule
-        NSLog(@" rulelist update sended");
-        [self requestForRuleList];
-        
-    }
-    
-    return;
-    
-}
--(void)requestForRuleList{
-    
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    GenericCommand *cmd = [GenericCommand websocketRequestAlmondRules];
-    [[SecurifiToolkit sharedInstance] asyncSendToLocal:cmd almondMac:plus.almondplusMAC];
-}
 
 
 @end

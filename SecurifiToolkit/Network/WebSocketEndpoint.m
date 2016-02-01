@@ -102,9 +102,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     [self.delegate networkEndpointDidConnect:self];
-    [self requestForWiFiClientList];
-    [self requestForRuleList];
-    [self requestForSceneList];
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *plus = [toolkit currentAlmond];
+    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondWifiClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
+    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondSceneList] almondMac:plus.almondplusMAC];
+    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondRules] almondMac:plus.almondplusMAC];
     NSLog(@" rewuest for rule is send");
 }
 
@@ -186,7 +188,19 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
              },
              @"DynamicRuleAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  NSLog(@"websocket payload : %@", payload);
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_DYNAMICADD];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
+             },
+             @"DynamicRuleRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 NSLog(@"websocket payload : %@", payload);
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
+             },
+             @"DynamicAllRulesRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 NSLog(@"websocket payload : %@", payload);
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
+             },
+             @"DynamicRuleUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 NSLog(@"websocket payload : %@", payload);
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
              },
              @"RuleAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {// adding just gor getting rulId in savedRuleController
                  NSLog(@"websocket payload : %@", payload);

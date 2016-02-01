@@ -24,11 +24,13 @@
     SFIButtonSubProperties *butProperties = [[SFIButtonSubProperties alloc]init];
     butProperties.deviceId = self.deviceId;
     butProperties.index = self.index;
+    butProperties.matchData = self.matchData;
     butProperties.delay = self.delay;
     butProperties.eventType = self.eventType;
     butProperties.positionId = self.positionId;
     butProperties.deviceType = self.deviceType;
     butProperties.deviceName = self.deviceName;
+    
     if(butProperties.time!=nil)
         butProperties.time=[self.time createNew];
 
