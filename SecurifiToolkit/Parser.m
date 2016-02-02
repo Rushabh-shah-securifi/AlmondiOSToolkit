@@ -18,37 +18,15 @@
 - (instancetype)init {
     self = [super init];
     [self initNotification];
-        return self;
+    return self;
 }
+
 -(void)initNotification{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(onWiFiClientsListResCallback:) name:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE object:nil];
-
-    [center addObserver:self
-               selector:@selector(onDynamicClientAdded:)
-                   name:NOTIFICATION_DYNAMIC_CLIENT_ADD_REQUEST_NOTIFIER
-                 object:nil];
-    [center addObserver:self
-               selector:@selector(onDynamicClientUpdate:)
-                   name:NOTIFICATION_DYNAMIC_CLIENT_UPDATE_REQUEST_NOTIFIER
-                 object:nil];
-    
-    [center addObserver:self
-               selector:@selector(onDynamicClientUpdate:)
-                   name:NOTIFICATION_DYNAMIC_CLIENT_JOIN_REQUEST_NOTIFIER
-                 object:nil];
-    [center addObserver:self
-               selector:@selector(onDynamicClientUpdate:)
-                   name:NOTIFICATION_DYNAMIC_CLIENT_LEFT_REQUEST_NOTIFIER
-                 object:nil];
-    
-    [center addObserver:self
-               selector:@selector(onDynamicClientRemove:)
-                   name:NOTIFICATION_DYNAMIC_CLIENT_REMOVE_REQUEST_NOTIFIER
-                 object:nil];
+    [center addObserver:self selector:@selector(onWiFiClientsListResAndDynamicCallbacks:) name:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE object:nil];
 }
 
--(void)onWiFiClientsListResCallback:(id)sender {
+-(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
     NSLog(@"onWiFiClientsListResCallback ");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
@@ -63,164 +41,65 @@
         mainDict = [data valueForKey:@"data"];
     }else{
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
-    }// required for switching local<=>cloud
-    NSLog(@" mainDict %@",mainDict);
+    }
     
-   // NSDictionary *mainDict = [[data valueForKey:@"data"] objectFromJSONData];
-    NSMutableArray *wifiClientsArray = [[NSMutableArray alloc]init];
-    
-    if ([[mainDict valueForKey:@"Clients"] isKindOfClass:[NSArray class]]) {
+    if ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"ClientList"] && [[mainDict valueForKey:@"Clients"] isKindOfClass:[NSArray class]]) {
         NSArray *dDictArray = [mainDict valueForKey:@"Clients"];
-        wifiClientsArray = [NSMutableArray new];
+        NSMutableArray *wifiClientsArray = [NSMutableArray new];
         for (NSDictionary *dict in dDictArray) {
             SFIConnectedDevice *device = [SFIConnectedDevice new];
-            device.deviceID = [dict valueForKey:@"ID"];
-            device.name = [dict valueForKey:@"Name"];
-            device.deviceMAC = [dict valueForKey:@"MAC"];
-            device.deviceIP = [dict valueForKey:@"LastKnownIP"];
-            device.deviceConnection = [dict valueForKey:@"Connection"];
-            device.name = [dict valueForKey:@"Name"];
-            device.deviceLastActiveTime = [dict valueForKey:@"LastActiveEpoch"];
-            device.deviceType = [dict valueForKey:@"Type"];
-            device.deviceUseAsPresence = [[dict valueForKey:@"UseAsPresence"] boolValue];
-            device.isActive = [[dict valueForKey:@"Active"] boolValue];
-            device.timeout = [[dict valueForKey:@"Wait"] integerValue];
-            if (device.isActive) {
-//                activeClientsCount++;
-            }else{
-//                inActiveClientsCount++;
-            }
+            [self setDeviceProperties:device forDict:dict];
             [wifiClientsArray addObject:device];
         }
-        
-    }
-    toolkit.wifiClientParser = wifiClientsArray;
-    return;
-}
-
-- (void)onDynamicClientAdded:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    NSLog(@" ondynamicClientAdded");
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    
-    BOOL local = [toolkit useLocalNetwork:plus.almondplusMAC];
-    NSDictionary *mainDict;
-    if(local){
-        mainDict = [data valueForKey:@"data"];
-    }else{
-        mainDict = [[data valueForKey:@"data"] objectFromJSONData];
-    }
-    
-    if ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:plus.almondplusMAC] || local)) {
+        toolkit.wifiClientParser = wifiClientsArray;
+    } else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){
         NSDictionary * dict = [mainDict valueForKey:@"Clients"];
         SFIConnectedDevice * device = [SFIConnectedDevice new];
-        device.deviceID = [dict valueForKey:@"ID"];
-        device.name = [dict valueForKey:@"Name"];
-        device.deviceMAC = [dict valueForKey:@"MAC"];
-        device.deviceIP = [dict valueForKey:@"LastKnownIP"];
-        device.deviceConnection = [dict valueForKey:@"Connection"];
-        device.name = [dict valueForKey:@"Name"];
-        device.deviceLastActiveTime = [dict valueForKey:@"LastActiveEpoch"];
-        device.deviceType = [dict valueForKey:@"Type"];
-        device.deviceUseAsPresence = [[dict valueForKey:@"UseAsPresence"] boolValue];
-        device.isActive = [[dict valueForKey:@"Active"] boolValue];
-        device.timeout = [[dict valueForKey:@"Wait"] integerValue];
-        
+        [self setDeviceProperties:device forDict:dict];
         [toolkit.wifiClientParser addObject:device];
-        //post notification
-        
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_WIFICLIENT_TABLEVIEW object:nil userInfo:nil];//as we are not doing any thing with data
-}
-- (void)onDynamicClientUpdate:(id)sender {
-    NSLog(@"onDynamicClientUpdate");
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    
-    BOOL local = [toolkit useLocalNetwork:plus.almondplusMAC];
-    NSDictionary *mainDict;
-    if(local){
-        mainDict = [data valueForKey:@"data"];
-    }else{
-        mainDict = [[data valueForKey:@"data"] objectFromJSONData];
-    }
-    NSLog(@"data: %@", data);
-    if (
-        ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientUpdated"]
-         || [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientJoined"]
-         || [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientLeft"])
-        && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:plus.almondplusMAC] || local)
-        ) {
+    } else if (
+               ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientUpdated"]||
+                [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientJoined"]||
+                [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientLeft"])&&
+               ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)
+               ) {
         NSLog(@"main dict: %@", mainDict);
         NSDictionary *dict = [mainDict valueForKey:@"Clients"];
-        int index = 0;
         for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
             if ([device.deviceID isEqualToString:[dict valueForKey:@"ID"]]) {
-                device.deviceID = [dict valueForKey:@"ID"];
-                device.name = [dict valueForKey:@"Name"];
-                device.deviceMAC = [dict valueForKey:@"MAC"];
-                device.deviceIP = [dict valueForKey:@"LastKnownIP"];
-                device.deviceConnection = [dict valueForKey:@"Connection"];
-                device.name = [dict valueForKey:@"Name"];
-                device.deviceLastActiveTime = [dict valueForKey:@"LastActiveEpoch"];
-                device.deviceType = [dict valueForKey:@"Type"];
-                device.deviceUseAsPresence = [[dict valueForKey:@"UseAsPresence"] boolValue];
-                device.isActive = [[dict valueForKey:@"Active"] boolValue];
-                device.timeout = [[dict valueForKey:@"Wait"] integerValue];
-               
+                [self setDeviceProperties:device forDict:dict];
                 break;
             }
-            index++;
-            
         }
-        //post notification
-        [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_WIFICLIENT_TABLEVIEW object:nil userInfo:nil];//as we are not doing any thing with data
-    }
-
-}
-
-- (void)onDynamicClientRemove:(id)sender {
-    
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-    
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    
-    BOOL local = [toolkit useLocalNetwork:plus.almondplusMAC];
-    NSDictionary *mainDict;
-    if(local){
-        mainDict = [data valueForKey:@"data"];
-    }else{
-        mainDict = [[data valueForKey:@"data"] objectFromJSONData];
-    }
-    
-    NSLog(@"maindict :%@",mainDict);
-    if ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:plus.almondplusMAC] || local)) {
+    } else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
         NSDictionary * removedClientDict = [mainDict valueForKey:@"Clients"];
-        int index = 0;
         for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
             if ([device.deviceID isEqualToString:[removedClientDict valueForKey:@"ID"]]) {
-                                [toolkit.wifiClientParser removeObject:device];
-                
+                [toolkit.wifiClientParser removeObject:device];
                 break;
             }
-            index++;
         }
     }
+
     
-    //post notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_WIFICLIENT_TABLEVIEW object:nil userInfo:nil];//as we are not doing any thing with data
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DYNAMIC_CLIENTLIST_ADD_UPDATE_REMOVE_NOTIFIER object:nil userInfo:nil];
 }
+
+-(void)setDeviceProperties:(SFIConnectedDevice*)device forDict:(NSDictionary*)dict{
+    device.deviceID = [dict valueForKey:@"ID"];
+    device.name = [dict valueForKey:@"Name"];
+    device.deviceMAC = [dict valueForKey:@"MAC"];
+    device.deviceIP = [dict valueForKey:@"LastKnownIP"];
+    device.deviceConnection = [dict valueForKey:@"Connection"];
+    device.name = [dict valueForKey:@"Name"];
+    device.deviceLastActiveTime = [dict valueForKey:@"LastActiveEpoch"];
+    device.deviceType = [dict valueForKey:@"Type"];
+    device.deviceUseAsPresence = [[dict valueForKey:@"UseAsPresence"] boolValue];
+    device.isActive = [[dict valueForKey:@"Active"] boolValue];
+    device.timeout = [[dict valueForKey:@"Wait"] integerValue];
+    device.deviceAllowedType = [[dict valueForKey:@"Block"] intValue];
+    device.deviceSchedule = [dict valueForKey:@"Schedule"];
+}
+
 
 @end
