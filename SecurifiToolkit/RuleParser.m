@@ -111,6 +111,7 @@
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         subProperties.type = [triggersDict valueForKey:@"Type"];
+        subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
         NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.deviceId);
         [self addTime:triggersDict timeProperty:subProperties];
         [list addObject:subProperties];
@@ -157,5 +158,4 @@
     [components setMinute:mins];
     return [gregorian dateFromComponents:components];
 }
-
 @end

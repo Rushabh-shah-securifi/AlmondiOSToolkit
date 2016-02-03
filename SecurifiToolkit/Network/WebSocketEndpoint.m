@@ -103,6 +103,13 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     [self.delegate networkEndpointDidConnect:self];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    if(toolkit.scenesArray!=nil && toolkit.scenesArray.count>0)
+        [toolkit.scenesArray removeAllObjects];
+    if(toolkit.wifiClientParser!=nil && toolkit.wifiClientParser.count>0)
+        [toolkit.wifiClientParser removeAllObjects];
+    if(toolkit.ruleList!=nil && toolkit.ruleList.count>0)
+        [toolkit.ruleList removeAllObjects];
+    
     SFIAlmondPlus *plus = [toolkit currentAlmond];
     [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondWifiClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondSceneList] almondMac:plus.almondplusMAC];
