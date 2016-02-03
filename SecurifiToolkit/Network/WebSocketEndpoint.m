@@ -83,23 +83,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     return YES;
 }
 
--(void)requestForSceneList{
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    GenericCommand *cmd = [GenericCommand websocketRequestAlmondSceneList];
-    [[SecurifiToolkit sharedInstance] asyncSendToLocal:cmd almondMac:plus.almondplusMAC];
-}
-
 #pragma mark - PSWebSocketDelegate methods
-
-- (void)requestForWiFiClientList{
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    NSLog(@" my almond mac %@ %@ %@",toolkit, plus.almondplusMAC,plus.almondplusName);
-    GenericCommand *cmd = [GenericCommand websocketRequestAlmondWifiClients:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:cmd almondMac:plus.almondplusMAC];
-}
-
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     [self.delegate networkEndpointDidConnect:self];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
@@ -117,13 +101,6 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSLog(@" rewuest for rule is send");
 }
 
--(void)requestForRuleList{
-    
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    GenericCommand *cmd = [GenericCommand websocketRequestAlmondRules];
-    [[SecurifiToolkit sharedInstance] asyncSendToLocal:cmd almondMac:plus.almondplusMAC];
-}
 
 - (void)webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
     NSLog(@"Websocket receive: %@", message);
