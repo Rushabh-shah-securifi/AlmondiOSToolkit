@@ -80,7 +80,6 @@
     
     rule.actions= [NSMutableArray new];
     [self getEntriesList:[dict valueForKey:@"Results"] list:rule.actions];
-    NSLog(@"CreateRule Rule is %d",rule);
     return rule;
     
 }
@@ -99,7 +98,6 @@
     newRule.ID=id;
     [toolkit.ruleList addObject:newRule];
     //[checkRules addObject:newRule];
-    NSLog(@"findRule %lu",toolkit.ruleList.count);
     return newRule;
 }
 
@@ -123,13 +121,13 @@
     if(![[timeDict valueForKey:@"Type"] isEqualToString:@"TimeTrigger"])
         return;
     RulesTimeElement *time = [[RulesTimeElement alloc]init];
-    
+    NSLog(@"dayOf week %@",[timeDict valueForKey:@"DayOfWeek"]);
     time.range = [self getIntegerValue:[timeDict valueForKey:@"Range"]];
     time.hours = [self getIntegerValue:[timeDict valueForKey:@"Hour"]];
     time.mins = [self getIntegerValue:[timeDict valueForKey:@"Minutes"]];
-    //time.dayOfMonth = [self getIntegerValue:[timeDict valueForKey:@"DayOfMonth"]];
-    //time.dayOfWeek = [self getIntegerValue:[timeDict valueForKey:@"DayOfWeek"]];
-    //time.monthOfYear = [self getIntegerValue:[timeDict valueForKey:@"MonthOfYear"]];
+    time.dayOfMonth = [timeDict valueForKey:@"DayOfMonth"];
+    time.dayOfWeek = [self getArray:[timeDict valueForKey:@"DayOfWeek"]];
+    time.monthOfYear = [timeDict valueForKey:@"MonthOfYear"];
     time.dateFrom = [self getDateFrom:time.hours minutes:time.mins];
     time.segmentType = 1;
     if(time.range > 0){
@@ -148,6 +146,16 @@
     }
     @catch (NSException * e) {
         return [stringValue intValue];
+    }
+}
+-(NSMutableArray*)getArray:(NSString*)stringValue{
+    @try {
+        NSArray *array = [stringValue componentsSeparatedByString:@","];
+        return [array mutableCopy];
+    }
+    @catch (NSException *exception) {
+        NSArray *array = [stringValue componentsSeparatedByString:@","];
+        return [array mutableCopy];
     }
 }
 
