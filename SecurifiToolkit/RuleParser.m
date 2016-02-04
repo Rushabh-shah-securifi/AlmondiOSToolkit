@@ -125,9 +125,9 @@
     time.range = [self getIntegerValue:[timeDict valueForKey:@"Range"]];
     time.hours = [self getIntegerValue:[timeDict valueForKey:@"Hour"]];
     time.mins = [self getIntegerValue:[timeDict valueForKey:@"Minutes"]];
-    time.dayOfMonth = [timeDict valueForKey:@"DayOfMonth"];
+    time.dayOfMonth = @([self getIntegerValue:[timeDict valueForKey:@"DayOfMonth"]]).stringValue;
     time.dayOfWeek = [self getArray:[timeDict valueForKey:@"DayOfWeek"]];
-    time.monthOfYear = [timeDict valueForKey:@"MonthOfYear"];
+    time.monthOfYear = @([self getIntegerValue:[timeDict valueForKey:@"MonthOfYear"]]).stringValue;
     time.dateFrom = [self getDateFrom:time.hours minutes:time.mins];
     time.segmentType = 1;
     if(time.range > 0){
