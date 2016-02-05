@@ -12,8 +12,6 @@
 #import "SFIConnectedDevice.h"
 #import "SecurifiToolkit.h"
 
-
-
 @implementation Parser
 - (instancetype)init {
     self = [super init];
@@ -23,11 +21,10 @@
 
 -(void)initNotification{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(onWiFiClientsListResAndDynamicCallbacks:) name:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE object:nil];
+    [center addObserver:self selector:@selector(onWiFiClientsListResAndDynamicCallbacks:) name:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
 }
 
 -(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
-    NSLog(@"onWiFiClientsListResCallback ");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil || [data valueForKey:@"data"]==nil ) {
@@ -42,6 +39,7 @@
     }else{
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
+    NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
     
     if ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"ClientList"] && [[mainDict valueForKey:@"Clients"] isKindOfClass:[NSArray class]]) {
         NSArray *dDictArray = [mainDict valueForKey:@"Clients"];
@@ -81,7 +79,6 @@
         }
     }
 
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DYNAMIC_CLIENTLIST_ADD_UPDATE_REMOVE_NOTIFIER object:nil userInfo:nil];
 }
 

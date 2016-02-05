@@ -571,29 +571,29 @@
         };
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_WIFI_CLIENTS_LIST_RESPONSE data:payload];
+            [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_UPDATE_REQUEST_NOTIFIER data:payload commandType:commandType];
+            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_JOIN_REQUEST_NOTIFIER data:payload commandType:commandType];
+            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_LEFT_REQUEST_NOTIFIER data:payload commandType:commandType];
+            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_ADD_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_DYNAMIC_CLIENT_ADD_REQUEST_NOTIFIER data:payload commandType:commandType];
+            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
             break;
         };
         case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_DYNAMIC_CLIENT_REMOVE_REQUEST_NOTIFIER data:payload];
+            [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
         case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
