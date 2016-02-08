@@ -33,7 +33,7 @@
     element.hours=self.hours;
     element.mins=self.mins;
     element.dayOfMonth=self.dayOfMonth;
-    element.dayOfWeek=self.dayOfWeek;
+    element.dayOfWeek = [NSMutableArray arrayWithArray:self.dayOfWeek];
     element.monthOfYear=self.monthOfYear;
     element.dateFrom=self.dateFrom;
     element.dateTo=self.dateTo;

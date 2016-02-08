@@ -150,12 +150,12 @@
 }
 -(NSMutableArray*)getArray:(NSString*)stringValue{
     @try {
-        NSArray *array = [stringValue componentsSeparatedByString:@","];
-        return [array mutableCopy];
+        if([stringValue isEqualToString:@"*"])
+            return [NSMutableArray new];
+        return [stringValue componentsSeparatedByString:@","];
     }
     @catch (NSException *exception) {
-        NSArray *array = [stringValue componentsSeparatedByString:@","];
-        return [array mutableCopy];
+        return [NSMutableArray new];
     }
 }
 
