@@ -41,21 +41,13 @@
     }
     NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
     
-    if ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"ClientList"] && [[mainDict valueForKey:@"Clients"] isKindOfClass:[NSArray class]]) {
-        NSArray *dDictArray = [mainDict valueForKey:@"Clients"];
-        NSMutableArray *wifiClientsArray = [NSMutableArray new];
-        for (NSDictionary *dict in dDictArray) {
-            SFIConnectedDevice *device = [SFIConnectedDevice new];
-            [self setDeviceProperties:device forDict:dict];
-            [wifiClientsArray addObject:device];
-        }
-        toolkit.wifiClientParser = wifiClientsArray;
-    } else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){
+    if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){
         NSDictionary * dict = [mainDict valueForKey:@"Clients"];
         SFIConnectedDevice * device = [SFIConnectedDevice new];
         [self setDeviceProperties:device forDict:dict];
         [toolkit.wifiClientParser addObject:device];
-    } else if (
+    }
+    else if (
                ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientUpdated"]||
                 [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientJoined"]||
                 [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientLeft"])&&
@@ -69,7 +61,8 @@
                 break;
             }
         }
-    } else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
+    }
+    else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
         NSDictionary * removedClientDict = [mainDict valueForKey:@"Clients"];
         for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
             if ([device.deviceID isEqualToString:[removedClientDict valueForKey:@"ID"]]) {
@@ -79,12 +72,27 @@
         }
     }
 
+    else if ([[mainDict valueForKey:@"Clients"] isKindOfClass:[NSArray class]]) {
+        NSArray *dDictArray = [mainDict valueForKey:@"Clients"];
+        NSMutableArray *wifiClientsArray = [NSMutableArray new];
+        for (NSDictionary *dict in dDictArray) {
+            SFIConnectedDevice *device = [SFIConnectedDevice new];
+            [self setDeviceProperties:device forDict:dict];
+            [wifiClientsArray addObject:device];
+        }
+        toolkit.wifiClientParser = wifiClientsArray;
+        NSLog(@"wifi parser - clientlist - wificlients: %@", toolkit.wifiClientParser);
+    }
+
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DYNAMIC_CLIENTLIST_ADD_UPDATE_REMOVE_NOTIFIER object:nil userInfo:nil];
 }
 
 -(void)setDeviceProperties:(SFIConnectedDevice*)device forDict:(NSDictionary*)dict{
     device.deviceID = [dict valueForKey:@"ID"];
     device.name = [dict valueForKey:@"Name"];
+    device.manufacturer = [dict valueForKey:@"Manufacturer"];
+    device.rssi = [dict valueForKey:@"RSSI"];
     device.deviceMAC = [dict valueForKey:@"MAC"];
     device.deviceIP = [dict valueForKey:@"LastKnownIP"];
     device.deviceConnection = [dict valueForKey:@"Connection"];

@@ -19,6 +19,8 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 //<ConnectedDevice><Name>ashutosh</Name><IP>1678379540</IP><MAC>10:60:4b:d9:60:84</MAC></ConnectedDevice>
 @property(nonatomic, retain) NSString *name;
 @property(nonatomic, retain) NSString *deviceIP;
+@property(nonatomic, strong) NSString *manufacturer;
+@property(nonatomic, strong) NSString *rssi;
 @property(nonatomic, retain) NSString *deviceMAC;
 @property(nonatomic, retain) NSString *deviceConnection;
 @property(nonatomic, retain) NSString *deviceID;
