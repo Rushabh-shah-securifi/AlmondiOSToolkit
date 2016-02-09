@@ -1,4 +1,6 @@
 
+
+
 //
 //  Parser.m
 //  SecurifiToolkit
@@ -63,6 +65,7 @@
         }
     }
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
+        NSLog(@"DynamicClientRemoved");
         NSDictionary * removedClientDict = [mainDict valueForKey:@"Clients"];
         for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
             if ([device.deviceID isEqualToString:[removedClientDict valueForKey:@"ID"]]) {
@@ -103,7 +106,7 @@
     device.isActive = [[dict valueForKey:@"Active"] boolValue];
     device.timeout = [[dict valueForKey:@"Wait"] integerValue];
     device.deviceAllowedType = [[dict valueForKey:@"Block"] intValue];
-    device.deviceSchedule = [dict valueForKey:@"Schedule"];
+    device.deviceSchedule = [dict valueForKey:@"Schedule"]==nil?@"":[dict valueForKey:@"Schedule"];
 }
 
 

@@ -73,7 +73,7 @@
 -(Rule *)createRule:(NSDictionary*)dict{
     Rule *rule = [self findRule:[dict valueForKey:@"ID"]];
     rule.name = [dict valueForKey:@"Name"]==nil?@"":[dict valueForKey:@"Name"];
-    
+    rule.isActive = [[dict valueForKey:@"Valid"] boolValue];
     rule.triggers= [NSMutableArray new];
     
     [self getEntriesList:[dict valueForKey:@"Triggers"] list:rule.triggers];
