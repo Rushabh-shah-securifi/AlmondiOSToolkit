@@ -679,7 +679,18 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [block_self internalInitializeCloud:network command:cmd];
     });
 }
+-(void)cleanUp{
 
+    [self removeObjectFromArray:[self scenesArray]];
+    [self removeObjectFromArray:[self wifiClientParser]];
+    [self removeObjectFromArray:[self ruleList]];
+
+}
+
+-(void)removeObjectFromArray:(NSMutableArray *)array{
+    if(array!=nil && array.count>0)
+        [array removeAllObjects];
+}
 // Invokes post-connection set-up and login to request updates that had been made while the connection was down
 - (void)asyncInitializeConnection2:(Network *)network {
     // After successful login, refresh the Almond list and hash values.
@@ -695,12 +706,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NetworkState *state = network.networkState;
             if (![state wasHashFetchedForAlmond:mac]) {
                 [state markHashFetchedForAlmond:mac];
-                
+                [self cleanUp];
                 DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
                 [block_self internalInitializeCloud:network command:cmd];
                 //send request for scene list cloud
                
+                
                 cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 NSLog(@" scene request send ");
