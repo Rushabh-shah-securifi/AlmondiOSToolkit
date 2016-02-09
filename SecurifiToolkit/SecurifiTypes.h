@@ -71,6 +71,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_NestSmokeDetector_58          = 58,
     SFIDeviceType_BuiltInSiren_60               = 60,
     SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
+    SFIDeviceType_REBOOT_ALMOND                 = 501,
     
     SFIDeviceType_count                         = 61, // always set to the last value; assumes sequence is continuous
 };
@@ -186,6 +187,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_SWITCH_BINARY1,
     SFIDevicePropertyType_SWITCH_BINARY2,
     SFIDevicePropertyType_TONE_SELECTED, //mk
+    SFIDevicePropertyType_REBOOT,
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 
