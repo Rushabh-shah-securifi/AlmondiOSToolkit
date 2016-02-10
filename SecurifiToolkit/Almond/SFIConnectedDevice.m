@@ -67,7 +67,12 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"camera"]) {
         return @"icon_camera";
     }
-    
+    if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_echo"]) {
+        return @"amazon-echo";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_dash"]) {
+        return @"amazon-dash";
+    }
     return @"icon_help";
 }
 
