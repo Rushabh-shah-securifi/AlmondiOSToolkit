@@ -93,7 +93,6 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondWifiClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondSceneList] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondRules] almondMac:plus.almondplusMAC];
-    NSLog(@" rewuest for rule is send");
 }
 
 
@@ -144,95 +143,71 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (NSDictionary *)buildResponseHandlers {
     return @{
              @"RemoveAllRules" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RULLCHANGED];
              },
              @"RuleRemoveAll" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_DYNAMICDELETEALL];
              },
              
              @"RuleUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RULLCHANGED];
              },
              @"RuleUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RULLCHANGED];
              },
              
              @"RuleRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RULLCHANGED];
              },
              @"DynamicRuleAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
              },
              @"DynamicRuleRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
              },
              @"DynamicAllRulesRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
              },
              @"DynamicRuleUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
              },
              @"RuleAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {// adding just gor getting rulId in savedRuleController
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RULLCHANGED];
              },
              @"AddRule" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RESPONSE];
              },
              @"UpdateRule" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RESPONSE];
              },
              
              @"RemoveRule" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RESPONSE];
              },
              //rules
              @"RuleList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 
-                 
-                 NSLog(@"websocket payload ruleList: %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_RESPONSE];
              },
              //rules
              @"DynamicClientRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST];
              },
              @"DynamicClientUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST];
              },
              @"DynamicClientAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_CLIENT_ADD_REQUEST];
              },
              @"DynamicClientLeft" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_CLIENT_LEFT_REQUEST];
              },
              @"DynamicClientJoined" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_CLIENT_JOIN_REQUEST];
              },
              @"UpdateClient" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"websocket payload : %@", payload);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"ClientList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 NSLog(@"ClientList");
-                 
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_WIFI_CLIENTS_LIST_RESPONSE];
              },
              

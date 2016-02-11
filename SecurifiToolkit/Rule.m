@@ -21,7 +21,6 @@
 }
 
  - (id)copyWithZone:(NSZone *)zone {
-     NSLog(@"copyWithZone rule");
      Rule *copy = (Rule *) [[[self class] allocWithZone:zone] init];
      if (copy != nil) {
          copy.triggers = [NSMutableArray arrayWithArray:self.triggers];

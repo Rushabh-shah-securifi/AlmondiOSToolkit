@@ -42,7 +42,6 @@
         
     }else if([commandType isEqualToString:@"DynamicRuleUpdated"] || [commandType isEqualToString:@"DynamicRuleAdded"]){
         NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
-        NSLog(@"onRuleListResponse Rule is %@",dDict);
         [self createRule:dDict];
     }else if([commandType isEqualToString:@"DynamicRuleRemoved"]){
         NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
@@ -54,10 +53,8 @@
     
     
     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
-    NSLog(@" rulesList in ruleParser %@",toolkit.ruleList);
 }
 -(BOOL)validateResponse:(id)sender{
-    NSLog(@"validateResponse: ");
     if(sender==nil)
         return NO;
     NSDictionary *data = [(NSNotification *) sender userInfo];
@@ -89,7 +86,6 @@
     
     for(Rule *rule  in toolkit.ruleList){
         if([rule.ID isEqualToString:id]){
-            NSLog(@"findRule match %@",toolkit.ruleList);
             return rule;
         }
     }
@@ -110,7 +106,6 @@
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         subProperties.type = [triggersDict valueForKey:@"Type"];
         subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
-        NSLog(@"Ruleparser eventType :- %@ index :%d",subProperties.eventType,subProperties.deviceId);
         [self addTime:triggersDict timeProperty:subProperties];
         [list addObject:subProperties];
     }
@@ -121,7 +116,6 @@
     if(![[timeDict valueForKey:@"Type"] isEqualToString:@"TimeTrigger"])
         return;
     RulesTimeElement *time = [[RulesTimeElement alloc]init];
-    NSLog(@"dayOf week %@",[timeDict valueForKey:@"DayOfWeek"]);
     time.range = [self getIntegerValue:[timeDict valueForKey:@"Range"]];
     time.hours = [self getIntegerValue:[timeDict valueForKey:@"Hour"]];
     time.mins = [self getIntegerValue:[timeDict valueForKey:@"Minutes"]];

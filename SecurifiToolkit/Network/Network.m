@@ -439,7 +439,6 @@
 }
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
-    NSLog(@" command type %d",commandType);
     switch (commandType) {
         case CommandType_SIGNUP_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
@@ -554,7 +553,6 @@
             
         case CommandType_GET_ALL_SCENES: {
             //md01
-            NSLog(@" get all scene");
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
             break;

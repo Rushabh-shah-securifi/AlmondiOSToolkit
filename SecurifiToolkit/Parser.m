@@ -55,7 +55,6 @@
                 [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientLeft"])&&
                ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)
                ) {
-        NSLog(@"main dict: %@", mainDict);
         NSDictionary *dict = [mainDict valueForKey:@"Clients"];
         for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
             if ([device.deviceID isEqualToString:[dict valueForKey:@"ID"]]) {
@@ -65,7 +64,6 @@
         }
     }
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
-        NSLog(@"DynamicClientRemoved");
         NSDictionary * removedClientDict = [mainDict valueForKey:@"Clients"];
         for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
             if ([device.deviceID isEqualToString:[removedClientDict valueForKey:@"ID"]]) {
@@ -84,7 +82,6 @@
             [wifiClientsArray addObject:device];
         }
         toolkit.wifiClientParser = wifiClientsArray;
-        NSLog(@"wifi parser - clientlist - wificlients: %@", toolkit.wifiClientParser);
     }
 
     

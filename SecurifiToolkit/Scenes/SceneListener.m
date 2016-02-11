@@ -46,7 +46,6 @@
 }
 
 - (void)getAllScenesCallback:(id)sender {
-    NSLog(@"getAllScenesCallback - scene listener");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     
@@ -60,7 +59,6 @@
         //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }// required for switching local<=>cloud
-    NSLog(@"main dict - %@", mainDict);
     [toolkit.scenesArray removeAllObjects];
     for(NSDictionary *sceneDict in [mainDict valueForKey:@"Scenes"]){
         NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:sceneDict];
@@ -78,12 +76,9 @@
             [sceneEntryList removeObjectForKey:@"Valid"];
         }
     }
-    NSLog(@"mutable scenes array: %@", toolkit.scenesArray);
-    
 }
 
 - (void)onScenesListChange:(id)sender{
-    NSLog(@"listner - onScenesListChange");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     
@@ -100,7 +95,6 @@
     NSString * commandType = [mainDict valueForKey:@"CommandType"];
     
     if ([commandType isEqualToString:@"DynamicSceneAdded"]){
-        NSLog(@"DynamicSceneAdded: %@", mainDict);
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
             if ([[sceneDict valueForKey:@"ID"] intValue] == [[[mainDict valueForKey:@"Scenes"] valueForKey:@"ID"] intValue]) {
                 dict = sceneDict;
@@ -121,7 +115,6 @@
 
     
     else if ([commandType isEqualToString:@"DynamicSceneActivated"]) {
-        NSLog(@"before DynamicSceneActivated: %@", toolkit.scenesArray);
         //scenes has been activated
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
             if ([[sceneDict valueForKey:@"ID"] intValue] == [[[mainDict valueForKey:@"Scenes" ] valueForKey:@"ID"] intValue]) {
@@ -130,11 +123,9 @@
                 break;
             }
         }
-        NSLog(@"after DynamicSceneActivated: %@", toolkit.scenesArray);
     }
     
     else if ([commandType isEqualToString:@"DynamicSceneUpdated"]) {
-        NSLog(@"DynamicSceneUpdated: %@", mainDict);
         //scenes parameterers has been updated
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
             if ([[sceneDict valueForKey:@"ID"] intValue] == [[[mainDict valueForKey:@"Scenes"] valueForKey:@"ID"] intValue]) {
@@ -153,7 +144,6 @@
     }
 
     else if ([commandType isEqualToString:@"DynamicSceneRemoved"]) {
-        NSLog(@"before scene removed: %@", toolkit.scenesArray);
         for (NSDictionary * sceneDict in toolkit.scenesArray) {
             if ([[[mainDict valueForKey:@"Scenes"] valueForKey:@"ID"] intValue]==[[sceneDict valueForKey:@"ID"] intValue])
             {
@@ -164,15 +154,12 @@
         if(dict != nil){
             [toolkit.scenesArray removeObject:dict];
         }
-        NSLog(@"after scene removed: %@", toolkit.scenesArray);
     }
     
     else if ([commandType isEqualToString:@"DynamicAllScenesRemoved"]) {
         [toolkit.scenesArray removeAllObjects];
     }
-    NSLog(@"listener - before posting notification");
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
-//                  );
 }
 
 

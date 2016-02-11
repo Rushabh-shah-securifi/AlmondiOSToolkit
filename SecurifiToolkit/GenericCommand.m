@@ -160,7 +160,6 @@
     NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
                                @"AlmondMAC":almondMac};
     
-    NSLog(@"%@",testDict);
     
     cloudCommand.command = [testDict JSONString];
     
@@ -175,7 +174,6 @@
     NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
                                @"AlmondMAC":almondMac};
     
-    NSLog(@"%@",testDict);
     
     cloudCommand.command = [testDict JSONString];
     
@@ -261,13 +259,11 @@
 
 //Rules
 + (instancetype)websocketRequestAlmondRules{
-    NSLog(@"websocketRequestAlmondRules");
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     NSDictionary *payload = @{
                               @"CommandType" : @"RuleList",
                               @"MobileInternalIndex" : @(correlationId).stringValue
                               };
-    NSLog(@"payload :%@",payload);
     return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST_REQUEST];
 }
 
