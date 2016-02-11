@@ -15,6 +15,7 @@
     if(self){
         self.delay = @"0";
         self.eventType=nil;
+        self.displayedData=nil;
         
     }
     return self;

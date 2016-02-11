@@ -76,7 +76,6 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
-    NSLog(@"send command: %@", obj);
     NSData *data = obj.command;
     [self.socket send:data];
     //    NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);

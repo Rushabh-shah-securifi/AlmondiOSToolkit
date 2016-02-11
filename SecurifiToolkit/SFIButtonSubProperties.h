@@ -22,6 +22,7 @@ typedef NS_ENUM(int , Type) {
 @property(nonatomic) sfi_id deviceId;
 @property(nonatomic) int index;
 @property(nonatomic) NSString* matchData;
+@property(nonatomic) NSString* displayedData;
 @property(nonatomic) NSString *delay; //to be used for actions
 @property(nonatomic) NSString *eventType;
 @property(nonatomic) int positionId; //for actioins
