@@ -40,7 +40,7 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 + (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac;
 
 //Rules
-+ (instancetype)websocketRequestAlmondRules;
++ (instancetype)websocketRequestAlmondRules:(NSString *)almondMac;
 + (instancetype)websocketRequestAlmondSceneList:(NSString *)almondMac;
 
 // constructs a generic command for requesting the sensor list

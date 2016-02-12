@@ -614,7 +614,7 @@
         };
             
             //rules
-        case CommandType_RULE_LIST_RESPONSE: {
+        case CommandType_RULE_LIST: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:RULE_LIST_NOTIFIER data:payload];
             break;
@@ -625,39 +625,6 @@
             [self postData:RULE_COMMAND_RESPONSE_NOTIFIER data:payload];
             break;
         };
-            
-        case CommandType_RULE_COMMAND_DYNAMICREMOVE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_RULE_REMOVE_NOTIFIER data:payload];
-            break;
-        };
-        case CommandType_RULE_COMMAND_DYNAMICUPDATE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_RULE_UPDATED data:payload];
-            break;
-        };
-            
-        case CommandType_RULE_COMMAND_DELETEALL: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_RULE_REMOVEALL data:payload];
-            break;
-        };
-        case CommandType_RULE_COMMAND_DYNAMICADD:{
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_RULE_LISTCHANGED data:payload];
-            break;
-        }
-        case CommandType_RULE_COMMAND_RULLCHANGED:{
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_RULE_LISTCHANGED data:payload];
-            
-        }
-        case CommandType_RULE_COMMAND_DYNAMICDELETEALL:{
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_RULE_LISTCHANGED data:payload];
-            
-        }//CommandType_RULE_COMMAND_DYNAMICDELETEALL
-            // =========================
             
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:

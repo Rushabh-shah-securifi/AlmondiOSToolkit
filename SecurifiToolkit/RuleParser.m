@@ -28,10 +28,14 @@
 -(void)onRuleListResponse:(id)sender{
     if(![self validateResponse:sender])
         return;
-    NSDictionary *mainDict = [[(NSNotification *) sender userInfo] valueForKey:@"data"];
+    SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
+    BOOL local = [toolkit useLocalNetwork:[toolkit currentAlmond].almondplusMAC];
+    NSDictionary *mainDict=[[(NSNotification *) sender userInfo] valueForKey:@"data"];
+    if(!local)
+         mainDict = [[[(NSNotification *) sender userInfo] valueForKey:@"data"] objectFromJSONData];
+
     NSString *commandType=[mainDict valueForKey:@"CommandType"] ;
     NSLog(@"onRuleList: %@",mainDict);
-    SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
     //RuleList
     if([commandType isEqualToString:@"RuleList"]){
         NSArray *dDictArray = [mainDict valueForKey:@"Rules"];

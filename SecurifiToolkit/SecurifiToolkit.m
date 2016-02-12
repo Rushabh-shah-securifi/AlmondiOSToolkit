@@ -722,6 +722,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 [block_self internalInitializeCloud:network command:cmd];
                 // send rule request
                 
+                cmd = [GenericCommand websocketRequestAlmondRules:plus.almondplusMAC];
+                [block_self internalInitializeCloud:network command:cmd];
+                NSLog(@" rule request send ");
+                //send request foe wifi client cloud
+                
             }
             
             [block_self tryRequestAlmondMode:mac];

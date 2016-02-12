@@ -69,7 +69,6 @@ NSString *securifi_name_to_device_type(SFIDeviceType type) {
 
 NSDictionary *securifi_property_name_to_type_dictionary() {
     static NSDictionary *lookupTable;
-    NSLog(@"lookuptable");
     if (lookupTable == nil) {
                 lookupTable = @{
                         // Normalize all names to upper case.
@@ -197,7 +196,6 @@ SFIDevicePropertyType securifi_name_to_property_type(NSString *valueName) {
     if (!o) {
         return SFIDevicePropertyType_UNKNOWN;
     }
-    NSLog(@"property type: %d", [o intValue]);
     return (SFIDevicePropertyType) [o intValue];
 }
 
