@@ -706,13 +706,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NetworkState *state = network.networkState;
             if (![state wasHashFetchedForAlmond:mac]) {
                 [state markHashFetchedForAlmond:mac];
-                [self cleanUp];
+                
                 DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
                 [block_self internalInitializeCloud:network command:cmd];
                 //send request for scene list cloud
-               
                 
+                [self cleanUp];
                 cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 NSLog(@" scene request send ");
@@ -725,10 +725,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 cmd = [GenericCommand websocketRequestAlmondRules:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 NSLog(@" rule request send ");
-                //send request foe wifi client cloud
-                
+
+               
             }
-            
+            //send request foe wifi client cloud
             [block_self tryRequestAlmondMode:mac];
         }
         
@@ -1280,7 +1280,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         cmd.networkPrecondition = precondition;
         
         [self asyncSendToCloud:cmd];
-        [self asyncRequestNotificationPreferenceList:almondMac];
+        //[self asyncRequestNotificationPreferenceList:almondMac];
     }
 }
 
@@ -1295,7 +1295,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [state markDeviceValuesFetchedForAlmond:almondMac];
     
     [self asyncRequestDeviceValueList:almondMac];
-    [self asyncRequestNotificationPreferenceList:almondMac];
     
     return YES;
 }
@@ -1712,6 +1711,21 @@ static SecurifiToolkit *toolkit_singleton = nil;
     cmd.command = req;
     
     [self asyncSendToCloud:cmd];
+    
+    [self cleanUp];
+    cmd = [GenericCommand cloudSceneListCommand:almondMAC];
+    [self asyncSendToCloud:cmd];
+    NSLog(@" scene request send ");
+    //send request foe wifi client cloud
+    
+    cmd = [GenericCommand cloudRequestAlmondWifiClients:almondMAC];
+    [self asyncSendToCloud:cmd];
+    // send rule request
+    
+    cmd = [GenericCommand websocketRequestAlmondRules:almondMAC];
+    [self asyncSendToCloud:cmd];
+    NSLog(@" rule request send ");
+    
 }
 
 - (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode {
