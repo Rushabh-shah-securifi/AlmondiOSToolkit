@@ -260,10 +260,11 @@
 //Rules
 + (instancetype)websocketRequestAlmondRules:(NSString *)almondMac {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
+    almondMac=(almondMac==nil)?@"":almondMac;
     NSDictionary *payload = @{
                               @"CommandType" : @"RuleList",
+                              @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"AlmondMAC" : almondMac,
-                              @"MobileInternalIndex" : @(correlationId).stringValue
                               };
     return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST];
 }
