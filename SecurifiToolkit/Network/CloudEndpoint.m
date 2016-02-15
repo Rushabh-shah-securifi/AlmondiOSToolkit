@@ -322,7 +322,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             }
                             else if (securifi_valid_json_command_type(commandType)) {
                                 NSData *buffer = [dataBuffer subdataWithRange:NSMakeRange(COMMAND_HEADER_LEN_BYTES, payloadLength)];
-
                                 // JSON payloads for Notifications are wrapped in <root></root>.
                                 // All other JSON commands are NOT
                                 if ([self isWrappedJson:commandType]) {
@@ -367,6 +366,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
                                     case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
                                     case (CommandType) 99:
+                                    case CommandType_RULE_LIST:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
                                         parsedPayload = YES;
@@ -706,6 +706,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_WIFI_CLIENTS_LIST_REQUEST:
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                 case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
+                    commandPayload = command.command;
+                    break;
+                }
+                case CommandType_RULE_LIST: {
                     commandPayload = command.command;
                     break;
                 }

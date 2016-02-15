@@ -33,6 +33,9 @@
     NSDictionary *mainDict=[[(NSNotification *) sender userInfo] valueForKey:@"data"];
     if(!local)
          mainDict = [[[(NSNotification *) sender userInfo] valueForKey:@"data"] objectFromJSONData];
+    
+    if([mainDict valueForKey:@"CommandType"]==nil)
+        return;
 
     NSString *commandType=[mainDict valueForKey:@"CommandType"] ;
     NSLog(@"onRuleList: %@",mainDict);
@@ -66,8 +69,6 @@
         return NO;
     NSDictionary *mainDict = [data valueForKey:@"data"];
     if(mainDict==nil)
-        return NO;
-    if([mainDict valueForKey:@"CommandType"]==nil)
         return NO;
     return YES;
 }
