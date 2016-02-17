@@ -216,6 +216,9 @@
 		A54EAFAD1C44D8FD00CF2837 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAFA51C44D8FD00CF2837 /* SFIButtonSubProperties.m */; };
 		A54EAFB01C44DC4A00CF2837 /* SceneListener.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */; };
 		A54EAFB11C44DC4A00CF2837 /* SceneListener.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAFAF1C44DC4A00CF2837 /* SceneListener.m */; };
+		A5E804131C74C1B9005A8DB3 /* DBManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804111C74C1B9005A8DB3 /* DBManager.h */; };
+		A5E804141C74C1B9005A8DB3 /* DBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804121C74C1B9005A8DB3 /* DBManager.m */; };
+		A5E804161C74C1E1005A8DB3 /* GenericIndexData.json in Resources */ = {isa = PBXBuildFile; fileRef = A5E804151C74C1E1005A8DB3 /* GenericIndexData.json */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
 		CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */; };
 		CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */; };
@@ -317,8 +320,8 @@
 		CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EE9181F9D9500F91AAD /* GenericCommandRequest.m */; };
 		CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE19EF2181FB01300F91AAD /* GenericCommandResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EF3181FB01300F91AAD /* GenericCommandResponse.m */; };
-		CEEB09891C5602E600F3E62E /* RulesTimeElement.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEB09871C5602E600F3E62E /* RulesTimeElement.h */; settings = {ASSET_TAGS = (); }; };
-		CEEB098A1C5602E600F3E62E /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEB09881C5602E600F3E62E /* RulesTimeElement.m */; settings = {ASSET_TAGS = (); }; };
+		CEEB09891C5602E600F3E62E /* RulesTimeElement.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEB09871C5602E600F3E62E /* RulesTimeElement.h */; };
+		CEEB098A1C5602E600F3E62E /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEB09881C5602E600F3E62E /* RulesTimeElement.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -557,6 +560,9 @@
 		A54EAFA51C44D8FD00CF2837 /* SFIButtonSubProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIButtonSubProperties.m; sourceTree = "<group>"; };
 		A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneListener.h; sourceTree = "<group>"; };
 		A54EAFAF1C44DC4A00CF2837 /* SceneListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneListener.m; sourceTree = "<group>"; };
+		A5E804111C74C1B9005A8DB3 /* DBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DBManager.h; sourceTree = "<group>"; };
+		A5E804121C74C1B9005A8DB3 /* DBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DBManager.m; sourceTree = "<group>"; };
+		A5E804151C74C1E1005A8DB3 /* GenericIndexData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = GenericIndexData.json; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
 		CE15FFAE186844AA00371183 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		CE15FFB418684D7500371183 /* certificate.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = certificate.cer; sourceTree = "<group>"; };
@@ -757,6 +763,9 @@
 		1C414BC11A79F02600C448A4 /* Db */ = {
 			isa = PBXGroup;
 			children = (
+				A5E804151C74C1E1005A8DB3 /* GenericIndexData.json */,
+				A5E804111C74C1B9005A8DB3 /* DBManager.h */,
+				A5E804121C74C1B9005A8DB3 /* DBManager.m */,
 				1C414BC21A79F02600C448A4 /* ZHDatabase.h */,
 				1C414BC31A79F02600C448A4 /* ZHDatabase.m */,
 				1C414BC41A79F02600C448A4 /* ZHDatabaseStatement.h */,
@@ -1305,6 +1314,7 @@
 				CE5EB63D17E8548500985636 /* DeviceDataHashRequest.h in Headers */,
 				CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */,
 				1C3EEFC11B37999300DFCF62 /* SFIConnectedDevice.h in Headers */,
+				A5E804131C74C1B9005A8DB3 /* DBManager.h in Headers */,
 				CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */,
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
 				1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */,
@@ -1485,6 +1495,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5E804161C74C1E1005A8DB3 /* GenericIndexData.json in Resources */,
 				221185FD178D453A00EE23ED /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1576,6 +1587,7 @@
 				1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */,
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
 				1CD1D5591A660B7A00C030E9 /* SFINotificationDevice.m in Sources */,
+				A5E804141C74C1B9005A8DB3 /* DBManager.m in Sources */,
 				1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
