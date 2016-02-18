@@ -152,12 +152,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
+        
         self.scenesArray = [NSMutableArray new];
         self.wifiClientParser = [NSMutableArray new];
         
         self.ruleParser=[[RuleParser alloc]init];
         self.sceneListener=[[SceneListener alloc]init];
         self.clientParser=[[Parser alloc]init];
+        self.dataBaseManager = [[DataBaseManager alloc]initDB];
         
         if (config.enableNotifications) {
             {

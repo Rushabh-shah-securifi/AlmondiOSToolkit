@@ -83,6 +83,7 @@
 
 #import <SecurifiToolkit/MDJSON.h>
 #import <SecurifiToolkit/Parser.h>
+#import "DataBaseManager.h"
 
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
@@ -171,6 +172,10 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 @property(nonatomic)NSMutableArray *wifiClientParser;
 @property(nonatomic)NSMutableArray *ruleList;
+
+//manages device, device-index database
+@property(nonatomic, strong) DataBaseManager *dataBaseManager;
+
 
 + (BOOL)isInitialized;
 
