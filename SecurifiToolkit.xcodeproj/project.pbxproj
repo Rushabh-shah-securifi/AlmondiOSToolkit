@@ -321,6 +321,10 @@
 		CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EF3181FB01300F91AAD /* GenericCommandResponse.m */; };
 		CEEB09891C5602E600F3E62E /* RulesTimeElement.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEB09871C5602E600F3E62E /* RulesTimeElement.h */; };
 		CEEB098A1C5602E600F3E62E /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEB09881C5602E600F3E62E /* RulesTimeElement.m */; };
+		CEED642F1C7C351E008A7412 /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED642D1C7C351E008A7412 /* Device.h */; settings = {ASSET_TAGS = (); }; };
+		CEED64301C7C351E008A7412 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED642E1C7C351E008A7412 /* Device.m */; settings = {ASSET_TAGS = (); }; };
+		CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED64311C7C370E008A7412 /* DeviceKnownValues.h */; settings = {ASSET_TAGS = (); }; };
+		CEED64341C7C370E008A7412 /* DeviceKnownValues.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED64321C7C370E008A7412 /* DeviceKnownValues.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -665,6 +669,10 @@
 		CEE19EF3181FB01300F91AAD /* GenericCommandResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericCommandResponse.m; sourceTree = "<group>"; };
 		CEEB09871C5602E600F3E62E /* RulesTimeElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RulesTimeElement.h; sourceTree = "<group>"; };
 		CEEB09881C5602E600F3E62E /* RulesTimeElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesTimeElement.m; sourceTree = "<group>"; };
+		CEED642D1C7C351E008A7412 /* Device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
+		CEED642E1C7C351E008A7412 /* Device.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
+		CEED64311C7C370E008A7412 /* DeviceKnownValues.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceKnownValues.h; sourceTree = "<group>"; };
+		CEED64321C7C370E008A7412 /* DeviceKnownValues.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceKnownValues.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1246,6 +1254,10 @@
 				CE5EB65917EAD46500985636 /* SFIDeviceKnownValues.m */,
 				1DF03F5902A972E2D8CA630A /* SFIAlmondLocalNetworkSettings.m */,
 				1DF0386F473DC4BF02299011 /* SFIAlmondLocalNetworkSettings.h */,
+				CEED642D1C7C351E008A7412 /* Device.h */,
+				CEED642E1C7C351E008A7412 /* Device.m */,
+				CEED64311C7C370E008A7412 /* DeviceKnownValues.h */,
+				CEED64321C7C370E008A7412 /* DeviceKnownValues.m */,
 			);
 			name = models;
 			sourceTree = "<group>";
@@ -1296,6 +1308,7 @@
 				CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */,
 				22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */,
 				CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */,
+				CEED642F1C7C351E008A7412 /* Device.h in Headers */,
 				CE5EB64117E8549200985636 /* DeviceDataHashResponse.h in Headers */,
 				CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */,
 				1C75820C19B028F70074C601 /* Scoreboard.h in Headers */,
@@ -1353,6 +1366,7 @@
 				1CD1D55A1A660B7A00C030E9 /* SFINotificationUser.h in Headers */,
 				CE2EA25919D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h in Headers */,
 				CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */,
+				CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */,
 				1CE67A311A91D7670004E68C /* AlmondModeChangeRequest.h in Headers */,
 				A54EAF9B1C44D8D800CF2837 /* Parser.h in Headers */,
 				A54EAFAC1C44D8FD00CF2837 /* SFIButtonSubProperties.h in Headers */,
@@ -1662,6 +1676,7 @@
 				1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */,
 				1DF03FFBF6EF6243078A2329 /* DatabaseStore.m in Sources */,
 				1DF038D75AEE3E0335A71E1F /* NotificationStoreImpl.m in Sources */,
+				CEED64301C7C351E008A7412 /* Device.m in Sources */,
 				1DF037CAB07B19208BC80642 /* AlmondModeChangeResponse.m in Sources */,
 				1DF03066782B488103FE1232 /* DynamicAlmondModeChange.m in Sources */,
 				1DF0329C5A1F03EC60478DC4 /* AlmondModeRequest.m in Sources */,
@@ -1679,6 +1694,7 @@
 				1DF03C2972842728AC1A7D2A /* CloudEndpoint.m in Sources */,
 				1DF03711937B3B810AAE5178 /* WebSocketEndpoint.m in Sources */,
 				A54EAFAD1C44D8FD00CF2837 /* SFIButtonSubProperties.m in Sources */,
+				CEED64341C7C370E008A7412 /* DeviceKnownValues.m in Sources */,
 				1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */,
 				1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */,
 				1DF0391E21650F9E90235929 /* Login.m in Sources */,
