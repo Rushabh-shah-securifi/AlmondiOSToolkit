@@ -54,6 +54,7 @@
 #import "Parser.h"
 #import "SceneListener.h"
 #import "RuleParser.h"
+#import "DataBaseManager.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -121,6 +122,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) RuleParser *ruleParser;
 @property(nonatomic, strong) SceneListener *sceneListener;
 @property(nonatomic, strong) Parser *clientParser;
+
 @end
 
 @implementation SecurifiToolkit
@@ -152,14 +154,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         _scoreboard = [Scoreboard new];
         _dataManager = [SFIOfflineDataManager new];
-        
-        self.scenesArray = [NSMutableArray new];
-        self.wifiClientParser = [NSMutableArray new];
-        
-        self.ruleParser=[[RuleParser alloc]init];
-        self.sceneListener=[[SceneListener alloc]init];
-        self.clientParser=[[Parser alloc]init];
-        self.dataBaseManager = [[DataBaseManager alloc]initDB];
+        [self initialize];
         
         if (config.enableNotifications) {
             {
@@ -192,6 +187,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)dealloc {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center removeObserver:self];
+}
+
+- (void)initialize{
+    self.scenesArray = [NSMutableArray new];
+    self.wifiClientParser = [NSMutableArray new];
+    
+    self.ruleParser=[[RuleParser alloc]init];
+    self.sceneListener=[[SceneListener alloc]init];
+    self.clientParser=[[Parser alloc]init];
+    
+    DataBaseManager *dataBaseManager = [[DataBaseManager alloc]initDB];
+    _devicesJSON = [dataBaseManager getDevicesForIds:@[]];
+    _indexesJSON = [dataBaseManager getDeviceIndexesForIds:@[]];
 }
 
 #pragma mark - Connection management

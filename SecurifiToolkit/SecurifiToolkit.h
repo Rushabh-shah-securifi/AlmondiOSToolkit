@@ -83,7 +83,6 @@
 
 #import <SecurifiToolkit/MDJSON.h>
 #import <SecurifiToolkit/Parser.h>
-#import "DataBaseManager.h"
 
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
@@ -167,15 +166,11 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Changes take effect on next connection attempt. Use closeConnection to force a connection change.
 @property(nonatomic) BOOL useProductionCloud;
 
-//has all the scenes
-@property(nonatomic)NSMutableArray* scenesArray;
-
+@property(nonatomic)NSMutableArray *scenesArray;
 @property(nonatomic)NSMutableArray *wifiClientParser;
 @property(nonatomic)NSMutableArray *ruleList;
-
-//manages device, device-index database
-@property(nonatomic, strong) DataBaseManager *dataBaseManager;
-
+@property(nonatomic)NSArray *devicesJSON;
+@property(nonatomic)NSArray *indexesJSON;
 
 + (BOOL)isInitialized;
 
