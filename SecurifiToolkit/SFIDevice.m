@@ -45,12 +45,10 @@
     NSMutableArray *new_list = [NSMutableArray array];
     
     for (SFIDevice *old in list) {
-        if (device.deviceID != old.deviceID) {
-            // already in list; do nothing
+        if (device.deviceID != old.deviceID)
             [new_list addObject:old];
-        }
+
     }
-    NSLog(@"new_list: %@", new_list);
     return new_list;
     
 }

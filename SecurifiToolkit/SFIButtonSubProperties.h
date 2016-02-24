@@ -32,6 +32,7 @@ typedef NS_ENUM(int , Type) {
 @property(nonatomic) NSString *displayText;
 @property(nonatomic) NSString *type;
 @property(nonatomic) RulesTimeElement *time;
+@property(nonatomic) BOOL *valid;
 
 @property bool isMode;
 @property bool isWiFi;

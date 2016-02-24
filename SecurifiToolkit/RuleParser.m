@@ -111,6 +111,7 @@
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         subProperties.type = [triggersDict valueForKey:@"Type"];
         subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
+        subProperties.valid= [[triggersDict valueForKey:@"Validation"] boolValue];
         [self addTime:triggersDict timeProperty:subProperties];
         [list addObject:subProperties];
     }
