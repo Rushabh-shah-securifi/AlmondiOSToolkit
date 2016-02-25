@@ -2714,7 +2714,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [network.networkState clearWillFetchDeviceListForAlmond:mac];
     
     if (!res.isSuccessful) {
-        
         return;
     }
     

@@ -216,6 +216,8 @@
 		A54EAFAD1C44D8FD00CF2837 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAFA51C44D8FD00CF2837 /* SFIButtonSubProperties.m */; };
 		A54EAFB01C44DC4A00CF2837 /* SceneListener.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */; };
 		A54EAFB11C44DC4A00CF2837 /* SceneListener.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAFAF1C44DC4A00CF2837 /* SceneListener.m */; };
+		A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */; };
+		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
 		A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804171C75A90E005A8DB3 /* DataBaseManager.h */; };
 		A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804181C75A90E005A8DB3 /* DataBaseManager.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
@@ -321,10 +323,10 @@
 		CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EF3181FB01300F91AAD /* GenericCommandResponse.m */; };
 		CEEB09891C5602E600F3E62E /* RulesTimeElement.h in Headers */ = {isa = PBXBuildFile; fileRef = CEEB09871C5602E600F3E62E /* RulesTimeElement.h */; };
 		CEEB098A1C5602E600F3E62E /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEEB09881C5602E600F3E62E /* RulesTimeElement.m */; };
-		CEED642F1C7C351E008A7412 /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED642D1C7C351E008A7412 /* Device.h */; settings = {ASSET_TAGS = (); }; };
-		CEED64301C7C351E008A7412 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED642E1C7C351E008A7412 /* Device.m */; settings = {ASSET_TAGS = (); }; };
-		CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED64311C7C370E008A7412 /* DeviceKnownValues.h */; settings = {ASSET_TAGS = (); }; };
-		CEED64341C7C370E008A7412 /* DeviceKnownValues.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED64321C7C370E008A7412 /* DeviceKnownValues.m */; settings = {ASSET_TAGS = (); }; };
+		CEED642F1C7C351E008A7412 /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED642D1C7C351E008A7412 /* Device.h */; };
+		CEED64301C7C351E008A7412 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED642E1C7C351E008A7412 /* Device.m */; };
+		CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED64311C7C370E008A7412 /* DeviceKnownValues.h */; };
+		CEED64341C7C370E008A7412 /* DeviceKnownValues.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED64321C7C370E008A7412 /* DeviceKnownValues.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -563,6 +565,8 @@
 		A54EAFA51C44D8FD00CF2837 /* SFIButtonSubProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIButtonSubProperties.m; sourceTree = "<group>"; };
 		A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneListener.h; sourceTree = "<group>"; };
 		A54EAFAF1C44DC4A00CF2837 /* SceneListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneListener.m; sourceTree = "<group>"; };
+		A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceParser.h; sourceTree = "<group>"; };
+		A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceParser.m; sourceTree = "<group>"; };
 		A5E804171C75A90E005A8DB3 /* DataBaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBaseManager.h; sourceTree = "<group>"; };
 		A5E804181C75A90E005A8DB3 /* DataBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBaseManager.m; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
@@ -956,6 +960,8 @@
 				1DF039B6D0CF3D59183C4EE1 /* RouterCommandParser.m */,
 				1DF03BEF6968BA7F09D479E4 /* CommandParser.h */,
 				1DF03662FC196FC8CE7AEF90 /* CommandParser.m */,
+				A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */,
+				A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */,
 			);
 			path = Parser;
 			sourceTree = "<group>";
@@ -1333,6 +1339,7 @@
 				CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */,
 				CEAD85A919CABCBE006D1048 /* DeleteAccountResponse.h in Headers */,
 				CEAD85AD19CACE43006D1048 /* UpdateUserProfileRequest.h in Headers */,
+				A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */,
 				CE91317119C9A2F900D94876 /* ChangePasswordResponse.h in Headers */,
 				CEEB09891C5602E600F3E62E /* RulesTimeElement.h in Headers */,
 				1C3270E41A243B28007202C1 /* SFIRouterSummary.h in Headers */,
@@ -1641,6 +1648,7 @@
 				CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */,
 				1C3EEFC81B379B3800DFCF62 /* SFIGenericRouterCommand.m in Sources */,
 				CE91316E19C9A2DD00D94876 /* ChangePasswordRequest.m in Sources */,
+				A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */,
 				22B326D01796D447004B3642 /* SanityResponse.m in Sources */,
 				CE2EA25E19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m in Sources */,
 				CE2EA26619D04BEA00C6D6A8 /* AlmondNameChangeResponse.m in Sources */,

@@ -51,7 +51,7 @@ static sqlite3 *database = nil;
                                                            error:&error];
 
     if (error != nil) {
-        NSLog(@"Error: was not able to load messages.");
+        NSLog(@"Error: was not able to load.");
     }
     return data;
 }
@@ -170,20 +170,20 @@ static sqlite3 *database = nil;
     }
 }
 
--(NSArray*)getDevicesForIds:(NSArray*)deviceIds{
+-(NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds{
     NSLog(@"getDevicesForIds");
-    NSMutableArray *devices = [[NSMutableArray alloc]init];
+    NSMutableDictionary *devices = [[NSMutableDictionary alloc]init];
     for(NSString *ID in deviceIds){
-        [devices addObject:[self findByID:ID fromTable:DEVICE_TABLE]];
+        [devices setValue:[self findByID:ID fromTable:DEVICE_TABLE] forKey:ID];
     }
     return  devices;
 }
 
 
--(NSArray*)getDeviceIndexesForIds:(NSArray*)indexIds{
-    NSMutableArray *deviceIndexes = [[NSMutableArray alloc]init];
+-(NSMutableDictionary*)getDeviceIndexesForIds:(NSArray*)indexIds{
+    NSMutableDictionary *deviceIndexes = [[NSMutableDictionary alloc]init];
     for(NSString *ID in indexIds){
-        [deviceIndexes addObject:[self findByID:ID fromTable:DEVICE_INDEX_TABLE]];
+        [deviceIndexes setValue:[self findByID:ID fromTable:DEVICE_INDEX_TABLE] forKey:ID];
     }
     return  deviceIndexes;
 }

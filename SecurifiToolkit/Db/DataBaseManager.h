@@ -14,6 +14,6 @@
 - (instancetype)initDB;
 - (void)deleteTable;
 
--(NSArray*)getDevicesForIds:(NSArray*)deviceIds;
--(NSArray*)getDeviceIndexesForIds:(NSArray*)indexIds;
+-(NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds;
+-(NSMutableDictionary*)getDeviceIndexesForIds:(NSArray*)indexIds;
 @end

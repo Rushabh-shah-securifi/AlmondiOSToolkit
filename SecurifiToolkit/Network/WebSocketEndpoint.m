@@ -78,7 +78,8 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
     NSData *data = obj.command;
     [self.socket send:data];
-    //    NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    NSLog(@"websocket send: %@", data);
+//        NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     return YES;
 }
 
@@ -96,7 +97,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 
 - (void)webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
-   // NSLog(@"Websocket receive: %@", message);
+    NSLog(@"Websocket receive: %@", message);
     
     NSString *str = message;
     NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
