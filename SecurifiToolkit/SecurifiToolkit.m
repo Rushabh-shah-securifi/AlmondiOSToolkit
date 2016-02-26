@@ -54,6 +54,7 @@
 #import "Parser.h"
 #import "SceneListener.h"
 #import "RuleParser.h"
+#import "DeviceParser.h"
 #import "DataBaseManager.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
@@ -122,6 +123,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) RuleParser *ruleParser;
 @property(nonatomic, strong) SceneListener *sceneListener;
 @property(nonatomic, strong) Parser *clientParser;
+@property(nonatomic, strong) DeviceParser *deviceParser;
 
 @end
 
@@ -192,10 +194,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)initialize{
     self.scenesArray = [NSMutableArray new];
     self.wifiClientParser = [NSMutableArray new];
+    self.devices = [NSMutableArray new];
     
     self.ruleParser=[[RuleParser alloc]init];
     self.sceneListener=[[SceneListener alloc]init];
     self.clientParser=[[Parser alloc]init];
+//    self.deviceParser = [[DeviceParser alloc]init];
     
     DataBaseManager *dataBaseManager = [[DataBaseManager alloc]initDB];
     _devicesJSON = [dataBaseManager getDevicesForIds:@[]];
