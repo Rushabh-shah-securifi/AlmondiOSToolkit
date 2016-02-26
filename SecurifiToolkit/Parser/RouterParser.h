@@ -1,12 +1,13 @@
 //
-//  DeviceParser.h
+//  RouterParser.h
 //  SecurifiToolkit
 //
-//  Created by Masood on 23/02/16.
+//  Created by Masood on 26/02/16.
 //  Copyright © 2016 Securifi Ltd. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
-@interface DeviceParser : NSObject
+@interface RouterParser : NSObject
+
 @end

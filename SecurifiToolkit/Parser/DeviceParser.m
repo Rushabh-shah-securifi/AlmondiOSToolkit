@@ -21,10 +21,136 @@
 }
 
 -(void)initNotification{
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(onDeviceListResAndDynamicCallback:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
+//    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+//    [center addObserver:self selector:@selector(onDeviceListResAndDynamicCallback:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
 }
 
+-(void)commandTesting{
+    NSDictionary *devicelistresponsedata =@{
+                                            @"MobileInternalIndex":@"<random key>",
+                                            @"CommandType":@"DeviceList",
+                                            @"Devices":@{
+                                                    @"3":@{
+                                                            @"Name":@"ContactSwitch #1",
+                                                            @"FriendlyDeviceType":@"ContactSwitch",
+                                                            @"Type":@"12",
+                                                            @"Location":@"Default",
+                                                            @"DeviceValues":@{
+                                                                    @"1":@{
+                                                                            @"Name":@"STATE",
+                                                                            @"GenericIndex":@"50",
+                                                                            @"Value":@"true"
+                                                                            },
+                                                                    @"2":@{
+                                                                            @"Name":@"LOW BATTERY",
+                                                                            @"GenericIndex":@"50",
+                                                                            @"Value":@"0"
+                                                                            },
+                                                                    @"3":@{
+                                                                            @"Name":@"TAMPER",
+                                                                            @"GenericIndex":@"50",
+                                                                            @"Value":@"true"
+                                                                            }
+                                                                    }
+                                                            },
+                                                    @"4":@{
+                                                        @"Name":@"BinarySwitch #2",
+                                                        @"FriendlyDeviceType":@"BinarySwitch",
+                                                        @"Type":@"1",
+                                                        @"Location":@"Default",
+                                                        @"DeviceValues":@{
+                                                                          @"1":@{
+                                                                                  @"Name":@"SWITCH BINARY",
+                                                                                  @"GenericIndex":@"50",
+                                                                                  @"Value":@"true"
+                                                                                  }
+                                                                          }
+                                                    }
+                                             }
+                                            };
+    NSDictionary *dynamicDeviceAdded = @{@"CommandType":@"DynamicDeviceAdded",
+                                         @"Devices":@{
+                                                 @"10":@{
+                                                         @"Name":@"ContactSwitch #1",
+                                                         @"FriendlyDeviceType":@"ContactSwitch",
+                                                         @"Type":@"12",
+                                                         @"Location":@"Default",
+                                                         @"DeviceValues":@{
+                                                                 @"1":@{
+                                                                         @"Name":@"STATE",
+                                                                         @"GenericIndex":@"50",
+                                                                         @"Value":@"true"
+                                                                         },
+                                                                 @"2":@{
+                                                                         @"Name":@"LOW BATTERY",
+                                                                         @"GenericIndex":@"50",
+                                                                         @"Value":@"0"
+                                                                         },
+                                                                 @"3":@{
+                                                                         @"Name":@"TAMPER",
+                                                                         @"GenericIndex":@"50",
+                                                                         @"Value":@"true"
+                                                                         }
+                                                                 }
+                                                         }
+                                            }
+                                         };
+    
+    NSDictionary *dynamicDeviceUpdated = @{@"CommandType":@"DynamicDeviceUpdated",
+                                           @"Devices":@{
+                                                   @"3":@{
+                                                           @"Name":@"ContactSwitch name updated",
+                                                           @"FriendlyDeviceType":@"ContactSwitch",
+                                                           @"Type":@"12",
+                                                           @"Location":@"Default",
+                                                           @"DeviceValues":@{
+                                                                   @"1":@{
+                                                                           @"Name":@"STATE",
+                                                                           @"GenericIndex":@"50",
+                                                                           @"Value":@"true"
+                                                                           },
+                                                                   @"2":@{
+                                                                           @"Name":@"LOW BATTERY",
+                                                                           @"GenericIndex":@"50",
+                                                                           @"Value":@"10"
+                                                                           },
+                                                                   @"3":@{
+                                                                           @"Name":@"TAMPER",
+                                                                           @"GenericIndex":@"50",
+                                                                           @"Value":@"true"
+                                                                           }
+                                                                   }
+                                                           }
+                                                   }
+                                           };
+    NSDictionary *dynamicDeviceRemove = @{
+                                   
+                                   @"CommandType":@"DynamicDeviceRemoved",
+                                   @"ID":@"10"
+                                   
+                                   };
+    NSDictionary *dynamicRemoveAll = @{@"CommandType":@"DynamicDeviceRemoveAll"};
+    
+    NSDictionary *dynamicIndexUpdate = @{
+                                    @"CommandType":@"DynamicIndexUpdated",
+                                    @"Data":@{
+                                              @"3":@{
+                                                      @"2":@{
+                                                              @"Name":@"LOW BATTERY",
+                                                              @"GenericIndex":@"50",
+                                                              @"Value":@"20"
+                                                              },
+                                                      }
+                                              }
+                                    };
+    
+    [self onDeviceListResAndDynamicCallback:devicelistresponsedata];
+    [self onDeviceListResAndDynamicCallback:dynamicDeviceAdded];
+    [self onDeviceListResAndDynamicCallback:dynamicDeviceUpdated];
+    [self onDeviceListResAndDynamicCallback:dynamicDeviceRemove];
+    [self onDeviceListResAndDynamicCallback:dynamicIndexUpdate];
+    [self onDeviceListResAndDynamicCallback:dynamicRemoveAll];
+}
 
 -(void)onDeviceListResAndDynamicCallback:(id)sender{
     NSNotification *notifier = (NSNotification *) sender;
@@ -44,33 +170,43 @@
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
+    
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"DeviceList"]){
-        NSDictionary *devices = payload[@"Devices"];
-        
-        NSArray *devicePosKeys = devices.allKeys;
+        NSDictionary *devicesPayload = payload[@"Devices"];
+        NSArray *devicePosKeys = devicesPayload.allKeys;
         NSArray *sortedPostKeys = [devicePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
         }];
         
         for (NSString *devicePosition in sortedPostKeys) {
-            NSDictionary *deviceDic = devices[devicePosition];
+            NSDictionary *deviceDic = devicesPayload[devicePosition];
             Device *device = [self parseDeviceForPayload:deviceDic];
+            device.ID = [devicePosition intValue];
             [toolkit.devices addObject:device];
         }
-        
-    }else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceAdded"]) {
-        NSDictionary *addedDevicePayload = payload[@"Devices"];
+    }
+    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceAdded"]) {
+        NSDictionary *devicesPayload = payload[@"Devices"];
+        NSString *deviceID = [[devicesPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
+        NSDictionary *addedDevicePayload = [devicesPayload objectForKey:deviceID];
         Device *device = [self parseDeviceForPayload:addedDevicePayload];
+        device.ID = (sfi_id) [deviceID intValue];
         [toolkit.devices addObject:device];
         
-    }else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceUpdated"]){
-        NSDictionary *updatedDevicePayload = payload[@"Devices"];
+    }
+    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceUpdated"]){
+        NSDictionary *devicesPayload = payload[@"Devices"];
+        NSString *deviceID = [[devicesPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
+        NSDictionary *updatedDevicePayload = [devicesPayload objectForKey:deviceID];
         for(Device *device in toolkit.devices){
-            if(device.ID == [updatedDevicePayload[@"ID"] intValue]){
+            if(device.ID == [deviceID intValue]){
                 [self updateDevice:device payload:updatedDevicePayload];
+                break;
             }
         }
-    }else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceRemoved"]){
+        
+    }
+    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceRemoved"]){
         NSString *removedDeviceID = payload[@"ID"];
         Device *toBeRemovedDevice;
         for(Device *device in toolkit.devices){
@@ -79,9 +215,11 @@
             }
         }
         [toolkit.devices removeObject:toBeRemovedDevice];
-    }else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceRemoveAll"]){
+    }
+    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceRemoveAll"]){
         [toolkit.devices removeAllObjects];
-    }else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicIndexUpdate"]){
+    }
+    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicIndexUpdated"]){
         NSDictionary *updatedDevice = payload[@"Data"];
         for(Device *device in toolkit.devices){
             NSDictionary *valuesDic = updatedDevice[@(device.ID).stringValue];
@@ -90,13 +228,13 @@
                     NSDictionary *knownValueDic = valuesDic[@(knownValue.index).stringValue];
                     if (knownValueDic != nil) {
                         [self updateKnownValue:knownValueDic knownValues:knownValue];
+                        break;
                     }
                 }
             }
         }
     }
 }
-
 
 
 /*
@@ -125,10 +263,6 @@
     str = payload[@"Type"];
     if (str.length > 0) {
         device.type =str.intValue;
-    }
-    str = payload[@"ID"];
-    if (str.length > 0) {
-        device.ID = (sfi_id) str.intValue;
     }
     NSDictionary *valuesDic = payload[@"DeviceValues"];
     device.knownValues = [self parseValues:valuesDic];
