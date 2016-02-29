@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface RouterParser : NSObject
-
+-(void)testRouterParser;
 @end
