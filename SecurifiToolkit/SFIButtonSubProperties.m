@@ -32,6 +32,7 @@
     butProperties.deviceType = self.deviceType;
     butProperties.deviceName = self.deviceName;
     butProperties.type=self.type;
+    butProperties.valid=self.valid;
     
     if([self.eventType isEqualToString: @"TimeTrigger"])
         butProperties.time=[self.time createNew];

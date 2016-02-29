@@ -2779,13 +2779,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSArray *currentDeviceList = [self.dataManager readDeviceList:mac];
             NSArray *currentValueList = [self.dataManager readDeviceValueList:mac];
             
-            for (SFIDevice *device in res.deviceList) {
-                currentDeviceList = [SFIDevice removeDevice:device list:currentDeviceList];
-                currentValueList = [SFIDeviceValue removeDeviceValue:device.deviceID list:currentValueList];
-                
-            }
+            SFIDevice *deviceToBeRemoved=[res.deviceList objectAtIndex:0];
             
-            [self processDeviceListChange:currentDeviceList mac:mac requestValues:NO partialList:NO];
+            currentDeviceList = [SFIDevice removeDevice:deviceToBeRemoved list:currentDeviceList];
+            currentValueList = [SFIDeviceValue removeDeviceValue:deviceToBeRemoved.deviceID list:currentValueList];
+                
+            [self.dataManager writeDeviceList:currentDeviceList almondMac:mac];
             [self.dataManager writeDeviceValueList:currentValueList almondMac:mac];
             [self postNotification:kSFIDidChangeDeviceList data:mac];
             
