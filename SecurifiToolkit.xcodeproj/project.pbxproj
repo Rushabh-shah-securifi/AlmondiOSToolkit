@@ -222,6 +222,7 @@
 		A5C7AE4B1C807BFA007E630D /* RouterParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE491C807BFA007E630D /* RouterParser.m */; };
 		A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804171C75A90E005A8DB3 /* DataBaseManager.h */; };
 		A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804181C75A90E005A8DB3 /* DataBaseManager.m */; };
+		CE004C031C8410530048E80D /* Dummycloud in Resources */ = {isa = PBXBuildFile; fileRef = CE004C021C8410530048E80D /* Dummycloud */; settings = {ASSET_TAGS = (); }; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
 		CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */; };
 		CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */; };
@@ -573,6 +574,7 @@
 		A5C7AE491C807BFA007E630D /* RouterParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RouterParser.m; sourceTree = "<group>"; };
 		A5E804171C75A90E005A8DB3 /* DataBaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBaseManager.h; sourceTree = "<group>"; };
 		A5E804181C75A90E005A8DB3 /* DataBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBaseManager.m; sourceTree = "<group>"; };
+		CE004C021C8410530048E80D /* Dummycloud */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Dummycloud; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
 		CE15FFAE186844AA00371183 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		CE15FFB418684D7500371183 /* certificate.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = certificate.cer; sourceTree = "<group>"; };
@@ -1038,6 +1040,7 @@
 		221185BF178D371200EE23ED /* SecurifiToolkit */ = {
 			isa = PBXGroup;
 			children = (
+				CE004C021C8410530048E80D /* Dummycloud */,
 				A54EAF9D1C44D8DE00CF2837 /* Rules */,
 				A54EAF981C44D8C700CF2837 /* WiFiClients */,
 				1C3EEFB81B37999300DFCF62 /* Almond */,
@@ -1521,6 +1524,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				221185FD178D453A00EE23ED /* InfoPlist.strings in Resources */,
+				CE004C031C8410530048E80D /* Dummycloud in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
