@@ -30,20 +30,7 @@
                  object:nil];
 }
 
--(BOOL)isLocal{
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
-    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
-    return local;
-}
 
--(NSMutableArray*)getMutableSceneEntryList:(NSDictionary*)sceneDict{
-    NSMutableArray *mutableEntryList = [[NSMutableArray alloc]init];
-    for(NSDictionary *entryList in [sceneDict valueForKey:@"SceneEntryList"]){
-        [mutableEntryList addObject:[entryList mutableCopy]];
-    }
-    return mutableEntryList;
-}
 
 - (void)getAllScenesCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
@@ -62,20 +49,16 @@
     [toolkit.scenesArray removeAllObjects];
     for(NSDictionary *sceneDict in [mainDict valueForKey:@"Scenes"]){
         NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:sceneDict];
-        
         NSMutableDictionary *mutableScene = [sceneDict mutableCopy];
         [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
-        
         [toolkit.scenesArray addObject:mutableScene];
-        
     }
-    
-    
     for(NSMutableDictionary *scenes in toolkit.scenesArray){
         for(NSMutableDictionary *sceneEntryList in [scenes valueForKey:@"SceneEntryList"]){
             [sceneEntryList removeObjectForKey:@"Valid"];
         }
     }
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
 }
 
 - (void)onScenesListChange:(id)sender{
@@ -162,6 +145,32 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
 }
 
+-(BOOL)isLocal{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+    return local;
+}
 
+-(NSMutableArray*)getMutableSceneEntryList:(NSDictionary*)sceneDict{
+    NSMutableArray *mutableEntryList = [[NSMutableArray alloc]init];
+    NSArray *sceneEntryListPayload = [sceneDict valueForKey:@"SceneEntryList"];
+    for(NSDictionary *entryList in sceneEntryListPayload){
+        NSMutableDictionary *mutableEntry = [entryList mutableCopy];
+        
+        if([mutableEntry[@"DeviceID"] isEqualToString:@"0"] &&  [mutableEntry[@"Index"] isEqualToString:@"1"] && ([mutableEntry[@"Value"] isEqualToString:@"home"] ||[mutableEntry[@"Value"] isEqualToString:@"away"])){
+            [self changeModeProperties:mutableEntry];
+        }
+        
+        [mutableEntryList addObject:mutableEntry];
+    }
+    return mutableEntryList;
+}
+
+-(void)changeModeProperties:(NSMutableDictionary*)modeEntry{
+    modeEntry[@"DeviceID"] = @"1";
+    modeEntry[@"Index"] = @"0";
+    modeEntry[@"EventType"] = @"AlmondModeUpdated";
+}
 
 @end
