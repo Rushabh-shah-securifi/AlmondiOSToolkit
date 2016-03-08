@@ -23,7 +23,7 @@
                selector:@selector(getAllScenesCallback:)
                    name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
                  object:nil];
-
+    
     [center addObserver:self
                selector:@selector(onScenesListChange:)
                    name:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER
@@ -71,7 +71,7 @@
     if(local){
         mainDict = [data valueForKey:@"data"];
     }else{
-         //till cloud changes are integrated
+        //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     NSDictionary *dict;
@@ -95,7 +95,7 @@
         
         [toolkit.scenesArray addObject:newScene];
     }
-
+    
     
     else if ([commandType isEqualToString:@"DynamicSceneActivated"]) {
         //scenes has been activated
@@ -125,7 +125,7 @@
             }
         }
     }
-
+    
     else if ([commandType isEqualToString:@"DynamicSceneRemoved"]) {
         for (NSDictionary * sceneDict in toolkit.scenesArray) {
             if ([[[mainDict valueForKey:@"Scenes"] valueForKey:@"ID"] intValue]==[[sceneDict valueForKey:@"ID"] intValue])
