@@ -23,27 +23,14 @@
                selector:@selector(getAllScenesCallback:)
                    name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
                  object:nil];
-
+    
     [center addObserver:self
                selector:@selector(onScenesListChange:)
                    name:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER
                  object:nil];
 }
 
--(BOOL)isLocal{
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
-    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
-    return local;
-}
 
--(NSMutableArray*)getMutableSceneEntryList:(NSDictionary*)sceneDict{
-    NSMutableArray *mutableEntryList = [[NSMutableArray alloc]init];
-    for(NSDictionary *entryList in [sceneDict valueForKey:@"SceneEntryList"]){
-        [mutableEntryList addObject:[entryList mutableCopy]];
-    }
-    return mutableEntryList;
-}
 
 - (void)getAllScenesCallback:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
@@ -62,20 +49,16 @@
     [toolkit.scenesArray removeAllObjects];
     for(NSDictionary *sceneDict in [mainDict valueForKey:@"Scenes"]){
         NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:sceneDict];
-        
         NSMutableDictionary *mutableScene = [sceneDict mutableCopy];
         [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
-        
         [toolkit.scenesArray addObject:mutableScene];
-        
     }
-    
-    
     for(NSMutableDictionary *scenes in toolkit.scenesArray){
         for(NSMutableDictionary *sceneEntryList in [scenes valueForKey:@"SceneEntryList"]){
             [sceneEntryList removeObjectForKey:@"Valid"];
         }
     }
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
 }
 
 - (void)onScenesListChange:(id)sender{
@@ -88,7 +71,7 @@
     if(local){
         mainDict = [data valueForKey:@"data"];
     }else{
-         //till cloud changes are integrated
+        //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     NSDictionary *dict;
@@ -112,7 +95,7 @@
         
         [toolkit.scenesArray addObject:newScene];
     }
-
+    
     
     else if ([commandType isEqualToString:@"DynamicSceneActivated"]) {
         //scenes has been activated
@@ -142,7 +125,7 @@
             }
         }
     }
-
+    
     else if ([commandType isEqualToString:@"DynamicSceneRemoved"]) {
         for (NSDictionary * sceneDict in toolkit.scenesArray) {
             if ([[[mainDict valueForKey:@"Scenes"] valueForKey:@"ID"] intValue]==[[sceneDict valueForKey:@"ID"] intValue])
@@ -162,6 +145,32 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
 }
 
+-(BOOL)isLocal{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+    return local;
+}
 
+-(NSMutableArray*)getMutableSceneEntryList:(NSDictionary*)sceneDict{
+    NSMutableArray *mutableEntryList = [[NSMutableArray alloc]init];
+    NSArray *sceneEntryListPayload = [sceneDict valueForKey:@"SceneEntryList"];
+    for(NSDictionary *entryList in sceneEntryListPayload){
+        NSMutableDictionary *mutableEntry = [entryList mutableCopy];
+        
+        if([mutableEntry[@"DeviceID"] isEqualToString:@"0"] &&  [mutableEntry[@"Index"] isEqualToString:@"1"] && ([mutableEntry[@"Value"] isEqualToString:@"home"] ||[mutableEntry[@"Value"] isEqualToString:@"away"])){
+            [self changeModeProperties:mutableEntry];
+        }
+        
+        [mutableEntryList addObject:mutableEntry];
+    }
+    return mutableEntryList;
+}
+
+-(void)changeModeProperties:(NSMutableDictionary*)modeEntry{
+    modeEntry[@"DeviceID"] = @"1";
+    modeEntry[@"Index"] = @"0";
+    modeEntry[@"EventType"] = @"AlmondModeUpdated";
+}
 
 @end
