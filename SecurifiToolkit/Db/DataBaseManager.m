@@ -15,11 +15,11 @@
 #define DEVICE_INDEX_TABLE @"deviceIndexes"
 
 @interface DataBaseManager()
-@property NSString *databasePath;
 
 @end
 
 @implementation DataBaseManager
+static NSString *databasePath;
 static DataBaseManager *dbSharedInstance = nil;
 static sqlite3 *database = nil;
 
@@ -32,54 +32,37 @@ static sqlite3 *database = nil;
 //    return dbSharedInstance;
 //}
 
-- (instancetype)initDB{
-    self = [super init];
-    if(self){
-        [self createDataBasePath:DATABASE_FILE];
-        [self setupDB];
-    }
-    return self;
+
++(void)initializeDataBase{
+    [self createDataBasePath:DATABASE_FILE];
+    [self setupDB];
 }
 
--(NSDictionary*)parseJSON{
-    NSError *error = nil;
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GenericIndexData"
-                                                         ofType:@"json"];
-    NSData *dataFromFile = [NSData dataWithContentsOfFile:filePath];
-    NSDictionary *data = [NSJSONSerialization JSONObjectWithData:dataFromFile
-                                                         options:kNilOptions
-                                                           error:&error];
-
-    if (error != nil) {
-        NSLog(@"Error: was not able to load.");
-    }
-    return data;
-}
-
--(void)createDataBasePath:(NSString*)dbPath{
++(void)createDataBasePath:(NSString*)dbPath{
     NSLog(@"createDataBasePath");
     NSArray * dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString * docsDir = dirPaths[0];
     // Build the path to the database file
-    _databasePath = [[NSString alloc] initWithString:[docsDir stringByAppendingPathComponent: dbPath]];
+    databasePath = [[NSString alloc] initWithString:[docsDir stringByAppendingPathComponent: dbPath]];
 }
 
--(void)setupDB{
++(void)setupDB{
     NSLog(@"createDB");
     NSFileManager *filemgr = [NSFileManager defaultManager];
-    if ([filemgr fileExistsAtPath: _databasePath ] == NO){
+    if ([filemgr fileExistsAtPath: databasePath ] == NO){
         [self createTable:@"CREATE TABLE IF NOT EXISTS devices (ID INTEGER PRIMARY KEY, DATA TEXT)"];
         [self createTable:@"CREATE TABLE IF NOT EXISTS deviceIndexes (ID INTEGER PRIMARY KEY, DATA TEXT)"];
     }
-    NSDictionary* deviceIndexData = [self parseJSON];
-    
-    [self insertData:[deviceIndexData valueForKey:@"commandtype"] query:@"INSERT INTO devices (id,data) VALUES(?,?)"];
-    [self insertData:[deviceIndexData valueForKey:@"commandtype"] query:@"INSERT INTO deviceIndexes (id,data) VALUES(?,?)"];
+    NSDictionary *devicesJson = [self parseJson:@"deviceListJson"];
+    NSDictionary *deviceIndexesJson = [self parseJson:@"GenericIndexesData"];
+
+    [self insertData:devicesJson query:@"INSERT INTO devices (id,data) VALUES(?,?)"];
+    [self insertData:deviceIndexesJson query:@"INSERT INTO deviceIndexes (id,data) VALUES(?,?)"];
 }
 
--(BOOL)createTable:(NSString*)query{
++(BOOL)createTable:(NSString*)query{
     BOOL isSuccess = YES;
-    const char *dbpath = [_databasePath UTF8String];
+    const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         char *errMsg;
@@ -98,10 +81,26 @@ static sqlite3 *database = nil;
     return isSuccess;
 }
 
-- (void)insertData:(NSDictionary*)deviceIndexDict query:(NSString*)query
+
++(NSDictionary*)parseJson:(NSString*)fileName{
+    NSError *error = nil;
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName
+                                                         ofType:@"json"];
+    NSData *dataFromFile = [NSData dataWithContentsOfFile:filePath];
+    NSDictionary *data = [NSJSONSerialization JSONObjectWithData:dataFromFile
+                                                         options:kNilOptions
+                                                           error:&error];
+    
+    if (error != nil) {
+        NSLog(@"Error: was not able to load json file: %@.",fileName);
+    }
+    return data;
+}
+
++ (void)insertData:(NSDictionary*)deviceIndexDict query:(NSString*)query
 {
     sqlite3_stmt *statement;
-    const char *dbpath = [_databasePath UTF8String];
+    const char *dbpath = [databasePath UTF8String];
     
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
@@ -127,12 +126,12 @@ static sqlite3 *database = nil;
     }
 }
 
-- (NSDictionary*)findByID:(NSString*)ID fromTable:(NSString*)table{
++ (NSDictionary*)findByID:(NSString*)ID fromTable:(NSString*)table{
     NSLog(@"findByID");
     [self createTableIfNeeded:table];
     
     sqlite3_stmt *statement;
-    const char *dbpath = [_databasePath UTF8String];
+    const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         NSString *querySQL = [NSString stringWithFormat:@"select data from \"%@\" where id=\"%@\"",table, ID];
@@ -156,21 +155,21 @@ static sqlite3 *database = nil;
     return @{};
 }
 
--(void)createTableIfNeeded:(NSString*)table{
++ (void)createTableIfNeeded:(NSString*)table{
     NSLog(@"createTableIfNeeded");
     NSString *query_stmt = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS \"%@\"(ID INTEGER PRIMARY KEY, DATA TEXT)", table];
     if(![self createTable:query_stmt]){
         if([[table lowercaseString] isEqualToString:DEVICE_TABLE]){
-            NSDictionary* deviceIndexData = [self parseJSON];
-            [self insertData:[deviceIndexData valueForKey:@"commandtype"] query:query_stmt];
+            NSDictionary* deviceData = [self parseJson:@"deviceListJson"];
+            [self insertData:[deviceData valueForKey:@"commandtype"] query:query_stmt];
         }else if([[table lowercaseString] isEqualToString:DEVICE_INDEX_TABLE]){
-            NSDictionary* deviceIndexData = [self parseJSON];
+            NSDictionary* deviceIndexData = [self parseJson:@"GenericIndexesData"];
             [self insertData:[deviceIndexData valueForKey:@"commandtype"] query:query_stmt];
         }
     }
 }
 
--(NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds{
++ (NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds{
     NSLog(@"getDevicesForIds");
     NSMutableDictionary *devices = [[NSMutableDictionary alloc]init];
     for(NSString *ID in deviceIds){
@@ -180,7 +179,7 @@ static sqlite3 *database = nil;
 }
 
 
--(NSMutableDictionary*)getDeviceIndexesForIds:(NSArray*)indexIds{
++ (NSMutableDictionary*)getDeviceIndexesForIds:(NSArray*)indexIds{
     NSMutableDictionary *deviceIndexes = [[NSMutableDictionary alloc]init];
     for(NSString *ID in indexIds){
         [deviceIndexes setValue:[self findByID:ID fromTable:DEVICE_INDEX_TABLE] forKey:ID];
@@ -190,11 +189,11 @@ static sqlite3 *database = nil;
 
 
 
--(void)deleteTable{
++ (void)deleteTable{
     NSLog(@"deleteTable");
     NSString *query = @"DELETE FROM deviceIndexDetail";
     const char *sqlStatement = [query UTF8String];
-    const char *dbpath = [_databasePath UTF8String];
+    const char *dbpath = [databasePath UTF8String];
     sqlite3_stmt *compiledStatement;
     if (sqlite3_open(dbpath, &database) == SQLITE_OK){
         if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK) {
@@ -210,11 +209,11 @@ static sqlite3 *database = nil;
 }
 
 
--(void)deleteDataBase{
++ (void)deleteDataBase{
     NSError *error;
     
-    if ([[NSFileManager defaultManager] isDeletableFileAtPath:_databasePath]) {
-        BOOL success = [[NSFileManager defaultManager] removeItemAtPath:_databasePath error:&error];
+    if ([[NSFileManager defaultManager] isDeletableFileAtPath:databasePath]) {
+        BOOL success = [[NSFileManager defaultManager] removeItemAtPath:databasePath error:&error];
         if (!success) {
             NSLog(@"Error removing file at path: %@", error.localizedDescription);
         }

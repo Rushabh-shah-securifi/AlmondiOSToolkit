@@ -11,21 +11,11 @@
 #import "SecurifiToolkit.h"
 #import "Device.h"
 #import "DeviceKnownValues.h"
+#import "DataBaseManager.h"
 
 @implementation DeviceParser
 
-- (instancetype)init {
-    self = [super init];
-    [self initNotification];
-    return self;
-}
-
--(void)initNotification{
-//    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-//    [center addObserver:self selector:@selector(onDeviceListResAndDynamicCallback:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
-}
-
--(void)commandTesting{
++(void)commandTesting{
     NSDictionary *devicelistresponsedata =@{
                                             @"MobileInternalIndex":@"<random key>",
                                             @"CommandType":@"DeviceList",
@@ -144,15 +134,15 @@
                                               }
                                     };
     
-    [self onDeviceListResAndDynamicCallback:devicelistresponsedata];
-    [self onDeviceListResAndDynamicCallback:dynamicDeviceAdded];
-    [self onDeviceListResAndDynamicCallback:dynamicDeviceUpdated];
-    [self onDeviceListResAndDynamicCallback:dynamicDeviceRemove];
-    [self onDeviceListResAndDynamicCallback:dynamicIndexUpdate];
-    [self onDeviceListResAndDynamicCallback:dynamicRemoveAll];
+    [self parseDeviceListAndDynamicDeviceResponse:devicelistresponsedata];
+    [self parseDeviceListAndDynamicDeviceResponse:dynamicDeviceAdded];
+    [self parseDeviceListAndDynamicDeviceResponse:dynamicDeviceUpdated];
+    [self parseDeviceListAndDynamicDeviceResponse:dynamicDeviceRemove];
+    [self parseDeviceListAndDynamicDeviceResponse:dynamicIndexUpdate];
+    [self parseDeviceListAndDynamicDeviceResponse:dynamicRemoveAll];
 }
 
--(void)onDeviceListResAndDynamicCallback:(id)sender{
++(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *dataInfo = [notifier userInfo];
     if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
@@ -234,6 +224,9 @@
             }
         }
     }
+    
+    toolkit.devicesJSON = [DataBaseManager getDevicesForIds:[Device getDeviceTypes]];
+    toolkit.indexesJSON = [DataBaseManager getDeviceIndexesForIds:[Device getGenericIndexes]];
 }
 
 
@@ -250,13 +243,13 @@
  }
  }"
  */
-- (Device *)parseDeviceForPayload:(NSDictionary *)payload {
++ (Device *)parseDeviceForPayload:(NSDictionary *)payload {
     Device *device = [Device new];
     [self updateDevice:device payload:payload];
     return device;
 }
 
-- (void)updateDevice:(Device*)device payload:(NSDictionary*)payload{
++ (void)updateDevice:(Device*)device payload:(NSDictionary*)payload{
     device.name = payload[@"Name"];
     device.location = payload[@"Location"];
     NSString *str;
@@ -269,7 +262,7 @@
 
 }
 
-- (NSMutableArray*)parseValues:(NSDictionary*)payload{
++ (NSMutableArray*)parseValues:(NSDictionary*)payload{
     NSMutableArray *values = [NSMutableArray array];
     for (NSString *index in payload) {
         NSDictionary *knownValuesDic = payload[index];
@@ -280,13 +273,13 @@
     return values;
 }
 
-- (DeviceKnownValues*)parseKnownValue:(NSDictionary *)payload {
++ (DeviceKnownValues*)parseKnownValue:(NSDictionary *)payload {
     DeviceKnownValues *values = [DeviceKnownValues new];
     [self updateKnownValue:payload knownValues:values];
     return values;
 }
 
--(void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
++ (void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
     NSString *index = payload[@"GenericIndex"];
     if (index.length > 0) {
         values.genericIndex = (unsigned int) index.intValue;

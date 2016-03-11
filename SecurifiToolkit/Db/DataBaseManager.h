@@ -11,9 +11,8 @@
 @interface DataBaseManager : NSObject
 
 //+(DBManager*)getSharedInstance;
-- (instancetype)initDB;
-- (void)deleteTable;
++(void)initializeDataBase;
 
--(NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds;
--(NSMutableDictionary*)getDeviceIndexesForIds:(NSArray*)indexIds;
++ (NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds;
++ (NSMutableDictionary*)getDeviceIndexesForIds:(NSArray*)indexIds;
 @end

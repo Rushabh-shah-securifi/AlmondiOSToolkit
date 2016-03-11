@@ -33,6 +33,7 @@
 // sent to the cloud to communicate this mode change.
 - (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(Device *)value;
 
-
-
++ (Device*)getDeviceForID:(sfi_id)deviceID;
++ (NSMutableArray*)getDeviceTypes;
++ (NSMutableArray*)getGenericIndexes;
 @end

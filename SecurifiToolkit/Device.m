@@ -7,7 +7,39 @@
 //
 
 #import "Device.h"
+#import "DeviceKnownValues.h"
+#import "SecurifiToolkit.h"
 
 @implementation Device
+
++(Device*)getDeviceForID:(sfi_id)deviceID{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    for(Device *device in toolkit.devices){
+        if(device.ID == deviceID){
+            return device;
+        }
+    }
+    return nil;
+}
+
++(NSMutableArray*)getDeviceTypes{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSMutableArray *deviceTypes = [NSMutableArray new];
+    for(Device *device in toolkit.devices){
+        [deviceTypes addObject:@(device.type).stringValue];
+    }
+    return deviceTypes;
+}
+
++(NSMutableArray*)getGenericIndexes{
+    NSMutableSet *typesSet = [NSMutableSet new];
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    for(Device *device in toolkit.devices){
+        for(DeviceKnownValues *knownValue in device.knownValues){
+            [typesSet addObject:@(knownValue.genericIndex).stringValue];
+        }
+    }
+    return [[typesSet allObjects] mutableCopy];
+}
 
 @end

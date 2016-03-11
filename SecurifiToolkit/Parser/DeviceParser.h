@@ -9,4 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface DeviceParser : NSObject
++(void)parseDeviceListAndDynamicDeviceResponse:(id)sender;
 @end
