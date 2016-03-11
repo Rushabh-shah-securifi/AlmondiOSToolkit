@@ -95,8 +95,9 @@
 
 - (void) callDummyCloud:(id)payload commandType:(enum CommandType)commandType{
     
-    NSLog(@" inside calldummycloud ");
+    NSLog(@" inside dummy cloud end point - delegation ");
     [self.delegate networkEndpoint:self dispatchResponse:payload commandType:(CommandType) commandType];
+    return;
 
 }
 
