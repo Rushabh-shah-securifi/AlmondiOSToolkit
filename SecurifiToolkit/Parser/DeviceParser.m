@@ -143,20 +143,21 @@
 }
 
 +(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *dataInfo = [notifier userInfo];
-    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
-        return;
-    }
+//    NSNotification *notifier = (NSNotification *) sender;
+//    NSDictionary *dataInfo = [notifier userInfo];
+//    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
+//        return;
+//    }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *almond = [toolkit currentAlmond];
     BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
-    if(local){
-        payload = [dataInfo valueForKey:@"data"];
-    }else{
-        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-    }
+//    if(local){
+//        payload = [dataInfo valueForKey:@"data"];
+//    }else{
+//        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+//    }
+    payload = [self parseJson:@"DeviceListResponse"];
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
@@ -287,4 +288,20 @@
     values.valueName = payload[@"Name"];
     values.value = payload[@"Value"];
 }
+
++(NSDictionary*)parseJson:(NSString*)fileName{
+    NSError *error = nil;
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName
+                                                         ofType:@"json"];
+    NSData *dataFromFile = [NSData dataWithContentsOfFile:filePath];
+    NSDictionary *data = [NSJSONSerialization JSONObjectWithData:dataFromFile
+                                                         options:kNilOptions
+                                                           error:&error];
+    
+    if (error != nil) {
+        NSLog(@"Error: was not able to load json file: %@.",fileName);
+    }
+    return data;
+}
+
 @end
