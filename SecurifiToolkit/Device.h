@@ -9,9 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SecurifiTypes.h"
 
-@class SFIDeviceKnownValues;
-
-@interface Device : NSObject <NSCoding, NSCopying>
+@interface Device : NSObject
 
 @property(nonatomic) int type;
 @property(nonatomic) sfi_id ID;
@@ -36,4 +34,5 @@
 + (Device*)getDeviceForID:(sfi_id)deviceID;
 + (NSMutableArray*)getDeviceTypes;
 + (NSMutableArray*)getGenericIndexes;
++ (NSString*)getValueForGenericIndex:(NSString*)genericIndex forDevice:(Device*)device;
 @end

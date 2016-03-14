@@ -158,9 +158,9 @@
 //        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
 //    }
     payload = [self parseJson:@"DeviceListResponse"];
-    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-    if(!isMatchingAlmondOrLocal) //for cloud
-        return;
+//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+//    if(!isMatchingAlmondOrLocal) //for cloud
+//        return;
     
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"DeviceList"]){
         NSDictionary *devicesPayload = payload[@"Devices"];
@@ -225,9 +225,9 @@
             }
         }
     }
-    
     toolkit.devicesJSON = [DataBaseManager getDevicesForIds:[Device getDeviceTypes]];
-    toolkit.indexesJSON = [DataBaseManager getDeviceIndexesForIds:[Device getGenericIndexes]];
+    toolkit.genericIndexesJson = [DataBaseManager getDeviceIndexesForIds:[Device getGenericIndexes]];
+//    NSLog(@"devices json: %@, indexesjson: %@", toolkit.devicesJSON, toolkit.indexesJSON);
 }
 
 

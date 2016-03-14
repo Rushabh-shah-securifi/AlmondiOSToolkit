@@ -24,11 +24,11 @@
 
 +(NSMutableArray*)getDeviceTypes{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSMutableArray *deviceTypes = [NSMutableArray new];
+    NSMutableSet *deviceTypes = [NSMutableSet new];
     for(Device *device in toolkit.devices){
         [deviceTypes addObject:@(device.type).stringValue];
     }
-    return deviceTypes;
+    return [[deviceTypes allObjects] mutableCopy];
 }
 
 +(NSMutableArray*)getGenericIndexes{
@@ -40,6 +40,15 @@
         }
     }
     return [[typesSet allObjects] mutableCopy];
+}
+
++(NSString*)getValueForGenericIndex:(NSString*)genericIndex forDevice:(Device*)device{
+    for(DeviceKnownValues *knownValue in device.knownValues){
+        if(knownValue.genericIndex == genericIndex.intValue){
+            return knownValue.value;
+        }
+    }
+    return nil;
 }
 
 @end

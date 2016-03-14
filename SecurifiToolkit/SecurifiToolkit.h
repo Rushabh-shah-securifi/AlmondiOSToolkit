@@ -172,7 +172,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 @property(nonatomic)NSMutableArray *ruleList;
 @property(nonatomic)NSDictionary *devicesJSON;
-@property(nonatomic)NSDictionary *indexesJSON;
+@property(nonatomic)NSDictionary *genericIndexesJson;
 
 
 + (BOOL)isInitialized;

@@ -199,11 +199,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.ruleParser=[[RuleParser alloc]init];
     self.sceneListener=[[SceneListener alloc]init];
     self.clientParser=[[Parser alloc]init];
-//    self.deviceParser = [[DeviceParser alloc]init];
-    
-    DataBaseManager *dataBaseManager = [[DataBaseManager alloc]initDB];
-    _devicesJSON = [dataBaseManager getDevicesForIds:@[]];
-    _indexesJSON = [dataBaseManager getDeviceIndexesForIds:@[]];
+    self.deviceParser = [[DeviceParser alloc]init];
+    [DataBaseManager initializeDataBase];
+//    DataBaseManager *dataBaseManager = [[DataBaseManager alloc]initDB];
+//    _devicesJSON = [dataBaseManager getDevicesForIds:@[]];
+//    _indexesJSON = [dataBaseManager getDeviceIndexesForIds:@[]];
 }
 
 #pragma mark - Connection management
