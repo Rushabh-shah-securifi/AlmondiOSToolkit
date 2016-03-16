@@ -169,10 +169,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(nonatomic)NSMutableArray *scenesArray;
 @property(nonatomic)NSMutableArray *wifiClientParser;
 @property(nonatomic)NSMutableArray *devices;
-
 @property(nonatomic)NSMutableArray *ruleList;
-@property(nonatomic)NSDictionary *devicesJSON;
-@property(nonatomic)NSDictionary *genericIndexesJson;
+@property(nonatomic)NSDictionary *genericDevices;
+@property(nonatomic)NSDictionary *genericIndexes;
 
 
 + (BOOL)isInitialized;

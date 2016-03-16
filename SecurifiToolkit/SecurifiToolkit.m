@@ -201,9 +201,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.clientParser=[[Parser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
     [DataBaseManager initializeDataBase];
-//    DataBaseManager *dataBaseManager = [[DataBaseManager alloc]initDB];
-//    _devicesJSON = [dataBaseManager getDevicesForIds:@[]];
-//    _indexesJSON = [dataBaseManager getDeviceIndexesForIds:@[]];
 }
 
 #pragma mark - Connection management

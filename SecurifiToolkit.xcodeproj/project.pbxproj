@@ -206,6 +206,23 @@
 		22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22B326D11796D659004B3642 /* PrivateCommandTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22FAE88817A8E528002FFEE8 /* Signup.h in Headers */ = {isa = PBXBuildFile; fileRef = 22FAE88617A8E528002FFEE8 /* Signup.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22FAE88917A8E528002FFEE8 /* Signup.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FAE88717A8E528002FFEE8 /* Signup.m */; };
+		A52163FE1C983E4E00E7B79D /* Formatter.h in Headers */ = {isa = PBXBuildFile; fileRef = A52163F61C983E4E00E7B79D /* Formatter.h */; };
+		A52163FF1C983E4E00E7B79D /* Formatter.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163F71C983E4E00E7B79D /* Formatter.m */; };
+		A52164001C983E4E00E7B79D /* Formatter.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163F71C983E4E00E7B79D /* Formatter.m */; };
+		A52164011C983E4E00E7B79D /* GenericDeviceClass.h in Headers */ = {isa = PBXBuildFile; fileRef = A52163F81C983E4E00E7B79D /* GenericDeviceClass.h */; };
+		A52164021C983E4E00E7B79D /* GenericDeviceClass.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163F91C983E4E00E7B79D /* GenericDeviceClass.m */; };
+		A52164031C983E4E00E7B79D /* GenericDeviceClass.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163F91C983E4E00E7B79D /* GenericDeviceClass.m */; };
+		A52164041C983E4E00E7B79D /* GenericIndexClass.h in Headers */ = {isa = PBXBuildFile; fileRef = A52163FA1C983E4E00E7B79D /* GenericIndexClass.h */; };
+		A52164051C983E4E00E7B79D /* GenericIndexClass.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163FB1C983E4E00E7B79D /* GenericIndexClass.m */; };
+		A52164061C983E4E00E7B79D /* GenericIndexClass.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163FB1C983E4E00E7B79D /* GenericIndexClass.m */; };
+		A52164071C983E4E00E7B79D /* GenericValue.h in Headers */ = {isa = PBXBuildFile; fileRef = A52163FC1C983E4E00E7B79D /* GenericValue.h */; };
+		A52164081C983E4E00E7B79D /* GenericValue.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163FD1C983E4E00E7B79D /* GenericValue.m */; };
+		A52164091C983E4E00E7B79D /* GenericValue.m in Sources */ = {isa = PBXBuildFile; fileRef = A52163FD1C983E4E00E7B79D /* GenericValue.m */; };
+		A52164101C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */; };
+		A52164131C984AB700E7B79D /* GenericIndexValue.h in Headers */ = {isa = PBXBuildFile; fileRef = A52164111C984AB700E7B79D /* GenericIndexValue.h */; };
+		A52164141C984AB700E7B79D /* GenericIndexValue.m in Sources */ = {isa = PBXBuildFile; fileRef = A52164121C984AB700E7B79D /* GenericIndexValue.m */; };
+		A52164171C9927D400E7B79D /* DeviceIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = A52164151C9927D400E7B79D /* DeviceIndex.h */; };
+		A52164181C9927D400E7B79D /* DeviceIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = A52164161C9927D400E7B79D /* DeviceIndex.m */; };
 		A54EAF9B1C44D8D800CF2837 /* Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAF991C44D8D800CF2837 /* Parser.h */; };
 		A54EAF9C1C44D8D800CF2837 /* Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAF9A1C44D8D800CF2837 /* Parser.m */; };
 		A54EAFB01C44DC4A00CF2837 /* SceneListener.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */; };
@@ -321,22 +338,22 @@
 		CEED64301C7C351E008A7412 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED642E1C7C351E008A7412 /* Device.m */; };
 		CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED64311C7C370E008A7412 /* DeviceKnownValues.h */; };
 		CEED64341C7C370E008A7412 /* DeviceKnownValues.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED64321C7C370E008A7412 /* DeviceKnownValues.m */; };
-		CEF6F4911C92CA1A00C68975 /* CommandMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F48A1C92CA1A00C68975 /* CommandMapping.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4921C92CA1A00C68975 /* CommandObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F48C1C92CA1A00C68975 /* CommandObject.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4931C92CA1A00C68975 /* dummyCloudEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F48E1C92CA1A00C68975 /* dummyCloudEndpoint.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4941C92CA1A00C68975 /* MockCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4901C92CA1A00C68975 /* MockCloud.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F49E1C92CAAF00C68975 /* Rule.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F4961C92CAAF00C68975 /* Rule.h */; settings = {ASSET_TAGS = (); }; };
-		CEF6F49F1C92CAAF00C68975 /* Rule.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4971C92CAAF00C68975 /* Rule.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A01C92CAAF00C68975 /* Rule.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4971C92CAAF00C68975 /* Rule.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A11C92CAAF00C68975 /* RuleParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F4981C92CAAF00C68975 /* RuleParser.h */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A21C92CAAF00C68975 /* RuleParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4991C92CAAF00C68975 /* RuleParser.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A31C92CAAF00C68975 /* RuleParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4991C92CAAF00C68975 /* RuleParser.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A41C92CAAF00C68975 /* RulesTimeElement.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49A1C92CAAF00C68975 /* RulesTimeElement.h */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A51C92CAAF00C68975 /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A61C92CAAF00C68975 /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; settings = {ASSET_TAGS = (); }; };
-		CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; settings = {ASSET_TAGS = (); }; };
+		CEF6F4911C92CA1A00C68975 /* CommandMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F48A1C92CA1A00C68975 /* CommandMapping.m */; };
+		CEF6F4921C92CA1A00C68975 /* CommandObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F48C1C92CA1A00C68975 /* CommandObject.m */; };
+		CEF6F4931C92CA1A00C68975 /* dummyCloudEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F48E1C92CA1A00C68975 /* dummyCloudEndpoint.m */; };
+		CEF6F4941C92CA1A00C68975 /* MockCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4901C92CA1A00C68975 /* MockCloud.m */; };
+		CEF6F49E1C92CAAF00C68975 /* Rule.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F4961C92CAAF00C68975 /* Rule.h */; };
+		CEF6F49F1C92CAAF00C68975 /* Rule.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4971C92CAAF00C68975 /* Rule.m */; };
+		CEF6F4A01C92CAAF00C68975 /* Rule.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4971C92CAAF00C68975 /* Rule.m */; };
+		CEF6F4A11C92CAAF00C68975 /* RuleParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F4981C92CAAF00C68975 /* RuleParser.h */; };
+		CEF6F4A21C92CAAF00C68975 /* RuleParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4991C92CAAF00C68975 /* RuleParser.m */; };
+		CEF6F4A31C92CAAF00C68975 /* RuleParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F4991C92CAAF00C68975 /* RuleParser.m */; };
+		CEF6F4A41C92CAAF00C68975 /* RulesTimeElement.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49A1C92CAAF00C68975 /* RulesTimeElement.h */; };
+		CEF6F4A51C92CAAF00C68975 /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */; };
+		CEF6F4A61C92CAAF00C68975 /* RulesTimeElement.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */; };
+		CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */; };
+		CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
+		CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -565,6 +582,19 @@
 		22B326D11796D659004B3642 /* PrivateCommandTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrivateCommandTypes.h; sourceTree = "<group>"; };
 		22FAE88617A8E528002FFEE8 /* Signup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Signup.h; sourceTree = "<group>"; };
 		22FAE88717A8E528002FFEE8 /* Signup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Signup.m; sourceTree = "<group>"; };
+		A52163F61C983E4E00E7B79D /* Formatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Formatter.h; sourceTree = "<group>"; };
+		A52163F71C983E4E00E7B79D /* Formatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Formatter.m; sourceTree = "<group>"; };
+		A52163F81C983E4E00E7B79D /* GenericDeviceClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericDeviceClass.h; sourceTree = "<group>"; };
+		A52163F91C983E4E00E7B79D /* GenericDeviceClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericDeviceClass.m; sourceTree = "<group>"; };
+		A52163FA1C983E4E00E7B79D /* GenericIndexClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericIndexClass.h; sourceTree = "<group>"; };
+		A52163FB1C983E4E00E7B79D /* GenericIndexClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericIndexClass.m; sourceTree = "<group>"; };
+		A52163FC1C983E4E00E7B79D /* GenericValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericValue.h; sourceTree = "<group>"; };
+		A52163FD1C983E4E00E7B79D /* GenericValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericValue.m; sourceTree = "<group>"; };
+		A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondJsonCommandKeyConstants.h; sourceTree = "<group>"; };
+		A52164111C984AB700E7B79D /* GenericIndexValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericIndexValue.h; sourceTree = "<group>"; };
+		A52164121C984AB700E7B79D /* GenericIndexValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericIndexValue.m; sourceTree = "<group>"; };
+		A52164151C9927D400E7B79D /* DeviceIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceIndex.h; sourceTree = "<group>"; };
+		A52164161C9927D400E7B79D /* DeviceIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceIndex.m; sourceTree = "<group>"; };
 		A54EAF991C44D8D800CF2837 /* Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Parser.h; sourceTree = "<group>"; };
 		A54EAF9A1C44D8D800CF2837 /* Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Parser.m; sourceTree = "<group>"; };
 		A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneListener.h; sourceTree = "<group>"; };
@@ -1055,6 +1085,7 @@
 		221185BF178D371200EE23ED /* SecurifiToolkit */ = {
 			isa = PBXGroup;
 			children = (
+				A52163F51C983E4E00E7B79D /* GenericIndexSupport */,
 				CEF6F4951C92CAAF00C68975 /* Rules */,
 				A54EAF981C44D8C700CF2837 /* WiFiClients */,
 				1C3EEFB81B37999300DFCF62 /* Almond */,
@@ -1071,13 +1102,14 @@
 				22A76D2417912B6E0099CD8F /* public */,
 				1C2F60531B69D5B9001CCA34 /* Scenes */,
 				221185C0178D371200EE23ED /* Supporting Files */,
-				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
 				1DF033C921E5DB9FD7468346 /* XMLWriter-1.0.4-MIT */,
 				1DF035609133676CE2B94C18 /* xml */,
-				1DF037E41986B5D077457BCB /* SecurifiTypes.h */,
 				1DF03F78AD630FEC5A752AC1 /* Login */,
-				1DF03C0E4702BF52858C839B /* SecurifiTypes.m */,
 				1DF038E69924C128D665E4C7 /* Parser */,
+				1DF037E41986B5D077457BCB /* SecurifiTypes.h */,
+				1DF03C0E4702BF52858C839B /* SecurifiTypes.m */,
+				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
+				A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */,
 			);
 			path = SecurifiToolkit;
 			sourceTree = "<group>";
@@ -1237,6 +1269,25 @@
 			name = parser;
 			sourceTree = "<group>";
 		};
+		A52163F51C983E4E00E7B79D /* GenericIndexSupport */ = {
+			isa = PBXGroup;
+			children = (
+				A52163F61C983E4E00E7B79D /* Formatter.h */,
+				A52163F71C983E4E00E7B79D /* Formatter.m */,
+				A52163F81C983E4E00E7B79D /* GenericDeviceClass.h */,
+				A52163F91C983E4E00E7B79D /* GenericDeviceClass.m */,
+				A52163FA1C983E4E00E7B79D /* GenericIndexClass.h */,
+				A52163FB1C983E4E00E7B79D /* GenericIndexClass.m */,
+				A52164111C984AB700E7B79D /* GenericIndexValue.h */,
+				A52164121C984AB700E7B79D /* GenericIndexValue.m */,
+				A52163FC1C983E4E00E7B79D /* GenericValue.h */,
+				A52163FD1C983E4E00E7B79D /* GenericValue.m */,
+				A52164151C9927D400E7B79D /* DeviceIndex.h */,
+				A52164161C9927D400E7B79D /* DeviceIndex.m */,
+			);
+			path = GenericIndexSupport;
+			sourceTree = "<group>";
+		};
 		A54EAF981C44D8C700CF2837 /* WiFiClients */ = {
 			isa = PBXGroup;
 			children = (
@@ -1344,6 +1395,7 @@
 				CE5EB64E17EAD41F00985636 /* DeviceValueRequest.h in Headers */,
 				CE5EB63917E852E500985636 /* SFIDevice.h in Headers */,
 				CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */,
+				A52164071C983E4E00E7B79D /* GenericValue.h in Headers */,
 				CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */,
 				1CFBB54F1A257D1900438B5F /* SecurifiConfigurator.h in Headers */,
 				1CD1D5541A660B7A00C030E9 /* NotificationRegistration.h in Headers */,
@@ -1374,6 +1426,7 @@
 				1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */,
 				CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */,
 				CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */,
+				A52164011C983E4E00E7B79D /* GenericDeviceClass.h in Headers */,
 				CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */,
 				CEAD85A919CABCBE006D1048 /* DeleteAccountResponse.h in Headers */,
 				CEAD85AD19CACE43006D1048 /* UpdateUserProfileRequest.h in Headers */,
@@ -1381,6 +1434,9 @@
 				CE91317119C9A2F900D94876 /* ChangePasswordResponse.h in Headers */,
 				1C3270E41A243B28007202C1 /* SFIRouterSummary.h in Headers */,
 				CEAD85B119CAEED1006D1048 /* UpdateUserProfileResponse.h in Headers */,
+				A52164131C984AB700E7B79D /* GenericIndexValue.h in Headers */,
+				A52164041C983E4E00E7B79D /* GenericIndexClass.h in Headers */,
+				A52164171C9927D400E7B79D /* DeviceIndex.h in Headers */,
 				1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */,
 				CE5EB65217EAD43000985636 /* DeviceValueResponse.h in Headers */,
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
@@ -1399,6 +1455,7 @@
 				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
 				1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */,
+				A52163FE1C983E4E00E7B79D /* Formatter.h in Headers */,
 				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
 				CE2EA26D19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h in Headers */,
 				1CD1D54E1A660B7A00C030E9 /* NotificationPreferenceListResponse.h in Headers */,
@@ -1409,6 +1466,7 @@
 				1CD1D54C1A660B7A00C030E9 /* NotificationPreferenceListRequest.h in Headers */,
 				1CD1D55A1A660B7A00C030E9 /* SFINotificationUser.h in Headers */,
 				CE2EA25919D03FB800C6D6A8 /* DeleteSecondaryUserRequest.h in Headers */,
+				A52164101C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h in Headers */,
 				CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */,
 				CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */,
 				1CE67A311A91D7670004E68C /* AlmondModeChangeRequest.h in Headers */,
@@ -1620,8 +1678,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
+				A52164051C983E4E00E7B79D /* GenericIndexClass.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
 				CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */,
+				A52164021C983E4E00E7B79D /* GenericDeviceClass.m in Sources */,
 				CE466A5C1823C50700E55DF9 /* ValidateAccountResponse.m in Sources */,
 				CE5EB64217E8549200985636 /* DeviceDataHashResponse.m in Sources */,
 				CE5EB63517E82CB400985636 /* DeviceListRequest.m in Sources */,
@@ -1640,6 +1700,7 @@
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
 				1C2F60571B69D5B9001CCA34 /* ScenesListRequest.m in Sources */,
+				A52164081C983E4E00E7B79D /* GenericValue.m in Sources */,
 				1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */,
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
 				1CD1D5591A660B7A00C030E9 /* SFINotificationDevice.m in Sources */,
@@ -1680,6 +1741,7 @@
 				1C3EEFC21B37999300DFCF62 /* SFIConnectedDevice.m in Sources */,
 				A54EAFB11C44DC4A00CF2837 /* SceneListener.m in Sources */,
 				CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */,
+				A52164141C984AB700E7B79D /* GenericIndexValue.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
 				1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */,
 				1CD1D54D1A660B7A00C030E9 /* NotificationPreferenceListRequest.m in Sources */,
@@ -1722,6 +1784,7 @@
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
 				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
 				1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */,
+				A52164181C9927D400E7B79D /* DeviceIndex.m in Sources */,
 				1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */,
 				1DF03FF5727F64CF4EDF5625 /* SFIXmlWriter.m in Sources */,
 				1DF033DD3C09A20ED5A7AEF9 /* SFINotification.m in Sources */,
@@ -1757,6 +1820,7 @@
 				1DF03F559DD7C482A3D38939 /* LogoutAllResponse.m in Sources */,
 				1DF03FE22D7AB1C44290B0BC /* CommandTypeScoreboardEvent.m in Sources */,
 				1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */,
+				A52163FF1C983E4E00E7B79D /* Formatter.m in Sources */,
 				1DF030BA38ACE415D8B22060 /* SecurifiTypes.m in Sources */,
 				1DF03A369FB69FD247EF53C4 /* NSData+Securifi.m in Sources */,
 				1DF037EFF36E54E1F5BEEFB5 /* RouterCommandParser.m in Sources */,
@@ -1772,11 +1836,15 @@
 				CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */,
 				CEF6F4A31C92CAAF00C68975 /* RuleParser.m in Sources */,
 				CEF6F4A01C92CAAF00C68975 /* Rule.m in Sources */,
+				A52164001C983E4E00E7B79D /* Formatter.m in Sources */,
 				CEF6F4931C92CA1A00C68975 /* dummyCloudEndpoint.m in Sources */,
 				CEF6F4921C92CA1A00C68975 /* CommandObject.m in Sources */,
 				CEF6F4911C92CA1A00C68975 /* CommandMapping.m in Sources */,
+				A52164061C983E4E00E7B79D /* GenericIndexClass.m in Sources */,
 				CEF6F4941C92CA1A00C68975 /* MockCloud.m in Sources */,
+				A52164031C983E4E00E7B79D /* GenericDeviceClass.m in Sources */,
 				CEF6F4A61C92CAAF00C68975 /* RulesTimeElement.m in Sources */,
+				A52164091C983E4E00E7B79D /* GenericValue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
