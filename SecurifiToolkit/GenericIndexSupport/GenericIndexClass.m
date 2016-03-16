@@ -12,7 +12,7 @@
 -(id)initWithLabel:(NSString*)label icon:(NSString*)icon identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType{
     self = [super init];
     if(self){
-        self.label = label;
+        self.groupLabel = label;
         self.icon = icon;
         self.ID = ID;
         self.placement = placement;

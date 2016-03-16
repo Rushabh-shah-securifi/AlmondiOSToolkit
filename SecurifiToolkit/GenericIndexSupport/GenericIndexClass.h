@@ -10,10 +10,11 @@
 #import "Formatter.h"
 
 @interface GenericIndexClass : NSObject
-@property NSString *label;
+@property NSString *groupLabel;
 @property NSString *icon;
 @property NSString *ID;
 @property NSString *placement;
+@property BOOL readOnly;
 @property NSDictionary *values;
 @property Formatter *formatter;
 @property NSString* layoutType;

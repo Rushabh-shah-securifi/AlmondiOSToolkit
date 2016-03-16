@@ -164,9 +164,9 @@
     //        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
     //    }
     payload = [self parseJson:@"DeviceListResponse"];
-    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-    if(!isMatchingAlmondOrLocal) //for cloud
-        return;
+//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+//    if(!isMatchingAlmondOrLocal) //for cloud
+//        return;
     
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"DeviceList"]){
         NSDictionary *devicesPayload = payload[@"Devices"];
@@ -311,6 +311,7 @@
                                              values:[self createGenericValues:genericIndexDict[VALUES]]
                                              formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
                                              layoutType:genericIndexDict[LAYOUT]];
+    genericIndexObject.readOnly = genericIndexDict[READ_ONLY];
     return genericIndexObject;
 }
 
