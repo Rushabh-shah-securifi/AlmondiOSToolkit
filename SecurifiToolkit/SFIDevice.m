@@ -117,7 +117,8 @@
         case SFIDeviceType_GarageDoorOpener_53: {
             return SFIDevicePropertyType_BARRIER_OPERATOR;
         }
-            
+         case SFIDeviceType_RollerShutter_52:
+            return SFIDevicePropertyType_SWITCH_MULTILEVEL;
             // Not implemented devices
         case SFIDeviceType_UnknownDevice_0:
         case SFIDeviceType_Thermostat_7:
@@ -138,7 +139,7 @@
         case SFIDeviceType_NestSmokeDetector_58:
         case SFIDeviceType_NestThermostat_57:
         case SFIDeviceType_51:
-        case SFIDeviceType_RollerShutter_52:
+        
         default: {
             return SFIDevicePropertyType_STATE;
         }
@@ -175,7 +176,8 @@
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
         case SFIDeviceType_GarageDoorOpener_53:
-        case SFIDeviceType_BuiltInSiren_60: {
+        case SFIDeviceType_BuiltInSiren_60:
+        case SFIDeviceType_RollerShutter_52:{
             return YES;
         }
             
@@ -357,6 +359,15 @@
                 [deviceValues setBoolValue:!deviceValues.boolValue];
             }
             break;
+            
+        }
+        case SFIDeviceType_RollerShutter_52:{
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
+            if (deviceValues.hasValue && [deviceValues.value intValue]>0) {
+                [deviceValues setIntValue:0];
+            }else
+                [deviceValues setIntValue:99];
+            break;
         }
             
         default: {
@@ -430,8 +441,7 @@
             break;
         case SFIDeviceType_51:
             break;
-        case SFIDeviceType_RollerShutter_52:
-            break;
+       
     } // end switch
     
     return deviceValues; // can be nil
