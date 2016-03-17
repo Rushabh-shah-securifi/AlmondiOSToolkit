@@ -271,8 +271,8 @@
     GenericDeviceClass *genericDeviceObject = [[GenericDeviceClass alloc] initWithName:genericDeviceDict[DEVICE_NAME]
                                                                                   type:genericDeviceDict[deviceType]
                                                                            defaultIcon:genericDeviceDict[DEVICE_DEFAULT_ICON]
-                                                                            isActuator:genericDeviceDict[IS_ACTUATOR]
-                                                                       isTriggerDevice:genericDeviceDict[IS_TRIGGER_DEVICE]
+                                                                            isActuator:[genericDeviceDict[IS_ACTUATOR] boolValue]
+                                                                       isTriggerDevice:[genericDeviceDict[IS_TRIGGER_DEVICE] boolValue]
                                                                                indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]]];
     return genericDeviceObject;
     
@@ -297,27 +297,28 @@
     GenericIndexClass *genericIndexObject;
     NSMutableDictionary *mutableGenericIndex = [NSMutableDictionary new];
     for(NSString *genericIndexID in genericIndexKeys){
-        genericIndexObject = [self createGenericIndexForDic:genericIndexesDict[genericIndexID] forID:genericIndexID];
+        genericIndexObject = [self createGenericIndexForDic:genericIndexesDict[genericIndexID]
+                                                      forID:genericIndexID];
         [mutableGenericIndex setObject:genericIndexObject forKey:genericIndexID];
     }
     return mutableGenericIndex;
 }
 +(GenericIndexClass*)createGenericIndexForDic:(NSDictionary*)genericIndexDict forID:(NSString*)ID{
     GenericIndexClass *genericIndexObject = [[GenericIndexClass alloc]
-                                             initWithLabel:genericIndexDict[LABEL]
+                                             initWithLabel:genericIndexDict[GROUP_LABEL]
                                              icon:genericIndexDict[INDEX_DEFAULT_ICON]
                                              identifier:ID
                                              placement:genericIndexDict[PLACEMENT]
                                              values:[self createGenericValues:genericIndexDict[VALUES]]
                                              formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
                                              layoutType:genericIndexDict[LAYOUT]];
-    genericIndexObject.readOnly = genericIndexDict[READ_ONLY];
+    genericIndexObject.readOnly = [genericIndexDict[READ_ONLY] boolValue];
     return genericIndexObject;
 }
 
 +(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
     if(formatterDict){
-        Formatter *formatter = [[Formatter alloc]initWithFactor:[formatterDict[FACTOR] floatValue] min:[formatterDict[MIN] intValue] max:[formatterDict[MAX] intValue] units:formatterDict[UNIT]];
+        Formatter *formatter = [[Formatter alloc]initWithFactor:[formatterDict[FACTOR] floatValue] min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT]];
         return formatter;
     }
     return nil;

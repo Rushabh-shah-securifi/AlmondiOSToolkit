@@ -31,11 +31,20 @@
 #define LABEL @"Label"
 
 #define FORMATTER @"Formatter"
-#define MIN @"Min"
-#define MAX @"Max"
+#define MINMUM @"Min"
+#define MAXIMUM @"Max"
 #define RANGE @"Range"
 #define UNIT @"Unit"
-#define FACTOR @"FACTOR"
+#define FACTOR @"Factor"
+
+//value constants
+#define TRUE_ @"true"
+#define SLIDER @"Slider"
+#define BUTTON @"Button"
+#define HUE @"Hue"
+#define HUE_SLIDER @"HueSlider"
+#define TEXT_INPUT @"textInput"
+
 
 
 //generic device key constants
