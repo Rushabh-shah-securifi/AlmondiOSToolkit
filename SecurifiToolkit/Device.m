@@ -9,6 +9,9 @@
 #import "Device.h"
 #import "DeviceKnownValues.h"
 #import "SecurifiToolkit.h"
+#import "AlmondJsonCommandKeyConstants.h"
+#import "GenericDeviceClass.h"
+#import "DeviceIndex.h"
 
 @implementation Device
 
@@ -32,23 +35,17 @@
 }
 
 +(NSMutableArray*)getGenericIndexes{
-    NSMutableSet *typesSet = [NSMutableSet new];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSMutableSet *genericIndexesSet = [NSMutableSet new];
     for(Device *device in toolkit.devices){
-        for(DeviceKnownValues *knownValue in device.knownValues){
-            [typesSet addObject:@(knownValue.genericIndex).stringValue];
+        GenericDeviceClass *genericDeviceObj = toolkit.genericDevices[@(device.type).stringValue];
+        for(NSString *index in genericDeviceObj.Indexes.allKeys){
+            DeviceIndex *indexObj = genericDeviceObj.Indexes[index];
+            [genericIndexesSet addObject:indexObj.genericIndex];
         }
     }
-    return [[typesSet allObjects] mutableCopy];
+    return [[genericIndexesSet allObjects] mutableCopy];
 }
 
-+(NSString*)getValueForGenericIndex:(NSString*)genericIndex forDevice:(Device*)device{
-    for(DeviceKnownValues *knownValue in device.knownValues){
-        if(knownValue.genericIndex == genericIndex.intValue){
-            return knownValue.value;
-        }
-    }
-    return nil;
-}
 
 @end

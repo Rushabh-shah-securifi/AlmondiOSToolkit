@@ -34,5 +34,4 @@
 + (Device*)getDeviceForID:(sfi_id)deviceID;
 + (NSMutableArray*)getDeviceTypes;
 + (NSMutableArray*)getGenericIndexes;
-+ (NSString*)getValueForGenericIndex:(NSString*)genericIndex forDevice:(Device*)device;
 @end

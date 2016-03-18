@@ -34,17 +34,14 @@
                                                             @"DeviceValues":@{
                                                                     @"1":@{
                                                                             @"Name":@"STATE",
-                                                                            @"GenericIndex":@"50",
                                                                             @"Value":@"true"
                                                                             },
                                                                     @"2":@{
                                                                             @"Name":@"LOW BATTERY",
-                                                                            @"GenericIndex":@"50",
                                                                             @"Value":@"0"
                                                                             },
                                                                     @"3":@{
                                                                             @"Name":@"TAMPER",
-                                                                            @"GenericIndex":@"50",
                                                                             @"Value":@"true"
                                                                             }
                                                                     }
@@ -57,7 +54,6 @@
                                                             @"DeviceValues":@{
                                                                     @"1":@{
                                                                             @"Name":@"SWITCH BINARY",
-                                                                            @"GenericIndex":@"50",
                                                                             @"Value":@"true"
                                                                             }
                                                                     }
@@ -74,17 +70,14 @@
                                                          @"DeviceValues":@{
                                                                  @"1":@{
                                                                          @"Name":@"STATE",
-                                                                         @"GenericIndex":@"50",
                                                                          @"Value":@"true"
                                                                          },
                                                                  @"2":@{
                                                                          @"Name":@"LOW BATTERY",
-                                                                         @"GenericIndex":@"50",
                                                                          @"Value":@"0"
                                                                          },
                                                                  @"3":@{
                                                                          @"Name":@"TAMPER",
-                                                                         @"GenericIndex":@"50",
                                                                          @"Value":@"true"
                                                                          }
                                                                  }
@@ -102,17 +95,14 @@
                                                            @"DeviceValues":@{
                                                                    @"1":@{
                                                                            @"Name":@"STATE",
-                                                                           @"GenericIndex":@"50",
                                                                            @"Value":@"true"
                                                                            },
                                                                    @"2":@{
                                                                            @"Name":@"LOW BATTERY",
-                                                                           @"GenericIndex":@"50",
                                                                            @"Value":@"10"
                                                                            },
                                                                    @"3":@{
                                                                            @"Name":@"TAMPER",
-                                                                           @"GenericIndex":@"50",
                                                                            @"Value":@"true"
                                                                            }
                                                                    }
@@ -133,7 +123,6 @@
                                                  @"3":@{
                                                          @"2":@{
                                                                  @"Name":@"LOW BATTERY",
-                                                                 @"GenericIndex":@"50",
                                                                  @"Value":@"20"
                                                                  },
                                                          }
@@ -148,25 +137,38 @@
     [self parseDeviceListAndDynamicDeviceResponse:dynamicRemoveAll];
 }
 
+- (instancetype)init {
+    self = [super init];
+    [self initNotification];
+    
+    return self;
+}
+-(void)initNotification{
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(onRuleListResponse:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
+}
+
 +(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
-    //    NSNotification *notifier = (NSNotification *) sender;
-    //    NSDictionary *dataInfo = [notifier userInfo];
-    //    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
-    //        return;
-    //    }
+    NSLog(@"parseDeviceListAndDynamicDeviceResponse");
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *dataInfo = [notifier userInfo];
+    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
+        return;
+    }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *almond = [toolkit currentAlmond];
     BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
-    //    if(local){
-    //        payload = [dataInfo valueForKey:@"data"];
-    //    }else{
-    //        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-    //    }
-    payload = [self parseJson:@"DeviceListResponse"];
-//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-//    if(!isMatchingAlmondOrLocal) //for cloud
-//        return;
+    if(local){
+        payload = [dataInfo valueForKey:@"data"];
+    }else{
+        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+    }
+//    payload = [self parseJson:@"DeviceListResponse"];
+    NSLog(@"payload: %@", payload);
+    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
     
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"DeviceList"]){
         NSDictionary *devicesPayload = payload[@"Devices"];
@@ -376,10 +378,6 @@
 }
 
 + (void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
-    NSString *index = payload[@"GenericIndex"];
-    if (index.length > 0) {
-        values.genericIndex = (unsigned int) index.intValue;
-    }
     values.valueName = payload[@"Name"];
     values.value = payload[@"Value"];
 }

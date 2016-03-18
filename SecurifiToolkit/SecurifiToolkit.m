@@ -691,10 +691,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     });
 }
 -(void)cleanUp{
-
-    [self removeObjectFromArray:[self scenesArray]];
-    [self removeObjectFromArray:[self wifiClientParser]];
-    [self removeObjectFromArray:[self ruleList]];
+    [self removeObjectFromArray:self.devices];
+    [self removeObjectFromArray:self.scenesArray];
+    [self removeObjectFromArray:self.wifiClientParser];
+    [self removeObjectFromArray:self.ruleList];
 
 }
 
@@ -724,6 +724,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 //send request for scene list cloud
                 
                 [self cleanUp];
+                
                 cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 NSLog(@" scene request send ");

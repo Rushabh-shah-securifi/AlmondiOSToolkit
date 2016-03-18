@@ -625,7 +625,11 @@
             [self postData:RULE_COMMAND_RESPONSE_NOTIFIER data:payload];
             break;
         };
-            
+        case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
+            break;
+        };
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:

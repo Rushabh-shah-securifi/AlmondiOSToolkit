@@ -90,9 +90,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     [toolkit cleanUp];
     
     SFIAlmondPlus *plus = [toolkit currentAlmond];
+    [toolkit asyncSendToLocal:[GenericCommand websocketRequestSensorDeviceList] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondWifiClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondSceneList] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];
+    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];   
 }
 
 
@@ -142,6 +143,25 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (NSDictionary *)buildResponseHandlers {
     return @{
+             //new device commands
+             @"DeviceList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
+             },
+             @"DynamicDeviceAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
+             },
+             @"DynamicDeviceUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
+             },
+             @"DynamicDeviceRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
+             },
+             @"DynamicDeviceRemoveAll" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
+             },
+             @"DynamicIndexUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
+             },
              //rules
              @"RuleList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST];

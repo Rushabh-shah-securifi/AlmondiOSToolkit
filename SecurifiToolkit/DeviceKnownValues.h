@@ -13,7 +13,6 @@
 
 @property(nonatomic) unsigned int index;
 @property(nonatomic) NSString *valueName;
-@property(nonatomic) unsigned int genericIndex;
 @property(nonatomic) NSString *value;
 
 @end
