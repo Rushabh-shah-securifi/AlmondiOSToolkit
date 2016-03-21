@@ -626,6 +626,7 @@
             break;
         };
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES: {
+            NSLog(@"network.m");
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;

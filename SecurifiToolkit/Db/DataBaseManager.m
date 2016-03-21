@@ -127,7 +127,6 @@ static sqlite3 *database = nil;
 }
 
 + (NSDictionary*)findByID:(NSString*)ID fromTable:(NSString*)table{
-    NSLog(@"findByID");
     [self createTableIfNeeded:table];
     
     sqlite3_stmt *statement;
@@ -156,7 +155,6 @@ static sqlite3 *database = nil;
 }
 
 + (void)createTableIfNeeded:(NSString*)table{
-    NSLog(@"createTableIfNeeded");
     NSString *query_stmt = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS \"%@\"(ID INTEGER PRIMARY KEY, DATA TEXT)", table];
     if(![self createTable:query_stmt]){
         if([[table lowercaseString] isEqualToString:DEVICE_TABLE]){
@@ -170,7 +168,6 @@ static sqlite3 *database = nil;
 }
 
 + (NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds{
-    NSLog(@"getDevicesForIds");
     NSMutableDictionary *devices = [[NSMutableDictionary alloc]init];
     for(NSString *ID in deviceIds){
         [devices setValue:[self findByID:ID fromTable:DEVICE_TABLE] forKey:ID];

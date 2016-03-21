@@ -21,7 +21,7 @@
 
 @implementation DeviceParser
 
-+(void)commandTesting{
+-(void)commandTesting{
     NSDictionary *devicelistresponsedata =@{
                                             @"MobileInternalIndex":@"<random key>",
                                             @"CommandType":@"DeviceList",
@@ -139,16 +139,18 @@
 
 - (instancetype)init {
     self = [super init];
-    [self initNotification];
-    
+    if(self){
+        [self initNotification];
+    }
     return self;
 }
 -(void)initNotification{
+    NSLog(@"init device notification");
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(onRuleListResponse:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
+    [center addObserver:self selector:@selector(parseDeviceListAndDynamicDeviceResponse:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
 }
 
-+(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
+-(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
     NSLog(@"parseDeviceListAndDynamicDeviceResponse");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *dataInfo = [notifier userInfo];
@@ -165,7 +167,7 @@
         payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
     }
 //    payload = [self parseJson:@"DeviceListResponse"];
-    NSLog(@"payload: %@", payload);
+    NSLog(@"devices - payload: %@", payload);
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
@@ -233,12 +235,14 @@
             }
         }
     }
-    
     NSDictionary *genericDeviceDict = [DataBaseManager getDevicesForIds:[Device getDeviceTypes]];
-    NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:[Device getGenericIndexes]];
     toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
+    
+    NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:[Device getGenericIndexes]];
     toolkit.genericIndexes = [self parseGenericIndexesDict:genericIndexesDict];
     
+//    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
+     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
 }
 
 //@property NSString *name;
@@ -258,7 +262,7 @@
 //#define INDEXES @"Indexes"
 
 //generic device parsing methods
-+(NSDictionary*)parseGenericDevicesDict:(NSDictionary*)genericDevicesDict{
+-(NSDictionary*)parseGenericDevicesDict:(NSDictionary*)genericDevicesDict{
     NSArray *genericDevicesKeys = genericDevicesDict.allKeys;
     GenericDeviceClass *genericIndexObject;
     NSMutableDictionary *mutableDeviceDict = [NSMutableDictionary new];
@@ -269,7 +273,7 @@
     return mutableDeviceDict;
 }
 
-+(GenericDeviceClass *)createGenericDeviceForDict:(NSDictionary*)genericDeviceDict forType:(NSString*)deviceType{
+-(GenericDeviceClass *)createGenericDeviceForDict:(NSDictionary*)genericDeviceDict forType:(NSString*)deviceType{
     GenericDeviceClass *genericDeviceObject = [[GenericDeviceClass alloc] initWithName:genericDeviceDict[DEVICE_NAME]
                                                                                   type:genericDeviceDict[deviceType]
                                                                            defaultIcon:genericDeviceDict[DEVICE_DEFAULT_ICON]
@@ -280,7 +284,7 @@
     
 }
 
-+(NSDictionary*)createDeviceIndexesDict:(NSDictionary*)indexesDict{
+-(NSDictionary*)createDeviceIndexesDict:(NSDictionary*)indexesDict{
     NSMutableDictionary *indexes = [NSMutableDictionary new];
     NSArray *indexesKeys = indexesDict.allKeys;
     for(NSString *index in indexesKeys){
@@ -294,7 +298,7 @@
 }
 
 //genericindexes parsing methods
-+(NSDictionary*)parseGenericIndexesDict:(NSDictionary*)genericIndexesDict{
+-(NSDictionary*)parseGenericIndexesDict:(NSDictionary*)genericIndexesDict{
     NSArray *genericIndexKeys = genericIndexesDict.allKeys;
     GenericIndexClass *genericIndexObject;
     NSMutableDictionary *mutableGenericIndex = [NSMutableDictionary new];
@@ -305,7 +309,7 @@
     }
     return mutableGenericIndex;
 }
-+(GenericIndexClass*)createGenericIndexForDic:(NSDictionary*)genericIndexDict forID:(NSString*)ID{
+-(GenericIndexClass*)createGenericIndexForDic:(NSDictionary*)genericIndexDict forID:(NSString*)ID{
     GenericIndexClass *genericIndexObject = [[GenericIndexClass alloc]
                                              initWithLabel:genericIndexDict[GROUP_LABEL]
                                              icon:genericIndexDict[INDEX_DEFAULT_ICON]
@@ -318,7 +322,7 @@
     return genericIndexObject;
 }
 
-+(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
+-(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
     if(formatterDict){
         Formatter *formatter = [[Formatter alloc]initWithFactor:[formatterDict[FACTOR] floatValue] min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT]];
         return formatter;
@@ -326,7 +330,7 @@
     return nil;
 }
 
-+(NSMutableDictionary *)createGenericValues:(NSDictionary*)genericValuesDict{
+-(NSMutableDictionary *)createGenericValues:(NSDictionary*)genericValuesDict{
     NSArray *valueKeys = genericValuesDict.allKeys;
     NSMutableDictionary *genericValues = [NSMutableDictionary new];
     for(NSString *value in valueKeys){
@@ -341,13 +345,13 @@
 
 
 //DeviceListAndDynamicDeviceResponse parsing methods
-+ (Device *)parseDeviceForPayload:(NSDictionary *)payload {
+- (Device *)parseDeviceForPayload:(NSDictionary *)payload {
     Device *device = [Device new];
     [self updateDevice:device payload:payload];
     return device;
 }
 
-+ (void)updateDevice:(Device*)device payload:(NSDictionary*)payload{
+- (void)updateDevice:(Device*)device payload:(NSDictionary*)payload{
     device.name = payload[@"Name"];
     device.location = payload[@"Location"];
     NSString *str;
@@ -360,7 +364,7 @@
     
 }
 
-+ (NSMutableArray*)parseValues:(NSDictionary*)payload{
+- (NSMutableArray*)parseValues:(NSDictionary*)payload{
     NSMutableArray *values = [NSMutableArray array];
     for (NSString *index in payload) {
         NSDictionary *knownValuesDic = payload[index];
@@ -371,18 +375,18 @@
     return values;
 }
 
-+ (DeviceKnownValues*)parseKnownValue:(NSDictionary *)payload {
+- (DeviceKnownValues*)parseKnownValue:(NSDictionary *)payload {
     DeviceKnownValues *values = [DeviceKnownValues new];
     [self updateKnownValue:payload knownValues:values];
     return values;
 }
 
-+ (void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
+- (void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
     values.valueName = payload[@"Name"];
     values.value = payload[@"Value"];
 }
 
-+(NSDictionary*)parseJson:(NSString*)fileName{
+- (NSDictionary*)parseJson:(NSString*)fileName{
     NSError *error = nil;
     NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName
                                                          ofType:@"json"];
