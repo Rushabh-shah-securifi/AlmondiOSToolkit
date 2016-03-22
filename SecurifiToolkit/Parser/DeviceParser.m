@@ -335,8 +335,7 @@
     NSMutableDictionary *genericValues = [NSMutableDictionary new];
     for(NSString *value in valueKeys){
         NSDictionary *valueDict = genericValuesDict[value];
-        GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] formattedValue:nil toggleValue:valueDict[TOGGLE_VALUE] isIconText:false];
-        genericValue.value = value;
+        GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value];
         [genericValues setObject:genericValue forKey:value];
     }
     return genericValues;

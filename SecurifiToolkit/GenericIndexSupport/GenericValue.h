@@ -11,11 +11,12 @@
 @interface GenericValue : NSObject
 @property NSString *displayText;
 @property NSString *icon;
-@property BOOL isIconText;
+@property NSString *iconText;
 @property NSString *toggleValue;
 @property NSString *formatttedValue;
 @property NSString *value;
 
--(id) initWithDisplayText:(NSString*) displayText icon:(NSString*)icon formattedValue:(NSString*)formattedValue toggleValue:(NSString*)toggleValue isIconText:(BOOL)isIconText;
--(id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
+- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value;
+- (id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value;
 @end

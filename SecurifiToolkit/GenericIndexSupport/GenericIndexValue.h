@@ -13,6 +13,7 @@
 @interface GenericIndexValue : UIViewController
 @property GenericIndexClass *genericIndex;
 @property GenericValue *genericValue;
+@property int index;
 
--(id)initWithGenericIndex:(GenericIndexClass*)genericIndex genericValue:(GenericValue*)genericValue;
+-(id)initWithGenericIndex:(GenericIndexClass*)genericIndex genericValue:(GenericValue*)genericValue index:(int)index;
 @end

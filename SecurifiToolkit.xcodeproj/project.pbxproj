@@ -231,6 +231,8 @@
 		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
 		A5C7AE4A1C807BFA007E630D /* RouterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE481C807BFA007E630D /* RouterParser.h */; };
 		A5C7AE4B1C807BFA007E630D /* RouterParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE491C807BFA007E630D /* RouterParser.m */; };
+		A5E677971CA02B5300B0D8C0 /* GenericProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E677951CA02B5200B0D8C0 /* GenericProperties.h */; };
+		A5E677981CA02B5300B0D8C0 /* GenericProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E677961CA02B5300B0D8C0 /* GenericProperties.m */; };
 		A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804171C75A90E005A8DB3 /* DataBaseManager.h */; };
 		A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804181C75A90E005A8DB3 /* DataBaseManager.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
@@ -603,6 +605,8 @@
 		A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceParser.m; sourceTree = "<group>"; };
 		A5C7AE481C807BFA007E630D /* RouterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterParser.h; sourceTree = "<group>"; };
 		A5C7AE491C807BFA007E630D /* RouterParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RouterParser.m; sourceTree = "<group>"; };
+		A5E677951CA02B5200B0D8C0 /* GenericProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericProperties.h; sourceTree = "<group>"; };
+		A5E677961CA02B5300B0D8C0 /* GenericProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericProperties.m; sourceTree = "<group>"; };
 		A5E804171C75A90E005A8DB3 /* DataBaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBaseManager.h; sourceTree = "<group>"; };
 		A5E804181C75A90E005A8DB3 /* DataBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBaseManager.m; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
@@ -1284,6 +1288,8 @@
 				A52163FD1C983E4E00E7B79D /* GenericValue.m */,
 				A52164151C9927D400E7B79D /* DeviceIndex.h */,
 				A52164161C9927D400E7B79D /* DeviceIndex.m */,
+				A5E677951CA02B5200B0D8C0 /* GenericProperties.h */,
+				A5E677961CA02B5300B0D8C0 /* GenericProperties.m */,
 			);
 			path = GenericIndexSupport;
 			sourceTree = "<group>";
@@ -1449,6 +1455,7 @@
 				CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */,
 				CE2EA26119D04BDD00C6D6A8 /* AlmondNameChange.h in Headers */,
 				CE2EA24D19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h in Headers */,
+				A5E677971CA02B5300B0D8C0 /* GenericProperties.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
 				1CD1D5561A660B7A00C030E9 /* NotificationRegistrationResponse.h in Headers */,
 				1C4382FA1B2FDD5200F6AB7A /* PSWebSocketTypes.h in Headers */,
@@ -1705,6 +1712,7 @@
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
 				1CD1D5591A660B7A00C030E9 /* SFINotificationDevice.m in Sources */,
 				1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */,
+				A5E677981CA02B5300B0D8C0 /* GenericProperties.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
 				1C4382F41B2FDD5200F6AB7A /* PSWebSocketInflater.m in Sources */,

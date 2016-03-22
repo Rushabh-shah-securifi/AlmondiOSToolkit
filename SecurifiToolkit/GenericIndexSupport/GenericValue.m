@@ -9,14 +9,13 @@
 #import "GenericValue.h"
 
 @implementation GenericValue
--(id) initWithDisplayText:(NSString*) displayText icon:(NSString*)icon formattedValue:(NSString*)formattedValue toggleValue:(NSString*)toggleValue isIconText:(BOOL)isIconText{
+-(id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value{
     self = [super init];
     if(self){
+        self.value = value;
         self.displayText = displayText;
         self.icon = icon;
-        self.formatttedValue = formattedValue;
         self.toggleValue = toggleValue;
-        self.isIconText = isIconText;
     }
     return self;
 }
@@ -26,9 +25,21 @@
     if(self){
         self.displayText = text;
         self.icon = genericValue.icon;
-        self.isIconText = genericValue.isIconText;
+        self.iconText = genericValue.iconText;
         self.formatttedValue = genericValue.formatttedValue;
         self.toggleValue = genericValue.toggleValue;
+    }
+    return self;
+}
+
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value{
+    self = [super init];
+    if(self){
+        self.iconText = iconText;
+        if(iconText == nil)
+            self.icon = @"1";
+        self.displayText = displayText;
+        self.value = value;
     }
     return self;
 }
