@@ -9,11 +9,11 @@
 #ifndef AlmondJsonCommandKeyConstants_h
 #define AlmondJsonCommandKeyConstants_h
 
+
 //generic index key constants
 #define INDEX_NAME @"Name"
 #define TYPE @"Type"
 #define DATA_TYPE @"DataType"
-#define READ_ONLY @"ReadOnly"
 #define PLACEMENT @"Placement"
 #define HEADER @"Header"
 #define DETAIL_HEADER @"DETAIL_HEADER"
@@ -29,6 +29,7 @@
 #define TOGGLE_VALUE @"ToggleValue"
 #define ICON @"Icon"
 #define LABEL @"Label"
+#define DEVICE_COMMAND_TYPE @"CommandType"
 
 #define FORMATTER @"Formatter"
 #define MINMUM @"Min"
@@ -44,7 +45,8 @@
 #define HUE @"Hue"
 #define HUE_SLIDER @"HueSlider"
 #define TEXT_INPUT @"textInput"
-
+#define ACTUATOR @"Actuator"
+#define SENSOR @"Sensor"
 
 
 //generic device key constants

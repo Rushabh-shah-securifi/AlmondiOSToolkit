@@ -235,14 +235,23 @@
             }
         }
     }
+    NSLog(@"devices: %@", toolkit.devices);
     NSDictionary *genericDeviceDict = [DataBaseManager getDevicesForIds:[Device getDeviceTypes]];
     toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
     
-    NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:[Device getGenericIndexes]];
+    NSMutableArray *genericIndexesArray = [Device getGenericIndexes];
+    [self addCommonGenericIndexes:genericIndexesArray];
+    NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:genericIndexesArray];
     toolkit.genericIndexes = [self parseGenericIndexesDict:genericIndexesDict];
     
-//    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
-     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
+}
+
+-(void)addCommonGenericIndexes:(NSMutableArray *)genericIndexesArray{
+    NSDictionary *commonIndexes = [Device getCommonIndexesDict];
+    for(NSString *value in commonIndexes.allValues){
+        [genericIndexesArray addObject:value];
+    }
 }
 
 //@property NSString *name;
@@ -313,12 +322,13 @@
     GenericIndexClass *genericIndexObject = [[GenericIndexClass alloc]
                                              initWithLabel:genericIndexDict[GROUP_LABEL]
                                              icon:genericIndexDict[INDEX_DEFAULT_ICON]
+                                             type:genericIndexDict[TYPE]
                                              identifier:ID
                                              placement:genericIndexDict[PLACEMENT]
                                              values:[self createGenericValues:genericIndexDict[VALUES]]
                                              formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
-                                             layoutType:genericIndexDict[LAYOUT]];
-    genericIndexObject.readOnly = [genericIndexDict[READ_ONLY] boolValue];
+                                             layoutType:genericIndexDict[LAYOUT]
+                                             commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]];
     return genericIndexObject;
 }
 

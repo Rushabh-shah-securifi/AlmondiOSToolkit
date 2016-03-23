@@ -162,6 +162,9 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
              @"DynamicIndexUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
              },
+             @"UpdateDeviceIndex" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_UPDATE_DEVICE_INDEX];
+             },
              //rules
              @"RuleList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST];

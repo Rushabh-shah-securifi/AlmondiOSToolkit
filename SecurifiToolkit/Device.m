@@ -47,5 +47,8 @@
     return [[genericIndexesSet allObjects] mutableCopy];
 }
 
++(NSDictionary*)getCommonIndexesDict{
+    return @{@"Name":@"-1", @"Location":@"-2", @"NotifyMe":@"-3"};
+}
 
 @end
