@@ -152,25 +152,25 @@
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
     NSLog(@"parseDeviceListAndDynamicDeviceResponse");
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *dataInfo = [notifier userInfo];
-    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
-        return;
-    }
+//    NSNotification *notifier = (NSNotification *) sender;
+//    NSDictionary *dataInfo = [notifier userInfo];
+//    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
+//        return;
+//    }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
-    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+//    SFIAlmondPlus *almond = [toolkit currentAlmond];
+//    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
-    if(local){
-        payload = [dataInfo valueForKey:@"data"];
-    }else{
-        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-    }
-   // payload = [self parseJson:@"DeviceListResponse"];
+//    if(local){
+//        payload = [dataInfo valueForKey:@"data"];
+//    }else{
+//        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+//    }
+    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
-    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-    if(!isMatchingAlmondOrLocal) //for cloud
-        return;
+//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+//    if(!isMatchingAlmondOrLocal) //for cloud
+//        return;
     
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"DeviceList"]){
         NSDictionary *devicesPayload = payload[@"Devices"];
@@ -178,7 +178,7 @@
         NSArray *sortedPostKeys = [devicePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
         }];
-        
+        [toolkit.devices removeAllObjects];
         for (NSString *devicePosition in sortedPostKeys) {
             NSDictionary *deviceDic = devicesPayload[devicePosition];
             Device *device = [self parseDeviceForPayload:deviceDic];

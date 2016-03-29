@@ -41,7 +41,7 @@
 //value constants
 #define TRUE_ @"true"
 #define SLIDER @"Slider"
-#define BUTTON @"Button"
+#define Multi_Input @"Multi_Input"
 #define HUE @"Hue"
 #define HUE_SLIDER @"HueSlider"
 #define TEXT_VIEW @"TextView"
