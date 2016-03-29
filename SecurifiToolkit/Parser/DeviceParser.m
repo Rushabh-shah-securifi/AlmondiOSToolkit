@@ -166,7 +166,7 @@
     }else{
         payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
     }
-//    payload = [self parseJson:@"DeviceListResponse"];
+   // payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud

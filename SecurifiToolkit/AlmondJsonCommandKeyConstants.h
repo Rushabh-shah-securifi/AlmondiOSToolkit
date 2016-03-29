@@ -44,7 +44,7 @@
 #define BUTTON @"Button"
 #define HUE @"Hue"
 #define HUE_SLIDER @"HueSlider"
-#define TEXT_INPUT @"textInput"
+#define TEXT_VIEW @"TextView"
 #define ACTUATOR @"Actuator"
 #define SENSOR @"Sensor"
 
