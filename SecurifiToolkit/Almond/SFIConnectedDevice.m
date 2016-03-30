@@ -7,6 +7,7 @@
 //
 
 #import "SFIConnectedDevice.h"
+#import "SecurifiToolkit.h"
 
 @implementation SFIConnectedDevice
 
@@ -102,6 +103,16 @@
             break;
     }
     return @"";
+}
+
++ (SFIConnectedDevice *)findClientByID:(NSString*)clientID{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    for(SFIConnectedDevice *client in toolkit.wifiClientParser){
+        if([client.deviceID isEqualToString:clientID]){
+            return client;
+        }
+    }
+    return nil;
 }
 
 @end

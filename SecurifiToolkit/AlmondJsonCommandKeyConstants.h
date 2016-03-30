@@ -60,5 +60,10 @@
 #define ROW_NO @"row_no"
 #define GENERIC_INDEX_ID @"genericIndexID"
 
+//clients constants
+#define BLOCKED @"Blocked"
+#define ACTIVE @"Active"
+#define INACTIVE @"InActive"
+#define UNKNOWN @"UnKnown"
 
 #endif /* AlmondJsonCommandKeyConstants_h */

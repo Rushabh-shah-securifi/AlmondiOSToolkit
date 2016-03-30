@@ -26,10 +26,6 @@
 }
 
 +(DeviceCommandType)getCommandType:(NSString*)command{
-    NSLog(@"command: %@",command);
-    if (command == nil) {
-        NSLog(@"command nil");
-    }
     if(command){
         if([command isEqualToString:@"Name"])
             return DeviceCommand_UpdateDeviceName;

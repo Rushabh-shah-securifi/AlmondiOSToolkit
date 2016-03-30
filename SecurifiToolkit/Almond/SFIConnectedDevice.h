@@ -38,4 +38,6 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 - (NSString *)getNotificationTypeByName:(NSString *)name;
 
 - (NSString *)getNotificationNameByType:(NSString *)type;
+
++ (NSString *)findClientByID:(NSString *)clientID;
 @end
