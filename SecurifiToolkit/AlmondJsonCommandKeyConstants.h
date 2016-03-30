@@ -60,10 +60,14 @@
 #define ROW_NO @"row_no"
 #define GENERIC_INDEX_ID @"genericIndexID"
 
+#define GRIDVIEW @"GRIDVIEW"
+#define LIST @"LIST"
+
 //clients constants
 #define BLOCKED @"Blocked"
 #define ACTIVE @"Active"
 #define INACTIVE @"InActive"
 #define UNKNOWN @"UnKnown"
+
 
 #endif /* AlmondJsonCommandKeyConstants_h */

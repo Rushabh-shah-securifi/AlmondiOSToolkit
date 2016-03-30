@@ -1,15 +1,15 @@
 //
-//  SFIConnectedDevice.m
+//  ClientDevice.m
 //  Securifi Cloud
 //
 //  Created by Priya Yerunkar on 29/10/13.
 //  Copyright (c) 2013 Securifi. All rights reserved.
 //
 
-#import "SFIConnectedDevice.h"
+#import "ClientDevice.h"
 #import "SecurifiToolkit.h"
 
-@implementation SFIConnectedDevice
+@implementation ClientDevice
 
 - (NSString *)iconName {
     if ([[self.deviceType lowercaseString] isEqualToString:@"tv"]) {
@@ -105,9 +105,9 @@
     return @"";
 }
 
-+ (SFIConnectedDevice *)findClientByID:(NSString*)clientID{
++ (ClientDevice *)findClientByID:(NSString*)clientID{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    for(SFIConnectedDevice *client in toolkit.wifiClientParser){
+    for(ClientDevice *client in toolkit.clients){
         if([client.deviceID isEqualToString:clientID]){
             return client;
         }

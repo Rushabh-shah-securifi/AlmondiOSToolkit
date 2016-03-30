@@ -193,7 +193,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)initialize{
     self.scenesArray = [NSMutableArray new];
-    self.wifiClientParser = [NSMutableArray new];
+    self.clients = [NSMutableArray new];
     self.devices = [NSMutableArray new];
     
     self.ruleParser=[[RuleParser alloc]init];
@@ -693,7 +693,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 -(void)cleanUp{
     [self removeObjectFromArray:self.devices];
     [self removeObjectFromArray:self.scenesArray];
-    [self removeObjectFromArray:self.wifiClientParser];
+    [self removeObjectFromArray:self.clients];
     [self removeObjectFromArray:self.ruleList];
 
 }

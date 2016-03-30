@@ -1,5 +1,5 @@
 //
-//  SFIConnectedDevice.h
+//  ClientDevice.h
 //  Securifi Cloud
 //
 //  Created by Priya Yerunkar on 29/10/13.
@@ -15,7 +15,7 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
     DeviceAllowed_OnSchedule=2
 };
 
-@interface SFIConnectedDevice : NSObject
+@interface ClientDevice : NSObject
 //<ConnectedDevice><Name>ashutosh</Name><IP>1678379540</IP><MAC>10:60:4b:d9:60:84</MAC></ConnectedDevice>
 @property(nonatomic, retain) NSString *name;
 @property(nonatomic, retain) NSString *deviceIP;

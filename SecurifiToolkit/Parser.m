@@ -11,7 +11,7 @@
 
 #import "Parser.h"
 #import "MDJSON.h"
-#import "SFIConnectedDevice.h"
+#import "ClientDevice.h"
 #import "SecurifiToolkit.h"
 
 @implementation Parser
@@ -47,18 +47,18 @@
         NSArray *dDictArray = [mainDict valueForKey:@"Clients"];
         NSMutableArray *wifiClientsArray = [NSMutableArray new];
         for (NSDictionary *dict in dDictArray) {
-            SFIConnectedDevice *device = [SFIConnectedDevice new];
+            ClientDevice *device = [ClientDevice new];
             [self setDeviceProperties:device forDict:dict];
             [wifiClientsArray addObject:device];
         }
-        toolkit.wifiClientParser = wifiClientsArray;
+        toolkit.clients = wifiClientsArray;
     }
     
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){
         NSDictionary * dict = [mainDict valueForKey:@"Clients"];
-        SFIConnectedDevice * device = [SFIConnectedDevice new];
+        ClientDevice * device = [ClientDevice new];
         [self setDeviceProperties:device forDict:dict];
-        [toolkit.wifiClientParser addObject:device];
+        [toolkit.clients addObject:device];
     }
     else if (
                ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientUpdated"]||
@@ -67,7 +67,7 @@
                ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)
                ) {
         NSDictionary *dict = [mainDict valueForKey:@"Clients"];
-        for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
+        for (ClientDevice * device in toolkit.clients) {
             if ([device.deviceID isEqualToString:[dict valueForKey:@"ID"]]) {
                 [self setDeviceProperties:device forDict:dict];
                 break;
@@ -76,20 +76,20 @@
     }
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
         NSDictionary * removedClientDict = [mainDict valueForKey:@"Clients"];
-        SFIConnectedDevice *toBeRemovedClient;
-        for (SFIConnectedDevice * device in toolkit.wifiClientParser) {
+        ClientDevice *toBeRemovedClient;
+        for (ClientDevice * device in toolkit.clients) {
             if ([device.deviceID isEqualToString:[removedClientDict valueForKey:@"ID"]]) {
                 toBeRemovedClient = device;
                 break;
             }
         }
-        [toolkit.wifiClientParser removeObject:toBeRemovedClient];
+        [toolkit.clients removeObject:toBeRemovedClient];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DYNAMIC_CLIENTLIST_ADD_UPDATE_REMOVE_NOTIFIER object:nil userInfo:nil];
 }
 
--(void)setDeviceProperties:(SFIConnectedDevice*)device forDict:(NSDictionary*)dict{
+-(void)setDeviceProperties:(ClientDevice*)device forDict:(NSDictionary*)dict{
     device.deviceID = [dict valueForKey:@"ID"];
     device.name = [dict valueForKey:@"Name"];
     device.manufacturer = [dict valueForKey:@"Manufacturer"];

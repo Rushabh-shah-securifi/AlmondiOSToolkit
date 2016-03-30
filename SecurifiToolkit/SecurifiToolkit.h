@@ -78,7 +78,7 @@
 #import <SecurifiToolkit/SFIGenericRouterCommand.h>
 #import <SecurifiToolkit/SFIBlockedContent.h>
 #import <SecurifiToolkit/SFIBlockedDevice.h>
-#import <SecurifiToolkit/SFIConnectedDevice.h>
+#import <SecurifiToolkit/ClientDevice.h>
 #import <SecurifiToolkit/SFIDevicesList.h>
 
 #import <SecurifiToolkit/MDJSON.h>
@@ -167,7 +167,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(nonatomic) BOOL useProductionCloud;
 
 @property(nonatomic)NSMutableArray *scenesArray;
-@property(nonatomic)NSMutableArray *wifiClientParser;
+@property(nonatomic)NSMutableArray *clients;
 @property(nonatomic)NSMutableArray *devices;
 @property(nonatomic)NSMutableArray *ruleList;
 @property(nonatomic)NSDictionary *genericDevices;

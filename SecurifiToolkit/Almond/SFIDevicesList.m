@@ -7,7 +7,7 @@
 //
 
 #import "SFIDevicesList.h"
-#import "SFIConnectedDevice.h"
+#import "ClientDevice.h"
 
 @implementation SFIDevicesList
 
@@ -34,7 +34,7 @@
 
     NSMutableArray *clients = [NSMutableArray new];
     for (NSDictionary *client_payload in clients_payloads) {
-        SFIConnectedDevice *device = [self parseClientJson:client_payload];
+        ClientDevice *device = [self parseClientJson:client_payload];
         [clients addObject:device];
     }
 
@@ -44,8 +44,8 @@
     return ls;
 }
 
-+ (SFIConnectedDevice *)parseClientJson:(NSDictionary *)payload {
-    SFIConnectedDevice *cd = [SFIConnectedDevice new];
++ (ClientDevice *)parseClientJson:(NSDictionary *)payload {
+    ClientDevice *cd = [ClientDevice new];
 
     cd.name = payload[@"Name"];
     cd.deviceIP = payload[@"LastKnownIP"];
