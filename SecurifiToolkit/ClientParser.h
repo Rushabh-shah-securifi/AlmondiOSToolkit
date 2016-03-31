@@ -8,5 +8,5 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Parser : NSObject
+@interface ClientParser : NSObject
 @end

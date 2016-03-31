@@ -7,7 +7,7 @@
 //
 
 #import "Client.h"
-//#import "SecurifiToolkit.h"
+#import "SecurifiToolkit.h"
 
 @implementation Client
 
@@ -105,14 +105,115 @@
     return @"";
 }
 
-//+ (Client *)findClientByID:(NSString*)clientID{
-//    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-//    for(Client *client in toolkit.clients){
-//        if([client.deviceID isEqualToString:clientID]){
-//            return client;
-//        }
-//    }
-//    return nil;
-//}
++ (Client *)findClientByID:(NSString*)clientID{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    for(Client *client in toolkit.clients){
+        if([client.deviceID isEqualToString:clientID]){
+            return client;
+        }
+    }
+    return nil;
+}
 
++(NSArray*) getClientGenericIndexes{
+    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@(-11),@(-12),@-13,@-14,@-15,@-16,@-17,@-18,@-19,@-20,@-3, nil];
+    return genericIndexesArray;
+}
+
++(NSString*)getOrSetValueForClient:(Client*)client genericIndex:(int)genericIndex newValue:(NSString*)newValue ifGet:(BOOL)get{
+    switch (genericIndex) {
+        case -11:
+        {
+            if(get)
+                return client.name;
+            else
+                client.name = newValue;
+            break;
+        }
+        case -12:
+        {
+            if(get)
+                return client.deviceType;
+            else
+                client.deviceType = newValue;
+            break;
+        }
+        case -13:
+        {
+            if(get)
+                return client.manufacturer;
+            else
+                client.manufacturer = newValue;
+            break;
+        }
+        case -14:
+        {
+            if(get)
+                return client.deviceMAC;
+            else
+                client.deviceMAC = newValue;
+            break;
+        }
+        case -15:
+        {
+            if(get)
+                return client.deviceLastActiveTime;
+            else
+                client.deviceLastActiveTime = newValue;
+            break;
+        }
+        case -16:
+        {
+            if(get)
+                return client.deviceConnection;
+            else
+                client.deviceConnection = newValue;
+            break;
+        }
+        case -17:
+        {
+            if(get)
+                return client.deviceUseAsPresence? @"true" : @"false";
+            else
+                client.deviceUseAsPresence = newValue.boolValue;
+            break;
+        }
+        case -18:
+        {
+            if(get)
+                return @(client.timeout).stringValue;
+            else
+                client.timeout = newValue.integerValue;
+            break;
+        }
+        case -19:{
+            if(get)
+                return @(client.deviceAllowedType).stringValue;
+            else
+                client.deviceAllowedType = newValue.integerValue;
+            break;
+        }
+        case -20:
+        {
+            if(get)
+                return client.rssi;
+            else
+                client.rssi = newValue;
+            break;
+        }
+        case -3:
+        {
+            if(get)
+                return @"always"; //todo
+            //        else
+            //            client.deviceType = newValue;
+            break;
+        }
+        default:{
+            return nil;
+        }
+            break;
+    }
+    return nil;
+}
 @end

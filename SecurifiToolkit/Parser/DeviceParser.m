@@ -18,6 +18,7 @@
 #import "GenericValue.h"
 #import "DeviceIndex.h"
 #import "AlmondJsonCommandKeyConstants.h"
+#import "Client.h"
 
 @implementation DeviceParser
 
@@ -240,7 +241,9 @@
     toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
     
     NSMutableArray *genericIndexesArray = [Device getGenericIndexes];
+//    [genericIndexesArray addObject:@(-100).stringValue];
     [self addCommonGenericIndexes:genericIndexesArray];
+    [self addClientGenericIndexes:genericIndexesArray];
     NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:genericIndexesArray];
     toolkit.genericIndexes = [self parseGenericIndexesDict:genericIndexesDict];
     
@@ -253,6 +256,13 @@
         [genericIndexesArray addObject:value];
     }
 }
+
+-(void)addClientGenericIndexes:(NSMutableArray*)genericIndexesArray{
+    for(NSNumber *clientIndex in [Client getClientGenericIndexes]){
+        [genericIndexesArray addObject:clientIndex.stringValue];
+    }
+}
+
 
 //@property NSString *name;
 //@property NSString *type;

@@ -39,5 +39,9 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 
 - (NSString *)getNotificationNameByType:(NSString *)type;
 
-+ (NSString *)findClientByID:(NSString *)clientID;
++ (Client *)findClientByID:(NSString *)clientID;
+
++(NSArray*) getClientGenericIndexes;
+
++(NSString*)getOrSetValueForClient:(Client*)client genericIndex:(int)genericIndex newValue:(NSString*)newValue ifGet:(BOOL)get;
 @end

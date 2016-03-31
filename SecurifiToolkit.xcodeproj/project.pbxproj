@@ -40,8 +40,6 @@
 		1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3270E31A243B28007202C1 /* SFIWirelessUsers.m */; };
 		1C3EEFBF1B37999300DFCF62 /* SFIBlockedDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFB91B37999300DFCF62 /* SFIBlockedDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C3EEFC01B37999300DFCF62 /* SFIBlockedDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFBA1B37999300DFCF62 /* SFIBlockedDevice.m */; };
-		1C3EEFC11B37999300DFCF62 /* ClientDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFBB1B37999300DFCF62 /* ClientDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1C3EEFC21B37999300DFCF62 /* ClientDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFBC1B37999300DFCF62 /* ClientDevice.m */; };
 		1C3EEFC31B37999300DFCF62 /* SFIDevicesList.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFBD1B37999300DFCF62 /* SFIDevicesList.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C3EEFC41B37999300DFCF62 /* SFIDevicesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFBE1B37999300DFCF62 /* SFIDevicesList.m */; };
 		1C3EEFC71B379B3800DFCF62 /* SFIGenericRouterCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFC51B379B3800DFCF62 /* SFIGenericRouterCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -221,8 +219,8 @@
 		A52164101C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */; };
 		A52164171C9927D400E7B79D /* DeviceIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = A52164151C9927D400E7B79D /* DeviceIndex.h */; };
 		A52164181C9927D400E7B79D /* DeviceIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = A52164161C9927D400E7B79D /* DeviceIndex.m */; };
-		A54EAF9B1C44D8D800CF2837 /* Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAF991C44D8D800CF2837 /* Parser.h */; };
-		A54EAF9C1C44D8D800CF2837 /* Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAF9A1C44D8D800CF2837 /* Parser.m */; };
+		A54EAF9B1C44D8D800CF2837 /* ClientParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAF991C44D8D800CF2837 /* ClientParser.h */; };
+		A54EAF9C1C44D8D800CF2837 /* ClientParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAF9A1C44D8D800CF2837 /* ClientParser.m */; };
 		A54EAFB01C44DC4A00CF2837 /* SceneListener.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */; };
 		A54EAFB11C44DC4A00CF2837 /* SceneListener.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAFAF1C44DC4A00CF2837 /* SceneListener.m */; };
 		A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */; };
@@ -332,6 +330,8 @@
 		CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EE9181F9D9500F91AAD /* GenericCommandRequest.m */; };
 		CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE19EF2181FB01300F91AAD /* GenericCommandResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEE19EF5181FB01300F91AAD /* GenericCommandResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EF3181FB01300F91AAD /* GenericCommandResponse.m */; };
+		CEEAB7A91CACF2B8003C5290 /* Client.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C3EEFBB1B37999300DFCF62 /* Client.h */; };
+		CEEAB7AA1CACF2C8003C5290 /* Client.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C3EEFBC1B37999300DFCF62 /* Client.m */; };
 		CEED642F1C7C351E008A7412 /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED642D1C7C351E008A7412 /* Device.h */; };
 		CEED64301C7C351E008A7412 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = CEED642E1C7C351E008A7412 /* Device.m */; };
 		CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */ = {isa = PBXBuildFile; fileRef = CEED64311C7C370E008A7412 /* DeviceKnownValues.h */; };
@@ -404,8 +404,8 @@
 		1C3270E31A243B28007202C1 /* SFIWirelessUsers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIWirelessUsers.m; sourceTree = "<group>"; };
 		1C3EEFB91B37999300DFCF62 /* SFIBlockedDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIBlockedDevice.h; sourceTree = "<group>"; };
 		1C3EEFBA1B37999300DFCF62 /* SFIBlockedDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIBlockedDevice.m; sourceTree = "<group>"; };
-		1C3EEFBB1B37999300DFCF62 /* ClientDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClientDevice.h; sourceTree = "<group>"; };
-		1C3EEFBC1B37999300DFCF62 /* ClientDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientDevice.m; sourceTree = "<group>"; };
+		1C3EEFBB1B37999300DFCF62 /* Client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Client.h; sourceTree = "<group>"; };
+		1C3EEFBC1B37999300DFCF62 /* Client.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Client.m; sourceTree = "<group>"; };
 		1C3EEFBD1B37999300DFCF62 /* SFIDevicesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIDevicesList.h; sourceTree = "<group>"; };
 		1C3EEFBE1B37999300DFCF62 /* SFIDevicesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIDevicesList.m; sourceTree = "<group>"; };
 		1C3EEFC51B379B3800DFCF62 /* SFIGenericRouterCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIGenericRouterCommand.h; sourceTree = "<group>"; };
@@ -591,8 +591,8 @@
 		A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondJsonCommandKeyConstants.h; sourceTree = "<group>"; };
 		A52164151C9927D400E7B79D /* DeviceIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceIndex.h; sourceTree = "<group>"; };
 		A52164161C9927D400E7B79D /* DeviceIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceIndex.m; sourceTree = "<group>"; };
-		A54EAF991C44D8D800CF2837 /* Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Parser.h; sourceTree = "<group>"; };
-		A54EAF9A1C44D8D800CF2837 /* Parser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Parser.m; sourceTree = "<group>"; };
+		A54EAF991C44D8D800CF2837 /* ClientParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClientParser.h; sourceTree = "<group>"; };
+		A54EAF9A1C44D8D800CF2837 /* ClientParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientParser.m; sourceTree = "<group>"; };
 		A54EAFAE1C44DC4A00CF2837 /* SceneListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneListener.h; sourceTree = "<group>"; };
 		A54EAFAF1C44DC4A00CF2837 /* SceneListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneListener.m; sourceTree = "<group>"; };
 		A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceParser.h; sourceTree = "<group>"; };
@@ -804,8 +804,8 @@
 				1C414BE71A7B625400C448A4 /* AppKit */,
 				1C3EEFB91B37999300DFCF62 /* SFIBlockedDevice.h */,
 				1C3EEFBA1B37999300DFCF62 /* SFIBlockedDevice.m */,
-				1C3EEFBB1B37999300DFCF62 /* ClientDevice.h */,
-				1C3EEFBC1B37999300DFCF62 /* ClientDevice.m */,
+				1C3EEFBB1B37999300DFCF62 /* Client.h */,
+				1C3EEFBC1B37999300DFCF62 /* Client.m */,
 				1C3EEFBD1B37999300DFCF62 /* SFIDevicesList.h */,
 				1C3EEFBE1B37999300DFCF62 /* SFIDevicesList.m */,
 				1C3EEFC51B379B3800DFCF62 /* SFIGenericRouterCommand.h */,
@@ -1285,8 +1285,8 @@
 		A54EAF981C44D8C700CF2837 /* WiFiClients */ = {
 			isa = PBXGroup;
 			children = (
-				A54EAF991C44D8D800CF2837 /* Parser.h */,
-				A54EAF9A1C44D8D800CF2837 /* Parser.m */,
+				A54EAF991C44D8D800CF2837 /* ClientParser.h */,
+				A54EAF9A1C44D8D800CF2837 /* ClientParser.m */,
 			);
 			name = WiFiClients;
 			sourceTree = "<group>";
@@ -1414,7 +1414,6 @@
 				CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */,
 				CE5EB63D17E8548500985636 /* DeviceDataHashRequest.h in Headers */,
 				CE466A5B1823C50700E55DF9 /* ValidateAccountResponse.h in Headers */,
-				1C3EEFC11B37999300DFCF62 /* ClientDevice.h in Headers */,
 				CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */,
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
 				1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */,
@@ -1447,6 +1446,7 @@
 				1C4382FA1B2FDD5200F6AB7A /* PSWebSocketTypes.h in Headers */,
 				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
+				CEEAB7A91CACF2B8003C5290 /* Client.h in Headers */,
 				1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */,
 				A52163FE1C983E4E00E7B79D /* Formatter.h in Headers */,
 				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
@@ -1463,7 +1463,7 @@
 				CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */,
 				CEED64331C7C370E008A7412 /* DeviceKnownValues.h in Headers */,
 				1CE67A311A91D7670004E68C /* AlmondModeChangeRequest.h in Headers */,
-				A54EAF9B1C44D8D800CF2837 /* Parser.h in Headers */,
+				A54EAF9B1C44D8D800CF2837 /* ClientParser.h in Headers */,
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
@@ -1670,6 +1670,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEEAB7AA1CACF2C8003C5290 /* Client.m in Sources */,
 				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
 				A52164051C983E4E00E7B79D /* GenericIndexClass.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
@@ -1721,7 +1722,7 @@
 				1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */,
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
-				A54EAF9C1C44D8D800CF2837 /* Parser.m in Sources */,
+				A54EAF9C1C44D8D800CF2837 /* ClientParser.m in Sources */,
 				A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */,
 				1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */,
 				1C4382EC1B2FDD5200F6AB7A /* PSWebSocket.m in Sources */,
@@ -1731,7 +1732,6 @@
 				CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */,
 				CEAD85AA19CABCBE006D1048 /* DeleteAccountResponse.m in Sources */,
 				CE9A2913188D2B240063D562 /* SensorChangeRequest.m in Sources */,
-				1C3EEFC21B37999300DFCF62 /* ClientDevice.m in Sources */,
 				A54EAFB11C44DC4A00CF2837 /* SceneListener.m in Sources */,
 				CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,

@@ -64,6 +64,7 @@
 #define LIST @"LIST"
 
 //clients constants
+#define CLIENT_NAME @"name"
 #define BLOCKED @"Blocked"
 #define ACTIVE @"Active"
 #define INACTIVE @"InActive"

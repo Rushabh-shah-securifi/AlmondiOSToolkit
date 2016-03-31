@@ -9,12 +9,12 @@
 //  Copyright © 2015 Securifi Ltd. All rights reserved.
 //
 
-#import "Parser.h"
+#import "ClientParser.h"
 #import "MDJSON.h"
 #import "Client.h"
 #import "SecurifiToolkit.h"
 
-@implementation Parser
+@implementation ClientParser
 - (instancetype)init {
     self = [super init];
     [self initNotification];
@@ -52,6 +52,7 @@
             [wifiClientsArray addObject:device];
         }
         toolkit.clients = wifiClientsArray;
+        NSLog(@"wificlient array: %ld", wifiClientsArray.count);
     }
     
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){

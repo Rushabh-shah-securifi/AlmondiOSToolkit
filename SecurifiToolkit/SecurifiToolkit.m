@@ -51,7 +51,7 @@
 #import "DeviceDataHashRequest.h"
 #import "AffiliationUserRequest.h"
 #import "ResetPasswordRequest.h"
-#import "Parser.h"
+#import "ClientParser.h"
 #import "SceneListener.h"
 #import "RuleParser.h"
 #import "DeviceParser.h"
@@ -122,7 +122,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 @property(nonatomic, strong) RuleParser *ruleParser;
 @property(nonatomic, strong) SceneListener *sceneListener;
-@property(nonatomic, strong) Parser *clientParser;
+@property(nonatomic, strong) ClientParser *clientParser;
 @property(nonatomic, strong) DeviceParser *deviceParser;
 
 @end
@@ -198,7 +198,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     self.ruleParser=[[RuleParser alloc]init];
     self.sceneListener=[[SceneListener alloc]init];
-    self.clientParser=[[Parser alloc]init];
+    self.clientParser=[[ClientParser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
     [DataBaseManager initializeDataBase];
 }
