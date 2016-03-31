@@ -11,7 +11,7 @@
 
 #import "Parser.h"
 #import "MDJSON.h"
-#import "ClientDevice.h"
+#import "Client.h"
 #import "SecurifiToolkit.h"
 
 @implementation Parser
@@ -47,7 +47,7 @@
         NSArray *dDictArray = [mainDict valueForKey:@"Clients"];
         NSMutableArray *wifiClientsArray = [NSMutableArray new];
         for (NSDictionary *dict in dDictArray) {
-            ClientDevice *device = [ClientDevice new];
+            Client *device = [Client new];
             [self setDeviceProperties:device forDict:dict];
             [wifiClientsArray addObject:device];
         }
@@ -56,7 +56,7 @@
     
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){
         NSDictionary * dict = [mainDict valueForKey:@"Clients"];
-        ClientDevice * device = [ClientDevice new];
+        Client * device = [Client new];
         [self setDeviceProperties:device forDict:dict];
         [toolkit.clients addObject:device];
     }
@@ -67,7 +67,7 @@
                ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)
                ) {
         NSDictionary *dict = [mainDict valueForKey:@"Clients"];
-        for (ClientDevice * device in toolkit.clients) {
+        for (Client * device in toolkit.clients) {
             if ([device.deviceID isEqualToString:[dict valueForKey:@"ID"]]) {
                 [self setDeviceProperties:device forDict:dict];
                 break;
@@ -76,8 +76,8 @@
     }
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
         NSDictionary * removedClientDict = [mainDict valueForKey:@"Clients"];
-        ClientDevice *toBeRemovedClient;
-        for (ClientDevice * device in toolkit.clients) {
+        Client *toBeRemovedClient;
+        for (Client * device in toolkit.clients) {
             if ([device.deviceID isEqualToString:[removedClientDict valueForKey:@"ID"]]) {
                 toBeRemovedClient = device;
                 break;
@@ -89,7 +89,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DYNAMIC_CLIENTLIST_ADD_UPDATE_REMOVE_NOTIFIER object:nil userInfo:nil];
 }
 
--(void)setDeviceProperties:(ClientDevice*)device forDict:(NSDictionary*)dict{
+-(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{
     device.deviceID = [dict valueForKey:@"ID"];
     device.name = [dict valueForKey:@"Name"];
     device.manufacturer = [dict valueForKey:@"Manufacturer"];

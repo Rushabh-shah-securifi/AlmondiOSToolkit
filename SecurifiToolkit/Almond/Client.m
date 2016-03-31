@@ -1,15 +1,15 @@
 //
-//  ClientDevice.m
+//  Client.m
 //  Securifi Cloud
 //
 //  Created by Priya Yerunkar on 29/10/13.
 //  Copyright (c) 2013 Securifi. All rights reserved.
 //
 
-#import "ClientDevice.h"
-#import "SecurifiToolkit.h"
+#import "Client.h"
+//#import "SecurifiToolkit.h"
 
-@implementation ClientDevice
+@implementation Client
 
 - (NSString *)iconName {
     if ([[self.deviceType lowercaseString] isEqualToString:@"tv"]) {
@@ -105,14 +105,14 @@
     return @"";
 }
 
-+ (ClientDevice *)findClientByID:(NSString*)clientID{
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    for(ClientDevice *client in toolkit.clients){
-        if([client.deviceID isEqualToString:clientID]){
-            return client;
-        }
-    }
-    return nil;
-}
+//+ (Client *)findClientByID:(NSString*)clientID{
+//    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+//    for(Client *client in toolkit.clients){
+//        if([client.deviceID isEqualToString:clientID]){
+//            return client;
+//        }
+//    }
+//    return nil;
+//}
 
 @end

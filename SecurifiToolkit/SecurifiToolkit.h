@@ -78,7 +78,7 @@
 #import <SecurifiToolkit/SFIGenericRouterCommand.h>
 #import <SecurifiToolkit/SFIBlockedContent.h>
 #import <SecurifiToolkit/SFIBlockedDevice.h>
-#import <SecurifiToolkit/ClientDevice.h>
+#import "Client.h"
 #import <SecurifiToolkit/SFIDevicesList.h>
 
 #import <SecurifiToolkit/MDJSON.h>

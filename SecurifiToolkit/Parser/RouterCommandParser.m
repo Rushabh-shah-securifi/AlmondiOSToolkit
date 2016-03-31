@@ -11,7 +11,7 @@
 #import "SFIDevicesList.h"
 #import "SFIBlockedDevice.h"
 #import "SFIGenericRouterCommand.h"
-#import "ClientDevice.h"
+#import "Client.h"
 #import "SFIRouterSummary.h"
 #import "SFIWirelessSummary.h"
 #import "GenericCommandResponse.h"
@@ -73,7 +73,7 @@
 @property(nonatomic, retain) SFIDevicesList *connectedDevices;
 @property(nonatomic, retain) NSMutableArray *connectedDevicesArray;
 
-@property(nonatomic, retain) ClientDevice *currentConnectedDevice;
+@property(nonatomic, retain) Client *currentConnectedDevice;
 
 @property(nonatomic, retain) SFIDevicesList *blockedDevices;
 @property(nonatomic, retain) NSMutableArray *blockedDevicesArray;
@@ -145,7 +145,7 @@
         self.connectedDevicesArray = [NSMutableArray new];
     }
     else if ([elementName isEqualToString:CONNECTED_DEVICE]) {
-        self.currentConnectedDevice = [ClientDevice new];
+        self.currentConnectedDevice = [Client new];
     }
     else if ([elementName isEqualToString:BLOCKED_MACS]) {
         self.blockedDevices = [SFIDevicesList new];
