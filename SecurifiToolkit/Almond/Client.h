@@ -43,4 +43,6 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 +(NSArray*) getClientGenericIndexes;
 
 +(NSString*)getOrSetValueForClient:(Client*)client genericIndex:(int)genericIndex newValue:(NSString*)newValue ifGet:(BOOL)get;
+
++(NSString *)getScheduleById:(NSString*)clientId;
 @end

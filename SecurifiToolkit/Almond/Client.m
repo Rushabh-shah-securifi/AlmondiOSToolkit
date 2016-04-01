@@ -115,6 +115,10 @@
     }
     return nil;
 }
++(NSString *)getScheduleById:(NSString*)clientId{
+    Client *client = [self findClientByID:clientId];
+    return client.deviceSchedule;
+}
 
 +(NSArray*) getClientGenericIndexes{
     NSArray *genericIndexesArray = [NSArray arrayWithObjects:@(-11),@(-12),@-13,@-14,@-15,@-16,@-17,@-18,@-19,@-20,@-3, nil];
