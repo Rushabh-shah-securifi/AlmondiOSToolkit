@@ -351,14 +351,17 @@
 }
 
 -(NSMutableDictionary *)createGenericValues:(NSDictionary*)genericValuesDict{
-    NSArray *valueKeys = genericValuesDict.allKeys;
-    NSMutableDictionary *genericValues = [NSMutableDictionary new];
-    for(NSString *value in valueKeys){
-        NSDictionary *valueDict = genericValuesDict[value];
-        GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value];
-        [genericValues setObject:genericValue forKey:value];
+    if(genericValuesDict){
+        NSArray *valueKeys = genericValuesDict.allKeys;
+        NSMutableDictionary *genericValues = [NSMutableDictionary new];
+        for(NSString *value in valueKeys){
+            NSDictionary *valueDict = genericValuesDict[value];
+            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value];
+            [genericValues setObject:genericValue forKey:value];
+        }
+        return genericValues;
     }
-    return genericValues;
+    return nil;
 }
 
 

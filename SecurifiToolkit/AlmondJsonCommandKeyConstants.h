@@ -41,10 +41,10 @@
 //value constants
 #define TRUE_ @"true"
 #define SLIDER @"Slider"
-#define Multi_Input @"Multi_Input"
+#define MULTI_BUTTON @"MULTI_BUTTON"
 #define HUE @"Hue"
 #define HUE_SLIDER @"HueSlider"
-#define TEXT_VIEW @"TextView"
+#define TEXT_VIEW @"TEXT_VIEW"
 #define ACTUATOR @"Actuator"
 #define SENSOR @"Sensor"
 
@@ -60,15 +60,17 @@
 #define ROW_NO @"row_no"
 #define GENERIC_INDEX_ID @"genericIndexID"
 
-#define GRIDVIEW @"GRIDVIEW"
+#define GRID_VIEW @"GRID_VIEW"
 #define LIST @"LIST"
 
 //clients constants
 #define CLIENT_NAME @"name"
-#define BLOCKED @"Blocked"
 #define ACTIVE @"Active"
 #define INACTIVE @"InActive"
 #define UNKNOWN @"UnKnown"
 
+#define ALLOWED_TYPE_ALWAYS @"Always"
+#define ALLOWED_TYPE_BLOCKED @"Blocked"
+#define ALLOWED_TYPE_ONSCHEDULE @"OnSchedule"
 
 #endif /* AlmondJsonCommandKeyConstants_h */

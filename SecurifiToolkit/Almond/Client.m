@@ -8,6 +8,7 @@
 
 #import "Client.h"
 #import "SecurifiToolkit.h"
+#import "AlmondJsonCommandKeyConstants.h"
 
 @implementation Client
 
@@ -122,58 +123,39 @@
 
 +(NSString*)getOrSetValueForClient:(Client*)client genericIndex:(int)genericIndex newValue:(NSString*)newValue ifGet:(BOOL)get{
     switch (genericIndex) {
-        case -11:
-        {
-            if(get)
-                return client.name;
-            else
-                client.name = newValue;
-            break;
+        case -11:{
+            client.name=get? client.name:newValue;
+            return client.name;
         }
         case -12:
         {
-            if(get)
-                return client.deviceType;
-            else
-                client.deviceType = newValue;
-            break;
+            client.deviceType=get? client.deviceType:newValue;
+            return client.deviceType;
         }
         case -13:
         {
-            if(get)
-                return client.manufacturer;
-            else
-                client.manufacturer = newValue;
-            break;
+            client.manufacturer=get? client.manufacturer:newValue;
+            return client.manufacturer;
         }
         case -14:
         {
-            if(get)
-                return client.deviceMAC;
-            else
-                client.deviceMAC = newValue;
-            break;
+            client.deviceMAC=get? client.deviceMAC:newValue;
+            return client.deviceMAC;
         }
         case -15:
         {
-            if(get)
-                return client.deviceLastActiveTime;
-            else
-                client.deviceLastActiveTime = newValue;
-            break;
+            client.deviceLastActiveTime=get? client.deviceLastActiveTime:newValue;
+            return client.deviceLastActiveTime;
         }
         case -16:
         {
-            if(get)
-                return client.deviceConnection;
-            else
-                client.deviceConnection = newValue;
-            break;
+            client.deviceConnection=get? client.deviceConnection:newValue;
+            return client.deviceConnection;
         }
         case -17:
         {
             if(get)
-                return client.deviceUseAsPresence? @"true" : @"false";
+                return @(client.deviceUseAsPresence).stringValue;
             else
                 client.deviceUseAsPresence = newValue.boolValue;
             break;
@@ -195,11 +177,8 @@
         }
         case -20:
         {
-            if(get)
-                return client.rssi;
-            else
-                client.rssi = newValue;
-            break;
+            client.rssi=get? client.rssi:newValue;
+            return client.rssi;
         }
         case -3:
         {
@@ -215,5 +194,18 @@
             break;
     }
     return nil;
+}
+
++(NSString*)getAllowedOnNetworkTypeForType:(DeviceAllowedType)type{
+    switch (type) {
+        case DeviceAllowed_Always:
+            return ALLOWED_TYPE_ALWAYS;
+        case DeviceAllowed_Blocked:
+            return ALLOWED_TYPE_BLOCKED;
+        case DeviceAllowed_OnSchedule:
+            return ALLOWED_TYPE_ONSCHEDULE;
+        default:
+            return UNKNOWN;
+    }
 }
 @end

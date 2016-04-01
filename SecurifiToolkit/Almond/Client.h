@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-//todo badly named; something more descriptive and accurate like AlmondConnectedClient
 typedef NS_ENUM(NSInteger, DeviceAllowedType){
     DeviceAllowed_Always=0,
     DeviceAllowed_Blocked=1,
