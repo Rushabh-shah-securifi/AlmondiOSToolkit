@@ -159,7 +159,7 @@
         case -17:
         {
             if(get)
-                return @(client.deviceUseAsPresence).stringValue;
+                return client.deviceUseAsPresence?@"true":@"false";
             else
                 client.deviceUseAsPresence = newValue.boolValue;
             break;
