@@ -27,9 +27,9 @@
 
 +(DeviceCommandType)getCommandType:(NSString*)command{
     if(command){
-        if([command isEqualToString:@"Name"])
+        if([command isEqualToString:@"NameChanged"])
             return DeviceCommand_UpdateDeviceName;
-        else if([command isEqualToString:@"Location"])
+        else if([command isEqualToString:@"LocationChanged"])
             return DeviceCommand_UpdateDeviceLocation;
         else if([command isEqualToString:@"NotifyMe"])
             return DeviceCommand_NotifyMe;
