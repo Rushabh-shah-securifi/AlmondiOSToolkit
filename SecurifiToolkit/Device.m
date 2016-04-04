@@ -25,6 +25,16 @@
     return nil;
 }
 
++(Device *)getDeviceCopy:(Device*)device{
+    Device *deviceNew = [Device new];
+    deviceNew.type = device.type;
+    deviceNew.name = device.name;
+    deviceNew.location = device.location;
+    deviceNew.almondMAC = device.almondMAC;
+    deviceNew.notificationMode = device.notificationMode;
+    deviceNew.knownValues = device.knownValues;
+    return  deviceNew;
+}
 +(NSMutableArray*)getDeviceTypes{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     NSMutableSet *deviceTypes = [NSMutableSet new];
@@ -49,6 +59,19 @@
 
 +(NSDictionary*)getCommonIndexesDict{
     return @{@"Name":@"-1", @"Location":@"-2", @"NotifyMe":@"-3"};
+}
+
++ (void)setDeviceNameLocation:(Device*)device forGenericID:(int)genericID value:(NSString*)value{
+    switch (genericID) {
+        case -1:
+            device.name = value;
+            break;
+        case -2:
+            device.location = value;
+            break;
+        default:
+            break;
+    }
 }
 
 @end

@@ -26,6 +26,6 @@
 -(NSString*)transform:(NSString*)value{
     int intValue = value.intValue;
     NSLog(@"value:%d, factor:%f", intValue, self.factor);
-    return [NSString stringWithFormat:@"%.1f", intValue*self.factor];
+    return [NSString stringWithFormat:@"%.1f%@", intValue*self.factor, self.units];
 }
 @end
