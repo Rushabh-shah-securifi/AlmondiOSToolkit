@@ -7,6 +7,7 @@
 //
 
 #import "GenericIndexClass.h"
+#import "AlmondJsonCommandKeyConstants.h"
 
 @implementation GenericIndexClass
 -(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType{
@@ -27,11 +28,11 @@
 
 +(DeviceCommandType)getCommandType:(NSString*)command{
     if(command){
-        if([command isEqualToString:@"NameChanged"])
+        if([command isEqualToString:NAME_CHANGED])
             return DeviceCommand_UpdateDeviceName;
-        else if([command isEqualToString:@"LocationChanged"])
+        else if([command isEqualToString:LOCATION_CHANGED])
             return DeviceCommand_UpdateDeviceLocation;
-        else if([command isEqualToString:@"NotifyMe"])
+        else if([command isEqualToString:NOTIFYME])
             return DeviceCommand_NotifyMe;
     }
     else{

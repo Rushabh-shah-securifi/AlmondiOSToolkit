@@ -48,6 +48,9 @@
 #define ACTUATOR @"Actuator"
 #define SENSOR @"Sensor"
 
+#define NAME_CHANGED @"NameChanged"
+#define LOCATION_CHANGED @"LocationChanged"
+#define NOTIFYME @"NotifyMe"
 
 //generic device key constants
 #define DEVICE_NAME @"name"
