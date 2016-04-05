@@ -175,8 +175,10 @@
         case -19:{
             if(get)
                 return @(client.deviceAllowedType).stringValue;
-            else
-                client.deviceAllowedType = newValue.integerValue;
+            else{
+                [self updateAllowOnNetworkAndSchedule:client blockedString:newValue];
+            }
+            
             break;
         }
         case -20:
@@ -200,6 +202,17 @@
     return nil;
 }
 
++(void)updateAllowOnNetworkAndSchedule:(Client*)client blockedString:(NSString*)blockedString{
+    if([blockedString isEqualToString:@"000000,000000,000000,000000,000000,00000,00000"]){
+        client.deviceAllowedType = DeviceAllowed_Always;
+    }else if([blockedString isEqualToString:@"ffffff,ffffff,ffffff,ffffff,ffffff,ffffff,ffffff"]){
+        client.deviceAllowedType = DeviceAllowed_Blocked;
+        
+    }else{
+        client.deviceAllowedType = DeviceAllowed_OnSchedule;
+    }
+    client.deviceSchedule = blockedString;
+}
 +(NSString*)getAllowedOnNetworkTypeForType:(DeviceAllowedType)type{
     switch (type) {
         case DeviceAllowed_Always:

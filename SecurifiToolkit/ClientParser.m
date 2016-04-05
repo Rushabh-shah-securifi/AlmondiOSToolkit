@@ -52,7 +52,6 @@
             [wifiClientsArray addObject:device];
         }
         toolkit.clients = wifiClientsArray;
-        NSLog(@"wificlient array: %ld", wifiClientsArray.count);
     }
     
     else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){
