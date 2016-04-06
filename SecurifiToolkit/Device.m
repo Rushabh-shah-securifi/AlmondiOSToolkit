@@ -35,6 +35,7 @@
     deviceNew.knownValues = device.knownValues;
     return  deviceNew;
 }
+
 +(NSMutableArray*)getDeviceTypes{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     NSMutableSet *deviceTypes = [NSMutableSet new];

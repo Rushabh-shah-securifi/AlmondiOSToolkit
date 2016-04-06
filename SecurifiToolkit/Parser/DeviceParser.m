@@ -153,28 +153,28 @@
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
     NSLog(@"parseDeviceListAndDynamicDeviceResponse");
-//    NSNotification *notifier = (NSNotification *) sender;
-//    NSDictionary *dataInfo = [notifier userInfo];
-//    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
-//        return;
-//    }
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *dataInfo = [notifier userInfo];
+    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
+        return;
+    }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-//    SFIAlmondPlus *almond = [toolkit currentAlmond];
-//    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
-//    if(local){
-//        payload = [dataInfo valueForKey:@"data"];
-//    }else{
-//        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-//    }
-    payload = [self parseJson:@"DeviceListResponse"];
+    if(local){
+        payload = [dataInfo valueForKey:@"data"];
+    }else{
+        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+    }
+//    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
-//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-//    if(!isMatchingAlmondOrLocal) //for cloud
-//        return;
+    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
     
-    if([[payload valueForKey:@"CommandType"] isEqualToString:@"DeviceList"]){
-        NSDictionary *devicesPayload = payload[@"Devices"];
+    if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DEVICE_LIST]){
+        NSDictionary *devicesPayload = payload[DEVICES];
         NSArray *devicePosKeys = devicesPayload.allKeys;
         NSArray *sortedPostKeys = [devicePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
@@ -187,8 +187,8 @@
             [toolkit.devices addObject:device];
         }
     }
-    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceAdded"]) {
-        NSDictionary *devicesPayload = payload[@"Devices"];
+    else if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_DEVICE_ADDED]) {
+        NSDictionary *devicesPayload = payload[DEVICES];
         NSString *deviceID = [[devicesPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         NSDictionary *addedDevicePayload = [devicesPayload objectForKey:deviceID];
         Device *device = [self parseDeviceForPayload:addedDevicePayload];
@@ -196,8 +196,8 @@
         [toolkit.devices addObject:device];
         
     }
-    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceUpdated"]){
-        NSDictionary *devicesPayload = payload[@"Devices"];
+    else if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_DEVICE_UPDATED]){
+        NSDictionary *devicesPayload = payload[DEVICES];
         NSString *deviceID = [[devicesPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         NSDictionary *updatedDevicePayload = [devicesPayload objectForKey:deviceID];
         for(Device *device in toolkit.devices){
@@ -208,8 +208,8 @@
         }
         
     }
-    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceRemoved"]){
-        NSString *removedDeviceID = payload[@"ID"];
+    else if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_DEVICE_REMOVED]){
+        NSString *removedDeviceID = payload[D_ID];
         Device *toBeRemovedDevice;
         for(Device *device in toolkit.devices){
             if(device.ID == [removedDeviceID intValue]){
@@ -218,10 +218,10 @@
         }
         [toolkit.devices removeObject:toBeRemovedDevice];
     }
-    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicDeviceRemoveAll"]){
+    else if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_DEVICE_REMOVED_ALL]){
         [toolkit.devices removeAllObjects];
     }
-    else if([[payload valueForKey:@"CommandType"] isEqualToString:@"DynamicIndexUpdated"]){
+    else if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_INDEX_UPDATE]){
         NSDictionary *updatedDevice = payload[@"Data"];
         for(Device *device in toolkit.devices){
             NSDictionary *valuesDic = updatedDevice[@(device.ID).stringValue];
@@ -374,14 +374,14 @@
 }
 
 - (void)updateDevice:(Device*)device payload:(NSDictionary*)payload{
-    device.name = payload[@"Name"];
-    device.location = payload[@"Location"];
+    device.name = payload[D_NAME];
+    device.location = payload[LOCATION];
     NSString *str;
-    str = payload[@"Type"];
+    str = payload[D_TYPE];
     if (str.length > 0) {
         device.type =str.intValue;
     }
-    NSDictionary *valuesDic = payload[@"DeviceValues"];
+    NSDictionary *valuesDic = payload[DEVICE_VALUE];
     device.knownValues = [self parseValues:valuesDic];
     
 }
@@ -404,8 +404,8 @@
 }
 
 - (void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
-    values.valueName = payload[@"Name"];
-    values.value = payload[@"Value"];
+    values.valueName = payload[D_NAME];
+    values.value = payload[VALUE];
 }
 
 - (NSDictionary*)parseJson:(NSString*)fileName{

@@ -9,6 +9,8 @@
 #ifndef AlmondJsonCommandKeyConstants_h
 #define AlmondJsonCommandKeyConstants_h
 
+//common
+#define COMMAND_TYPE @"CommandType"
 
 //generic index key constants
 #define INDEX_NAME @"Name"
@@ -67,7 +69,6 @@
 #define LIST @"LIST"
 
 //clients constants
-#define CLIENT_NAME @"name"
 #define ACTIVE @"Active"
 #define INACTIVE @"InActive"
 #define UNKNOWN @"UnKnown"
@@ -75,5 +76,55 @@
 #define ALLOWED_TYPE_ALWAYS @"Always"
 #define ALLOWED_TYPE_BLOCKED @"Blocked"
 #define ALLOWED_TYPE_ONSCHEDULE @"OnSchedule"
+
+//DevicePayload
+#define MOBILE_INTERNAL_INDEX @"MobileInternalIndex"
+#define UPDATE_DEVICE_INDEX @"UpdateDeviceIndex"
+#define D_ID @"ID"
+#define INDEX @"Index"
+#define VALUE @"Value"
+#define UPDATE_DEVICE_NAME @"UpdateDeviceName"
+#define LOCATION @"Location"
+
+//clientPayload
+#define UPDATE_CLIENT @"UpdateClient"
+#define C_ID @"ID"
+#define CLIENT_NAME @"Name"
+#define CONNECTION @"Connection"
+#define MAC @"MAC"
+#define CLIENT_TYPE @"Type"
+#define LAST_KNOWN_IP @"LastKnownIP"
+#define USE_AS_PRESENCE @"UseAsPresence"
+#define WAIT @"Wait"
+#define BLOCK @"Block"
+#define SCHEDULE @"Schedule"
+#define CLIENTS @"Clients"
+
+
+//cientParser
+#define CLIENTLIST @"ClientList"
+#define ALMONDMAC @"AlmondMAC"
+
+#define DYNAMIC_CLIENT_ADDED @"DynamicClientAdded"
+#define DYNAMIC_CLIENT_UPDATED @"DynamicClientUpdated"
+#define DYNAMIC_CLIENT_JOINED @"DynamicClientJoined"
+#define DYNAMIC_CLIENT_LEFT @"DynamicClientLeft"
+#define DYNAMIC_CLIENT_REMOVED @"DynamicClientRemoved"
+
+#define MANUFACTURER @"Manufacturer"
+#define RSSI @"RSSI"
+#define LAST_ACTIVE_EPOCH @"LastActiveEpoch"
+
+//DeviceParser
+#define DEVICE_LIST @"DeviceList"
+#define DYNAMIC_DEVICE_ADDED @"DynamicDeviceAdded"
+#define DEVICES @"Devices"
+#define DYNAMIC_DEVICE_UPDATED @"DynamicDeviceUpdated"
+#define DYNAMIC_DEVICE_REMOVED @"DynamicDeviceRemoved"
+#define DYNAMIC_DEVICE_REMOVED_ALL @"DynamicDeviceRemoveAll"
+#define DYNAMIC_INDEX_UPDATE @"DynamicIndexUpdated"
+#define DEVICE_VALUE @"DeviceValues"
+#define D_TYPE @"Type"
+#define D_NAME @"Name"
 
 #endif /* AlmondJsonCommandKeyConstants_h */

@@ -3498,4 +3498,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
+#pragma mark toolkitsend command
+- (void)asyncSendCommand:(GenericCommand *)command {
+    SFIAlmondPlus *almond = [self currentAlmond];
+    BOOL local = [self useLocalNetwork:almond.almondplusMAC];
+    if(local){
+        [self asyncSendToLocal:command almondMac:almond.almondplusMAC];
+    }else{
+        [self asyncSendToCloud:command];
+    }
+}
+
 @end

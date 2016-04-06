@@ -404,4 +404,5 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network;
 
 -(void)cleanUp;
+- (void)asyncSendCommand:(GenericCommand *)command;
 @end

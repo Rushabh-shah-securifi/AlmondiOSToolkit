@@ -13,6 +13,7 @@
 #import "MDJSON.h"
 #import "Client.h"
 #import "SecurifiToolkit.h"
+#import "AlmondJsonCommandKeyConstants.h"
 
 @implementation ClientParser
 - (instancetype)init {
@@ -43,8 +44,8 @@
     }
     NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
     
-    if ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"ClientList"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
-        NSArray *dDictArray = [mainDict valueForKey:@"Clients"];
+    if ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:CLIENTLIST] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)) {
+        NSArray *dDictArray = [mainDict valueForKey:CLIENTS];
         NSMutableArray *wifiClientsArray = [NSMutableArray new];
         for (NSDictionary *dict in dDictArray) {
             Client *device = [Client new];
@@ -54,57 +55,66 @@
         toolkit.clients = wifiClientsArray;
     }
     
-    else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientAdded"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)){
-        NSDictionary * dict = [mainDict valueForKey:@"Clients"];
+    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)){
+        NSDictionary * dict = [mainDict valueForKey:CLIENTS];
         Client * device = [Client new];
         [self setDeviceProperties:device forDict:dict];
         [toolkit.clients addObject:device];
     }
     else if (
-               ([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientUpdated"]||
-                [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientJoined"]||
-                [[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientLeft"])&&
-               ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)
+               ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_UPDATED]||
+                [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_JOINED]||
+                [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_LEFT])&&
+               ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)
                ) {
-        NSDictionary *dict = [mainDict valueForKey:@"Clients"];
+        NSDictionary *dict = [mainDict valueForKey:CLIENTS];
         for (Client * device in toolkit.clients) {
-            if ([device.deviceID isEqualToString:[dict valueForKey:@"ID"]]) {
+            if ([device.deviceID isEqualToString:[dict valueForKey:C_ID]]) {
                 [self setDeviceProperties:device forDict:dict];
                 break;
             }
         }
     }
-    else if([[mainDict valueForKey:@"CommandType"] isEqualToString:@"DynamicClientRemoved"] && ([[mainDict valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local)) {
-        NSDictionary * removedClientDict = [mainDict valueForKey:@"Clients"];
+    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVED] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)) {
+        NSDictionary * removedClientDict = [mainDict valueForKey:CLIENTS];
         Client *toBeRemovedClient;
         for (Client * device in toolkit.clients) {
-            if ([device.deviceID isEqualToString:[removedClientDict valueForKey:@"ID"]]) {
+            if ([device.deviceID isEqualToString:[removedClientDict valueForKey:C_ID]]) {
                 toBeRemovedClient = device;
                 break;
             }
         }
         [toolkit.clients removeObject:toBeRemovedClient];
     }
+    toolkit.clients = [self getSortedDevices];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DYNAMIC_CLIENTLIST_ADD_UPDATE_REMOVE_NOTIFIER object:nil userInfo:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil userInfo:nil];
 }
 
 -(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{
-    device.deviceID = [dict valueForKey:@"ID"];
-    device.name = [dict valueForKey:@"Name"];
-    device.manufacturer = [dict valueForKey:@"Manufacturer"];
-    device.rssi = [dict valueForKey:@"RSSI"];
-    device.deviceMAC = [dict valueForKey:@"MAC"];
-    device.deviceIP = [dict valueForKey:@"LastKnownIP"];
-    device.deviceConnection = [dict valueForKey:@"Connection"];
-    device.deviceLastActiveTime = [dict valueForKey:@"LastActiveEpoch"];
-    device.deviceType = [dict valueForKey:@"Type"];
-    device.deviceUseAsPresence = [[dict valueForKey:@"UseAsPresence"] boolValue];
-    device.isActive = [[dict valueForKey:@"Active"] boolValue];
-    device.timeout = [[dict valueForKey:@"Wait"] integerValue];
-    device.deviceAllowedType = [[dict valueForKey:@"Block"] intValue];
-    device.deviceSchedule = [dict valueForKey:@"Schedule"]==nil?@"":[dict valueForKey:@"Schedule"];
+    device.deviceID = [dict valueForKey:C_ID];
+    device.name = [dict valueForKey:CLIENT_NAME];
+    device.manufacturer = [dict valueForKey:MANUFACTURER];
+    device.rssi = [dict valueForKey:RSSI];
+    device.deviceMAC = [dict valueForKey:MAC];
+    device.deviceIP = [dict valueForKey:LAST_KNOWN_IP];
+    device.deviceConnection = [dict valueForKey:CONNECTION];
+    device.deviceLastActiveTime = [dict valueForKey:LAST_ACTIVE_EPOCH];
+    device.deviceType = [dict valueForKey:CLIENT_TYPE];
+    device.deviceUseAsPresence = [[dict valueForKey:USE_AS_PRESENCE] boolValue];
+    device.isActive = [[dict valueForKey:ACTIVE] boolValue];
+    device.timeout = [[dict valueForKey:WAIT] integerValue];
+    device.deviceAllowedType = [[dict valueForKey:BLOCK] intValue];
+    device.deviceSchedule = [dict valueForKey:SCHEDULE]==nil?@"":[dict valueForKey:SCHEDULE];
 }
 
+-(NSMutableArray*)getSortedDevices{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSSortDescriptor *firstDescriptor = [[NSSortDescriptor alloc] initWithKey:@"isActive" ascending:NO];
+    NSSortDescriptor *secondDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES selector:@selector(caseInsensitiveCompare:)];
+    
+    NSArray *sortDescriptors = [NSArray arrayWithObjects:firstDescriptor, secondDescriptor, nil];
+    return [[toolkit.clients sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
+}
 
 @end
