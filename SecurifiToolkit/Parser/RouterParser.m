@@ -10,6 +10,20 @@
 #import "SecurifiToolkit.h"
 
 @implementation RouterParser
+
+- (instancetype)init {
+    self = [super init];
+    if(self){
+        [self initNotification];
+    }
+    return self;
+}
+-(void)initNotification{
+    NSLog(@"init device notification");
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(parseRouterResponse:) name:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER object:nil];
+}
+
 -(void)testRouterParser{
     NSDictionary *routerSumary = @{
                                    @"CommandType":@"RouterSummary",
@@ -31,7 +45,7 @@
                                                                  }
                                                                ],
                                            @"Uptime":@"12633321",
-                                           @"URL":@"",
+                                           @"URL":@"10.10.10.10",
                                            @"Login":@"root",
                                            @"TempPass":@"xyz",
                                            @"RouterUptime":@"5 days, 6:15hrs",
@@ -92,12 +106,13 @@
                                                       }
                                           };
     
-//    [self onRouterSummaryResponse:nil paload:routerSumary];
-//    [self onRouterSummaryResponse:nil paload:getWirelessSettings];
-//    [self onRouterSummaryResponse:nil paload:setWirelessSettings];
+    [self parseRouterResponse:routerSumary];
+    [self parseRouterResponse:getWirelessSettings];
+//    [self parseRouterResponse:setWirelessSettings];
 }
 
--(void)onRouterSummaryResponse:(id)sender{
+
+-(void)parseRouterResponse:(id)sender{
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *dataInfo = [notifier userInfo];
     if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
@@ -116,20 +131,19 @@
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
-    
+//    payload = sender;
+    NSLog(@"router payload: %@", payload);
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"RouterSummary"]){
-        NSDictionary *routerSummaryPayload = payload[@"Data"];
-        [self parseRouterSummary:routerSummaryPayload];
+        toolkit.routerSummary = [self parseRouterSummary:payload];
         
     }else if([[payload valueForKey:@"CommandType"] isEqualToString:@"GetWirelessSettings"]){
-        NSDictionary *wirelessSettingsPayload = payload[@"Data"];
-        [self parseWirelessSettings:wirelessSettingsPayload[@"WirelessSetting"]];
+        toolkit.wireLessSettings = [self parseWirelessSettings:payload[@"WirelessSetting"]];
     }
     else if([[payload valueForKey:@"CommandType"] isEqualToString:@"SetWirelessSettings"]){
-        NSDictionary *wirelessSettingsPayload = payload[@"Data"];
-        [self parseWirelessSettings:wirelessSettingsPayload[@"WirelessSetting"]];
+        [self parseWirelessSettings:payload[@"WirelessSetting"]];
     }
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER object:nil];
 }
 
 -(SFIRouterSummary*)parseRouterSummary:(NSDictionary*)payload{

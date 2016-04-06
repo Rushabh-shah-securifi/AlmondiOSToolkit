@@ -56,6 +56,7 @@
 #import "RuleParser.h"
 #import "DeviceParser.h"
 #import "DataBaseManager.h"
+#import "RouterParser.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -124,6 +125,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) SceneListener *sceneListener;
 @property(nonatomic, strong) ClientParser *clientParser;
 @property(nonatomic, strong) DeviceParser *deviceParser;
+@property(nonatomic, strong) RouterParser *routerParser;
 
 @end
 
@@ -200,6 +202,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.sceneListener=[[SceneListener alloc]init];
     self.clientParser=[[ClientParser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
+    self.routerParser = [[RouterParser alloc]init];
     [DataBaseManager initializeDataBase];
 }
 

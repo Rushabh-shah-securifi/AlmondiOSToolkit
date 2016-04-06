@@ -69,6 +69,8 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 // the dictionary will be serialized as JSON (NSData)
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(CommandType)type;
 
++ (instancetype)jsonStringPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType;
+
 //scene list request
 + (instancetype)websocketRequestAlmondSceneList;
 

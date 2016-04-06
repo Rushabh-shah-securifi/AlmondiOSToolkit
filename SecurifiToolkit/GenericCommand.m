@@ -294,6 +294,13 @@
     return cmd;
 }
 
++ (instancetype)jsonStringPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.command = [payload JSONString];
+    cmd.commandType = commandType;
+    return cmd;
+}
+
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.command=%@", self.command];

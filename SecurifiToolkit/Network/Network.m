@@ -640,6 +640,12 @@
             [self postData:NOTIFICATION_UPDATE_DEVICE_NAME_NOTIFIER data:payload];
             break;
         };
+        case CommandType_ROUTER_COMMAND_RESPOSE: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
+            break;
+        };
+        
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:

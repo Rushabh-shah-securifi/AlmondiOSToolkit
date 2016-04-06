@@ -166,13 +166,14 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Changes take effect on next connection attempt. Use closeConnection to force a connection change.
 @property(nonatomic) BOOL useProductionCloud;
 
-@property(nonatomic)NSMutableArray *scenesArray;
-@property(nonatomic)NSMutableArray *clients;
-@property(nonatomic)NSMutableArray *devices;
-@property(nonatomic)NSMutableArray *ruleList;
-@property(nonatomic)NSDictionary *genericDevices;
-@property(nonatomic)NSDictionary *genericIndexes;
-
+@property(nonatomic) NSMutableArray *scenesArray;
+@property(nonatomic) NSMutableArray *clients;
+@property(nonatomic) NSMutableArray *devices;
+@property(nonatomic) NSMutableArray *ruleList;
+@property(nonatomic) NSDictionary *genericDevices;
+@property(nonatomic) NSDictionary *genericIndexes;
+@property(nonatomic) SFIRouterSummary *routerSummary;
+@property(nonatomic) NSArray *wireLessSettings;
 
 + (BOOL)isInitialized;
 
@@ -230,6 +231,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // returns the Local Connection settings for the almond, or nil if none configured
 - (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
+
+- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary;
 
 - (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
 
