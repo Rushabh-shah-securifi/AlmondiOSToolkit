@@ -640,7 +640,7 @@
             [self postData:NOTIFICATION_UPDATE_DEVICE_NAME_NOTIFIER data:payload];
             break;
         };
-        case CommandType_ROUTER_COMMAND_RESPOSE: {
+        case CommandType_ROUTER_COMMAND_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
             break;

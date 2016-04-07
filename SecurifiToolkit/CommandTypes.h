@@ -136,7 +136,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE   = 93,
     
     CommandType_ROUTER_COMMAND_REQUEST                  = 1320,
-    CommandType_ROUTER_COMMAND_RESPOSE                  = 1321,
+    CommandType_ROUTER_COMMAND_RESPONSE                 = 1321,
 };
 
 // returns a string name for the specified type; useful for logging

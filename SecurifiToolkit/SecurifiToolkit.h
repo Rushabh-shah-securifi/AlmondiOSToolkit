@@ -172,8 +172,6 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(nonatomic) NSMutableArray *ruleList;
 @property(nonatomic) NSDictionary *genericDevices;
 @property(nonatomic) NSDictionary *genericIndexes;
-@property(nonatomic) SFIRouterSummary *routerSummary;
-@property(nonatomic) NSArray *wireLessSettings;
 
 + (BOOL)isInitialized;
 

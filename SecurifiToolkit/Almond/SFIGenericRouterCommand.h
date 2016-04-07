@@ -29,5 +29,6 @@ typedef NS_ENUM(unsigned int, SFIGenericRouterCommandType) {
 @property(nonatomic) BOOL commandSuccess;
 @property(nonatomic) NSString *responseMessage;
 @property(nonatomic) unsigned int completionPercentage;
+@property(nonatomic) int mii;
 
 @end

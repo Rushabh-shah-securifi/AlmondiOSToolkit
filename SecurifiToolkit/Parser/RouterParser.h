@@ -9,5 +9,15 @@
 #import <Foundation/Foundation.h>
 
 @interface RouterParser : NSObject
--(void)testRouterParser;
++(void)testRouterParser;
+
++(void)sendrouterSummary;
+
++(void)getWirelessSetting;
+
++(void)setWirelessSetting;
+
++(void)setLogsResponce;
+
++(void)setRebootResponce;
 @end
