@@ -69,6 +69,7 @@
 // Controls whether hidden controls will be enabled on the Sensor Tile
 @property(nonatomic) BOOL enableSensorTileDebugInfo;
 
+@property(nonatomic) BOOL isSimulator;
 - (id)copyWithZone:(NSZone *)zone;
 
 @end
