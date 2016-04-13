@@ -17,6 +17,8 @@
 
 +(void)setWirelessSetting;
 
++(void)updateFirmwareResponse;
+
 +(void)setLogsResponce;
 
 +(void)setRebootResponce;

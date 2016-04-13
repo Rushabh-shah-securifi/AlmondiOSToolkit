@@ -125,6 +125,10 @@
     [self parseRouterCommandResponse:[self getcommand:setWirelessSettings]];
 }
 
++(void)updateFirmwareResponse{
+    
+}
+
 +(void)setRebootResponce{
     NSDictionary *rebootRes = @{
                                 
