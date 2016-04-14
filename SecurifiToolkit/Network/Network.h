@@ -43,6 +43,7 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 
 - (void)networkDidReceiveDynamicUpdate:(Network*)network response:(id)payload responseType:(enum CommandType)commandType;
 
+-(void)_sendSanity;
 @end
 
 

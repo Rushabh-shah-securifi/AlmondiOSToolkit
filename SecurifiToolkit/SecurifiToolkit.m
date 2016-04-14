@@ -373,6 +373,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
     // guard against bad data
     if (![settings hasCompleteSettings]) {
+        NSLog(@"storeLocalNetworkSettings");
         return;
     }
     
@@ -380,6 +381,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary {
+    NSLog(@"tryUpdateLocalNetworkSettingsForAlmond");
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
     if (!settings) {
         settings = [SFIAlmondLocalNetworkSettings new];
@@ -568,30 +570,84 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         Network *network = [block_self setupCloudNetwork];
         
-        // After setting up the network, we need to do some basic things
-        // 1. send sanity cmd to test the socket
-        // 2. logon
-        // 3. update the devices list
-        // 4. check hashes etc.
+//        // After setting up the network, we need to do some basic things
+//        // 1. send sanity cmd to test the socket
+//        // 2. logon
+//        // 3. update the devices list
+//        // 4. check hashes etc.
+//        
+//        GenericCommand *cmd;
+//        BOOL cmdSendSuccess;
+//        
+//        // Send sanity command testing network connection
+//        cmd = [block_self makeCloudSanityCommand];
+//        cmdSendSuccess = [block_self internalInitializeCloud:network command:cmd];
+//        if (!cmdSendSuccess) {
+//            return;
+//        }
+//        
+//        DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
+//        DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+//        
+//        // If no logon credentials, then initialization is completed.
+//        if (![block_self hasLoginCredentials]) {
+//            DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
+//            network.loginStatus = NetworkLoginStatusNotLoggedIn;
+//            [network markCloudInitialized]; //todo fix me: this is fouling up the Network control logic, but removing it then prevents normal commands from being sent...
+//            
+//            // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
+//            // We probably should track things down and find a way to remove a dependency on this event in the UI.
+//            [block_self postNotification:kSFIDidLogoutNotification data:nil];
+//            return;
+//        }
+//        
+//        // Send logon credentials
+//        network.loginStatus = NetworkLoginStatusInProcess;
+//        
+//        DLog(@"%s: sending temp pass credentials", __PRETTY_FUNCTION__);
+//        cmd = [block_self makeTempPassLoginCommand];
+//        cmdSendSuccess = [block_self internalInitializeCloud:network command:cmd];
+//        if (!cmdSendSuccess) {
+//            DLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
+//        }
+//        
+//        // Request updates to the almond; See onLoginResponse handler for logic handling first-time login and follow-on requests.
+//        [block_self asyncInitializeConnection1:network];
+    });
+}
+
+-(void)_sendSanity{
+    
+    __weak SecurifiToolkit *block_self = self;
+    dispatch_async(self.commandDispatchQueue, ^() {
+        //        BOOL success = [block_self.cloudNetwork submitCommand:command];
+        //        if (success) {
+        //            DLog(@"[Generic cmd: %d] send success", command.commandType);
+        //        }
+        //        else {
+        //            DLog(@"[Generic cmd: %d] send error", command.commandType);
+        //        }
+        
+        
         
         GenericCommand *cmd;
         BOOL cmdSendSuccess;
         
         // Send sanity command testing network connection
         cmd = [block_self makeCloudSanityCommand];
-        cmdSendSuccess = [block_self internalInitializeCloud:network command:cmd];
+        cmdSendSuccess = [block_self internalInitializeCloud:block_self.cloudNetwork command:cmd];
         if (!cmdSendSuccess) {
             return;
         }
         
-        DLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
-        DLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+        NSLog(@"%s: init SDK: send sanity successful", __PRETTY_FUNCTION__);
+        NSLog(@"%s: session started: %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
         
         // If no logon credentials, then initialization is completed.
         if (![block_self hasLoginCredentials]) {
-            DLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
-            network.loginStatus = NetworkLoginStatusNotLoggedIn;
-            [network markCloudInitialized]; //todo fix me: this is fouling up the Network control logic, but removing it then prevents normal commands from being sent...
+            NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
+            block_self.cloudNetwork.loginStatus = NetworkLoginStatusNotLoggedIn;
+            [block_self.cloudNetwork markCloudInitialized]; //todo fix me: this is fouling up the Network control logic, but removing it then prevents normal commands from being sent...
             
             // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
             // We probably should track things down and find a way to remove a dependency on this event in the UI.
@@ -600,19 +656,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
         
         // Send logon credentials
-        network.loginStatus = NetworkLoginStatusInProcess;
+        block_self.cloudNetwork.loginStatus = NetworkLoginStatusInProcess;
         
-        DLog(@"%s: sending temp pass credentials", __PRETTY_FUNCTION__);
+        NSLog(@"%s: sending temp pass credentials", __PRETTY_FUNCTION__);
         cmd = [block_self makeTempPassLoginCommand];
-        cmdSendSuccess = [block_self internalInitializeCloud:network command:cmd];
+        cmdSendSuccess = [block_self internalInitializeCloud:block_self.cloudNetwork command:cmd];
         if (!cmdSendSuccess) {
-            DLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
+            NSLog(@"%s: failed on sending login command", __PRETTY_FUNCTION__);
         }
         
         // Request updates to the almond; See onLoginResponse handler for logic handling first-time login and follow-on requests.
-        [block_self asyncInitializeConnection1:network];
+        [block_self asyncInitializeConnection1:block_self.cloudNetwork];
+        
     });
+   
 }
+
 
 - (void)_asyncInitLocal:(NSString *)almondMac {
     if (self.isShutdown) {
@@ -2595,10 +2654,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (routerCommand == nil) {
         return;
     }
-    
+    NSLog(@"internalOnGenericRouterCommandResponse");
     if (routerCommand.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
         // after receiving summary, we update the local wireless connection settings with the current login/password
         SFIRouterSummary *summary = (SFIRouterSummary *) routerCommand.command;
+        
         [self tryUpdateLocalNetworkSettingsForAlmond:routerCommand.almondMAC withRouterSummary:summary];
     }
     

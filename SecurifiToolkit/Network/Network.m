@@ -430,6 +430,7 @@
         [self.delegate networkConnectionDidEstablish:self];
         self.networkUpNoticePosted = YES;
         [self postData:NETWORK_UP_NOTIFIER data:nil];
+        [self.delegate _sendSanity];
     }
 }
 
