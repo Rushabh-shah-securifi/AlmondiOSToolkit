@@ -74,6 +74,8 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 //scene list request
 + (instancetype)websocketRequestAlmondSceneList;
 
++ (instancetype)requestSensorDeviceList:(NSString*)mac;
+
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
 
