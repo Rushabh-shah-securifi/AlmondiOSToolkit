@@ -14,7 +14,7 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
     DeviceAllowed_OnSchedule=2
 };
 
-@interface Client : NSObject
+@interface Client : NSObject <NSCopying>
 //<ConnectedDevice><Name>ashutosh</Name><IP>1678379540</IP><MAC>10:60:4b:d9:60:84</MAC></ConnectedDevice>
 @property(nonatomic, retain) NSString *name;
 @property(nonatomic, retain) NSString *deviceIP;

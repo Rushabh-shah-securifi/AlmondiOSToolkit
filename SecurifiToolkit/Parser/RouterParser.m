@@ -52,8 +52,8 @@
                                                }
                                            ],
                                    @"Uptime":@"12633321",
-                                   @"URL":@"10.10.10.10",
-                                   @"Login":@"root",
+                                   @"URL":@"10.1.1.254",
+                                   @"Login":@"admin",
                                    @"TempPass":@"xyz",
                                    @"RouterUptime":@"5 days, 6:15hrs",
                                    @"FirmwareVersion":@"AL2-R091"
@@ -111,6 +111,16 @@
                                                       @"Type":@"2G",
                                                       @"Enabled":@"true",
                                                       @"SSID":@"AlmondNetwork",
+                                                      @"Channel":@"1",
+                                                      @"EncryptionType":@"AES",
+                                                      @"Security":@"WPA2PSK",
+                                                      @"WirelessMode":@"802.11bgn",
+                                                      @"CountryRegion":@"0"
+                                                      },
+                                                  @{
+                                                      @"Type":@"Guest2G",
+                                                      @"Enabled":@"true",
+                                                      @"SSID":@"Guest",
                                                       @"Channel":@"1",
                                                       @"EncryptionType":@"AES",
                                                       @"Security":@"WPA2PSK",

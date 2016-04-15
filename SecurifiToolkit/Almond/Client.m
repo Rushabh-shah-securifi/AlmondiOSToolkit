@@ -213,6 +213,7 @@
     }
     client.deviceSchedule = blockedString;
 }
+
 +(NSString*)getAllowedOnNetworkTypeForType:(DeviceAllowedType)type{
     switch (type) {
         case DeviceAllowed_Always:
@@ -225,4 +226,26 @@
             return UNKNOWN;
     }
 }
+
+- (id)copyWithZone:(NSZone *)zone {
+    Client *copy = [[[self class] allocWithZone:zone] init];
+    if (copy != nil) {
+        copy.name = self.name;
+        copy.deviceIP = self.deviceIP;
+        copy.manufacturer = self.manufacturer;
+        copy.rssi = self.rssi;
+        copy.deviceMAC = self.deviceMAC;
+        copy.deviceConnection = self.deviceConnection;
+        copy.deviceID = self.deviceID;
+        copy.deviceType = self.deviceType;
+        copy.timeout = self.timeout;
+        copy.deviceLastActiveTime = self.deviceLastActiveTime;
+        copy.deviceUseAsPresence = self.deviceUseAsPresence;
+        copy.isActive = self.isActive;
+        copy.deviceAllowedType = self.deviceAllowedType;
+        copy.deviceSchedule = self.deviceSchedule;
+    }
+    return copy;
+}
+
 @end
