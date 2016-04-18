@@ -244,6 +244,8 @@
         copy.isActive = self.isActive;
         copy.deviceAllowedType = self.deviceAllowedType;
         copy.deviceSchedule = self.deviceSchedule;
+        copy.canBeBlocked = self.canBeBlocked;
+        copy.userType = self.userType;
     }
     return copy;
 }
