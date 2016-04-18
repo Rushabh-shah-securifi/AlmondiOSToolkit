@@ -121,7 +121,7 @@
 }
 
 +(NSArray*) getClientGenericIndexes{
-    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@(-11),@(-12),@-13,@-14,@-15,@-16,@-17,@-18,@-19,@-20,@-3, nil];
+    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@(-11),@(-12),@-13,@-14,@-15,@-16,@-17,@-18,@-19,@-20,@-21,@-22,@-3, nil];
     return genericIndexesArray;
 }
 
@@ -185,6 +185,17 @@
         {
             client.rssi=get? client.rssi:newValue;
             return client.rssi;
+        }
+        case -21:{
+            if(get)
+                return client.canBeBlocked? @"true": @"false";
+            else{
+                client.canBeBlocked = newValue.boolValue;
+            }
+        }
+        case -22:{
+            client.userType = get? client.userType: newValue;
+            return  client.userType;
         }
         case -3:
         {

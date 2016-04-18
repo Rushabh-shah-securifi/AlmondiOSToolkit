@@ -99,7 +99,8 @@
 #define BLOCK @"Block"
 #define SCHEDULE @"Schedule"
 #define CLIENTS @"Clients"
-
+#define CAN_BE_BLOCKED @"CanBeBlocked"
+#define USER_TYPE @"UserType"
 
 //cientParser
 #define CLIENTLIST @"ClientList"
