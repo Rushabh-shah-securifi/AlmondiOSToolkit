@@ -32,6 +32,7 @@
 #define ICON @"Icon"
 #define LABEL @"Label"
 #define DEVICE_COMMAND_TYPE @"CommandType"
+#define READ_ONLY @"ReadOnly"
 
 #define FORMATTER @"Formatter"
 #define MINMUM @"Min"

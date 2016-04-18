@@ -107,7 +107,7 @@
     device.deviceAllowedType = [[dict valueForKey:BLOCK] intValue];
     device.deviceSchedule = [dict valueForKey:SCHEDULE]==nil?@"":[dict valueForKey:SCHEDULE];
     device.canBeBlocked = YES; //[[dict valueForKey:CAN_BE_BLOCKED] boolValue];
-    device.userType = @"Kid"; //[dict valueForKey:USER_TYPE];    
+    device.userType = @"Kid"; //[dict valueForKey:USER_TYPE];
 }
 
 -(NSMutableArray*)getSortedDevices{

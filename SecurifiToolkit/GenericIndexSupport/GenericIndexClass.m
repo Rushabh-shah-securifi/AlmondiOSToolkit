@@ -10,7 +10,7 @@
 #import "AlmondJsonCommandKeyConstants.h"
 
 @implementation GenericIndexClass
--(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType{
+-(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly{
     self = [super init];
     if(self){
         self.groupLabel = label;
@@ -22,6 +22,7 @@
         self.formatter = formatter;
         self.layoutType = layoutType;
         self.commandType = commandType;
+        self.readOnly = readOnly;
     }
     return self;
 }

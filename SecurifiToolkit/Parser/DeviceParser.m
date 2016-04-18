@@ -338,7 +338,8 @@
                                              values:[self createGenericValues:genericIndexDict[VALUES]]
                                              formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
                                              layoutType:genericIndexDict[LAYOUT]
-                                             commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]];
+                                             commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
+                                             readOnly:[genericIndexDict[READ_ONLY] boolValue]];
     return genericIndexObject;
 }
 

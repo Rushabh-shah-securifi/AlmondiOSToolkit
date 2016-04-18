@@ -121,7 +121,7 @@
 }
 
 +(NSArray*) getClientGenericIndexes{
-    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@(-11),@(-12),@-13,@-14,@-15,@-16,@-17,@-18,@-19,@-20,@-21,@-22,@-3, nil];
+    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3, nil];
     return genericIndexesArray;
 }
 
