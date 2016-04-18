@@ -272,11 +272,11 @@
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     NSDictionary *payload = @{
                               @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"commandtype" : @"WifiClientList",
+                              @"commandtype" : @"ClientList",
                               @"AlmondMAC" : almondMac,
                               };
     
-    return [self jsonPayloadCommand:payload commandType:CommandType_WIFI_CLIENTS_LIST_REQUEST];
+    return [self jsonPayloadCommand:payload commandType:CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES];
 }
 
 //Rules

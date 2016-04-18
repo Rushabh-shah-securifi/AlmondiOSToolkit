@@ -100,7 +100,7 @@
 #define BLOCK @"Block"
 #define SCHEDULE @"Schedule"
 #define CLIENTS @"Clients"
-#define CAN_BE_BLOCKED @"CanBlock"
+#define CAN_BLOCK @"CanBlock"
 #define CATEGORY @"Category"
 
 //cientParser

@@ -30,6 +30,7 @@
 -(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
+    NSLog(@"client parser data: %@", data);
     if (data == nil || [data valueForKey:@"data"]==nil ) {
         return;
     }
@@ -45,11 +46,15 @@
     NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
     
     if ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:CLIENTLIST] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)) {
-        NSArray *dDictArray = [mainDict valueForKey:CLIENTS];
+        [toolkit.clients removeAllObjects];
+        
+        NSDictionary *clientsPayload = [mainDict valueForKey:CLIENTS];
+        NSArray *clientKeys = clientsPayload.allKeys;
         NSMutableArray *wifiClientsArray = [NSMutableArray new];
-        for (NSDictionary *dict in dDictArray) {
+        
+        for (NSString *key in clientKeys) {
             Client *device = [Client new];
-            [self setDeviceProperties:device forDict:dict];
+            [self setDeviceProperties:device forDict:clientsPayload[key]];
             [wifiClientsArray addObject:device];
         }
         toolkit.clients = wifiClientsArray;
@@ -106,8 +111,8 @@
     device.timeout = [[dict valueForKey:WAIT] integerValue];
     device.deviceAllowedType = [[dict valueForKey:BLOCK] intValue];
     device.deviceSchedule = [dict valueForKey:SCHEDULE]==nil? @"": [dict valueForKey:SCHEDULE];
-    device.canBeBlocked = YES; //[[dict valueForKey:CAN_BE_BLOCKED] boolValue];
-    device.category = @"Kids"; //[dict valueForKey:CATEGORY];
+    device.canBeBlocked = [[dict valueForKey:CAN_BLOCK] boolValue];
+    device.category = [dict valueForKey:CATEGORY];
 }
 
 -(NSMutableArray*)getSortedDevices{

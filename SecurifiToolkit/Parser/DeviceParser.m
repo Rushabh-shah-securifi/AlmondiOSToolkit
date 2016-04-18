@@ -153,25 +153,25 @@
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
     NSLog(@"parseDeviceListAndDynamicDeviceResponse");
-//    NSNotification *notifier = (NSNotification *) sender;
-//    NSDictionary *dataInfo = [notifier userInfo];
-//    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
-//        return;
-//    }
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *dataInfo = [notifier userInfo];
+    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
+        return;
+    }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-//    SFIAlmondPlus *almond = [toolkit currentAlmond];
-//    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
-//    if(local){
-//        payload = [dataInfo valueForKey:@"data"];
-//    }else{
-//        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-//    }
-    payload = [self parseJson:@"DeviceListResponse"];
+    if(local){
+        payload = [dataInfo valueForKey:@"data"];
+    }else{
+        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+    }
+//    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
-//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-//    if(!isMatchingAlmondOrLocal) //for cloud
-//        return;
+    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
     
     if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DEVICE_LIST]){
         NSDictionary *devicesPayload = payload[DEVICES];
@@ -262,23 +262,6 @@
         [genericIndexesArray addObject:clientIndex.stringValue];
     }
 }
-
-
-//@property NSString *name;
-//@property NSString *type;
-//@property NSString *defaultIcon;
-//@property BOOL isActuator;
-//@property BOOL isTriggerDevice;
-//@property NSDictionary *Indexes;
-//@end
-
-//generic device key constants
-//#define DEVICE_NAME @"name"
-//#define DEVICE_DEFAULT_ICON @"defaultIcon"
-//#define IS_ACTION_DEVICE @"isActionDevice"
-//#define IS_ACTUATOR @"isActuator"
-//#define IS_TRIGGER_DEVICE @"isTriggerDevice"
-//#define INDEXES @"Indexes"
 
 //generic device parsing methods
 -(NSDictionary*)parseGenericDevicesDict:(NSDictionary*)genericDevicesDict{
@@ -374,7 +357,8 @@
     return device;
 }
 
-- (void)updateDevice:(Device*)device payload:(NSDictionary*)payload{
+- (void)updateDevice:(Device*)device payload:(NSDictionary*)payloadDevice{
+    NSDictionary *payload = payloadDevice[@"Data"];
     device.name = payload[D_NAME];
     device.location = payload[LOCATION];
     NSString *str;
@@ -382,7 +366,9 @@
     if (str.length > 0) {
         device.type =str.intValue;
     }
-    NSDictionary *valuesDic = payload[DEVICE_VALUE];
+    
+    NSDictionary *valuesDic = payloadDevice[DEVICE_VALUE];
+    
     device.knownValues = [self parseValues:valuesDic];
     
 }

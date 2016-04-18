@@ -233,7 +233,8 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"ClientList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_WIFI_CLIENTS_LIST_RESPONSE];
+                 NSLog(@"client list websocket: %@", payload);
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES];
              },
              
              @"DynamicSceneList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {

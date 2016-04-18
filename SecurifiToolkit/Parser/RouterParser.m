@@ -116,16 +116,6 @@
                                                       @"Security":@"WPA2PSK",
                                                       @"WirelessMode":@"802.11bgn",
                                                       @"CountryRegion":@"0"
-                                                      },
-                                                  @{
-                                                      @"Type":@"Guest2G",
-                                                      @"Enabled":@"true",
-                                                      @"SSID":@"Guest",
-                                                      @"Channel":@"1",
-                                                      @"EncryptionType":@"AES",
-                                                      @"Security":@"WPA2PSK",
-                                                      @"WirelessMode":@"802.11bgn",
-                                                      @"CountryRegion":@"0"
                                                       }
                                                   ]
                                           

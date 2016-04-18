@@ -568,33 +568,40 @@
             [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
             break;
         };
-        case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
+        case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES: {
+            NSLog(@"network.m - CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES");
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
-        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-            break;
-        };
-        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-            break;
-        };
-        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-            break;
-        };
-        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST: {
-            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-            break;
-        };
-        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST: {
-            //md01
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
-            break;
-        };
+//        case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
+//            NSLog(@"nsetwor.m - CommandType_WIFI_CLIENTS_LIST_RESPONSE");
+//            [self tryMarkUnitCompletion:YES responseType:commandType];
+//            [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
+//            break;
+//        };
+//        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST: {
+//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
+//            break;
+//        };
+//        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST: {
+//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
+//            break;
+//        };
+//        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST: {
+//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
+//            break;
+//        };
+//        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST: {
+//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
+//            break;
+//        };
+//        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST: {
+//            //md01
+//            [self tryMarkUnitCompletion:YES responseType:commandType];
+//            [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
+//            break;
+//        };
         case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
