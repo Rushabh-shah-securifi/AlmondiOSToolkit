@@ -31,7 +31,7 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 
 @property(nonatomic) DeviceAllowedType deviceAllowedType;
 @property(nonatomic) NSString *deviceSchedule;
-@property(nonatomic) NSString *userType;
+@property(nonatomic) NSString *category;
 @property(nonatomic) BOOL *canBeBlocked;
 
 - (NSString *)iconName;

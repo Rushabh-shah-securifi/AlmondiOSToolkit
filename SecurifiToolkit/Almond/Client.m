@@ -194,8 +194,8 @@
             }
         }
         case -22:{
-            client.userType = get? client.userType: newValue;
-            return  client.userType;
+            client.category = get? client.category: newValue;
+            return  client.category;
         }
         case -3:
         {
@@ -256,7 +256,7 @@
         copy.deviceAllowedType = self.deviceAllowedType;
         copy.deviceSchedule = self.deviceSchedule;
         copy.canBeBlocked = self.canBeBlocked;
-        copy.userType = self.userType;
+        copy.category = self.category;
     }
     return copy;
 }
