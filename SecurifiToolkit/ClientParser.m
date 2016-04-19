@@ -54,10 +54,10 @@
         for (NSString *key in clientKeys) {
             Client *device = [Client new];
             [self setDeviceProperties:device forDict:clientsPayload[key]];
+            device.deviceID = key;
             [wifiClientsArray addObject:device];
         }
         toolkit.clients = wifiClientsArray;
-        NSLog(@"toolkit.clients: %@", toolkit.clients);
     }
     
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)){
@@ -79,7 +79,7 @@
         NSDictionary *updatedClientPayload = [clientPayload objectForKey:ID];
             
         for (Client *device in toolkit.clients) {
-            if ([device.deviceID isEqualToString:[updatedClientPayload valueForKey:C_ID]]) {
+            if ([device.deviceID isEqualToString:ID]) {
                 [self setDeviceProperties:device forDict:updatedClientPayload];
                  NSLog(@"client updated: %@", device.category);
                 break;
@@ -87,10 +87,13 @@
         }
     }
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVED] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)) {
-        NSDictionary * removedClientDict = [mainDict valueForKey:CLIENTS];
+  
+        NSDictionary *clientPayload = mainDict[CLIENTS];
+        
+        NSString *clientID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         Client *toBeRemovedClient;
-        for (Client * device in toolkit.clients) {
-            if ([device.deviceID isEqualToString:[removedClientDict valueForKey:C_ID]]) {
+        for(Client *device in toolkit.clients){
+            if(device.deviceID == [clientID intValue]){
                 toBeRemovedClient = device;
                 break;
             }
@@ -103,7 +106,6 @@
 }
 
 -(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{
-    device.deviceID = [dict valueForKey:C_ID];
     device.name = [dict valueForKey:CLIENT_NAME];
     device.manufacturer = [dict valueForKey:MANUFACTURER];
     device.rssi = [dict valueForKey:RSSI];

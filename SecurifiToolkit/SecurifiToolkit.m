@@ -790,14 +790,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 [block_self internalInitializeCloud:network command:cmd];
                 
                 //send request for scene list cloud
-                cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
-                [block_self internalInitializeCloud:network command:cmd];
-                
+//                cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
+//                [block_self internalInitializeCloud:network command:cmd];
+//                
                 cmd = [GenericCommand cloudRequestAlmondWifiClients:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 
-                cmd = [GenericCommand websocketRequestAlmondRules:plus.almondplusMAC];
-                [block_self internalInitializeCloud:network command:cmd];
+//                cmd = [GenericCommand websocketRequestAlmondRules:plus.almondplusMAC];
+//                [block_self internalInitializeCloud:network command:cmd];
             }
             //send request foe wifi client cloud
             [block_self tryRequestAlmondMode:mac];
@@ -3560,6 +3560,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark toolkitsend command
 - (void)asyncSendCommand:(GenericCommand *)command {
+    NSLog(@"asyncSendCommand");
     SFIAlmondPlus *almond = [self currentAlmond];
     BOOL local = [self useLocalNetwork:almond.almondplusMAC];
     if(local){

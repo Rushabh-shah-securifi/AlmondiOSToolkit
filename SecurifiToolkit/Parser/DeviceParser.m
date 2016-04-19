@@ -152,7 +152,7 @@
 }
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
-    return;
+    
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *dataInfo = [notifier userInfo];
     if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
@@ -175,6 +175,7 @@
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
     
+//    return;
     if([[payload valueForKey:COMMAND_TYPE] isEqualToString:DEVICE_LIST]){
         NSDictionary *devicesPayload = payload[DEVICES];
         NSArray *devicePosKeys = devicesPayload.allKeys;
@@ -365,9 +366,7 @@
     device.location = payload[LOCATION];
     NSString *str;
     str = payload[D_TYPE];
-    if (str.length > 0) {
-        device.type =str.intValue;
-    }
+    device.type =str.intValue;
     
     NSDictionary *valuesDic = payloadDevice[DEVICE_VALUE];
     

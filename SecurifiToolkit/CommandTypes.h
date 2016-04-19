@@ -133,7 +133,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_UPDATE_DEVICE_NAME                      = 1122,
     
     CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES       = 1500,
-    CommandType_UPDATE_CLIENT                           = 1211,
+//    CommandType_UPDATE_CLIENT                           = 1211,
     CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE   = 93,
     
     CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES        = 1300,
