@@ -152,9 +152,9 @@
 }
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
+    return;
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *dataInfo = [notifier userInfo];
-    NSLog(@" parseDeviceListAndDynamicDeviceResponse parseDeviceListAndDynamicDeviceResponse :%@",dataInfo);
     if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
         return;
     }
@@ -168,6 +168,7 @@
         NSLog(@"cloud data");
         payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
     }
+    
 //    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
