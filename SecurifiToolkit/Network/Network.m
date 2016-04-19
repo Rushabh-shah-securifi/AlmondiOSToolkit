@@ -575,6 +575,17 @@
             [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
+        case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
+            break;
+        };
+        case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES: {
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
+            break;
+        };
+
 //        case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
 //            NSLog(@"nsetwor.m - CommandType_WIFI_CLIENTS_LIST_RESPONSE");
 //            [self tryMarkUnitCompletion:YES responseType:commandType];

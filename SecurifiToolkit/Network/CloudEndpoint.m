@@ -368,6 +368,9 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_RULE_LIST:
                                     case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+                                    case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
+                                    case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+                                    
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
@@ -708,6 +711,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_WIFI_CLIENTS_LIST_REQUEST:
                 case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
                 case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                 case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
                     commandPayload = command.command;

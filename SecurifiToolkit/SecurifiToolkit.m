@@ -783,8 +783,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
                 [block_self internalInitializeCloud:network command:cmd];
-                
-                
+
                 [self cleanUp];
                 
                 cmd = [GenericCommand requestSensorDeviceList:plus.almondplusMAC];
@@ -793,18 +792,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 //send request for scene list cloud
                 cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
-                NSLog(@" scene request send ");
-                //send request foe wifi client cloud
                 
                 cmd = [GenericCommand cloudRequestAlmondWifiClients:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
-                // send rule request
                 
                 cmd = [GenericCommand websocketRequestAlmondRules:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
-                NSLog(@" rule request send ");
-
-               
             }
             //send request foe wifi client cloud
             [block_self tryRequestAlmondMode:mac];

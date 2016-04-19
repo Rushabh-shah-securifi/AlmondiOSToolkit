@@ -292,7 +292,7 @@
                               @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"AlmondMAC" : almondMac,
                               };
-    return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST];
+    return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES];
 }
 
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
