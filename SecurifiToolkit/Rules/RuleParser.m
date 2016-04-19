@@ -19,11 +19,6 @@
     
     return self;
 }
-//-(void)initNotification{
-//    NSLog(@"init device notification");
-//    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-//    [center addObserver:self selector:@selector(onRuleListResponse:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
-//}
 
 -(void)initNotification{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -47,12 +42,12 @@
     NSLog(@"onRuleList: %@",mainDict);
     //RuleList
     if([commandType isEqualToString:@"RuleList"]){
-        NSArray *dDictArray = [mainDict valueForKey:@"Rules"];
-        if (dDictArray)
-            for (NSDictionary *dict in dDictArray) {
-                [self createRule:dict];
-            }
+        NSDictionary *rulesPayload = [mainDict valueForKey:@"Rules"];
+        NSArray *ruleIds = rulesPayload.allKeys;
         
+        for (NSString *key in ruleIds) {
+            [self createRule:rulesPayload[key]];
+        }
     }else if([commandType isEqualToString:@"DynamicRuleUpdated"] || [commandType isEqualToString:@"DynamicRuleAdded"]){
         NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
         [self createRule:dDict];

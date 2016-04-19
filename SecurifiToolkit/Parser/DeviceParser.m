@@ -169,7 +169,6 @@
         payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
     }
 //    payload = [self parseJson:@"DeviceListResponse"];
-    NSLog(@"data log: %@", [NSJSONSerialization JSONObjectWithData:[@"ffffffff ffffffff 7b22436f 6d6d616e 64547970 65223a22 44657669 63654c69 7374222c 22537563 63657373 223a7472 75652c22 52656173 6f6e223a 6e756c6c 2c224465 7669" dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil]);
     NSLog(@"devices - payload: %@", payload);
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
