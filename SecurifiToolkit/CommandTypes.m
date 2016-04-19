@@ -340,6 +340,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
         case CommandType_RULE_LIST:
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
             return YES;
             
         default:
@@ -367,6 +368,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
         case CommandType_RULE_LIST:
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
         case (CommandType) 1551:
         case (CommandType) 99:
             return YES;

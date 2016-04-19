@@ -783,10 +783,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
                 [block_self internalInitializeCloud:network command:cmd];
-                //send request for scene list cloud
+                
                 
                 [self cleanUp];
                 
+                cmd = [GenericCommand requestSensorDeviceList:plus.almondplusMAC];
+                [block_self internalInitializeCloud:network command:cmd];
+                
+                //send request for scene list cloud
                 cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 NSLog(@" scene request send ");

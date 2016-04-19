@@ -272,7 +272,7 @@
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     NSDictionary *payload = @{
                               @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"commandtype" : @"ClientList",
+                              @"CommandType" : @"ClientList",
                               @"AlmondMAC" : almondMac,
                               };
     

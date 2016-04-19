@@ -412,7 +412,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     NSLog(@"Exception on parsing XML payload, ex:%@, data:'%@'", ex, buffer_str);
                                 }
                             } // end if valid command, json, or xml
-
+                            NSLog(@"cep - commandtype: %d", commandType);
                             if (parsedPayload) {
                                 // Tell the world the connection is up and running
                                 [self tryPostNetworkUpNotification];
@@ -706,6 +706,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_GET_ALL_SCENES:
                 case CommandType_UPDATE_REQUEST:
                 case CommandType_WIFI_CLIENTS_LIST_REQUEST:
+                case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                 case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
                     commandPayload = command.command;

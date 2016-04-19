@@ -398,6 +398,7 @@
         
         BOOL success = [block_self.endpoint sendCommand:command error:&error];
         if (!success) {
+            NSLog(@"sending command error %@,Discription %@",command,error.description);
             NSLog(@"Command Queue: send error, command:%@, error:%@, tag:%ld", command, error.description, (long) tag);
             [unit markResponse:NO];
             return;
@@ -636,6 +637,7 @@
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
+            NSLog(@" device list network %@ ,command type %d",payload,commandType);
             break;
         };
         case CommandType_UPDATE_DEVICE_INDEX: {

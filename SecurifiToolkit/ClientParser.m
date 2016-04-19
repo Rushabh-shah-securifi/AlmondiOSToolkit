@@ -30,7 +30,6 @@
 -(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
-    NSLog(@"client parser data: %@", data);
     if (data == nil || [data valueForKey:@"data"]==nil ) {
         return;
     }
@@ -72,10 +71,16 @@
                 [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_LEFT])&&
                ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)
                ) {
-        NSDictionary *dict = [mainDict valueForKey:CLIENTS];
-        for (Client * device in toolkit.clients) {
-            if ([device.deviceID isEqualToString:[dict valueForKey:C_ID]]) {
-                [self setDeviceProperties:device forDict:dict];
+        NSDictionary *clientPayload = [mainDict valueForKey:CLIENTS];
+        
+        
+        NSString *ID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
+        NSDictionary *updatedClientPayload = [clientPayload objectForKey:ID];
+            
+        for (Client *device in toolkit.clients) {
+            if ([device.deviceID isEqualToString:[updatedClientPayload valueForKey:C_ID]]) {
+                [self setDeviceProperties:device forDict:updatedClientPayload];
+                 NSLog(@"client updated: %@", device.category);
                 break;
             }
         }
