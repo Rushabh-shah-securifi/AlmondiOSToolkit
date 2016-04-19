@@ -28,6 +28,11 @@
                selector:@selector(onScenesListChange:)
                    name:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER
                  object:nil];
+    
+    [center addObserver:self
+               selector:@selector(getAllScenesCallback:)
+                   name:NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
+                 object:nil];//NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
 }
 
 
@@ -46,13 +51,29 @@
         //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }// required for switching local<=>cloud
+    
+    /*
+     {
+     CommandType = SceneList;
+     Reason = "";
+     Scenes =     {
+     };
+     Success = 1;
+     }
+     */
+    NSLog(@" scene list dict %@",mainDict);
     [toolkit.scenesArray removeAllObjects];
-    for(NSDictionary *sceneDict in [mainDict valueForKey:@"Scenes"]){
-        NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:sceneDict];
-        NSMutableDictionary *mutableScene = [sceneDict mutableCopy];
+    
+    NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
+    NSArray *sceneKeys = scenesPayload.allKeys;
+
+    for (NSString *key in sceneKeys) {
+        NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:scenesPayload[key]];
+        NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
         [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
         [toolkit.scenesArray addObject:mutableScene];
     }
+
     for(NSMutableDictionary *scenes in toolkit.scenesArray){
         for(NSMutableDictionary *sceneEntryList in [scenes valueForKey:@"SceneEntryList"]){
             [sceneEntryList removeObjectForKey:@"Valid"];

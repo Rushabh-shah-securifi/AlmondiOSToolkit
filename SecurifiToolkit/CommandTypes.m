@@ -224,10 +224,13 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_%d", type];
         case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
             return [NSString stringWithFormat:@"DYNAMIC_WIFI_CLIENT_REMOVED_ALL_%d", type];
-            //        case CommandType_RULE_LIST_REQUEST:
-            //            return [NSString stringWithFormat:@"RULE_LIST_REQUEST_%d", type];
-            //        case CommandType_RULE_LIST_RESPONSE:
-            //            return [NSString stringWithFormat:@"RULE_LIST_RESPONSE_%d", type];
+
+        case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+            return [NSString stringWithFormat:@"DEVICE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
+        case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+            return [NSString stringWithFormat:@"CLIENT_LIST_AND_DYNAMIC_RESPONSES_%d", type];
+        case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
+            return [NSString stringWithFormat:@"SCENE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -341,6 +344,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_RULE_LIST:
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
             return YES;
             
         default:
@@ -369,6 +373,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_RULE_LIST:
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
         case (CommandType) 1551:
         case (CommandType) 99:
             return YES;

@@ -155,11 +155,15 @@
 + (instancetype)cloudSceneListCommand:(NSString *)almondMac{
 
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_GET_ALL_SCENES;
-    
-    NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
-                               @"AlmondMAC":almondMac};
-    
+    cloudCommand.commandType = CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES;
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+//    NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
+//                               @"AlmondMAC":almondMac};
+    NSDictionary * testDict =@{
+                               @"MobileInternalIndex" : @(correlationId).stringValue,
+                               @"CommandType" : @"SceneList",
+                               @"AlmondMAC":almondMac
+                               };;
     
     cloudCommand.command = [testDict JSONString];
     
@@ -169,7 +173,7 @@
 + (instancetype)cloudClientListCommand:(NSString *)almondMac{
     
     GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_GET_ALL_SCENES;
+    cloudCommand.commandType = CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES;
     
     NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
                                @"AlmondMAC":almondMac};
