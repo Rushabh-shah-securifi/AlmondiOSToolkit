@@ -44,23 +44,23 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 + (instancetype)websocketRequestAlmondSceneList:(NSString *)almondMac;
 
 // constructs a generic command for requesting the sensor list
-+ (instancetype)websocketSensorDeviceListCommand;
+//+ (instancetype)websocketSensorDeviceListCommand;
 
 // constructs a generic command for requesting the sensor values
-+ (instancetype)websocketSensorDeviceValueListCommand;
+//+ (instancetype)websocketSensorDeviceValueListCommand;
 
 // constructs a generic command for updating a sensor's index value
 + (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue ;
 
 // constructs a generic command for requesting the sensor list for the specified Almond
-+ (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac;
+//+ (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac;
 
 + (instancetype)cloudSceneListCommand:(NSString *)almondMac;
 
 + (instancetype)websocketRequestSensorDeviceList;
 
 // constructs a generic command for requesting the sensor values for the specified Almond
-+ (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac;
+//+ (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac;
 
 // constructs a generic command for updating a sensor's index value
 + (instancetype)cloudSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue almondMac:(NSString *)almondMac;

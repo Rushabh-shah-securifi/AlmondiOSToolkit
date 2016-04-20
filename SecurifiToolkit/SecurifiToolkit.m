@@ -52,7 +52,7 @@
 #import "AffiliationUserRequest.h"
 #import "ResetPasswordRequest.h"
 #import "ClientParser.h"
-#import "SceneListener.h"
+#import "SceneParser.h"
 #import "RuleParser.h"
 #import "DeviceParser.h"
 #import "DataBaseManager.h"
@@ -122,7 +122,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) Network *localNetwork;
 
 @property(nonatomic, strong) RuleParser *ruleParser;
-@property(nonatomic, strong) SceneListener *sceneListener;
+@property(nonatomic, strong) SceneParser *sceneParser;
 @property(nonatomic, strong) ClientParser *clientParser;
 @property(nonatomic, strong) DeviceParser *deviceParser;
 @property(nonatomic, strong) RouterParser *routerParser;
@@ -198,9 +198,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.clients = [NSMutableArray new];
     self.devices = [NSMutableArray new];
     
-    self.ruleParser=[[RuleParser alloc]init];
-    self.sceneListener=[[SceneListener alloc]init];
-    self.clientParser=[[ClientParser alloc]init];
+    self.ruleParser =[[RuleParser alloc]init];
+    self.sceneParser =[[SceneParser alloc]init];
+    self.clientParser =[[ClientParser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
     self.routerParser = [[RouterParser alloc]init];
     [DataBaseManager initializeDataBase];
@@ -1133,6 +1133,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
+    NSLog(@"manageCurrentAlmondChange");
     if (!almond) {
         return;
     }
@@ -1320,16 +1321,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
-        GenericCommand *cmd = [GenericCommand websocketSensorDeviceListCommand];
-        cmd.networkPrecondition = precondition;
-        
-        [self asyncSendToLocal:cmd almondMac:almondMac];
+//        GenericCommand *cmd = [GenericCommand websocketSensorDeviceListCommand];
+//        cmd.networkPrecondition = precondition;
+//        
+//        [self asyncSendToLocal:cmd almondMac:almondMac];
     }
     else {
-        GenericCommand *cmd = [GenericCommand cloudSensorDeviceListCommand:almondMac];
-        cmd.networkPrecondition = precondition;
-        
-        [self asyncSendToCloud:cmd];
+//        GenericCommand *cmd = [GenericCommand cloudSensorDeviceListCommand:almondMac];
+//        cmd.networkPrecondition = precondition;
+//        
+//        [self asyncSendToCloud:cmd];
     }
 }
 
@@ -1341,16 +1342,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     BOOL local = [self useLocalNetwork:almondMac];
     if (local) {
-        GenericCommand *cmd = [GenericCommand websocketSensorDeviceValueListCommand];
-        cmd.networkPrecondition = precondition;
-        
-        [self asyncSendToLocal:cmd almondMac:almondMac];
+//        GenericCommand *cmd = [GenericCommand websocketSensorDeviceValueListCommand];
+//        cmd.networkPrecondition = precondition;
+//        
+//        [self asyncSendToLocal:cmd almondMac:almondMac];
     }
     else {
-        GenericCommand *cmd = [GenericCommand cloudSensorDeviceValueListCommand:almondMac];
-        cmd.networkPrecondition = precondition;
-        
-        [self asyncSendToCloud:cmd];
+//        GenericCommand *cmd = [GenericCommand cloudSensorDeviceValueListCommand:almondMac];
+//        cmd.networkPrecondition = precondition;
+//        
+//        [self asyncSendToCloud:cmd];
         //[self asyncRequestNotificationPreferenceList:almondMac];
     }
 }
@@ -1406,8 +1407,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [writer startElement:@"FirmwareUpdate"];
     [writer addAttribute:@"Available" value:@"1"];
     [writer addElement:@"Version" text:firmwareVersion];
-    [writer endElement];;
-    [writer endElement];;
+    [writer endElement];
+    [writer endElement];
     
     GenericCommandRequest *request = [GenericCommandRequest new];
     request.almondMAC = almondMAC;
@@ -1784,19 +1785,23 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self asyncSendToCloud:cmd];
     
     [self cleanUp];
+    NSLog(@"device request send");
+    GenericCommand *genericCmd = [GenericCommand requestSensorDeviceList:almondMAC];
+    [[SecurifiToolkit sharedInstance] asyncSendCommand:genericCmd];
+    
+    NSLog(@"scene request send ");
     cmd = [GenericCommand cloudSceneListCommand:almondMAC];
     [self asyncSendToCloud:cmd];
-    NSLog(@" scene request send ");
-    //send request foe wifi client cloud
     
+    //send request foe wifi client cloud
+    NSLog(@"clients request send");
     cmd = [GenericCommand cloudRequestAlmondWifiClients:almondMAC];
     [self asyncSendToCloud:cmd];
     // send rule request
-    
+    NSLog(@" rule request send ");
     cmd = [GenericCommand websocketRequestAlmondRules:almondMAC];
     [self asyncSendToCloud:cmd];
-    NSLog(@" rule request send ");
-    
+
 }
 
 - (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode {

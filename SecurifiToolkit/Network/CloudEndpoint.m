@@ -315,7 +315,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             CommandType commandType = (CommandType) commandType_raw;
                             id responsePayload = nil;
                             BOOL parsedPayload = NO;
-
+                            NSLog(@"cloudendpoint response: %d", commandType);
                             if (!securifi_valid_command_type(commandType)) {
                                 NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@",
                                         commandType, [[NSString alloc] initWithData:dataBuffer encoding:NSUTF8StringEncoding]);
@@ -415,7 +415,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     NSLog(@"Exception on parsing XML payload, ex:%@, data:'%@'", ex, buffer_str);
                                 }
                             } // end if valid command, json, or xml
-                            NSLog(@"cep - commandtype: %d", commandType);
                             if (parsedPayload) {
                                 // Tell the world the connection is up and running
                                 [self tryPostNetworkUpNotification];
@@ -734,7 +733,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
             unsigned int header_commandType = (unsigned int) htonl(commandType);
 
-            DLog(@"Sending payload: %@", commandPayload);
+            NSLog(@"Sending payload: %@, Type: %d", commandPayload, commandType);
 
             NSOutputStream *outputStream = cloudEndpoint.outputStream;
             if (outputStream == nil) {

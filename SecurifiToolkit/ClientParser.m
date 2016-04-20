@@ -42,9 +42,14 @@
     }else{
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
+    
+    BOOL isMatchingAlmondOrLocal = ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
+    
     NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
     
-    if ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:CLIENTLIST] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)) {
+    if ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:CLIENTLIST]) {
         [toolkit.clients removeAllObjects];
         
         NSDictionary *clientsPayload = [mainDict valueForKey:CLIENTS];
@@ -60,17 +65,19 @@
         toolkit.clients = wifiClientsArray;
     }
     
-    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)){
+    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED]){
         NSDictionary * dict = [mainDict valueForKey:CLIENTS];
+        NSString *ID = [[dict allKeys] objectAtIndex:0]; // Assumes payload always has one device.
+        
         Client * device = [Client new];
-        [self setDeviceProperties:device forDict:dict];
+        [self setDeviceProperties:device forDict:dict[ID]];
         [toolkit.clients addObject:device];
+        NSLog(@"toolkit.clients count %ld",toolkit.clients.count);
     }
     else if (
                ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_UPDATED]||
                 [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_JOINED]||
-                [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_LEFT])&&
-               ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)
+                [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_LEFT])
                ) {
         NSDictionary *clientPayload = [mainDict valueForKey:CLIENTS];
         
@@ -81,19 +88,17 @@
         for (Client *device in toolkit.clients) {
             if ([device.deviceID isEqualToString:ID]) {
                 [self setDeviceProperties:device forDict:updatedClientPayload];
-                 NSLog(@"client updated: %@", device.category);
                 break;
             }
         }
     }
-    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVED] && ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local)) {
-  
+    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVED]) {
         NSDictionary *clientPayload = mainDict[CLIENTS];
         
         NSString *clientID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         Client *toBeRemovedClient;
         for(Client *device in toolkit.clients){
-            if(device.deviceID == [clientID intValue]){
+            if([device.deviceID isEqualToString:clientID]){
                 toBeRemovedClient = device;
                 break;
             }

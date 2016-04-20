@@ -1,5 +1,5 @@
 //
-//  SceneListener.h
+//  SceneParser.h
 //  SecurifiToolkit
 //
 //  Created by Masood on 30/12/15.
@@ -8,6 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SceneListener : NSObject
+@interface SceneParser : NSObject
 
 @end

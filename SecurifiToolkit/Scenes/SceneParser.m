@@ -1,15 +1,15 @@
 //
-//  SceneListener.m
+//  SceneParser.m
 //  SecurifiToolkit
 //
 //  Created by Masood on 30/12/15.
 //  Copyright © 2015 Securifi Ltd. All rights reserved.
 //
 
-#import "SceneListener.h"
+#import "SceneParser.h"
 #import "SecurifiToolkit.h"
 
-@implementation SceneListener
+@implementation SceneParser
 
 - (instancetype)init {
     self = [super init];
@@ -19,10 +19,10 @@
 
 - (void)initializeNotifications{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self
-               selector:@selector(getAllScenesCallback:)
-                   name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
-                 object:nil];
+//    [center addObserver:self
+//               selector:@selector(getAllScenesCallback:)
+//                   name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
+//                 object:nil];
     
     [center addObserver:self
                selector:@selector(onScenesListChange:)
@@ -51,17 +51,8 @@
         //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }// required for switching local<=>cloud
-    
-    /*
-     {
-     CommandType = SceneList;
-     Reason = "";
-     Scenes =     {
-     };
-     Success = 1;
-     }
-     */
-    NSLog(@" scene list dict %@",mainDict);
+
+//    NSLog(@" scene list dict %@",mainDict);
     [toolkit.scenesArray removeAllObjects];
     
     NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
@@ -110,6 +101,7 @@
         }
         NSMutableDictionary *newScene = [[mainDict valueForKey:@"Scenes"] mutableCopy];
         [newScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
+        
         for(NSMutableDictionary *sceneEntryList in [newScene valueForKey:@"SceneEntryList"]){
             [sceneEntryList removeObjectForKey:@"Valid"];
         }
