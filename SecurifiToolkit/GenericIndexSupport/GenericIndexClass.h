@@ -27,7 +27,8 @@ typedef NS_ENUM(int, DeviceCommandType){
 @property(nonatomic) NSString* layoutType;
 @property DeviceCommandType commandType;
 @property(nonatomic) BOOL readOnly;
+@property(nonatomic) NSString *excludeFrom;
 
--(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly;
+-(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly excludeFrom:(NSString *)excludeFrom;
 +(DeviceCommandType)getCommandType:(NSString*)command;
 @end

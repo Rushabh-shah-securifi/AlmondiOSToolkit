@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 
 @interface Formatter : NSObject
-@property float factor;
-@property int min;
-@property int max;
-@property NSString* units;
+@property (nonatomic) float factor;
+@property (nonatomic)int min;
+@property (nonatomic)int max;
+@property (nonatomic)NSString* units;
 
 -(id)initWithFactor:(float)factor min:(int)min max:(int)max units:(NSString*)units;
 -(NSString*)transform:(NSString*)value;

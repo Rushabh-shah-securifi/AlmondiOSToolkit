@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 
 @interface GenericDeviceClass : NSObject
-@property NSString *name;
-@property NSString *type;
-@property NSString *defaultIcon;
-@property BOOL isActuator;
-@property BOOL isTriggerDevice;
-@property NSDictionary *Indexes;
+@property (nonatomic) NSString *name;
+@property (nonatomic)NSString *type;
+@property (nonatomic)NSString *defaultIcon;
+@property (nonatomic)BOOL isActuator;
+@property (nonatomic)NSString *excludeFrom;
+@property (nonatomic)NSDictionary *Indexes;
 
--(id)initWithName:(NSString*)name type:(NSString*)type defaultIcon:(NSString*)defaultIcon isActuator:(BOOL)isActuator isTriggerDevice:(BOOL)isTriggerDevice indexes:(NSDictionary*)indexes;
+-(id)initWithName:(NSString*)name type:(NSString*)type defaultIcon:(NSString*)defaultIcon isActuator:(BOOL)isActuator excludeFrom:(NSString *)excludeFrom indexes:(NSDictionary*)indexes;
 @end

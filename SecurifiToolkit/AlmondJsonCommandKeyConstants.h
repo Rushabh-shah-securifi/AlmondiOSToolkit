@@ -60,7 +60,7 @@
 #define DEVICE_DEFAULT_ICON @"defaultIcon"
 #define IS_ACTION_DEVICE @"isActionDevice"
 #define IS_ACTUATOR @"isActuator"
-#define IS_TRIGGER_DEVICE @"isTriggerDevice"
+#define EXCLUDE_FROM @"ExcludeFrom"
 #define INDEXES @"Indexes"
 
 #define ROW_NO @"row_no"

@@ -286,7 +286,7 @@
                                                                                   type:genericDeviceDict[deviceType]
                                                                            defaultIcon:genericDeviceDict[DEVICE_DEFAULT_ICON]
                                                                             isActuator:[genericDeviceDict[IS_ACTUATOR] boolValue]
-                                                                       isTriggerDevice:[genericDeviceDict[IS_TRIGGER_DEVICE] boolValue]
+                                                                       excludeFrom:genericDeviceDict[EXCLUDE_FROM]
                                                                                indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]]];
     return genericDeviceObject;
     
@@ -328,7 +328,8 @@
                                              formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
                                              layoutType:genericIndexDict[LAYOUT]
                                              commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
-                                             readOnly:[genericIndexDict[READ_ONLY] boolValue]];
+                                             readOnly:[genericIndexDict[READ_ONLY] boolValue]
+                                             excludeFrom:genericIndexDict[EXCLUDE_FROM]];
     return genericIndexObject;
 }
 
@@ -346,7 +347,7 @@
         NSMutableDictionary *genericValues = [NSMutableDictionary new];
         for(NSString *value in valueKeys){
             NSDictionary *valueDict = genericValuesDict[value];
-            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value];
+            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM]];
             [genericValues setObject:genericValue forKey:value];
         }
         return genericValues;

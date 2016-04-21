@@ -648,19 +648,18 @@
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
-            NSLog(@" device list network %@ ,command type %d",payload,commandType);
             break;
         };
-        case CommandType_UPDATE_DEVICE_INDEX: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_UPDATE_DEVICE_INDEX_NOTIFIER data:payload];
-            break;
-        };
-        case CommandType_UPDATE_DEVICE_NAME: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_UPDATE_DEVICE_NAME_NOTIFIER data:payload];
-            break;
-        };
+//        case CommandType_UPDATE_DEVICE_INDEX: {
+//            [self tryMarkUnitCompletion:YES responseType:commandType];
+//            [self postData:NOTIFICATION_UPDATE_DEVICE_INDEX_NOTIFIER data:payload];
+//            break;
+//        };
+//        case CommandType_UPDATE_DEVICE_NAME: {
+//            [self tryMarkUnitCompletion:YES responseType:commandType];
+//            [self postData:NOTIFICATION_UPDATE_DEVICE_NAME_NOTIFIER data:payload];
+//            break;
+//        };
         case CommandType_ROUTER_COMMAND_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];

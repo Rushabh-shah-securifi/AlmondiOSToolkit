@@ -9,14 +9,15 @@
 #import <Foundation/Foundation.h>
 
 @interface GenericValue : NSObject
-@property NSString *displayText;
-@property NSString *icon;
-@property NSString *iconText;
-@property NSString *toggleValue;
-@property NSString *formatttedValue;
-@property NSString *value;
+@property (nonatomic)NSString *displayText;
+@property (nonatomic)NSString *icon;
+@property (nonatomic)NSString *iconText;
+@property (nonatomic)NSString *toggleValue;
+@property (nonatomic)NSString *formatttedValue;
+@property (nonatomic)NSString *value;
+@property (nonatomic)NSString *excludeFrom;
 
-- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value;
+- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom;
 - (id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
 - (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value;
 @end
