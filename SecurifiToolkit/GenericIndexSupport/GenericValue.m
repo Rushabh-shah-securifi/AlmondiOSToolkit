@@ -27,21 +27,21 @@
         self.displayText = text;
         self.icon = genericValue.icon;
         self.iconText = genericValue.iconText;
-        self.formatttedValue = genericValue.formatttedValue;
         self.toggleValue = genericValue.toggleValue;
         self.excludeFrom = genericValue.excludeFrom;
     }
     return self;
 }
 
-- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value{
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom{
     self = [super init];
     if(self){
+        self.displayText = displayText;
         self.iconText = iconText;
         if(iconText == nil)
             self.icon = @"1";
-        self.displayText = displayText;
         self.value = value;
+        self.excludeFrom = excludeFrom;
     }
     return self;
 }

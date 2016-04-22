@@ -13,11 +13,12 @@
 @property (nonatomic)NSString *icon;
 @property (nonatomic)NSString *iconText;
 @property (nonatomic)NSString *toggleValue;
-@property (nonatomic)NSString *formatttedValue;
 @property (nonatomic)NSString *value;
 @property (nonatomic)NSString *excludeFrom;
 
 - (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom;
+
 - (id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
-- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value;
+
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom;
 @end
