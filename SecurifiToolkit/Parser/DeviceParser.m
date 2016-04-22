@@ -160,20 +160,20 @@
     }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *almond = [toolkit currentAlmond];
-    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+//    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
-    if(local){
-        payload = [dataInfo valueForKey:@"data"];
-    }else{
-        NSLog(@"cloud data");
-        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-    }
+//    if(local){
+//        payload = [dataInfo valueForKey:@"data"];
+//    }else{
+//        NSLog(@"cloud data");
+//        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+//    }
     
-//    payload = [self parseJson:@"DeviceListResponse"];
+    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
-    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-    if(!isMatchingAlmondOrLocal) //for cloud
-        return;
+//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+//    if(!isMatchingAlmondOrLocal) //for cloud
+//        return;
     NSString *commandType = [payload valueForKey:COMMAND_TYPE];
 //    return;
     if([commandType isEqualToString:DEVICE_LIST]){
