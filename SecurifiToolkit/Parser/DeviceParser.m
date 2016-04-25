@@ -247,12 +247,11 @@
     toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
     
     NSMutableArray *genericIndexesArray = [Device getGenericIndexes];
-//    [genericIndexesArray addObject:@(-100).stringValue];
     [self addCommonGenericIndexes:genericIndexesArray];
     [self addClientGenericIndexes:genericIndexesArray];
+    [self addModeClientIndexes:genericIndexesArray];
     NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:genericIndexesArray];
     toolkit.genericIndexes = [self parseGenericIndexesDict:genericIndexesDict];
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
 }
 
@@ -267,6 +266,10 @@
     for(NSNumber *clientIndex in [Client getClientGenericIndexes]){
         [genericIndexesArray addObject:clientIndex.stringValue];
     }
+}
+
+-(void)addModeClientIndexes:(NSMutableArray*)genericIndexesArray{
+    [genericIndexesArray addObjectsFromArray:@[@"0", @"-30"]];
 }
 
 //generic device parsing methods

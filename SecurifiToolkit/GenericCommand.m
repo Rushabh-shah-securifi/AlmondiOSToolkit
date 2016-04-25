@@ -98,34 +98,6 @@
     return cmd;
 }
 
-+ (instancetype)websocketSensorDeviceListCommand {
-    return [self internalWebsocketSensorDeviceListCommand:CommandType_DEVICE_DATA];
-}
-
-+ (instancetype)websocketSensorDeviceValueListCommand {
-    return [self internalWebsocketSensorDeviceListCommand:CommandType_DEVICE_VALUE];
-}
-
-+ (GenericCommand *)internalWebsocketSensorDeviceListCommand:(enum CommandType)commandType {
-    sfi_id correlationId = [GenericCommand nextCorrelationId];
-    
-    NSDictionary *payload = @{
-                              @"mii" : @(correlationId).stringValue,
-                              @"cmd" : @"devicelist"
-                              };
-    
-    return [GenericCommand jsonPayloadCommand:payload commandType:commandType];
-}
-
-+ (instancetype)websocketRequestAlmondSceneList{
-    sfi_id correlationId = [GenericCommand nextCorrelationId];
-    
-    NSDictionary *payload = @{
-                              @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"CommandType" : @"DynamicSceneList"
-                              };
-    return [self jsonPayloadCommand:payload commandType:CommandType_GET_ALL_SCENES];
-}
 
 
 + (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {
@@ -142,59 +114,8 @@
     return [GenericCommand jsonPayloadCommand:payload commandType:CommandType_MOBILE_COMMAND];
 }
 
-+ (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac {
-    DeviceListRequest *request = [DeviceListRequest new];
-    request.almondMAC = almondMac;
-    
-    GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
-    cmd.commandType = CommandType_DEVICE_DATA;
-    cmd.command = request;
-    
-    return cmd;
-}
-+ (instancetype)cloudSceneListCommand:(NSString *)almondMac{
-
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES;
-    sfi_id correlationId = [GenericCommand nextCorrelationId];
-//    NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
-//                               @"AlmondMAC":almondMac};
-    NSDictionary * testDict =@{
-                               @"MobileInternalIndex" : @(correlationId).stringValue,
-                               @"CommandType" : @"SceneList",
-                               @"AlmondMAC":almondMac
-                               };;
-    
-    cloudCommand.command = [testDict JSONString];
-    
-    return cloudCommand;
-}
-
-+ (instancetype)cloudClientListCommand:(NSString *)almondMac{
-    
-    GenericCommand *cloudCommand = [[GenericCommand alloc] init];
-    cloudCommand.commandType = CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES;
-    
-    NSDictionary * testDict =@{@"MobileCommand":@"LIST_SCENE_REQUEST",
-                               @"AlmondMAC":almondMac};
-    
-    
-    cloudCommand.command = [testDict JSONString];
-    
-    return cloudCommand;
-}
 
 
-+ (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac {
-    DeviceValueRequest *request = [DeviceValueRequest new];
-    request.almondMAC = almondMac;
-    
-    GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
-    cmd.commandType = CommandType_DEVICE_VALUE;
-    cmd.command = request;
-    
-    return cmd;
-}
 
 + (instancetype)cloudSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue almondMac:(NSString *)almondMac {
     MobileCommandRequest *request = [MobileCommandRequest new];
@@ -211,86 +132,53 @@
     return cmd;
 }
 
-
-
-+ (instancetype)websocketRequestAlmondWifiClients {
-    sfi_id correlationId = [GenericCommand nextCorrelationId];
-    
-    NSDictionary *payload = @{
-                              @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"CommandType" : @"ClientsList"
-                              };
-    
-    return [self jsonPayloadCommand:payload commandType:CommandType_GENERIC_COMMAND_REQUEST];
-}
-
-+ (instancetype)websocketRequestSensorDeviceList {
-    sfi_id correlationId = [GenericCommand nextCorrelationId];
-    
-    NSDictionary *payload = @{
-                              @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"CommandType" : @"DeviceList"
-                              };
-    
-    return [self jsonPayloadCommand:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
-}
-
 + (instancetype)requestSensorDeviceList:(NSString*)mac {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     
     NSDictionary *payload = @{
                               @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"CommandType" : @"DeviceList",
-                              @"AlmondMAC":mac
+                              @"AlmondMAC":mac,
+                              @"Action" : @"get"
                               };
     
     return [self jsonPayloadCommand:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
 }
 
-+ (instancetype)websocketRequestAlmondWifiClients:(NSString *)almondMac {
-    sfi_id correlationId = [GenericCommand nextCorrelationId];
-    
-    NSDictionary *payload = @{
-                              @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"CommandType" : @"ClientList",
-//                              @"AlmondMAC" : almondMac //if almond mac is null it would crash
-                              };
-    
-    return [self jsonPayloadCommand:payload commandType:CommandType_WIFI_CLIENTS_LIST_REQUEST];
-}
-
-+ (instancetype)websocketRequestAlmondSceneList:(NSString *)almondMac {
-    sfi_id correlationId = [GenericCommand nextCorrelationId];
-    
-    NSDictionary *payload = @{
-                              @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"CommandType" : @"DynamicSceneList",
-                              @"AlmondMAC" : almondMac
-                              };
-    
-    return [self jsonPayloadCommand:payload commandType:CommandType_GET_ALL_SCENES];
-}
-
-+ (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac {
++ (instancetype)requestAlmondClients:(NSString *)almondMac {
     
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     NSDictionary *payload = @{
                               @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"CommandType" : @"ClientList",
                               @"AlmondMAC" : almondMac,
+                              @"Action" : @"get"
                               };
     
     return [self jsonPayloadCommand:payload commandType:CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES];
 }
 
++ (instancetype)requestSceneList:(NSString *)almondMac{
+
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+    NSDictionary * payload =@{
+                               @"MobileInternalIndex" : @(correlationId).stringValue,
+                               @"CommandType" : @"SceneList",
+                               @"AlmondMAC":almondMac,
+                               @"Action" : @"get"
+                               };
+    return [self jsonPayloadCommand:payload commandType:CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES];
+}
+
 //Rules
-+ (instancetype)websocketRequestAlmondRules:(NSString *)almondMac {
++ (instancetype)requestAlmondRules:(NSString *)almondMac {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     almondMac=(almondMac==nil)?@"":almondMac;
     NSDictionary *payload = @{
                               @"CommandType" : @"RuleList",
                               @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"AlmondMAC" : almondMac,
+                              @"Action" : @"get"
                               };
     return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES];
 }

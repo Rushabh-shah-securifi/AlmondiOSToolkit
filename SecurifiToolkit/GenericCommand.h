@@ -33,34 +33,15 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)cloudChangeAlmondMode:(SFIAlmondMode)newMode userId:(NSString *)userId almondMac:(NSString *)almondMac;
 
-+ (instancetype)websocketRequestAlmondWifiClients;
-
-+ (instancetype)websocketRequestAlmondWifiClients:(NSString *)almondMac;//temprarily tried it, we dont need mac in local connection
-
-+ (instancetype)cloudRequestAlmondWifiClients:(NSString *)almondMac;
++ (instancetype)requestAlmondClients:(NSString *)almondMac;
 
 //Rules
-+ (instancetype)websocketRequestAlmondRules:(NSString *)almondMac;
-+ (instancetype)websocketRequestAlmondSceneList:(NSString *)almondMac;
-
-// constructs a generic command for requesting the sensor list
-//+ (instancetype)websocketSensorDeviceListCommand;
-
-// constructs a generic command for requesting the sensor values
-//+ (instancetype)websocketSensorDeviceValueListCommand;
++ (instancetype)requestAlmondRules:(NSString *)almondMac;
 
 // constructs a generic command for updating a sensor's index value
 + (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue ;
 
-// constructs a generic command for requesting the sensor list for the specified Almond
-//+ (instancetype)cloudSensorDeviceListCommand:(NSString *)almondMac;
-
-+ (instancetype)cloudSceneListCommand:(NSString *)almondMac;
-
-+ (instancetype)websocketRequestSensorDeviceList;
-
-// constructs a generic command for requesting the sensor values for the specified Almond
-//+ (instancetype)cloudSensorDeviceValueListCommand:(NSString *)almondMac;
++ (instancetype)requestSceneList:(NSString *)almondMac;
 
 // constructs a generic command for updating a sensor's index value
 + (instancetype)cloudSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue almondMac:(NSString *)almondMac;
@@ -70,9 +51,6 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(CommandType)type;
 
 + (instancetype)jsonStringPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType;
-
-//scene list request
-+ (instancetype)websocketRequestAlmondSceneList;
 
 + (instancetype)requestSensorDeviceList:(NSString*)mac;
 

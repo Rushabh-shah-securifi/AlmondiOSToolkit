@@ -790,13 +790,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 [block_self internalInitializeCloud:network command:cmd];
                 
                 //send request for scene list cloud
-//                cmd = [GenericCommand cloudSceneListCommand:plus.almondplusMAC];
+//                cmd = [GenericCommand requestSceneList:plus.almondplusMAC];
 //                [block_self internalInitializeCloud:network command:cmd];
 //                
-                cmd = [GenericCommand cloudRequestAlmondWifiClients:plus.almondplusMAC];
+                cmd = [GenericCommand requestAlmondClients:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 
-//                cmd = [GenericCommand websocketRequestAlmondRules:plus.almondplusMAC];
+//                cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
 //                [block_self internalInitializeCloud:network command:cmd];
             }
             //send request foe wifi client cloud
@@ -1667,11 +1667,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     BOOL local = [self useLocalNetwork:almondMac];
     NSLog(@"local: %d", local);
     if (local) {
-        GenericCommand *cmd = [GenericCommand websocketRequestAlmondWifiClients:almondMac];
+        GenericCommand *cmd = [GenericCommand requestAlmondClients:almondMac];
         [self asyncSendToLocal:cmd almondMac:almondMac];
     }
     else{
-        GenericCommand *cmd = [GenericCommand cloudRequestAlmondWifiClients:almondMac];
+        GenericCommand *cmd = [GenericCommand requestAlmondClients:almondMac];
         [self asyncSendToCloud:cmd];
     }
     
@@ -1790,16 +1790,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [[SecurifiToolkit sharedInstance] asyncSendCommand:genericCmd];
     
     NSLog(@"scene request send ");
-    cmd = [GenericCommand cloudSceneListCommand:almondMAC];
+    cmd = [GenericCommand requestSceneList:almondMAC];
     [self asyncSendToCloud:cmd];
     
     //send request foe wifi client cloud
     NSLog(@"clients request send");
-    cmd = [GenericCommand cloudRequestAlmondWifiClients:almondMAC];
+    cmd = [GenericCommand requestAlmondClients:almondMAC];
     [self asyncSendToCloud:cmd];
     // send rule request
     NSLog(@" rule request send ");
-    cmd = [GenericCommand websocketRequestAlmondRules:almondMAC];
+    cmd = [GenericCommand requestAlmondRules:almondMAC];
     [self asyncSendToCloud:cmd];
 
 }

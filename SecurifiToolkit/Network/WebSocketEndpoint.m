@@ -90,10 +90,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     [toolkit cleanUp];
     
     SFIAlmondPlus *plus = [toolkit currentAlmond];
-    [toolkit asyncSendToLocal:[GenericCommand websocketRequestSensorDeviceList] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondWifiClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondSceneList] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand websocketRequestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];   
+    [toolkit asyncSendToLocal:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
+    [toolkit asyncSendToLocal:[GenericCommand requestAlmondClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
+    [toolkit asyncSendToLocal:[GenericCommand requestSceneList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
+    [toolkit asyncSendToLocal:[GenericCommand requestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];   
 }
 
 
