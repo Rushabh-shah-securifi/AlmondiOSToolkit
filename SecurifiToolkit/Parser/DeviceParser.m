@@ -243,9 +243,15 @@
     }
 
     NSLog(@"devices: %@", toolkit.devices);
-    NSDictionary *genericDeviceDict = [DataBaseManager getDevicesForIds:[Device getDeviceTypes]];
-    toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
     
+    //genericdevices
+    NSMutableArray *genericDeviceTypesArray = [Device getDeviceTypes];
+    [self addModeClientDeviceTypes:genericDeviceTypesArray];
+    NSDictionary *genericDeviceDict = [DataBaseManager getDevicesForIds:genericDeviceTypesArray];
+    toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
+    NSLog(@"generic device 500: %@", toolkit.genericDevices[@"500"]);
+    
+    //genericindexes
     NSMutableArray *genericIndexesArray = [Device getGenericIndexes];
     [self addCommonGenericIndexes:genericIndexesArray];
     [self addClientGenericIndexes:genericIndexesArray];
@@ -253,6 +259,10 @@
     NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:genericIndexesArray];
     toolkit.genericIndexes = [self parseGenericIndexesDict:genericIndexesDict];
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
+}
+
+-(void)addModeClientDeviceTypes:(NSMutableArray*)genericDeviceTypes{
+    [genericDeviceTypes addObjectsFromArray:@[@"0", @"500"]];
 }
 
 -(void)addCommonGenericIndexes:(NSMutableArray *)genericIndexesArray{
@@ -371,9 +381,8 @@
     NSDictionary *payload = payloadDevice[@"Data"];
     device.name = payload[D_NAME];
     device.location = payload[LOCATION];
-    NSString *str;
-    str = payload[D_TYPE];
-    device.type =str.intValue;
+    NSLog(@"devicetype: %@", payload[D_TYPE]);
+    device.type =[payload[D_TYPE] intValue];
     
     NSDictionary *valuesDic = payloadDevice[DEVICE_VALUE];
     
