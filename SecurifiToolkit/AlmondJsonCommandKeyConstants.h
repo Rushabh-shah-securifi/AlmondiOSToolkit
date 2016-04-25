@@ -62,6 +62,7 @@
 #define IS_ACTUATOR @"isActuator"
 #define EXCLUDE_FROM @"ExcludeFrom"
 #define INDEXES @"Indexes"
+#define EVENT_TYPE @"EventType"
 
 #define ROW_NO @"row_no"
 #define GENERIC_INDEX_ID @"genericIndexID"

@@ -9,7 +9,7 @@
 #import "GenericValue.h"
 
 @implementation GenericValue
--(id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom{
+-(id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString *)eventType{
     self = [super init];
     if(self){
         self.value = value;
@@ -17,6 +17,7 @@
         self.icon = icon;
         self.toggleValue = toggleValue;
         self.excludeFrom = excludeFrom;
+        self.eventType = eventType;
     }
     return self;
 }
@@ -29,6 +30,7 @@
         self.iconText = genericValue.iconText;
         self.toggleValue = genericValue.toggleValue;
         self.excludeFrom = genericValue.excludeFrom;
+        self.eventType = genericValue.eventType;
     }
     return self;
 }

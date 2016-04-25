@@ -342,7 +342,8 @@
                                              layoutType:genericIndexDict[LAYOUT]
                                              commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
                                              readOnly:[genericIndexDict[READ_ONLY] boolValue]
-                                             excludeFrom:genericIndexDict[EXCLUDE_FROM]];
+                                             excludeFrom:genericIndexDict[EXCLUDE_FROM]
+                                             showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]];
     return genericIndexObject;
 }
 
@@ -360,7 +361,7 @@
         NSMutableDictionary *genericValues = [NSMutableDictionary new];
         for(NSString *value in valueKeys){
             NSDictionary *valueDict = genericValuesDict[value];
-            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM]];
+            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM] eventType:valueDict[EVENT_TYPE]];
             [genericValues setObject:genericValue forKey:value];
         }
         return genericValues;
