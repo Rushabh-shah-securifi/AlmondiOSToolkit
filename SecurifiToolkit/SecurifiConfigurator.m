@@ -36,7 +36,7 @@
         self.enableWifiClients = NO;
         self.enableAlmondVersionRemoteUpdate = NO;
         self.enableSensorTileDebugInfo = NO;
-        self.isSimulator = YES;
+        self.isSimulator = NO;
     }
 
     return self;

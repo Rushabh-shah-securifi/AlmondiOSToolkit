@@ -40,27 +40,30 @@
     if([mainDict valueForKey:@"CommandType"]==nil)
         return;
 
-    NSString *commandType=[mainDict valueForKey:@"CommandType"] ;
+    NSString *commandType=[mainDict valueForKey:@"CommandType"];
+    NSDictionary *rulesDict = mainDict[@"Rules"];
     NSLog(@"onRuleList: %@",mainDict);
     //RuleList
     if([commandType isEqualToString:@"RuleList"]){
         NSDictionary *rulesPayload = [mainDict valueForKey:@"Rules"];
         NSArray *ruleIds = rulesPayload.allKeys;
-        
         for (NSString *key in ruleIds) {
             [self createRule:rulesPayload[key]];
         }
-    }else if([commandType isEqualToString:@"DynamicRuleUpdated"] || [commandType isEqualToString:@"DynamicRuleAdded"]){
-        NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
+    }
+    else if([commandType isEqualToString:@"DynamicRuleUpdated"] || [commandType isEqualToString:@"DynamicRuleAdded"]){
+        NSString *Id = [[rulesDict allKeys] objectAtIndex:0];
+        NSDictionary *dDict = rulesDict[Id];
         [self createRule:dDict];
-    }else if([commandType isEqualToString:@"DynamicRuleRemoved"]){
-        NSDictionary *dDict = [mainDict valueForKey:@"Rules"];
-        Rule *deleteRule = [self findRule:[dDict valueForKey:@"ID"]];
+    }
+    else if([commandType isEqualToString:@"DynamicRuleRemoved"]){
+//        NSString *Id = [[rulesDict allKeys] objectAtIndex:0]; //use this when ID key is removed
+        Rule *deleteRule = [self findRule:rulesDict[@"ID"]];
         if(toolkit.ruleList!=nil && toolkit.ruleList.count>0)
             [toolkit.ruleList removeObject:deleteRule];
-    }else if([commandType isEqualToString:@"DynamicAllRulesRemoved"] && toolkit.ruleList!=nil && toolkit.ruleList.count>0)
+    }
+    else if([commandType isEqualToString:@"DynamicAllRulesRemoved"] && toolkit.ruleList!=nil && toolkit.ruleList.count>0)
         [toolkit.ruleList removeAllObjects];
-    
     
     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
 }
@@ -82,12 +85,11 @@
     rule.triggers= [NSMutableArray new];
     
     [self getEntriesList:[dict valueForKey:@"Triggers"] list:rule.triggers];
-    
     rule.actions= [NSMutableArray new];
     [self getEntriesList:[dict valueForKey:@"Results"] list:rule.actions];
     return rule;
-    
 }
+
 -(Rule*)findRule:(NSString *)id{
     SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
     toolkit.ruleList=toolkit.ruleList==nil?[NSMutableArray new]:toolkit.ruleList;
@@ -114,7 +116,7 @@
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         subProperties.type = [triggersDict valueForKey:@"Type"];
         subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
-        subProperties.valid= [[triggersDict valueForKey:@"Validation"] boolValue];
+        subProperties.valid= [[triggersDict valueForKey:@"Valid"] boolValue];
         [self addTime:triggersDict timeProperty:subProperties];
         [list addObject:subProperties];
     }
