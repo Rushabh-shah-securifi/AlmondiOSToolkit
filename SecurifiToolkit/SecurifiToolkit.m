@@ -203,7 +203,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.clientParser =[[ClientParser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
     self.routerParser = [[RouterParser alloc]init];
-    [DataBaseManager initializeDataBase];
+//    [DataBaseManager initializeDataBase];
+    
+    self.genericDevices = [DeviceParser parseGenericDevicesDict:[DeviceParser parseJson:@"deviceListJson"]];
+    self.genericIndexes = [DeviceParser parseGenericIndexesDict:[DeviceParser parseJson:@"GenericIndexesData"]];
+    
+    NSLog(@"toolkit.genericDevice: %@", self.genericDevices);
+    NSLog(@"toolkit.genericDevice 500: %@", self.genericDevices[@"500"]);
 }
 
 #pragma mark - Connection management
@@ -789,17 +795,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 cmd = [GenericCommand requestSensorDeviceList:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 
-                //send request for scene list cloud
-//                cmd = [GenericCommand requestSceneList:plus.almondplusMAC];
-//                [block_self internalInitializeCloud:network command:cmd];
-//                
+                cmd = [GenericCommand requestSceneList:plus.almondplusMAC];
+                [block_self internalInitializeCloud:network command:cmd];
+
                 cmd = [GenericCommand requestAlmondClients:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
                 
-//                cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
-//                [block_self internalInitializeCloud:network command:cmd];
+                cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
+                [block_self internalInitializeCloud:network command:cmd];
             }
-            //send request foe wifi client cloud
             [block_self tryRequestAlmondMode:mac];
         }
         

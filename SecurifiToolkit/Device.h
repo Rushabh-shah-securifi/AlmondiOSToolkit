@@ -37,5 +37,6 @@
 + (NSDictionary*)getCommonIndexesDict;
 + (void)setDeviceNameLocation:(Device*)device forGenericID:(int)genericID value:(NSString*)value;
 + (Device *)getDeviceCopy:(Device*)device;
++ (NSString *)getValueForIndex:(int)index deviceID:(int)deviceID;
 
 @end

@@ -29,6 +29,25 @@
     return self;
 }
 
+-(id)initWithGenericIndex:(GenericIndexClass*)genericIndex{
+    self = [super init];
+    if(self){
+        self.groupLabel = genericIndex.groupLabel;
+        self.icon = genericIndex.icon;
+        self.type = genericIndex.type;
+        self.ID = genericIndex.ID;
+        self.placement = genericIndex.placement;
+        self.values = genericIndex.values;
+        self.formatter = genericIndex.formatter;
+        self.layoutType = genericIndex.layoutType;
+        self.commandType = genericIndex.commandType;
+        self.readOnly = genericIndex.readOnly;
+        self.excludeFrom = genericIndex.excludeFrom;
+        self.showToggleInRules = genericIndex.showToggleInRules;
+    }
+    return self;
+}
+
 +(DeviceCommandType)getCommandType:(NSString*)command{
     if(command){
         if([command isEqualToString:NAME_CHANGED])

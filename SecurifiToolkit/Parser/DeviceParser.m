@@ -160,22 +160,21 @@
     }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *almond = [toolkit currentAlmond];
-//    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
-//    if(local){
-//        payload = [dataInfo valueForKey:@"data"];
-//    }else{
-//        NSLog(@"cloud data");
-//        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-//    }
+    if(local){
+        payload = [dataInfo valueForKey:@"data"];
+    }else{
+        NSLog(@"cloud data");
+        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+    }
     
-    payload = [self parseJson:@"DeviceListResponse"];
+//    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
-//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-//    if(!isMatchingAlmondOrLocal) //for cloud
-//        return;
+    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
     NSString *commandType = [payload valueForKey:COMMAND_TYPE];
-//    return;
     if([commandType isEqualToString:DEVICE_LIST]){
         NSDictionary *devicesPayload = payload[DEVICES];
         NSArray *devicePosKeys = devicesPayload.allKeys;
@@ -189,6 +188,21 @@
             device.ID = [devicePosition intValue];
             [toolkit.devices addObject:device];
         }
+
+//        //    genericdevices
+//        NSMutableArray *genericDeviceTypesArray = [Device getDeviceTypes];
+//        [self addModeClientRebootDeviceTypes:genericDeviceTypesArray];
+//        NSDictionary *genericDeviceDict = [DataBaseManager getDevicesForIds:genericDeviceTypesArray];
+//        toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
+////
+//        //    genericindexes
+//        NSMutableArray *genericIndexesArray = [Device getGenericIndexes];
+//        [self addCommonGenericIndexes:genericIndexesArray];
+//        [self addClientGenericIndexes:genericIndexesArray];
+//        [self addModeClientRebootIndexes:genericIndexesArray];
+//        NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:genericIndexesArray];
+//        toolkit.genericIndexes = [self parseGenericIndexesDict:genericIndexesDict];
+        
     }
     else if([commandType isEqualToString:DYNAMIC_DEVICE_ADDED]) {
         NSDictionary *devicesPayload = payload[DEVICES];
@@ -231,8 +245,9 @@
         for(Device *device in toolkit.devices){
             NSDictionary *valuesDic = updatedDevice[@(device.ID).stringValue];
             if(valuesDic != nil){
+                NSDictionary *DeviceValuesDict = valuesDic[@"DeviceValues"];
                 for(DeviceKnownValues *knownValue in device.knownValues){
-                    NSDictionary *knownValueDic = valuesDic[@(knownValue.index).stringValue];
+                    NSDictionary *knownValueDic = DeviceValuesDict[@(knownValue.index).stringValue];
                     if (knownValueDic != nil) {
                         [self updateKnownValue:knownValueDic knownValues:knownValue];
                         break;
@@ -244,131 +259,31 @@
 
     NSLog(@"devices: %@", toolkit.devices);
     
-    //genericdevices
-    NSMutableArray *genericDeviceTypesArray = [Device getDeviceTypes];
-    [self addModeClientDeviceTypes:genericDeviceTypesArray];
-    NSDictionary *genericDeviceDict = [DataBaseManager getDevicesForIds:genericDeviceTypesArray];
-    toolkit.genericDevices = [self parseGenericDevicesDict:genericDeviceDict];
-    NSLog(@"generic device 500: %@", toolkit.genericDevices[@"500"]);
-    
-    //genericindexes
-    NSMutableArray *genericIndexesArray = [Device getGenericIndexes];
-    [self addCommonGenericIndexes:genericIndexesArray];
-    [self addClientGenericIndexes:genericIndexesArray];
-    [self addModeClientIndexes:genericIndexesArray];
-    NSDictionary *genericIndexesDict = [DataBaseManager getDeviceIndexesForIds:genericIndexesArray];
-    toolkit.genericIndexes = [self parseGenericIndexesDict:genericIndexesDict];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
 }
 
--(void)addModeClientDeviceTypes:(NSMutableArray*)genericDeviceTypes{
-    [genericDeviceTypes addObjectsFromArray:@[@"0", @"500"]];
-}
 
--(void)addCommonGenericIndexes:(NSMutableArray *)genericIndexesArray{
-    NSDictionary *commonIndexes = [Device getCommonIndexesDict];
-    for(NSString *value in commonIndexes.allValues){
-        [genericIndexesArray addObject:value];
-    }
-}
-
--(void)addClientGenericIndexes:(NSMutableArray*)genericIndexesArray{
-    for(NSNumber *clientIndex in [Client getClientGenericIndexes]){
-        [genericIndexesArray addObject:clientIndex.stringValue];
-    }
-}
-
--(void)addModeClientIndexes:(NSMutableArray*)genericIndexesArray{
-    [genericIndexesArray addObjectsFromArray:@[@"0", @"-30"]];
-}
-
-//generic device parsing methods
--(NSDictionary*)parseGenericDevicesDict:(NSDictionary*)genericDevicesDict{
-    NSArray *genericDevicesKeys = genericDevicesDict.allKeys;
-    GenericDeviceClass *genericIndexObject;
-    NSMutableDictionary *mutableDeviceDict = [NSMutableDictionary new];
-    for(NSString *deviceType in genericDevicesKeys){
-        genericIndexObject = [self createGenericDeviceForDict:genericDevicesDict[deviceType] forType:deviceType];
-        [mutableDeviceDict setObject:genericIndexObject forKey:deviceType];
-    }
-    return mutableDeviceDict;
-}
-
--(GenericDeviceClass *)createGenericDeviceForDict:(NSDictionary*)genericDeviceDict forType:(NSString*)deviceType{
-    GenericDeviceClass *genericDeviceObject = [[GenericDeviceClass alloc] initWithName:genericDeviceDict[DEVICE_NAME]
-                                                                                  type:genericDeviceDict[deviceType]
-                                                                           defaultIcon:genericDeviceDict[DEVICE_DEFAULT_ICON]
-                                                                            isActuator:[genericDeviceDict[IS_ACTUATOR] boolValue]
-                                                                       excludeFrom:genericDeviceDict[EXCLUDE_FROM]
-                                                                               indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]]];
-    return genericDeviceObject;
-    
-}
-
--(NSDictionary*)createDeviceIndexesDict:(NSDictionary*)indexesDict{
-    NSMutableDictionary *indexes = [NSMutableDictionary new];
-    NSArray *indexesKeys = indexesDict.allKeys;
-    for(NSString *index in indexesKeys){
-        NSDictionary *indexDict = indexesDict[index];
-        DeviceIndex *deviceIndex = [[DeviceIndex alloc]initWithIndex:index
-                                                        genericIndex:indexDict[GENERIC_INDEX_ID]
-                                                               rowID:indexDict[ROW_NO]];
-        [indexes setObject:deviceIndex forKey:index];
-    }
-    return indexes;
-}
-
-//genericindexes parsing methods
--(NSDictionary*)parseGenericIndexesDict:(NSDictionary*)genericIndexesDict{
-    NSArray *genericIndexKeys = genericIndexesDict.allKeys;
-    GenericIndexClass *genericIndexObject;
-    NSMutableDictionary *mutableGenericIndex = [NSMutableDictionary new];
-    for(NSString *genericIndexID in genericIndexKeys){
-        genericIndexObject = [self createGenericIndexForDic:genericIndexesDict[genericIndexID]
-                                                      forID:genericIndexID];
-        [mutableGenericIndex setObject:genericIndexObject forKey:genericIndexID];
-    }
-    return mutableGenericIndex;
-}
--(GenericIndexClass*)createGenericIndexForDic:(NSDictionary*)genericIndexDict forID:(NSString*)ID{
-    GenericIndexClass *genericIndexObject = [[GenericIndexClass alloc]
-                                             initWithLabel:genericIndexDict[GROUP_LABEL]
-                                             icon:genericIndexDict[INDEX_DEFAULT_ICON]
-                                             type:genericIndexDict[TYPE]
-                                             identifier:ID
-                                             placement:genericIndexDict[PLACEMENT]
-                                             values:[self createGenericValues:genericIndexDict[VALUES]]
-                                             formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
-                                             layoutType:genericIndexDict[LAYOUT]
-                                             commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
-                                             readOnly:[genericIndexDict[READ_ONLY] boolValue]
-                                             excludeFrom:genericIndexDict[EXCLUDE_FROM]
-                                             showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]];
-    return genericIndexObject;
-}
-
--(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
-    if(formatterDict){
-        Formatter *formatter = [[Formatter alloc]initWithFactor:[formatterDict[FACTOR] floatValue] min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT]];
-        return formatter;
-    }
-    return nil;
-}
-
--(NSMutableDictionary *)createGenericValues:(NSDictionary*)genericValuesDict{
-    if(genericValuesDict){
-        NSArray *valueKeys = genericValuesDict.allKeys;
-        NSMutableDictionary *genericValues = [NSMutableDictionary new];
-        for(NSString *value in valueKeys){
-            NSDictionary *valueDict = genericValuesDict[value];
-            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM] eventType:valueDict[EVENT_TYPE]];
-            [genericValues setObject:genericValue forKey:value];
-        }
-        return genericValues;
-    }
-    return nil;
-}
-
+//-(void)addModeClientRebootDeviceTypes:(NSMutableArray*)genericDeviceTypes{
+//    [genericDeviceTypes addObjectsFromArray:@[@"0", @"500", @"501"]];
+//}
+//
+//-(void)addCommonGenericIndexes:(NSMutableArray *)genericIndexesArray{
+//    NSDictionary *commonIndexes = [Device getCommonIndexesDict];
+//    for(NSString *value in commonIndexes.allValues){
+//        [genericIndexesArray addObject:value];
+//    }
+//}
+//
+//-(void)addClientGenericIndexes:(NSMutableArray*)genericIndexesArray{
+//    for(NSNumber *clientIndex in [Client getClientGenericIndexes]){
+//        [genericIndexesArray addObject:clientIndex.stringValue];
+//    }
+//}
+//
+//-(void)addModeClientRebootIndexes:(NSMutableArray*)genericIndexesArray{
+//    [genericIndexesArray addObjectsFromArray:@[@"0", @"-30", @"-31"]];
+//}
 
 
 //DeviceListAndDynamicDeviceResponse parsing methods
@@ -413,7 +328,98 @@
     values.value = payload[VALUE];
 }
 
-- (NSDictionary*)parseJson:(NSString*)fileName{
+
+
+
+//generic device parsing methods
++(NSDictionary*)parseGenericDevicesDict:(NSDictionary*)genericDevicesDict{
+    NSArray *genericDevicesKeys = genericDevicesDict.allKeys;
+    GenericDeviceClass *genericIndexObject;
+    NSMutableDictionary *mutableDeviceDict = [NSMutableDictionary new];
+    for(NSString *deviceType in genericDevicesKeys){
+        genericIndexObject = [self createGenericDeviceForDict:genericDevicesDict[deviceType] forType:deviceType];
+        [mutableDeviceDict setObject:genericIndexObject forKey:deviceType];
+    }
+    return mutableDeviceDict;
+}
+
++(GenericDeviceClass *)createGenericDeviceForDict:(NSDictionary*)genericDeviceDict forType:(NSString*)deviceType{
+    GenericDeviceClass *genericDeviceObject = [[GenericDeviceClass alloc] initWithName:genericDeviceDict[DEVICE_NAME]
+                                                                                  type:genericDeviceDict[deviceType]
+                                                                           defaultIcon:genericDeviceDict[DEVICE_DEFAULT_ICON]
+                                                                            isActuator:[genericDeviceDict[IS_ACTUATOR] boolValue]
+                                                                       excludeFrom:genericDeviceDict[EXCLUDE_FROM]
+                                                                               indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]]];
+    return genericDeviceObject;
+    
+}
+
++(NSDictionary*)createDeviceIndexesDict:(NSDictionary*)indexesDict{
+    NSMutableDictionary *indexes = [NSMutableDictionary new];
+    NSArray *indexesKeys = indexesDict.allKeys;
+    for(NSString *index in indexesKeys){
+        NSDictionary *indexDict = indexesDict[index];
+        DeviceIndex *deviceIndex = [[DeviceIndex alloc]initWithIndex:index
+                                                        genericIndex:indexDict[GENERIC_INDEX_ID]
+                                                               rowID:indexDict[ROW_NO]];
+        [indexes setObject:deviceIndex forKey:index];
+    }
+    return indexes;
+}
+
+//genericindexes parsing methods
++(NSDictionary*)parseGenericIndexesDict:(NSDictionary*)genericIndexesDict{
+    NSArray *genericIndexKeys = genericIndexesDict.allKeys;
+    GenericIndexClass *genericIndexObject;
+    NSMutableDictionary *mutableGenericIndex = [NSMutableDictionary new];
+    for(NSString *genericIndexID in genericIndexKeys){
+        genericIndexObject = [self createGenericIndexForDic:genericIndexesDict[genericIndexID]
+                                                      forID:genericIndexID];
+        [mutableGenericIndex setObject:genericIndexObject forKey:genericIndexID];
+    }
+    return mutableGenericIndex;
+}
++(GenericIndexClass*)createGenericIndexForDic:(NSDictionary*)genericIndexDict forID:(NSString*)ID{
+    GenericIndexClass *genericIndexObject = [[GenericIndexClass alloc]
+                                             initWithLabel:genericIndexDict[GROUP_LABEL]
+                                             icon:genericIndexDict[INDEX_DEFAULT_ICON]
+                                             type:genericIndexDict[TYPE]
+                                             identifier:ID
+                                             placement:genericIndexDict[PLACEMENT]
+                                             values:[self createGenericValues:genericIndexDict[VALUES]]
+                                             formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
+                                             layoutType:genericIndexDict[LAYOUT]
+                                             commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
+                                             readOnly:[genericIndexDict[READ_ONLY] boolValue]
+                                             excludeFrom:genericIndexDict[EXCLUDE_FROM]
+                                             showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]];
+    return genericIndexObject;
+}
+
++(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
+    if(formatterDict){
+        Formatter *formatter = [[Formatter alloc]initWithFactor:[formatterDict[FACTOR] floatValue] min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT]];
+        return formatter;
+    }
+    return nil;
+}
+
++(NSMutableDictionary *)createGenericValues:(NSDictionary*)genericValuesDict{
+    if(genericValuesDict){
+        NSArray *valueKeys = genericValuesDict.allKeys;
+        NSMutableDictionary *genericValues = [NSMutableDictionary new];
+        for(NSString *value in valueKeys){
+            NSDictionary *valueDict = genericValuesDict[value];
+            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM] eventType:valueDict[EVENT_TYPE]];
+            [genericValues setObject:genericValue forKey:value];
+        }
+        return genericValues;
+    }
+    return nil;
+}
+
+
++ (NSDictionary*)parseJson:(NSString*)fileName{
     NSError *error = nil;
     NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName
                                                          ofType:@"json"];
@@ -427,5 +433,6 @@
     }
     return data;
 }
+
 
 @end

@@ -25,12 +25,15 @@ typedef NS_ENUM(int, DeviceCommandType){
 @property(nonatomic) NSDictionary *values;
 @property(nonatomic) Formatter *formatter;
 @property(nonatomic) NSString* layoutType;
-@property DeviceCommandType commandType;
+@property(nonatomic) DeviceCommandType commandType;
 @property(nonatomic) BOOL readOnly;
 @property(nonatomic) NSString *excludeFrom;
 @property(nonatomic) NSString *rowID;
 @property(nonatomic) BOOL showToggleInRules;
 
 -(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly excludeFrom:(NSString *)excludeFrom showToggleInRules:(BOOL)showToggleInRules;
+
+-(id)initWithGenericIndex:(GenericIndexClass*)genericIndex;
+
 +(DeviceCommandType)getCommandType:(NSString*)command;
 @end

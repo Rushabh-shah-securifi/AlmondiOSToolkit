@@ -10,4 +10,10 @@
 
 @interface DeviceParser : NSObject
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender;
+
++ (NSDictionary*)parseGenericDevicesDict:(NSDictionary*)genericDevicesDict;
+
++ (NSDictionary*)parseGenericIndexesDict:(NSDictionary*)genericIndexesDict;
+
++ (NSDictionary*)parseJson:(NSString*)fileName;
 @end

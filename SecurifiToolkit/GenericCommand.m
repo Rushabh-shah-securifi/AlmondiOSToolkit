@@ -138,7 +138,7 @@
     NSDictionary *payload = @{
                               @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"CommandType" : @"DeviceList",
-                              @"AlmondMAC":mac,
+                              @"AlmondMAC":mac? mac: @"",
                               @"Action" : @"get"
                               };
     
@@ -151,7 +151,7 @@
     NSDictionary *payload = @{
                               @"MobileInternalIndex" : @(correlationId).stringValue,
                               @"CommandType" : @"ClientList",
-                              @"AlmondMAC" : almondMac,
+                              @"AlmondMAC" : almondMac? almondMac: @"",
                               @"Action" : @"get"
                               };
     
@@ -163,8 +163,8 @@
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     NSDictionary * payload =@{
                                @"MobileInternalIndex" : @(correlationId).stringValue,
-                               @"CommandType" : @"SceneList",
-                               @"AlmondMAC":almondMac,
+                               @"CommandType" : @"DynamicSceneList",
+                               @"AlmondMAC":almondMac? almondMac: @"",
                                @"Action" : @"get"
                                };
     return [self jsonPayloadCommand:payload commandType:CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES];
@@ -177,7 +177,7 @@
     NSDictionary *payload = @{
                               @"CommandType" : @"RuleList",
                               @"MobileInternalIndex" : @(correlationId).stringValue,
-                              @"AlmondMAC" : almondMac,
+                              @"AlmondMAC" : almondMac? almondMac: @"",
                               @"Action" : @"get"
                               };
     return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES];

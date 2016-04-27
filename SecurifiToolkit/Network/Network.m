@@ -633,7 +633,7 @@
             break;
         };
             
-            //rules
+        //rules
         case CommandType_RULE_LIST: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:RULE_LIST_NOTIFIER data:payload];

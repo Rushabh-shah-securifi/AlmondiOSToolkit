@@ -15,6 +15,11 @@
 
 @implementation Device
 
++ (NSString *)getValueForIndex:(int)index deviceID:(int)deviceID{
+    Device *device = [Device getDeviceForID:deviceID];
+    return [self getValueFormKnownValues:device.knownValues];
+}
+
 +(Device*)getDeviceForID:(sfi_id)deviceID{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     for(Device *device in toolkit.devices){
@@ -23,6 +28,16 @@
         }
     }
     return nil;
+}
+
++(NSString*)getValueFormKnownValues:(NSArray*)knownValues{
+    NSString *value;
+    for(DeviceKnownValues *knownValue in knownValues){
+        if(knownValue.index == index){
+            value = knownValue.value;
+        }
+    }
+    return value;
 }
 
 +(Device *)getDeviceCopy:(Device*)device{
@@ -74,5 +89,9 @@
             break;
     }
 }
+
+
+
+
 
 @end
