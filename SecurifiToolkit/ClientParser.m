@@ -95,15 +95,18 @@
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVED]) {
         NSDictionary *clientPayload = mainDict[CLIENTS];
         
-        NSString *clientID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
+//        NSString *clientID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         Client *toBeRemovedClient;
         for(Client *device in toolkit.clients){
-            if([device.deviceID isEqualToString:clientID]){
+            if([device.deviceID isEqualToString:clientPayload[@"ID"]]){
                 toBeRemovedClient = device;
                 break;
             }
         }
+        NSLog(@"toolkit client list count %ld",toolkit.clients.count);
+        
         [toolkit.clients removeObject:toBeRemovedClient];
+         NSLog(@"toolkit client list count %ld",toolkit.clients.count);
     }
     toolkit.clients = [self getSortedDevices];
     
