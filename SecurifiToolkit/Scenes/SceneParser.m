@@ -19,20 +19,20 @@
 
 - (void)initializeNotifications{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-//    [center addObserver:self
-//               selector:@selector(getAllScenesCallback:)
-//                   name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
-//                 object:nil];
+    [center addObserver:self
+               selector:@selector(getAllScenesCallback:)
+                   name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
+                 object:nil];
     
     [center addObserver:self
                selector:@selector(onScenesListChange:)
                    name:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER
                  object:nil];
-    
-    [center addObserver:self
-               selector:@selector(getAllScenesCallback:)
-                   name:NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
-                 object:nil];//NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
+//    
+//    [center addObserver:self
+//               selector:@selector(getAllScenesCallback:)
+//                   name:NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
+//                 object:nil];//NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
 }
 
 
@@ -52,7 +52,7 @@
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }// required for switching local<=>cloud
 
-//    NSLog(@" scene list dict %@",mainDict);
+    NSLog(@" scene list dict %@",mainDict);
     [toolkit.scenesArray removeAllObjects];
     
     NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
@@ -74,6 +74,7 @@
 }
 
 - (void)onScenesListChange:(id)sender{
+    
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     
@@ -86,6 +87,7 @@
         //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
+    NSLog(@"main scene dict %@",mainDict);
     NSDictionary *dict;
     NSString * commandType = [mainDict valueForKey:@"CommandType"];
     
@@ -124,9 +126,15 @@
     else if ([commandType isEqualToString:@"DynamicSceneUpdated"]) {
         //scenes parameterers has been updated
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
-            if ([[sceneDict valueForKey:@"ID"] intValue] == [[[mainDict valueForKey:@"Scenes"] valueForKey:@"ID"] intValue]) {
+             NSString *SceneID = [[sceneDict allKeys] objectAtIndex:0]; // Assumes payload always has one scene.
+            NSDictionary *scenDict = [mainDict valueForKey:@"Scenes"];
+            NSLog(@"scen dict %@",sceneDict);
+            NSLog(@"scene ID scene ID %@ == %@",[sceneDict allKeys],[scenDict valueForKey:@"ID"]);
+            
+            if ([[sceneDict valueForKey:@"ID"] intValue] == [[[mainDict valueForKey:@"Scenes"]valueForKey:@"ID"] intValue]) {
                 
                 NSMutableDictionary *newScene = [[mainDict valueForKey:@"Scenes"] mutableCopy];
+                NSLog(@" scene in main dict %@",newScene);
                 [newScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
                 for(NSMutableDictionary *sceneEntryList in [newScene valueForKey:@"SceneEntryList"]){
                     [sceneEntryList removeObjectForKey:@"Valid"];
