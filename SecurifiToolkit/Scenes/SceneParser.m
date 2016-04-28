@@ -151,7 +151,7 @@
     else if ([commandType isEqualToString:@"DynamicSceneRemoved"]) {
         NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
         for (NSDictionary * sceneDict in toolkit.scenesArray) {
-            if ([[[mainDict valueForKey:@"Scenes"]valueForKey:@"ID"] intValue]==[[sceneDict valueForKey:@"ID"] intValue])
+            if ([[sceneDict valueForKey:@"ID"] intValue] == updatedID.intValue)
             {
                 dict = sceneDict;
                 break;

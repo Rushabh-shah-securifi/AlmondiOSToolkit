@@ -323,12 +323,18 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
              },
-             @"AlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+             @"DynamicAlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
                  res.almondMAC = endpoint.config.almondMac;
                  
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
              },
+//             @"AlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
+//                 res.almondMAC = endpoint.config.almondMac;
+//                 
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
+//             },
              @"ClientsList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  SFIDevicesList *res = [SFIDevicesList parseJson:payload];
                  

@@ -57,8 +57,8 @@
         [self createRule:dDict];
     }
     else if([commandType isEqualToString:@"DynamicRuleRemoved"]){
-//        NSString *Id = [[rulesDict allKeys] objectAtIndex:0]; //use this when ID key is removed
-        Rule *deleteRule = [self findRule:rulesDict[@"ID"]];
+        NSString *Id = [[rulesDict allKeys] objectAtIndex:0]; //use this when ID key is removed
+        Rule *deleteRule = [self findRule:Id];
         if(toolkit.ruleList!=nil && toolkit.ruleList.count>0)
             [toolkit.ruleList removeObject:deleteRule];
     }

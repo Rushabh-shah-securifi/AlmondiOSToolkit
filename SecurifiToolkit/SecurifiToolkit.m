@@ -3437,7 +3437,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!res.success) {
         return;
     }
-    
+    NSLog(@"res.mode: %d", res.mode);
     [network.networkState markModeForAlmond:res.almondMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }

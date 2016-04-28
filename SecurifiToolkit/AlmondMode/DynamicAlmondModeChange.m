@@ -10,16 +10,19 @@
 
 + (DynamicAlmondModeChange *)parseJson:(NSDictionary *)payload {
     //"{"commandtype":"AlmondModeUpdated","data":{"2":{"emailid":"msd@mingfu.tw"}}}"
+    /*  {"CommandType":"DynamicAlmondModeUpdated","Mode":"2","EmailId":"NULL"}  */ //NEW COMMAND
 
     DynamicAlmondModeChange *res = DynamicAlmondModeChange.new;
     res.success = YES;
 
-    NSDictionary *data = payload[@"data"];
-
-    NSString *modeValue = data.allKeys.firstObject;
+//    NSDictionary *data = payload[@"data"];
+//
+//    NSString *modeValue = data.allKeys.firstObject;
+    NSString *modeValue = payload[@"Mode"];
+    NSString *emailId = payload[@"EmailId"];
     if (modeValue) {
         res.mode = (SFIAlmondMode) modeValue.intValue;
-        res.userId = data[modeValue];
+        res.userId = emailId;
 
     }
 
