@@ -15,9 +15,9 @@
 
 @implementation Device
 
-+ (NSString *)getValueForIndex:(int)index deviceID:(int)deviceID{
++ (NSString *)getValueForIndex:(int)deviceIndex deviceID:(int)deviceID{
     Device *device = [Device getDeviceForID:deviceID];
-    return [self getValueFormKnownValues:device.knownValues];
+    return [self getValueFormKnownValues:device.knownValues forIndex:deviceIndex];
 }
 
 +(Device*)getDeviceForID:(sfi_id)deviceID{
@@ -30,10 +30,10 @@
     return nil;
 }
 
-+(NSString*)getValueFormKnownValues:(NSArray*)knownValues{
++(NSString*)getValueFormKnownValues:(NSArray*)knownValues forIndex:(int)deviceIndex{
     NSString *value;
     for(DeviceKnownValues *knownValue in knownValues){
-        if(knownValue.index == index){
+        if(knownValue.index == deviceIndex){
             value = knownValue.value;
         }
     }
