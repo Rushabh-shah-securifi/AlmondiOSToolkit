@@ -362,7 +362,7 @@
         NSDictionary *indexDict = indexesDict[index];
         DeviceIndex *deviceIndex = [[DeviceIndex alloc]initWithIndex:index
                                                         genericIndex:indexDict[GENERIC_INDEX_ID]
-                                                               rowID:indexDict[ROW_NO]];
+                                                               rowID:indexDict[ROW_NO] placement:indexDict[@"Placement"]];
         [indexes setObject:deviceIndex forKey:index];
     }
     return indexes;
@@ -399,7 +399,8 @@
 
 +(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
     if(formatterDict){
-        Formatter *formatter = [[Formatter alloc]initWithFactor:[formatterDict[FACTOR] floatValue] min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT]];
+        float factor = formatterDict[FACTOR]? [formatterDict[FACTOR] floatValue]: 1;
+        Formatter *formatter = [[Formatter alloc]initWithFactor:factor min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT]];
         return formatter;
     }
     return nil;

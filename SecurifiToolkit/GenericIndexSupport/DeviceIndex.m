@@ -9,12 +9,13 @@
 #import "DeviceIndex.h"
 
 @implementation DeviceIndex
--(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID{
+-(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement{
     self = [super init];
     if(self){
         self.index = index;
         self.genericIndex = genericIndex;
         self.rowID = rowID;
+        self.placement = placement;
     }
     return self;
 }

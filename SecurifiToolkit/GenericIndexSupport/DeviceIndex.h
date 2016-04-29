@@ -12,6 +12,7 @@
 @property NSString *rowID;
 @property NSString *genericIndex;
 @property NSString *index;
+@property NSString *placement;
 
--(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID;
+-(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement;
 @end
