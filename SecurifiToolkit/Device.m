@@ -73,6 +73,10 @@
     return [[genericIndexesSet allObjects] mutableCopy];
 }
 
++ (int)getTypeForID:(int)deviceId{
+   Device *device = [self getDeviceForID:deviceId];
+    return device.type;
+}
 +(NSDictionary*)getCommonIndexesDict{
     return @{@"Name":@"-1", @"Location":@"-2", @"NotifyMe":@"-3"};
 }
@@ -89,8 +93,6 @@
             break;
     }
 }
-
-
 
 
 
