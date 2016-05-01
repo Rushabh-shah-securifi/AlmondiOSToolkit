@@ -111,6 +111,7 @@
     for(NSDictionary *triggersDict in triggers){
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
         subProperties.deviceId = [self getIntegerValue:[triggersDict valueForKey:@"ID"]];
+        NSLog(@"[triggersDict index id %@",[triggersDict valueForKey:@"Index"]);
         subProperties.index = [self getIntegerValue:[triggersDict valueForKey:@"Index"]];
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];

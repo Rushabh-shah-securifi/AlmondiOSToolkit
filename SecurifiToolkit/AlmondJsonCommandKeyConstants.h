@@ -18,10 +18,10 @@
 #define DATA_TYPE @"DataType"
 #define PLACEMENT @"Placement"
 #define HEADER @"Header"
-#define DETAIL_HEADER @"DETAIL_HEADER"
-#define DETAIL @"DETAIL"
+#define HEADER_DETAIL @"Header_Detail"
+#define DETAIL @"Detail"
 #define LAYOUT @"Layout"
-#define GROUP_LABEL @"GroupLabel"
+#define APP_LABEL @"AppLabel"
 #define CONDITIONAL @"Conditional"
 #define DEFAULT_VISIBILITY @"DefaultVisibility"
 #define HAS_TOGGLE_ICON @"HasToggleIcon"
@@ -33,6 +33,7 @@
 #define LABEL @"Label"
 #define DEVICE_COMMAND_TYPE @"CommandType"
 #define READ_ONLY @"ReadOnly"
+
 
 #define FORMATTER @"Formatter"
 #define MINMUM @"Min"
@@ -63,6 +64,7 @@
 #define EXCLUDE_FROM @"ExcludeFrom"
 #define INDEXES @"Indexes"
 #define EVENT_TYPE @"EventType"
+#define ISTRIOGGER @"isTrigger"
 
 #define ROW_NO @"row_no"
 #define GENERIC_INDEX_ID @"genericIndexID"

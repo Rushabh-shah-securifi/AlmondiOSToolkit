@@ -345,12 +345,13 @@
 }
 
 +(GenericDeviceClass *)createGenericDeviceForDict:(NSDictionary*)genericDeviceDict forType:(NSString*)deviceType{
+    NSLog(@"device types %@",deviceType);
     GenericDeviceClass *genericDeviceObject = [[GenericDeviceClass alloc] initWithName:genericDeviceDict[DEVICE_NAME]
-                                                                                  type:genericDeviceDict[deviceType]
+                                                                                  type:deviceType
                                                                            defaultIcon:genericDeviceDict[DEVICE_DEFAULT_ICON]
                                                                             isActuator:[genericDeviceDict[IS_ACTUATOR] boolValue]
                                                                        excludeFrom:genericDeviceDict[EXCLUDE_FROM]
-                                                                               indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]]];
+                                                                               indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]] isTrigger:[genericDeviceDict[ISTRIOGGER] boolValue]];
     return genericDeviceObject;
     
 }
@@ -381,8 +382,9 @@
     return mutableGenericIndex;
 }
 +(GenericIndexClass*)createGenericIndexForDic:(NSDictionary*)genericIndexDict forID:(NSString*)ID{
+    BOOL readOnly =[genericIndexDict[TYPE] isEqualToString:ACTUATOR]?NO:YES;
     GenericIndexClass *genericIndexObject = [[GenericIndexClass alloc]
-                                             initWithLabel:genericIndexDict[GROUP_LABEL]
+                                             initWithLabel:genericIndexDict[APP_LABEL]
                                              icon:genericIndexDict[INDEX_DEFAULT_ICON]
                                              type:genericIndexDict[TYPE]
                                              identifier:ID
@@ -391,7 +393,7 @@
                                              formatter:[self createFormatterFromIndexDicIfExists:genericIndexDict[FORMATTER]]
                                              layoutType:genericIndexDict[LAYOUT]
                                              commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
-                                             readOnly:[genericIndexDict[READ_ONLY] boolValue]
+                                             readOnly:readOnly
                                              excludeFrom:genericIndexDict[EXCLUDE_FROM]
                                              showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]];
     return genericIndexObject;
@@ -407,12 +409,12 @@
 }
 
 +(NSMutableDictionary *)createGenericValues:(NSDictionary*)genericValuesDict{
-    if(genericValuesDict){
+    if(genericValuesDict){//NSLocalizedString(@"'s Smoke is gone.", @"'s Smoke is gone.")
         NSArray *valueKeys = genericValuesDict.allKeys;
         NSMutableDictionary *genericValues = [NSMutableDictionary new];
         for(NSString *value in valueKeys){
             NSDictionary *valueDict = genericValuesDict[value];
-            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:valueDict[LABEL] icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM] eventType:valueDict[EVENT_TYPE]];
+            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:NSLocalizedString(valueDict[APP_LABEL],valueDict[APP_LABEL]) icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM] eventType:valueDict[EVENT_TYPE]];
             [genericValues setObject:genericValue forKey:value];
         }
         return genericValues;

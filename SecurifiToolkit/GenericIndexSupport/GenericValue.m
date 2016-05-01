@@ -35,6 +35,15 @@
     return self;
 }
 
+-(id)initUnknownDevice{
+    self = [super init];
+    if(self){
+        self.displayText = @"Unknown";
+        self.icon = @"Unknown";
+    }
+    return self;
+}
+
 - (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom{
     self = [super init];
     if(self){

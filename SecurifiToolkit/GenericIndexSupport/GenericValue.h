@@ -22,4 +22,5 @@
 - (id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
 
 - (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom;
+-(id)initUnknownDevice;
 @end

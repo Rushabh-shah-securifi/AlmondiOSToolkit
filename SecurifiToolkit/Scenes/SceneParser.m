@@ -184,17 +184,18 @@
     for(NSDictionary *entryList in sceneEntryListPayload){
         NSMutableDictionary *mutableEntry = [entryList mutableCopy];
         
-        if([mutableEntry[@"DeviceID"] isEqualToString:@"0"] &&  [mutableEntry[@"Index"] isEqualToString:@"1"] && ([mutableEntry[@"Value"] isEqualToString:@"home"] ||[mutableEntry[@"Value"] isEqualToString:@"away"])){
+        if([mutableEntry[@"ID"] isEqualToString:@"0"] &&  [mutableEntry[@"Index"] isEqualToString:@"1"] && ([mutableEntry[@"Value"] isEqualToString:@"home"] ||[mutableEntry[@"Value"] isEqualToString:@"away"])){
             [self changeModeProperties:mutableEntry];
+             NSLog(@"mode dict %@",mutableEntry);
         }
-        
+       
         [mutableEntryList addObject:mutableEntry];
     }
     return mutableEntryList;
 }
 
 -(void)changeModeProperties:(NSMutableDictionary*)modeEntry{
-    modeEntry[@"DeviceID"] = @"1";
+    modeEntry[@"ID"] = @"0";
     modeEntry[@"Index"] = @"0";
     modeEntry[@"EventType"] = @"AlmondModeUpdated";
 }
