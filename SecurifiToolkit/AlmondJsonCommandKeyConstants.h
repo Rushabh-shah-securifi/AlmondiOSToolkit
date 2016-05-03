@@ -116,6 +116,7 @@
 #define DYNAMIC_CLIENT_JOINED @"DynamicClientJoined"
 #define DYNAMIC_CLIENT_LEFT @"DynamicClientLeft"
 #define DYNAMIC_CLIENT_REMOVED @"DynamicClientRemoved"
+#define DYNAMIC_CLIENT_REMOVEALL @"DynamicAllClientsRemoved"
 
 #define MANUFACTURER @"Manufacturer"
 #define RSSI @"RSSI"

@@ -108,6 +108,9 @@
         [toolkit.clients removeObject:toBeRemovedClient];
          NSLog(@"toolkit client list count %ld",toolkit.clients.count);
     }
+    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVEALL]){
+        [toolkit.clients removeAllObjects];
+    }
     toolkit.clients = [self getSortedDevices];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil userInfo:nil];

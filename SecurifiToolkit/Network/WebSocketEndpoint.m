@@ -214,6 +214,9 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
              },
              
              //Client
+             @"DynamicAllClientsRemoved":^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES];
+             },
              @"DynamicClientRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES];
              },
