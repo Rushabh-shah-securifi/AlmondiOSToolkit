@@ -108,17 +108,29 @@
 }
 
 -(void)getEntriesList:(NSArray*)triggers list:(NSMutableArray *)list{
+    
     for(NSDictionary *triggersDict in triggers){
+        int indexID;
+        if([[triggersDict valueForKey:@"EventType"] isEqualToString:@"ClientJoined"] || [[triggersDict valueForKey:@"EventType"] isEqualToString:@"ClientLeft"]){
+            indexID = 1;
+        }
+        else if ([[triggersDict valueForKey:@"EventType"] isEqualToString:@"AlmondModeUpdated"]){
+            indexID = 1;
+        }
+        else{
+            indexID = [self getIntegerValue:[triggersDict valueForKey:@"Index"]];
+        }
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
         subProperties.deviceId = [self getIntegerValue:[triggersDict valueForKey:@"ID"]];
-        NSLog(@"[triggersDict index id %@",[triggersDict valueForKey:@"Index"]);
-        subProperties.index = [self getIntegerValue:[triggersDict valueForKey:@"Index"]];
+        NSLog(@"[triggersDict index id %@ eventType %@",[triggersDict valueForKey:@"Index"],[triggersDict valueForKey:@"EventType"]);
+        subProperties.index = indexID;
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         subProperties.type = [triggersDict valueForKey:@"Type"];
         subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
         subProperties.valid= [[triggersDict valueForKey:@"Valid"] boolValue];
         [self addTime:triggersDict timeProperty:subProperties];
+        NSLog(@"subproperty.matchdata %@",subProperties.matchData);
         [list addObject:subProperties];
     }
 }

@@ -148,8 +148,8 @@
         }
         case -15:
         {
-            client.deviceLastActiveTime=get? client.deviceLastActiveTime:newValue;
-            return client.deviceLastActiveTime;
+            client.deviceIP=get? client.deviceIP:newValue;
+            return client.deviceIP;
         }
         case -16:
         {

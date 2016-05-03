@@ -384,7 +384,7 @@
 +(GenericIndexClass*)createGenericIndexForDic:(NSDictionary*)genericIndexDict forID:(NSString*)ID{
     BOOL readOnly =[genericIndexDict[TYPE] isEqualToString:ACTUATOR]?NO:YES;
     GenericIndexClass *genericIndexObject = [[GenericIndexClass alloc]
-                                             initWithLabel:genericIndexDict[APP_LABEL]
+                                             initWithLabel:NSLocalizedString(genericIndexDict[APP_LABEL],genericIndexDict[APP_LABEL])
                                              icon:genericIndexDict[INDEX_DEFAULT_ICON]
                                              type:genericIndexDict[TYPE]
                                              identifier:ID

@@ -196,7 +196,7 @@
 
 -(void)changeModeProperties:(NSMutableDictionary*)modeEntry{
     modeEntry[@"ID"] = @"0";
-    modeEntry[@"Index"] = @"0";
+    modeEntry[@"Index"] = @"1";
     modeEntry[@"EventType"] = @"AlmondModeUpdated";
 }
 

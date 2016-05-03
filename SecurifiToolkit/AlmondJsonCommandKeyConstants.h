@@ -44,13 +44,14 @@
 
 //value constants
 #define TRUE_ @"true"
-#define SLIDER @"Slider"
+#define SLIDER @"SLIDER"
 #define MULTI_BUTTON @"MULTI_BUTTON"
 #define HUE @"Hue"
 #define HUE_SLIDER @"HueSlider"
 #define TEXT_VIEW @"TEXT_VIEW"
 #define ACTUATOR @"Actuator"
 #define SENSOR @"Sensor"
+#define SINGLE_TEMP @"SINGLE_TEMP"
 
 #define NAME_CHANGED @"NameChanged"
 #define LOCATION_CHANGED @"LocationChanged"
