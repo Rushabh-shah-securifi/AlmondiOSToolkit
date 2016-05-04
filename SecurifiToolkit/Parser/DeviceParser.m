@@ -414,7 +414,12 @@
         NSMutableDictionary *genericValues = [NSMutableDictionary new];
         for(NSString *value in valueKeys){
             NSDictionary *valueDict = genericValuesDict[value];
-            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:NSLocalizedString(valueDict[APP_LABEL],valueDict[APP_LABEL]) icon:valueDict[ICON] toggleValue:valueDict[TOGGLE_VALUE] value:value excludeFrom:valueDict[EXCLUDE_FROM] eventType:valueDict[EVENT_TYPE]];
+            GenericValue *genericValue = [[GenericValue alloc]initWithDisplayText:NSLocalizedString(valueDict[APP_LABEL],valueDict[APP_LABEL])
+                                                                             icon:valueDict[ICON]
+                                                                      toggleValue:valueDict[TOGGLE_VALUE]
+                                                                            value:value
+                                                                      excludeFrom:valueDict[EXCLUDE_FROM]
+                                                                        eventType:valueDict[EVENT_TYPE]];
             [genericValues setObject:genericValue forKey:value];
         }
         return genericValues;
@@ -423,7 +428,7 @@
 }
 
 
-+ (NSDictionary*)parseJson:(NSString*)fileName{
+- (NSDictionary*)parseJson:(NSString*)fileName{
     NSError *error = nil;
     NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName
                                                          ofType:@"json"];

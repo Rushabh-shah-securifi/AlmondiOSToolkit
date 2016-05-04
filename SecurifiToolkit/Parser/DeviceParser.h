@@ -15,5 +15,5 @@
 
 + (NSDictionary*)parseGenericIndexesDict:(NSDictionary*)genericIndexesDict;
 
-+ (NSDictionary*)parseJson:(NSString*)fileName;
+- (NSDictionary*)parseJson:(NSString*)fileName;
 @end

@@ -31,13 +31,12 @@
 }
 
 +(NSString*)getValueFormKnownValues:(NSArray*)knownValues forIndex:(int)deviceIndex{
-    NSString *value;
     for(DeviceKnownValues *knownValue in knownValues){
         if(knownValue.index == deviceIndex){
-            value = knownValue.value;
+            return knownValue.value;
         }
     }
-    return value;
+    return nil;
 }
 
 +(Device *)getDeviceCopy:(Device*)device{
