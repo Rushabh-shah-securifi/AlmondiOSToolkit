@@ -16,11 +16,12 @@
 @property (nonatomic)NSString *value;
 @property (nonatomic)NSString *excludeFrom;
 @property (nonatomic)NSString *eventType;
+@property (nonatomic)NSString *transformedValue;
 
 - (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType;
 
 - (id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
 
-- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom;
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue;
 -(id)initUnknownDevice;
 @end

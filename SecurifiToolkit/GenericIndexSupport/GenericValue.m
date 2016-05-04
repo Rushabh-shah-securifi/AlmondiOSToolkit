@@ -31,6 +31,7 @@
         self.toggleValue = genericValue.toggleValue;
         self.excludeFrom = genericValue.excludeFrom;
         self.eventType = genericValue.eventType;
+        self.transformedValue = genericValue.transformedValue;
     }
     return self;
 }
@@ -44,7 +45,7 @@
     return self;
 }
 
-- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom{
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue{
     self = [super init];
     if(self){
         self.displayText = displayText;
@@ -53,6 +54,7 @@
             self.icon = @"1";
         self.value = value;
         self.excludeFrom = excludeFrom;
+        self.transformedValue = transformedValue;
     }
     return self;
 }
