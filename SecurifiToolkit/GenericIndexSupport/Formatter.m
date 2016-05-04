@@ -24,13 +24,13 @@
 }
 
 -(NSString*)transform:(NSString*)value{
-    int intValue = value.intValue;
-    NSLog(@"value:%d, factor:%f", intValue, self.factor);
-    return [NSString stringWithFormat:@"%.1f%@", intValue*self.factor, self.units];
+    float fVal = [value floatValue];
+    NSLog(@"value:%f factor:%f", fVal, self.factor);
+    return [NSString stringWithFormat:@"%.1f%@", fVal*self.factor, self.units];
 }
 -(NSString*)transformValue:(NSString*)value{
-    int intValue = value.intValue;
-    NSLog(@"value:%d, factor:%f", intValue, self.factor);
-    return [NSString stringWithFormat:@"%.1f", intValue*self.factor];
+    float fVal = [value floatValue];
+    NSLog(@"value:%f factor:%f", fVal, self.factor);
+    return [NSString stringWithFormat:@"%.1f", fVal*self.factor];
 }
 @end
