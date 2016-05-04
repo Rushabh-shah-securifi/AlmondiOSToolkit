@@ -71,8 +71,8 @@
         
         Client * device = [Client new];
         [self setDeviceProperties:device forDict:dict[ID]];
+        device.deviceID = ID;
         [toolkit.clients addObject:device];
-        NSLog(@"toolkit.clients count %ld",toolkit.clients.count);
     }
     else if (
                ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_UPDATED]||
