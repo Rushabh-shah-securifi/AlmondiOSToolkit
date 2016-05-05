@@ -53,9 +53,9 @@
 #define SENSOR @"Sensor"
 #define SINGLE_TEMP @"SINGLE_TEMP"
 
-#define NAME_CHANGED @"NameChanged"
-#define LOCATION_CHANGED @"LocationChanged"
-#define NOTIFYME @"NotifyMe"
+#define NAME_CHANGED @"NAME_CHANGE"
+#define LOCATION_CHANGED @"LOCATION_CHANGE"
+#define NOTIFYME @"NOTIFICATION"
 
 //generic device key constants
 #define DEVICE_NAME @"name"
