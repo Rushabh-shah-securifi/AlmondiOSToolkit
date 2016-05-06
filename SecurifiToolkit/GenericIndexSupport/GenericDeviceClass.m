@@ -9,7 +9,7 @@
 #import "GenericDeviceClass.h"
 
 @implementation GenericDeviceClass
--(id)initWithName:(NSString*)name type:(NSString*)type defaultIcon:(NSString*)defaultIcon isActuator:(BOOL)isActuator excludeFrom:(NSString*)excludeFrom indexes:(NSDictionary*)indexes isTrigger:(BOOL)isTrigger {
+-(id)initWithName:(NSString*)name type:(NSString*)type defaultIcon:(NSString*)defaultIcon isActuator:(BOOL)isActuator excludeFrom:(NSString*)excludeFrom indexes:(NSDictionary*)indexes isTrigger:(BOOL)isTrigger{
     self = [super init];
     if(self){
         self.name = name;
@@ -21,6 +21,7 @@
         if(isTrigger == nil)
             isTrigger = YES;
         self.isTrigger = isTrigger;
+
     }
     return self;
 }

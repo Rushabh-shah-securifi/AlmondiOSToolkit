@@ -9,13 +9,15 @@
 #import "DeviceIndex.h"
 
 @implementation DeviceIndex
--(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement{
+-(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement min:(NSString*)min max:(NSString*)max {
     self = [super init];
     if(self){
         self.index = index;
         self.genericIndex = genericIndex;
         self.rowID = rowID;
         self.placement = placement;
+        self.min = min;
+        self.max = max;
     }
     return self;
 }

@@ -22,6 +22,19 @@
     return self;
 }
 
++(GenericValue*)getCopy:(GenericValue*)genVal{
+    GenericValue *copy = [GenericValue new];
+    copy.value = genVal.value;
+    copy.displayText = genVal.displayText;
+    copy.icon = genVal.icon;
+    copy.toggleValue = genVal.toggleValue;
+    copy.excludeFrom = genVal.excludeFrom;
+    copy.iconText = genVal.iconText;
+    copy.eventType = genVal.eventType;
+    copy.transformedValue = genVal.transformedValue;
+    return copy;
+}
+
 -(id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text{
     self = [super init];
     if(self){

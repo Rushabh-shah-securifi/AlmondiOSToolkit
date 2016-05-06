@@ -23,5 +23,8 @@
 - (id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
 
 - (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue;
+
 -(id)initUnknownDevice;
+
++(GenericValue*)getCopy:(GenericValue*)genVal;
 @end

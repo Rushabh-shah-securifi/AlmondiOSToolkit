@@ -38,7 +38,7 @@
         self.ID = genericIndex.ID;
         self.placement = genericIndex.placement;
         self.values = genericIndex.values;
-        self.formatter = genericIndex.formatter;
+        self.formatter = [Formatter getFormatterCopy:genericIndex.formatter];
         self.layoutType = genericIndex.layoutType;
         self.commandType = genericIndex.commandType;
         self.readOnly = genericIndex.readOnly;
@@ -47,6 +47,7 @@
     }
     return self;
 }
+
 
 +(DeviceCommandType)getCommandType:(NSString*)command{
     if(command){

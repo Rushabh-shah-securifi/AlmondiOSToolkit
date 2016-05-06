@@ -152,16 +152,17 @@
 }
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+    NSDictionary *payload;
     
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *dataInfo = [notifier userInfo];
     if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
         return;
     }
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
-    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
-    NSDictionary *payload;
+    
     if(local){
         payload = [dataInfo valueForKey:@"data"];
     }else{
@@ -171,9 +172,7 @@
     
 //    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
-    for(Device *device in toolkit.devices){
-        NSLog(@"toolkit devices id: %d", device.ID);
-    }
+
     BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
@@ -363,7 +362,9 @@
         NSDictionary *indexDict = indexesDict[index];
         DeviceIndex *deviceIndex = [[DeviceIndex alloc]initWithIndex:index
                                                         genericIndex:indexDict[GENERIC_INDEX_ID]
-                                                               rowID:indexDict[ROW_NO] placement:indexDict[@"Placement"]];
+                                                               rowID:indexDict[ROW_NO] placement:indexDict[@"Placement"]
+                                                                 min:indexDict[@"min"]
+                                                                 max:indexDict[@"max"]];
         [indexes setObject:deviceIndex forKey:index];
     }
     return indexes;

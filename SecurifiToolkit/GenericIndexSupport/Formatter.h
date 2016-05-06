@@ -17,4 +17,5 @@
 -(id)initWithFactor:(float)factor min:(int)min max:(int)max units:(NSString*)units;
 -(NSString*)transform:(NSString*)value;
 -(NSString*)transformValue:(NSString*)value;
++(Formatter*)getFormatterCopy:(Formatter*)formatter;
 @end

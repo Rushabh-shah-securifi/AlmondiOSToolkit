@@ -23,6 +23,15 @@
     return self;
 }
 
++(Formatter*)getFormatterCopy:(Formatter*)formatter{
+    Formatter *copy = [[Formatter alloc]init];
+    copy.factor = formatter.factor;
+    copy.min = formatter.min;
+    copy.max = formatter.max;
+    copy.units = formatter.units;
+    return copy;
+}
+
 -(NSString*)transform:(NSString*)value{
     float fVal = [value floatValue];
     NSLog(@"value:%f factor:%f", fVal, self.factor);

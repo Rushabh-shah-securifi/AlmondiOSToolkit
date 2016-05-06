@@ -13,6 +13,8 @@
 @property NSString *genericIndex;
 @property NSString *index;
 @property NSString *placement;
+@property (nonatomic) NSString *min;
+@property (nonatomic) NSString *max;
 
--(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement;
+-(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement min:(NSString*)min max:(NSString*)max;
 @end
