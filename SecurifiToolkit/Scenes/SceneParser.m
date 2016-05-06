@@ -62,6 +62,7 @@
         NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:scenesPayload[key]];
         NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
         [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
+        NSLog(@" getLaa scene %@",mutableScene);
         [toolkit.scenesArray addObject:mutableScene];
     }
 
@@ -71,6 +72,29 @@
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
+    /*
+     if ([commandType isEqualToString:@"DynamicSceneAdded"]){
+     NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
+     for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
+     if ([[sceneDict valueForKey:@"ID"] intValue] == [updatedID intValue]) {
+     dict = sceneDict;
+     break;
+     }
+     }
+     if(dict != nil){
+     [toolkit.scenesArray removeObject:dict];
+     }
+     NSMutableDictionary *newScene = [[mainDict valueForKey:@"Scenes"] mutableCopy];
+     [newScene setValue:[self getMutableSceneEntryList:[newScene valueForKey:updatedID]] forKey:@"SceneEntryList"];
+     
+     for(NSMutableDictionary *sceneEntryList in [newScene  valueForKey:@"SceneEntryList"]){
+     [sceneEntryList removeObjectForKey:@"Valid"];
+     }
+     [toolkit.scenesArray addObject:[newScene valueForKey:updatedID]];
+     }
+     
+
+     */
 }
 
 - (void)onScenesListChange:(id)sender{
@@ -103,13 +127,19 @@
             [toolkit.scenesArray removeObject:dict];
         }
         NSMutableDictionary *newScene = [[mainDict valueForKey:@"Scenes"] mutableCopy];
-        [newScene setValue:[self getMutableSceneEntryList:[newScene valueForKey:updatedID]] forKey:@"SceneEntryList"];
+//         NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
+        NSLog( @"new scene add updated id %@",[newScene valueForKey:updatedID]);
+         NSMutableDictionary *mutableScene = [newScene[updatedID] mutableCopy];
+        [mutableScene setValue:[self getMutableSceneEntryList:[newScene valueForKey:updatedID]] forKey:@"SceneEntryList"];
         
-        for(NSMutableDictionary *sceneEntryList in [newScene  valueForKey:@"SceneEntryList"]){
+         NSLog( @"new scene add after updated id %@",mutableScene);
+        
+        for(NSMutableDictionary *sceneEntryList in [mutableScene  valueForKey:@"SceneEntryList"]){
             [sceneEntryList removeObjectForKey:@"Valid"];
         }
-        NSLog(@" new scene name %@",newScene);
-        [toolkit.scenesArray addObject:[newScene valueForKey:updatedID]];
+        [newScene setValue:mutableScene forKey:updatedID];
+        NSLog(@"final new scene %@",newScene);
+        [toolkit.scenesArray addObject:newScene];
     }
     
     
@@ -119,13 +149,21 @@
         NSDictionary *newScene = [mainDict[@"Scenes"]valueForKey:updatedID];
         NSInteger index = 0;
         for (NSDictionary *sceneDict in toolkit.scenesArray) {
-            NSLog(@"sceneDict %@",sceneDict);
-            if ([[sceneDict valueForKey:@"ID"] intValue] == [updatedID intValue]) {
+            NSLog(@"sceneDict active %@",sceneDict);
+            if ([[[sceneDict valueForKey:updatedID] valueForKey:@"ID"] intValue] == [updatedID intValue]) {
                 index = [toolkit.scenesArray indexOfObject:sceneDict];
                 break;
             }
         }
-        [toolkit.scenesArray replaceObjectAtIndex:index withObject:newScene];
+        NSMutableDictionary *mutableScene = [newScene mutableCopy];
+        [mutableScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
+        
+        
+        for(NSMutableDictionary *sceneEntryList in [mutableScene  valueForKey:@"SceneEntryList"]){
+            [sceneEntryList removeObjectForKey:@"Valid"];
+        }
+        NSLog(@"index replace %d",index);
+        [toolkit.scenesArray replaceObjectAtIndex:index withObject:mutableScene];
     }
     
     else if ([commandType isEqualToString:@"DynamicSceneUpdated"]) {
@@ -134,18 +172,23 @@
          NSDictionary *newScene = [mainDict[@"Scenes"]valueForKey:updatedID];
         NSInteger index = 0;
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
+            NSLog(@"scene dict update %@",sceneDict);
             if ([[sceneDict valueForKey:@"ID"] intValue] ==  [updatedID intValue]) {
                 
-                NSMutableDictionary *newScene = [[mainDict valueForKey:@"Scenes"] mutableCopy];
-                [newScene setValue:[self getMutableSceneEntryList:[newScene valueForKey:updatedID]] forKey:@"SceneEntryList"];
-                for(NSMutableDictionary *sceneEntryList in [newScene valueForKey:@"SceneEntryList"]){
-                    [sceneEntryList removeObjectForKey:@"Valid"];
-                }
+                 NSMutableDictionary *mutableScene = [newScene mutableCopy];
+                 [mutableScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
+                 
+                 
+                 for(NSMutableDictionary *sceneEntryList in [mutableScene  valueForKey:@"SceneEntryList"]){
+                 [sceneEntryList removeObjectForKey:@"Valid"];
+                 }
+                NSLog(@"mutableScene ...%@",mutableScene);
                 index = [toolkit.scenesArray indexOfObject:sceneDict];
+                [toolkit.scenesArray replaceObjectAtIndex:index withObject:mutableScene];
                 break;
             }
         }
-        [toolkit.scenesArray replaceObjectAtIndex:index withObject:newScene];
+//        [toolkit.scenesArray replaceObjectAtIndex:index withObject:newScene];
     }
     
     else if ([commandType isEqualToString:@"DynamicSceneRemoved"]) {
@@ -154,7 +197,7 @@
             if ([[sceneDict valueForKey:@"ID"] intValue] == updatedID.intValue)
             {
                 dict = sceneDict;
-                break;
+                    break;
             }
         }
         if(dict != nil){
@@ -177,7 +220,6 @@
 
 -(NSMutableArray*)getMutableSceneEntryList:(NSDictionary*)sceneDict{
     NSMutableArray *mutableEntryList = [[NSMutableArray alloc]init];
-    NSLog(@"scene entry list1 %@",sceneDict );
     NSString *updatedID = [[sceneDict  allKeys] objectAtIndex:0];
     NSArray *sceneEntryListPayload = [sceneDict valueForKey:@"SceneEntryList"];
     
@@ -186,7 +228,7 @@
         
         if([mutableEntry[@"ID"] isEqualToString:@"0"] &&  [mutableEntry[@"Index"] isEqualToString:@"1"] && ([mutableEntry[@"Value"] isEqualToString:@"home"] ||[mutableEntry[@"Value"] isEqualToString:@"away"])){
             [self changeModeProperties:mutableEntry];
-             NSLog(@"mode dict %@",mutableEntry);
+            NSLog(@"mutableEntry %@",mutableEntry);
         }
        
         [mutableEntryList addObject:mutableEntry];
