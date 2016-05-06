@@ -139,7 +139,7 @@
         }
         [newScene setValue:mutableScene forKey:updatedID];
         NSLog(@"final new scene %@",newScene);
-        [toolkit.scenesArray addObject:newScene];
+        [toolkit.scenesArray addObject:mutableScene];
     }
     
     
@@ -149,8 +149,8 @@
         NSDictionary *newScene = [mainDict[@"Scenes"]valueForKey:updatedID];
         NSInteger index = 0;
         for (NSDictionary *sceneDict in toolkit.scenesArray) {
-            NSLog(@"sceneDict active %@",sceneDict);
-            if ([[[sceneDict valueForKey:updatedID] valueForKey:@"ID"] intValue] == [updatedID intValue]) {
+            NSLog(@"sceneDict active:: %@",sceneDict);
+            if ([[sceneDict valueForKey:@"ID"] intValue] == [updatedID intValue]) {
                 index = [toolkit.scenesArray indexOfObject:sceneDict];
                 break;
             }

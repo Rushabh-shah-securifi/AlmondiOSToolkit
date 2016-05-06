@@ -46,7 +46,7 @@
 #define TRUE_ @"true"
 #define SLIDER @"SLIDER"
 #define MULTI_BUTTON @"MULTI_BUTTON"
-#define HUE @"Hue"
+#define HUE @"HUE"
 #define HUE_SLIDER @"HueSlider"
 #define TEXT_VIEW @"TEXT_VIEW"
 #define ACTUATOR @"Actuator"
