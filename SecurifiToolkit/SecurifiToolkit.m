@@ -1137,7 +1137,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
-    NSLog(@"manageCurrentAlmondChange");
+    NSLog(@"toolkit - manageCurrentAlmondChange");
     if (!almond) {
         return;
     }

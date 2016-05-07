@@ -46,8 +46,13 @@
     //RuleList
     if([commandType isEqualToString:@"RuleList"]){
         NSDictionary *rulesPayload = [mainDict valueForKey:@"Rules"];
-        NSArray *ruleIds = rulesPayload.allKeys;
-        for (NSString *key in ruleIds) {
+        
+        NSArray *rulePosKeys = rulesPayload.allKeys;
+        NSArray *sortedPostKeys = [rulePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
+        }];
+        
+        for (NSString *key in sortedPostKeys) {
             [self createRule:rulesPayload[key]];
         }
     }
