@@ -115,6 +115,14 @@
     }
     return nil;
 }
++ (BOOL)findClientByMAC:(NSString *)mac{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    for(Client *client in toolkit.clients){
+        if([mac isEqualToString:client.deviceMAC])
+            return YES;
+    }
+    return NO;
+}
 +(NSString *)getScheduleById:(NSString*)clientId{
     Client *client = [self findClientByID:clientId];
     return client.deviceSchedule;

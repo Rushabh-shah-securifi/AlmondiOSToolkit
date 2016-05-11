@@ -85,6 +85,7 @@
 #import <SecurifiToolkit/ClientParser.h>
 #import "Device.h"
 #import "DeviceKnownValues.h"
+#import "Client.h"
 
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
