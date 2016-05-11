@@ -13,6 +13,7 @@
 #import "GenericDeviceClass.h"
 #import "DeviceIndex.h"
 
+
 @implementation Device
 
 + (NSString *)getValueForIndex:(int)deviceIndex deviceID:(int)deviceID{
@@ -75,6 +76,23 @@
 + (int)getTypeForID:(int)deviceId{
    Device *device = [self getDeviceForID:deviceId];
     return device.type;
+}
+
++ (void)updateValueForID:(int)deviceID index:(int)index value:(NSString*)value{
+    Device *device = [self getDeviceForID:deviceID];
+    for(DeviceKnownValues *knownValue in device.knownValues){
+        if(knownValue.index == index)
+            knownValue.value = value;
+    }
+}
+
++ (void)updateDeviceData:(DeviceCommandType)deviceCmdType value:(NSString*)value deviceID:(int)deviceID{
+    Device *device = [self getDeviceForID:deviceID];
+    if(deviceCmdType == DeviceCommand_UpdateDeviceName){
+        device.name = value;
+    }else if(deviceCmdType == DeviceCommand_UpdateDeviceLocation){
+        device.location = value;
+    }
 }
 +(NSDictionary*)getCommonIndexesDict{
     return @{@"Name":@"-1", @"Location":@"-2", @"NotifyMe":@"-3"};

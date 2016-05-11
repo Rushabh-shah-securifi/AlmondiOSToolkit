@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SecurifiTypes.h"
+#import "GenericIndexClass.h"
 
 @interface Device : NSObject
 
@@ -32,12 +33,23 @@
 - (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(Device *)value;
 
 + (Device*)getDeviceForID:(sfi_id)deviceID;
+
 + (NSMutableArray*)getDeviceTypes;
+
 + (NSMutableArray*)getGenericIndexes;
+
 + (NSDictionary*)getCommonIndexesDict;
+
 + (void)setDeviceNameLocation:(Device*)device forGenericID:(int)genericID value:(NSString*)value;
+
 + (Device *)getDeviceCopy:(Device*)device;
+
 + (NSString *)getValueForIndex:(int)index deviceID:(int)deviceID;
+
 + (int)getTypeForID:(int)deviceId;
+
++ (void)updateValueForID:(int)deviceID index:(int)index value:(NSString*)value;
+
++ (void)updateDeviceData:(DeviceCommandType)deviceCmdType value:(NSString*)value deviceID:(int)deviceID;
 
 @end

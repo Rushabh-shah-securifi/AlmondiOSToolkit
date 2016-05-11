@@ -34,12 +34,13 @@
 
 -(NSString*)transform:(NSString*)value{
     float fVal = [value floatValue];
-    NSLog(@"value:%f factor:%f", fVal, self.factor);
-    return [NSString stringWithFormat:@"%.1f%@", fVal*self.factor, self.units];
+    NSLog(@"transform - value:%f factor:%f", fVal, self.factor);
+    return [NSString stringWithFormat:@"%.1f%@", roundf(fVal*self.factor), self.units];
 }
 -(NSString*)transformValue:(NSString*)value{
     float fVal = [value floatValue];
-    NSLog(@"value:%f factor:%f", fVal, self.factor);
-    return [NSString stringWithFormat:@"%.1f", fVal*self.factor];
+    int roundedValue = roundf(fVal*self.factor);
+    NSLog(@"transformValue - actual value: %.1f, roundedval: %d", fVal*self.factor, roundedValue);
+    return [NSString stringWithFormat:@"%d",roundedValue];
 }
 @end

@@ -220,13 +220,14 @@
         NSDictionary *devicesPayload = payload[DEVICES];
         NSString *deviceID = [[devicesPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         NSDictionary *updatedDevicePayload = [devicesPayload objectForKey:deviceID];
- 
+        
         for(Device *device in toolkit.devices){
             if(device.ID == [deviceID intValue]){
                 [self updateDevice:device payload:updatedDevicePayload];
                 break;
             }
         }
+        
     }
     else if([commandType isEqualToString:DYNAMIC_DEVICE_REMOVED]){
         NSString *removedDeviceID = payload[D_ID];
@@ -301,9 +302,8 @@
     device.type =[payload[D_TYPE] intValue];
     
     NSDictionary *valuesDic = payloadDevice[DEVICE_VALUE];
-    
-    device.knownValues = [self parseValues:valuesDic];
-    
+    if(valuesDic != nil)
+        device.knownValues = [self parseValues:valuesDic];
 }
 
 - (NSMutableArray*)parseValues:(NSDictionary*)payload{
