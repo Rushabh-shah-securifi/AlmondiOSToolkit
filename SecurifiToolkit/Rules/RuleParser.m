@@ -21,10 +21,10 @@
 }
 
 -(void)initNotification{
-//    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-//    [center addObserver:self selector:@selector(onRuleListResponse:) name:RULE_LIST_NOTIFIER object:nil];
-//    
-//    [center addObserver:self selector:@selector(onRuleListResponse:) name:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(onRuleListResponse:) name:RULE_LIST_NOTIFIER object:nil];
+    
+    [center addObserver:self selector:@selector(onRuleListResponse:) name:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
 }
 
 
@@ -53,16 +53,18 @@
         }];
         
         for (NSString *key in sortedPostKeys) {
-            [self createRule:rulesPayload[key]];
+            NSLog(@"create rule:: %@",rulesPayload[key]);
+            [self createRule:rulesPayload[key] ruleID:key];
         }
     }
     else if([commandType isEqualToString:@"DynamicRuleUpdated"] || [commandType isEqualToString:@"DynamicRuleAdded"]){
         NSString *Id = [[rulesDict allKeys] objectAtIndex:0];
         NSDictionary *dDict = rulesDict[Id];
-        [self createRule:dDict];
+        [self createRule:dDict ruleID:Id];
     }
     else if([commandType isEqualToString:@"DynamicRuleRemoved"]){
         NSString *Id = [[rulesDict allKeys] objectAtIndex:0]; //use this when ID key is removed
+        NSLog(@"dynamic rule removed %@",Id);
         Rule *deleteRule = [self findRule:Id];
         if(toolkit.ruleList!=nil && toolkit.ruleList.count>0)
             [toolkit.ruleList removeObject:deleteRule];
@@ -83,8 +85,8 @@
         return NO;
     return YES;
 }
--(Rule *)createRule:(NSDictionary*)dict{
-    Rule *rule = [self findRule:[dict valueForKey:@"ID"]];
+-(Rule *)createRule:(NSDictionary*)dict ruleID:(NSString*)ruleID{
+    Rule *rule = [self findRule:ruleID];
     rule.name = [dict valueForKey:@"Name"]==nil?@"":[dict valueForKey:@"Name"];
     rule.isActive = [[dict valueForKey:@"Valid"] boolValue];
     rule.triggers= [NSMutableArray new];
@@ -97,9 +99,11 @@
 
 -(Rule*)findRule:(NSString *)ID{
     SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
+    NSLog(@"toolkit.rulelist count before %ld ",toolkit.ruleList.count);
     toolkit.ruleList=toolkit.ruleList==nil?[NSMutableArray new]:toolkit.ruleList;
-    
+    NSLog(@"toolkit.rulelist count after %ld ",toolkit.ruleList.count);
     for(Rule *rule  in toolkit.ruleList){
+        NSLog(@"rule id %@==%@",rule.ID,ID);
         if([rule.ID isEqualToString:ID]){
             return rule;
         }
