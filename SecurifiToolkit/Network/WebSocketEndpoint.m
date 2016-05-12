@@ -232,13 +232,16 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
              @"DynamicClientJoined" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES];
              },
-             @"UpdateClient" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
-             },
              @"ClientList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES];
              },
-             
+             @"UpdateClient" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
+             },
+             @"RemoveClient" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
+             },
+             //scenes
              @"DynamicSceneList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_GET_ALL_SCENES];
              },

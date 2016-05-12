@@ -210,10 +210,14 @@
         NSDictionary *devicesPayload = payload[DEVICES];
         NSString *deviceID = [[devicesPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         NSDictionary *addedDevicePayload = [devicesPayload objectForKey:deviceID];
-        Device *device = [self parseDeviceForPayload:addedDevicePayload];
-        device.ID = (sfi_id) [deviceID intValue];
-        [toolkit.devices addObject:device];
-        
+        Device *device = [Device getDeviceForID:deviceID.intValue];
+        if(device)
+            [self updateDevice:device payload:addedDevicePayload];
+        else{
+            device = [self parseDeviceForPayload:addedDevicePayload];
+            device.ID = (sfi_id) [deviceID intValue];
+            [toolkit.devices addObject:device];
+        }   
     }
     
     else if([commandType isEqualToString:DYNAMIC_DEVICE_UPDATED]){

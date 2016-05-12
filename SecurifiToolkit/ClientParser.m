@@ -68,44 +68,43 @@
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED]){
         NSDictionary * dict = [mainDict valueForKey:CLIENTS];
         NSString *ID = [[dict allKeys] objectAtIndex:0]; // Assumes payload always has one device.
-        
-        Client * device = [Client new];
-        [self setDeviceProperties:device forDict:dict[ID]];
-        device.deviceID = ID;
-        [toolkit.clients addObject:device];
+        Client *client = [Client findClientByID:ID];
+        if(client){
+            [self setDeviceProperties:client forDict:dict[ID]];
+        }else{
+            client = [Client new];
+            [self setDeviceProperties:client forDict:dict[ID]];
+            client.deviceID = ID;
+            [toolkit.clients addObject:client];
+        }
     }
     else if (
                ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_UPDATED]||
                 [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_JOINED]||
                 [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_LEFT])
-               ) {
+            ){
         NSDictionary *clientPayload = [mainDict valueForKey:CLIENTS];
-        
-        
         NSString *ID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         NSDictionary *updatedClientPayload = [clientPayload objectForKey:ID];
-            
-        for (Client *device in toolkit.clients) {
-            if ([device.deviceID isEqualToString:ID]) {
-                [self setDeviceProperties:device forDict:updatedClientPayload];
-                break;
-            }
-        }
+        
+        Client *client = [Client findClientByID:ID];
+        if(client)
+            [self setDeviceProperties:client forDict:updatedClientPayload];
     }
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVED]) {
         NSDictionary *clientPayload = mainDict[CLIENTS];
         
-//        NSString *clientID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
-        Client *toBeRemovedClient;
+        NSString *clientID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
+        Client *toBeRemovedClient = nil;
         for(Client *device in toolkit.clients){
-            if([device.deviceID isEqualToString:clientPayload[@"ID"]]){
+            if([device.deviceID isEqualToString:clientID]){//clientPayload[@"ID"]
                 toBeRemovedClient = device;
                 break;
             }
         }
         NSLog(@"toolkit client list count %ld",toolkit.clients.count);
-        
-        [toolkit.clients removeObject:toBeRemovedClient];
+        if(toBeRemovedClient)
+            [toolkit.clients removeObject:toBeRemovedClient];
          NSLog(@"toolkit client list count %ld",toolkit.clients.count);
     }
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVEALL]){
