@@ -322,15 +322,17 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  res.type = DeviceListResponseType_deviceList;
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
              },
-             @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
-             },
+//             @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
+//             },
              @"DynamicAlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
-                 res.almondMAC = endpoint.config.almondMac;
-                 
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
+//                 DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
+//                 res.almondMAC = endpoint.config.almondMac;
+//                 
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
+                 NSLog(@"DynamicAlmondModeUpdated ");
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
              },
 //             @"AlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
 //                 DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];

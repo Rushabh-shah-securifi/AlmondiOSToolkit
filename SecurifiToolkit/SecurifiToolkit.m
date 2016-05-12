@@ -2290,11 +2290,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
             
         case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
             AlmondModeChangeResponse *res = payload;
-            [self onAlmondModeChangeCompletion:res network:network];
+            [self onAlmondModeChangeCompletion:payload network:network];
             break;
         }
             
         case CommandType_ALMOND_MODE_RESPONSE: {
+            NSLog(@"almond mode payload %@",payload);
             AlmondModeResponse *res = payload;
             [self onAlmondModeResponse:res network:network];
             break;
@@ -2361,6 +2362,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [self onAlmondRouterCommandResponse:res network:network];
             break;
         };
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
+            [self onDynamicAlmondModeChange:payload network:network];
+            break;
+        }
             
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: {
             NSDictionary *dict = payload;
@@ -2429,11 +2434,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         }
-        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
-            DynamicAlmondModeChange *obj = payload;
-            [self onDynamicAlmondModeChange:obj network:network];
-            break;
-        }
+//        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
+//            DynamicAlmondModeChange *obj = payload;
+//            [self onDynamicAlmondModeChange:payload network:network];
+//            break;
+//        }
             
         default:
             break;
@@ -3405,10 +3410,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - Almond Mode change callbacks
 
-- (void)onAlmondModeChangeCompletion:(AlmondModeChangeResponse*)res network:(Network *)network {
-    if (!res.success) {
-        return;
-    }
+- (void)onAlmondModeChangeCompletion:(NSDictionary*)res network:(Network *)network {
+//    if (!res.success) {
+//        return;
+//    }
     
     [network.networkState confirmPendingModeForAlmond];
     
@@ -3425,20 +3430,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
     
-    [network.networkState markModeForAlmond:res.almondMAC mode:res.mode];
+    [network.networkState markModeForAlmond:self.currentAlmond.almondplusMAC mode:res.mode];
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }
 
-- (void)onDynamicAlmondModeChange:(DynamicAlmondModeChange *)res network:(Network *)network {
+- (void)onDynamicAlmondModeChange:(NSDictionary *)res network:(Network *)network {
     if (res == nil) {
         return;
     }
     
-    if (!res.success) {
-        return;
-    }
-    NSLog(@"res.mode: %d", res.mode);
-    [network.networkState markModeForAlmond:res.almondMAC mode:res.mode];
+//    if (!res.success) {
+//        return;
+//    }
+    NSLog(@"res dict %@",res);
+    NSLog(@"res.mode: %d", res[@"Mode"]);
+    NSString *modeString = res[@"Mode"];
+    [network.networkState markModeForAlmond:self.currentAlmond.almondplusMAC mode:[modeString integerValue]];
     [self postNotification:kSFIAlmondModeDidChange data:res];
 }
 

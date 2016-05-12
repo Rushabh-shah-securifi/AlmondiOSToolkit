@@ -21,10 +21,10 @@
 }
 
 -(void)initNotification{
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(onRuleListResponse:) name:RULE_LIST_NOTIFIER object:nil];
-    
-    [center addObserver:self selector:@selector(onRuleListResponse:) name:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
+//    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+//    [center addObserver:self selector:@selector(onRuleListResponse:) name:RULE_LIST_NOTIFIER object:nil];
+//    
+//    [center addObserver:self selector:@selector(onRuleListResponse:) name:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
 }
 
 
@@ -95,18 +95,18 @@
     return rule;
 }
 
--(Rule*)findRule:(NSString *)id{
+-(Rule*)findRule:(NSString *)ID{
     SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
     toolkit.ruleList=toolkit.ruleList==nil?[NSMutableArray new]:toolkit.ruleList;
     
     for(Rule *rule  in toolkit.ruleList){
-        if([rule.ID isEqualToString:id]){
+        if([rule.ID isEqualToString:ID]){
             return rule;
         }
     }
     //Add New Rule
     Rule *newRule=[Rule new];
-    newRule.ID=id;
+    newRule.ID=ID;
     [toolkit.ruleList addObject:newRule];
     //[checkRules addObject:newRule];
     return newRule;

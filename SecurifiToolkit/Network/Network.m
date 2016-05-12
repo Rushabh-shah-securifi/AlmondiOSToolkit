@@ -255,7 +255,7 @@
     __weak id block_payload = payload;
     __weak id block_self = self;
     
-    dispatch_sync(queue, ^() {
+    //dispatch_sync(queue, ^() {
         NSDictionary *data = nil;
         if (payload) {
             data = @{
@@ -265,7 +265,7 @@
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
-    });
+    //});
 }
 
 
@@ -570,7 +570,6 @@
             break;
         };
         case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES: {
-            NSLog(@"network.m - CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES");
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
@@ -650,6 +649,14 @@
             [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
+        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+//            .s
+            NSLog(@"CommandType_DYNAMIC_ALMOND_MODE_CHANGE");
+            [self delegateData:payload commandType:commandType];
+//            [self postData:kSFIAlmondModeDidChange data:payload];
+            break;
+        };
 //        case CommandType_UPDATE_DEVICE_INDEX: {
 //            [self tryMarkUnitCompletion:YES responseType:commandType];
 //            [self postData:NOTIFICATION_UPDATE_DEVICE_INDEX_NOTIFIER data:payload];
@@ -665,18 +672,25 @@
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
             break;
         };
+        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:{
+            NSLog(@"Almond mode change responce");
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self delegateData:payload commandType:commandType];
+            [self postData:kSFIAlmondModeDidChange data:payload];
+            break;
+        };
         
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
-        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:
+        
         case CommandType_DYNAMIC_DEVICE_DATA:
         case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
         case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:
         {
             [self delegateDataDynamic:payload commandType:commandType];
             break;
-        }
+        };
             
             // =========================
             
@@ -684,7 +698,7 @@
             LoginResponse *obj = (LoginResponse *) payload;
             [self markLoggedInState:obj.isSuccessful];
             // pass through to normal handler below
-        }
+        };
             
         case CommandType_LOGOUT_RESPONSE:
         case CommandType_LOGOUT_ALL_RESPONSE:
@@ -696,7 +710,6 @@
         case CommandType_GENERIC_COMMAND_RESPONSE:
         case CommandType_GENERIC_COMMAND_NOTIFICATION:
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
-        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:
         case CommandType_ALMOND_MODE_RESPONSE:
         case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
