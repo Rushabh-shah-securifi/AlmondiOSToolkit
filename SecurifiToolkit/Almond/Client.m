@@ -70,10 +70,10 @@
         return @"icon_camera";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_echo"]) {
-        return @"amazon-echo";
+        return @"amazon_echo";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_dash"]) {
-        return @"amazon-dash";
+        return @"amazon_dash";
     }
     return @"icon_help";
 }

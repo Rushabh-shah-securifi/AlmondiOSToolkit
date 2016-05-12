@@ -229,8 +229,9 @@
         }
         
     }
+
     else if([commandType isEqualToString:DYNAMIC_DEVICE_REMOVED]){
-        NSString *removedDeviceID = payload[D_ID];
+        NSString *removedDeviceID = [payload[DEVICES] allKeys].firstObject;
         Device *toBeRemovedDevice;
         for(Device *device in toolkit.devices){
             if(device.ID == [removedDeviceID intValue]){
@@ -344,13 +345,13 @@
 }
 
 +(GenericDeviceClass *)createGenericDeviceForDict:(NSDictionary*)genericDeviceDict forType:(NSString*)deviceType{
-    NSLog(@"device types %@",deviceType);
     GenericDeviceClass *genericDeviceObject = [[GenericDeviceClass alloc] initWithName:genericDeviceDict[DEVICE_NAME]
                                                                                   type:deviceType
                                                                            defaultIcon:genericDeviceDict[DEVICE_DEFAULT_ICON]
                                                                             isActuator:[genericDeviceDict[IS_ACTUATOR] boolValue]
-                                                                       excludeFrom:genericDeviceDict[EXCLUDE_FROM]
-                                                                               indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]] isTrigger:[genericDeviceDict[ISTRIOGGER] boolValue]];
+                                                                           excludeFrom:genericDeviceDict[EXCLUDE_FROM]
+                                                                               indexes:[self createDeviceIndexesDict:genericDeviceDict[INDEXES]]
+                                                                             isTrigger:genericDeviceDict[ISTRIGGER]];
     return genericDeviceObject;
     
 }

@@ -17,5 +17,5 @@
 @property (nonatomic)NSString *excludeFrom;
 @property (nonatomic)NSDictionary *Indexes;
 
--(id)initWithName:(NSString*)name type:(NSString*)type defaultIcon:(NSString*)defaultIcon isActuator:(BOOL)isActuator excludeFrom:(NSString *)excludeFrom indexes:(NSDictionary*)indexes isTrigger:(BOOL)isTrigger;
+-(id)initWithName:(NSString*)name type:(NSString*)type defaultIcon:(NSString*)defaultIcon isActuator:(BOOL)isActuator excludeFrom:(NSString *)excludeFrom indexes:(NSDictionary*)indexes isTrigger:(NSString*)isTrigger;
 @end
