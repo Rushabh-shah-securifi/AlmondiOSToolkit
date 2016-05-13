@@ -423,7 +423,7 @@
 }
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
-    if (self.networkConfig.mode == NetworkEndpointMode_web_socket) {
+    if (self.networkConfig.mode == NetworkEndpointMode_cloud || self.networkConfig.mode == NetworkEndpointMode_web_socket) {
         [self markConnectionState:NetworkConnectionStatusInitialized];
     }
     
@@ -672,13 +672,13 @@
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
             break;
         };
-        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:{
-            NSLog(@"Almond mode change responce");
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self delegateData:payload commandType:commandType];
-            [self postData:kSFIAlmondModeDidChange data:payload];
-            break;
-        };
+//        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:{
+//            NSLog(@"Almond mode change responce");
+//            [self tryMarkUnitCompletion:YES responseType:commandType];
+//            [self delegateData:payload commandType:commandType];
+//            [self postData:kSFIAlmondModeDidChange data:payload];
+//            break;
+//        };
         
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:

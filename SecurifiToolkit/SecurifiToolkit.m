@@ -450,13 +450,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (BOOL)isCloudOnline {
     BOOL reachable = [self isCloudReachable];
+    NSLog(@"reachable : %d",reachable);
     if (!reachable) {
         return NO;
     }
     
     NetworkConnectionStatus state = [self cloudNetworkStatus];
-    
+    NSLog(@"state:: %d ",state);
     enum SFIAlmondConnectionStatus status = [self connectionStatusFromNetworkState:state];
+    NSLog(@"status:: %d ",status);
     return status == SFIAlmondConnectionStatus_connected;
 }
 
@@ -2363,7 +2365,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
             break;
         };
         case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
-            [self onDynamicAlmondModeChange:payload network:network];
+            DynamicAlmondModeChange *obj = payload;
+            [self onDynamicAlmondModeChange:obj network:network];
             break;
         }
             
@@ -2436,7 +2439,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
 //        case CommandType_DYNAMIC_ALMOND_MODE_CHANGE: {
 //            DynamicAlmondModeChange *obj = payload;
-//            [self onDynamicAlmondModeChange:payload network:network];
+//            [self onDynamicAlmondModeChange:obj network:network];
 //            break;
 //        }
             
@@ -3431,22 +3434,33 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     [network.networkState markModeForAlmond:self.currentAlmond.almondplusMAC mode:res.mode];
-    [self postNotification:kSFIAlmondModeDidChange data:res];
+    NSDictionary *modeNotifyDict =  @{
+                                      @"CommandType": @"DynamicAlmondModeUpdated",
+                                      @"Mode" : @(res.mode).stringValue
+                                      
+                                      };
+    [self postNotification:kSFIAlmondModeDidChange data:modeNotifyDict];
 }
 
-- (void)onDynamicAlmondModeChange:(NSDictionary *)res network:(Network *)network {
+- (void)onDynamicAlmondModeChange:(DynamicAlmondModeChange *)res network:(Network *)network {
     if (res == nil) {
         return;
     }
     
-//    if (!res.success) {
-//        return;
-//    }
+    if (!res.success) {
+        return;
+    }
     NSLog(@"res dict %@",res);
-    NSLog(@"res.mode: %d", res[@"Mode"]);
-    NSString *modeString = res[@"Mode"];
-    [network.networkState markModeForAlmond:self.currentAlmond.almondplusMAC mode:[modeString integerValue]];
-    [self postNotification:kSFIAlmondModeDidChange data:res];
+    NSLog(@"res.mode: %d", res.mode);
+//    NSString *modeString = res[@"Mode"];
+    [network.networkState markModeForAlmond:self.currentAlmond.almondplusMAC mode:res.mode];
+    NSDictionary *modeNotifyDict =  @{
+                                        @"CommandType": @"DynamicAlmondModeUpdated",
+                                        @"Mode" : @(res.mode).stringValue
+                                             
+                                                };
+    
+    [self postNotification:kSFIAlmondModeDidChange data:modeNotifyDict];
 }
 
 #pragma mark - Device Log processing and SFIDeviceLogStoreDelegate methods

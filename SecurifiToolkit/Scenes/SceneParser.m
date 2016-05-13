@@ -8,6 +8,9 @@
 
 #import "SceneParser.h"
 #import "SecurifiToolkit.h"
+#import "AlmondJsonCommandKeyConstants.h"
+#import "AlmondPlusSDKConstants.h"
+
 
 @implementation SceneParser
 
@@ -19,60 +22,18 @@
 
 - (void)initializeNotifications{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
     [center addObserver:self
                selector:@selector(getAllScenesCallback:)
-                   name:NOTIFICATION_GET_ALL_SCENES_NOTIFIER//
+                   name:NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
                  object:nil];
-    
-    [center addObserver:self
-               selector:@selector(onScenesListChange:)
-                   name:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER
-                 object:nil];
-//    
-//    [center addObserver:self
-//               selector:@selector(getAllScenesCallback:)
-//                   name:NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
-//                 object:nil];//NOTIFICATION_SCENE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
 }
 
 
 
-- (void)getAllScenesCallback:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    
-    
-    NSDictionary *mainDict;
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    BOOL local = [self isLocal];
-    if(local){
-        mainDict = [data valueForKey:@"data"];
-    }else{
-        //till cloud changes are integrated
-        mainDict = [[data valueForKey:@"data"] objectFromJSONData];
-    }// required for switching local<=>cloud
 
-    NSLog(@" scene list dict %@",mainDict);
-    [toolkit.scenesArray removeAllObjects];
-    NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
 
-    NSArray *scenePosKeys = scenesPayload.allKeys;
-    NSArray *sortedPostKeys = [scenePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-        return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
-    }];
-    
-    for (NSString *key in sortedPostKeys) {
-        NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:scenesPayload[key]];
-        NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
-        [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
-        NSLog(@" getLaa scene %@",mutableScene);
-        [toolkit.scenesArray addObject:mutableScene];
-    }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
-}
-
-- (void)onScenesListChange:(id)sender{
+- (void)getAllScenesCallback:(id)sender{
     
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
@@ -86,11 +47,35 @@
         //till cloud changes are integrated
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
+    
+    BOOL isMatchingAlmondOrLocal = ([[mainDict valueForKey:ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
+    
     NSLog(@"main scene dict %@",mainDict);
     NSDictionary *dict;
     NSString * commandType = [mainDict valueForKey:@"CommandType"];
     
-    if ([commandType isEqualToString:@"DynamicSceneAdded"]){
+    
+    if([commandType isEqualToString:@"DynamicSceneList"] || [commandType isEqualToString:@"SceneList"]){
+        [toolkit.scenesArray removeAllObjects];
+        NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
+        NSLog(@"scenesPayload sceneList %@",scenesPayload);
+        NSArray *scenePosKeys = scenesPayload.allKeys;
+        NSArray *sortedPostKeys = [scenePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
+        }];
+        
+        for (NSString *key in sortedPostKeys) {
+            NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:scenesPayload[key]];
+            NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
+            [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
+            [mutableScene setValue:key forKey:@"ID"];
+            [toolkit.scenesArray addObject:mutableScene];
+        }
+    }
+    
+    else if ([commandType isEqualToString:@"DynamicSceneAdded"]){
         NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
             if ([[sceneDict valueForKey:@"ID"] intValue] == [updatedID intValue]) {
@@ -106,7 +91,7 @@
         NSLog( @"new scene add updated id %@",[newScene valueForKey:updatedID]);
          NSMutableDictionary *mutableScene = [newScene[updatedID] mutableCopy];
         [mutableScene setValue:[self getMutableSceneEntryList:[newScene valueForKey:updatedID]] forKey:@"SceneEntryList"];
-        
+        [mutableScene setValue:updatedID forKey:@"ID"];
          NSLog( @"new scene add after updated id %@",mutableScene);
         
 
@@ -116,7 +101,7 @@
     }
     
     
-    else if ([commandType isEqualToString:@"DynamicSceneActivated"] || [commandType isEqualToString:@"DynamicSceneUpdated"]) {
+    else if ([commandType isEqualToString:@"DynamicSceneUpdated"]) {
         //scenes has been activated
          NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
         NSDictionary *newScene = [mainDict[@"Scenes"]valueForKey:updatedID];
@@ -130,32 +115,23 @@
         }
         NSMutableDictionary *mutableScene = [newScene mutableCopy];
         [mutableScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
+        [mutableScene setValue:updatedID forKey:@"ID"];
 
         NSLog(@"index replace %d",index);
         [toolkit.scenesArray replaceObjectAtIndex:index withObject:mutableScene];
     }
-//    
-//    else if ([commandType isEqualToString:@"DynamicSceneUpdated"]) {
-//        //scenes parameterers has been updated
-//         NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
-//         NSDictionary *newScene = [mainDict[@"Scenes"]valueForKey:updatedID];
-//        NSInteger index = 0;
-//        for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
-//            NSLog(@"scene dict update: %@",sceneDict);
-//            if ([[sceneDict valueForKey:@"ID"] intValue] ==  [updatedID intValue]) {
-//                 index = [toolkit.scenesArray indexOfObject:sceneDict];
-//                
-//                break;
-//            }
-//            
-//        }
-//        NSMutableDictionary *mutableScene = [newScene mutableCopy];
-//        [mutableScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
-//        NSLog(@"mutableScene ...%@",mutableScene);
-//        
-//        [toolkit.scenesArray replaceObjectAtIndex:index withObject:mutableScene];
-//    }
-    
+    else if ([commandType isEqualToString:@"DynamicSceneActivated"]){
+        NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
+        NSDictionary *newScene = [mainDict[@"Scenes"] valueForKey:updatedID];
+        NSInteger index = 0;
+        for (NSMutableDictionary *sceneDict in toolkit.scenesArray){
+            if ([[sceneDict valueForKey:@"ID"] intValue] == [updatedID intValue]){
+                sceneDict[@"Active"] = newScene[@"Active"];
+            }
+        }
+
+    }
+
     else if ([commandType isEqualToString:@"DynamicSceneRemoved"]) {
         NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
         for (NSDictionary * sceneDict in toolkit.scenesArray) {
@@ -173,6 +149,7 @@
     else if ([commandType isEqualToString:@"DynamicAllScenesRemoved"]) {
         [toolkit.scenesArray removeAllObjects];
     }
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
 }
 
@@ -184,10 +161,11 @@
 }
 
 -(NSMutableArray*)getMutableSceneEntryList:(NSDictionary*)sceneDict{
+    NSLog(@"getMutableSceneEntryList sceneDict %@",sceneDict);
     NSMutableArray *mutableEntryList = [[NSMutableArray alloc]init];
     NSString *updatedID = [[sceneDict  allKeys] objectAtIndex:0];
     NSArray *sceneEntryListPayload = [sceneDict valueForKey:@"SceneEntryList"];
-    
+    // need to handle empty SceneEntryList
     for(NSDictionary *entryList in sceneEntryListPayload){
         NSMutableDictionary *mutableEntry = [entryList mutableCopy];
         
@@ -206,5 +184,45 @@
     modeEntry[@"Index"] = @"1";
     modeEntry[@"EventType"] = @"AlmondModeUpdated";
 }
+
+
+//- (void)getAllScenesCallback:(id)sender {
+//    NSNotification *notifier = (NSNotification *) sender;
+//    NSDictionary *data = [notifier userInfo];
+//    
+//    
+//    NSDictionary *mainDict;
+//    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+//    BOOL local = [self isLocal];
+//    if(local){
+//        mainDict = [data valueForKey:@"data"];
+//    }else{
+//        //till cloud changes are integrated
+//        mainDict = [[data valueForKey:@"data"] objectFromJSONData];
+//    }// required for switching local<=>cloud
+//    
+//    
+//    
+//    
+//    
+//    NSLog(@" scene list dict %@",mainDict);
+//    [toolkit.scenesArray removeAllObjects];
+//    NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
+//    
+//    NSArray *scenePosKeys = scenesPayload.allKeys;
+//    NSArray *sortedPostKeys = [scenePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+//        return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
+//    }];
+//    
+//    for (NSString *key in sortedPostKeys) {
+//        NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:scenesPayload[key]];
+//        NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
+//        [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
+//        NSLog(@" getLaa scene %@",mutableScene);
+//        [toolkit.scenesArray addObject:mutableScene];
+//    }
+//    
+//    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
+//}
 
 @end
