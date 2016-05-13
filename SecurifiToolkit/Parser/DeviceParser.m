@@ -210,7 +210,7 @@
         NSDictionary *devicesPayload = payload[DEVICES];
         NSString *deviceID = [[devicesPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         NSDictionary *addedDevicePayload = [devicesPayload objectForKey:deviceID];
-        Device *device = [Device getDeviceForID:deviceID.intValue];
+        Device *device = [Device getDeviceForID:[deviceID intValue]];
         if(device)
             [self updateDevice:device payload:addedDevicePayload];
         else{

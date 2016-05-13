@@ -112,7 +112,15 @@
     }
     toolkit.clients = [self getSortedDevices];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil userInfo:nil];
+    
+    NSDictionary *resData = nil;
+    if (mainDict) {
+        resData = @{
+                 @"data" : mainDict
+                 };
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil userInfo:resData];
 }
 
 -(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{
