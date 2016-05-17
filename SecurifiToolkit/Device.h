@@ -30,7 +30,7 @@
 
 // Updates this instances notificationMode and generates SFINotificationDevice values that can be
 // sent to the cloud to communicate this mode change.
-- (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(Device *)value;
+- (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(NSArray *)knownValues;
 
 + (Device*)getDeviceForID:(sfi_id)deviceID;
 
@@ -51,5 +51,4 @@
 + (void)updateValueForID:(int)deviceID index:(int)index value:(NSString*)value;
 
 + (void)updateDeviceData:(DeviceCommandType)deviceCmdType value:(NSString*)value deviceID:(int)deviceID;
-
 @end

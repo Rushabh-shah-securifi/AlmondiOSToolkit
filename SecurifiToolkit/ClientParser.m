@@ -63,6 +63,7 @@
             [wifiClientsArray addObject:device];
         }
         toolkit.clients = wifiClientsArray;
+        [toolkit getClientsNotificationPreferences];
     }
     
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED]){
@@ -149,5 +150,7 @@
     NSArray *sortDescriptors = [NSArray arrayWithObjects:firstDescriptor, secondDescriptor, nil];
     return [[toolkit.clients sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
 }
+
+
 
 @end

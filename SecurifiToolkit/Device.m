@@ -92,6 +92,8 @@
         device.name = value;
     }else if(deviceCmdType == DeviceCommand_UpdateDeviceLocation){
         device.location = value;
+    }else if(deviceCmdType == DeviceCommand_NotifyMe){
+        device.notificationMode = [value intValue];
     }
 }
 +(NSDictionary*)getCommonIndexesDict{
@@ -111,6 +113,46 @@
     }
 }
 
-
+- (NSArray *)updateNotificationMode:(SFINotificationMode)mode deviceValue:(NSArray *)knownValues {
+    if (mode == SFINotificationMode_unknown) {
+        NSLog(@"updateNotificationMode: illegal mode 'SFINotificationMode_unknown'; ignoring change");
+        return @[];
+    }
+    
+    // Note side-effect on this instance
+//    self.notificationMode = mode;
+    
+    // When changing mode, we have to set the preference for each index and send the list to the cloud.
+    // Notification will be sent for all changes to the devices known values; one preference setting for each device property.
+    // It seems like the cloud could provide a simple API for doing this work for us.
+    //
+    // The list of indexes whose preference setting has to be changed
+    NSArray *deviceValuesList;
+    
+//    if (self.type == SFIDeviceType_SmartACSwitch_22 || self.type == SFIDeviceType_SecurifiSmartSwitch_50) {
+//        // Special case these two: we only toggle the setting for the main state index
+//        // otherwise the notifications will be too many
+//        SFIDeviceKnownValues *deviceValue = [value knownValuesForProperty:self.statePropertyType];
+//        deviceValuesList = @[deviceValue];
+//    }
+//    else {
+//        // General case: change all indexes
+//        deviceValuesList = [value knownDevicesValues];
+//    }
+    
+    // The list of preference settings
+    NSMutableArray *settings = [[NSMutableArray alloc] init];
+    
+    for (DeviceKnownValues *knownValue in knownValues) {
+        SFINotificationDevice *notificationDevice = [[SFINotificationDevice alloc] init];
+        notificationDevice.deviceID = self.ID;
+        notificationDevice.notificationMode = self.notificationMode;
+        notificationDevice.valueIndex = knownValue.index;
+        
+        [settings addObject:notificationDevice];
+    }
+    
+    return settings;
+}
 
 @end

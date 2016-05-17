@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SecurifiTypes.h"
 
 typedef NS_ENUM(NSInteger, DeviceAllowedType){
     DeviceAllowed_Always=0,
@@ -33,6 +34,8 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 @property(nonatomic) NSString *deviceSchedule;
 @property(nonatomic) NSString *category;
 @property(nonatomic) BOOL *canBeBlocked;
+
+@property(nonatomic) SFINotificationMode notificationMode;
 
 - (NSString *)iconName;
 

@@ -404,10 +404,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
         settings.login = summary.login;
     }
     if (summary.password) {
-        NSString *decrypted = [summary decryptPassword:almondMac];
-        if (decrypted) {
-            settings.password = decrypted;
-        }
+//        NSString *decrypted = [summary decryptPassword:almondMac];
+//        if (decrypted) {
+//            settings.password = decrypted;
+            settings.password = summary.password;
+//        }
     }
     if (summary.url) {
         settings.host = summary.url;
@@ -1184,8 +1185,26 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // Fetch the Almond Mode
     [self tryRequestAlmondMode:mac];
     
+    [self cleanUp];
+    NSLog(@"device request send");
+    GenericCommand *cmd = [GenericCommand requestSensorDeviceList:mac];
+    [[SecurifiToolkit sharedInstance] asyncSendCommand:cmd];
+    
+    NSLog(@"scene request send ");
+    cmd = [GenericCommand requestSceneList:mac];
+    [self asyncSendToCloud:cmd];
+    
+    //send request foe wifi client cloud
+    NSLog(@"clients request send");
+    cmd = [GenericCommand requestAlmondClients:mac];
+    [self asyncSendToCloud:cmd];
+    // send rule request
+    NSLog(@" rule request send ");
+    cmd = [GenericCommand requestAlmondRules:mac];
+    [self asyncSendToCloud:cmd];
+    
     // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
-    [self asyncRequestNotificationPreferenceList:mac];
+//    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser
 }
 
 - (BOOL)isCurrentTemperatureFormatFahrenheit {
@@ -1358,7 +1377,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 //        cmd.networkPrecondition = precondition;
 //        
 //        [self asyncSendToCloud:cmd];
-        //[self asyncRequestNotificationPreferenceList:almondMac];
+//        [self asyncRequestNotificationPreferenceList:almondMac];
     }
 }
 
@@ -1776,6 +1795,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC {
+    NSLog(@"toolkit - asyncRequestNotificationPreferenceList");
     if (almondMAC == nil) {
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;
@@ -1789,25 +1809,21 @@ static SecurifiToolkit *toolkit_singleton = nil;
     cmd.command = req;
     
     [self asyncSendToCloud:cmd];
-    
-    [self cleanUp];
-    NSLog(@"device request send");
-    GenericCommand *genericCmd = [GenericCommand requestSensorDeviceList:almondMAC];
-    [[SecurifiToolkit sharedInstance] asyncSendCommand:genericCmd];
-    
-    NSLog(@"scene request send ");
-    cmd = [GenericCommand requestSceneList:almondMAC];
-    [self asyncSendToCloud:cmd];
-    
-    //send request foe wifi client cloud
-    NSLog(@"clients request send");
-    cmd = [GenericCommand requestAlmondClients:almondMAC];
-    [self asyncSendToCloud:cmd];
-    // send rule request
-    NSLog(@" rule request send ");
-    cmd = [GenericCommand requestAlmondRules:almondMAC];
-    [self asyncSendToCloud:cmd];
+}
 
+- (void)getClientsNotificationPreferences{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSString *userID = [KeyChainWrapper retrieveEntryForUser:SEC_EMAIL forService:SEC_SERVICE_NAME];
+    NSMutableDictionary *commandInfo = [NSMutableDictionary new];
+    
+    [commandInfo setValue:@"GetClientPreferences" forKey:@"CommandType"];
+    [commandInfo setValue:toolkit.currentAlmond.almondplusMAC forKey:@"AlmondMAC"];
+    [commandInfo setValue:userID forKey:@"UserID"];
+    
+    
+    GenericCommand *cloudCommand = [GenericCommand jsonStringPayloadCommand:commandInfo commandType:CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST];
+    
+    [toolkit asyncSendCommand:cloudCommand];
 }
 
 - (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode {
@@ -2312,6 +2328,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
             
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
+            NSLog(@"toolkit - CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE");
             if (self.config.enableNotifications) {
                 NotificationPreferenceListResponse *res = payload;
                 [self onNotificationPrefListChange:res];
@@ -2560,7 +2577,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
         
         // Tell the world so they can update their view
-        [self postNotification:kSFIDidChangeAlmondName data:changed];
+        [self postNotification:kSFIDidChangeAlmondName data:obj];
     }
 }
 
@@ -3008,12 +3025,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Notification Preference List callbacks
 
 - (void)onDeviceNotificationPreferenceChangeResponseCallback:(NotificationPreferenceResponse*)res network:(Network *)network {
+    
     if (!res.isSuccessful) {
         return;
     }
     
     GenericCommand *cmd = [network.networkState expirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
     NotificationPreferences *req = cmd.command;
+    NSLog(@"onDeviceNotificationPreferenceChangeResponseCallback req :%@", req);
     if (!req) {
         return;
     }
@@ -3035,7 +3054,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         newPrefs = [SFINotificationDevice removeNotificationDevices:req.notificationDeviceList from:currentPrefs];
     }
     else {
-        
         [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
         return;
     }

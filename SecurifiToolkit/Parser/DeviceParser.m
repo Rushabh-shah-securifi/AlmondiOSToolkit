@@ -190,6 +190,7 @@
             device.ID = [devicePosition intValue];
             [toolkit.devices addObject:device];
         }
+        [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
 
 //        //    genericdevices
 //        NSMutableArray *genericDeviceTypesArray = [Device getDeviceTypes];
@@ -305,7 +306,7 @@
     device.location = payload[LOCATION];
     NSLog(@"devicetype: %@", payload[D_TYPE]);
     device.type =[payload[D_TYPE] intValue];
-    
+
     NSDictionary *valuesDic = payloadDevice[DEVICE_VALUE];
     if(valuesDic != nil)
         device.knownValues = [self parseValues:valuesDic];

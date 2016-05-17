@@ -169,12 +169,12 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Changes take effect on next connection attempt. Use closeConnection to force a connection change.
 @property(nonatomic) BOOL useProductionCloud;
 
-@property(nonatomic) NSMutableArray *scenesArray;
-@property(nonatomic) NSMutableArray *clients;
-@property(nonatomic) NSMutableArray *devices;
-@property(nonatomic) NSMutableArray *ruleList;
-@property(nonatomic) NSDictionary *genericDevices;
-@property(nonatomic) NSDictionary *genericIndexes;
+@property(atomic) NSMutableArray *scenesArray;
+@property(atomic) NSMutableArray *clients;
+@property(atomic) NSMutableArray *devices;
+@property(atomic) NSMutableArray *ruleList;
+@property(atomic) NSDictionary *genericDevices;
+@property(atomic) NSDictionary *genericIndexes;
 
 + (BOOL)isInitialized;
 
@@ -367,6 +367,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC;
 
+- (void)getClientsNotificationPreferences;
 // Send a command to change the notification mode for the specific almond
 - (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode;
 

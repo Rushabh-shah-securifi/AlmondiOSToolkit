@@ -208,9 +208,9 @@
         case -3:
         {
             if(get)
-                return @"always"; //todo
-            //        else
-            //            client.deviceType = newValue;
+                return @(client.notificationMode).stringValue; //todo
+            else
+                client.notificationMode = [newValue intValue];
             break;
         }
         default:{
@@ -220,6 +220,7 @@
     }
     return nil;
 }
+
 
 +(void)updateAllowOnNetworkAndSchedule:(Client*)client blockedString:(NSString*)blockedString{
     if([blockedString isEqualToString:@"000000,000000,000000,000000,000000,00000,00000"]){
