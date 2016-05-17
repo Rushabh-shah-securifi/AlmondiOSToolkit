@@ -33,6 +33,7 @@
     return [SecurifiToolkit sharedInstance].currentAlmond.almondplusMAC;
 }
 +(void)sendrouterSummary{
+    NSLog(@"router summery %@",[self getAlmondMac]);
     NSDictionary *routerSumary = @{
                                    @"CommandType":@"RouterSummary",
                                    @"MobileInternalIndex":@"123456",
@@ -52,9 +53,9 @@
                                                }
                                            ],
                                    @"Uptime":@"12633321",
-                                   @"URL":@"10.1.1.254",
+                                   @"URL":@"10.10.1.125",
                                    @"Login":@"admin",
-                                   @"TempPass":@"xyz",
+                                   @"TempPass":@"root",
                                    @"RouterUptime":@"5 days, 6:15hrs",
                                    @"FirmwareVersion":@"AL2-R091"
                                    

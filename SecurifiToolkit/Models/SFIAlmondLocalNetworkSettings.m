@@ -62,7 +62,7 @@
     //
     _test_connection_latch = nil;
     _test_command_latch = nil;
-
+    NSLog(@"local testResult  %d",self.testResult);
     return self.testResult;
 }
 
@@ -75,7 +75,7 @@
     if (!success) {
         return;
     }
-
+    NSLog(@"processTestConnectionResponsePayload %@",payload);
     NSString *mac_hex = payload[@"MAC"];
 //    if (![self validMac:mac_hex]) {
 //        self.testResult = TestConnectionResult_macMissing;
@@ -83,7 +83,7 @@
 //    }
 
     NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
-
+    NSLog(@"mac address %@==%@",mac,self.almondplusMAC);
     if (self.almondplusMAC) {
         // if a MAC is specified then let's compare and make sure the almond to which we connected is the same one specified
         // in these settings.
@@ -130,6 +130,7 @@
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
     if (commandType == CommandType_ALMOND_NAME_AND_MAC_RESPONSE) {
         dispatch_semaphore_t latch = self.test_command_latch;
+        NSLog(@"processTestConnectionResponsePayload almond name and mac %@",payload);
         [self processTestConnectionResponsePayload:payload];
         dispatch_semaphore_signal(latch);
     }
