@@ -1897,7 +1897,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self asyncSendToCloud:cmd];
 }
 
-- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action {
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action mii:(int)mii{
     if (almondMAC == nil) {
         SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
         return;
@@ -1909,7 +1909,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     req.userID = [self loginEmail];
     req.preferenceCount = (int) [deviceList count];
     req.notificationDeviceList = deviceList;
-    
+    req.internalIndex = @(mii).stringValue;
     // Use this as a state holder so we can get access to the actual NotificationPreferences when processing the response.
     // This is a work-around measure until cloud dynamic updates are working; we keep track of the last mode change request and
     // update internal state on receipt of a confirmation from the cloud; normally, we would rely on the
@@ -2337,6 +2337,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
             
         case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE: {
+            NSLog(@"toolkit - CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE");
             if (self.config.enableNotifications) {
                 NotificationPreferenceResponse *res = payload;
                 [self onDeviceNotificationPreferenceChangeResponseCallback:res network:network];
@@ -3026,9 +3027,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onDeviceNotificationPreferenceChangeResponseCallback:(NotificationPreferenceResponse*)res network:(Network *)network {
     
-    if (!res.isSuccessful) {
-        return;
-    }
+//    if (!res.isSuccessful) {
+//        return;
+//    }
     
     GenericCommand *cmd = [network.networkState expirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
     NotificationPreferences *req = cmd.command;
@@ -3038,10 +3039,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     int res_correlationId = res.internalIndex.intValue;
-    if (res_correlationId != req.correlationId) {
-        
-        return;
-    }
+//    if (res_correlationId != req.correlationId) {
+//        return;
+//    }
     
     NSString *almondMac = req.almondMAC;
     NSArray *currentPrefs = [self notificationPrefList:almondMac];
@@ -3057,11 +3057,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
         return;
     }
-    
     [self.dataManager writeNotificationPreferenceList:newPrefs almondMac:almondMac];
     
     [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
-    [self postNotification:kSFINotificationPreferencesDidChange data:almondMac];
+
+    [self postNotification:kSFINotificationPreferencesDidChange data:res];
 }
 
 - (void)onNotificationRegistrationResponseCallback:(NotificationRegistrationResponse *)obj {

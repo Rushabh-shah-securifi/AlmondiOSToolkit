@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SecurifiTypes.h"
 #import "GenericIndexClass.h"
+#import "DeviceKnownValues.h"
 
 @interface Device : NSObject
 
@@ -51,4 +52,6 @@
 + (void)updateValueForID:(int)deviceID index:(int)index value:(NSString*)value;
 
 + (void)updateDeviceData:(DeviceCommandType)deviceCmdType value:(NSString*)value deviceID:(int)deviceID;
+
++ (DeviceKnownValues *)getKnownValue:(NSArray*)knownValues index:(int)index;
 @end

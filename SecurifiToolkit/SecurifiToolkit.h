@@ -378,7 +378,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 // Supported actions are:
 // kSFINotificationPreferenceChangeActionAdd;
 // kSFINotificationPreferenceChangeActionDelete;
-- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action;
+- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action mii:(int)mii;
 
 - (NSInteger)countUnviewedNotifications;
 

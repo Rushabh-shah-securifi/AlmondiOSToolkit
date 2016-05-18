@@ -38,8 +38,10 @@
 
     // close Preference
     [writer endElement];
+    self.correlationId = self.internalIndex.intValue; //need to fix it
+    NSLog(@"mii tweak");
     [self addMobileInternalIndexElement:writer];
-
+    
     // close NotificationPreferences
     [writer endElement];
     // close root
