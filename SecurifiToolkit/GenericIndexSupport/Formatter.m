@@ -34,9 +34,11 @@
 
 -(NSString*)transform:(NSString*)value{
     float fVal = [value floatValue];
+    float roundVal = roundf(fVal*self.factor);
     NSLog(@"transform - value:%f factor:%f", fVal, self.factor);
-    return [NSString stringWithFormat:@"%.1f%@", roundf(fVal*self.factor), self.units];
+    return [NSString stringWithFormat:@"%d%@", (int)roundVal, self.units];
 }
+
 -(NSString*)transformValue:(NSString*)value{
     float fVal = [value floatValue];
     int roundedValue = roundf(fVal*self.factor);

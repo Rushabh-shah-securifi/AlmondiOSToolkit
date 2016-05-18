@@ -67,16 +67,24 @@
         }];
         
         for (NSString *key in sortedPostKeys) {
+            if([[NSString stringWithFormat:@"%@", [scenesPayload[key] valueForKey:@"SceneEntryList"]] isEqualToString:@""])
+                continue;
             NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:scenesPayload[key]];
             NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
             [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
             [mutableScene setValue:key forKey:@"ID"];
             [toolkit.scenesArray addObject:mutableScene];
+            NSLog(@"scene list");
         }
     }
     
     else if ([commandType isEqualToString:@"DynamicSceneAdded"]){
         NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
+        NSMutableDictionary *newScene = [[mainDict valueForKey:@"Scenes"] mutableCopy];
+        
+        if([[NSString stringWithFormat:@"%@", [newScene[updatedID] valueForKey:@"SceneEntryList"]] isEqualToString:@""])
+            return;
+            
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
             if ([[sceneDict valueForKey:@"ID"] intValue] == [updatedID intValue]) {
                 dict = sceneDict;
@@ -86,7 +94,7 @@
         if(dict != nil){
             [toolkit.scenesArray removeObject:dict];
         }
-        NSMutableDictionary *newScene = [[mainDict valueForKey:@"Scenes"] mutableCopy];
+        
 //         NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
         NSLog( @"new scene add updated id %@",[newScene valueForKey:updatedID]);
          NSMutableDictionary *mutableScene = [newScene[updatedID] mutableCopy];
@@ -103,8 +111,10 @@
     
     else if ([commandType isEqualToString:@"DynamicSceneUpdated"]) {
         //scenes has been activated
-         NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
+        NSString *updatedID = [[[mainDict valueForKey:@"Scenes"] allKeys] objectAtIndex:0];
         NSDictionary *newScene = [mainDict[@"Scenes"]valueForKey:updatedID];
+        if([[NSString stringWithFormat:@"%@", [newScene[updatedID] valueForKey:@"SceneEntryList"]] isEqualToString:@""])
+            return;
         NSInteger index = 0;
         for (NSDictionary *sceneDict in toolkit.scenesArray) {
             NSLog(@"sceneDict active:: %@",sceneDict);
