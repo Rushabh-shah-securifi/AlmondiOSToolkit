@@ -183,13 +183,16 @@
         NSArray *sortedPostKeys = [devicePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
         }];
-        [toolkit.devices removeAllObjects];
+        
+        NSMutableArray *deviceList = [NSMutableArray new];
         for (NSString *devicePosition in sortedPostKeys) {
             NSDictionary *deviceDic = devicesPayload[devicePosition];
             Device *device = [self parseDeviceForPayload:deviceDic];
             device.ID = [devicePosition intValue];
-            [toolkit.devices addObject:device];
+            [deviceList addObject:device];
         }
+        NSLog(@"addobjects");
+        toolkit.devices = deviceList;
         [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
 
 //        //    genericdevices

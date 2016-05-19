@@ -99,6 +99,7 @@
 -(Rule*)findRule:(NSString *)ID{
     SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
     NSLog(@"toolkit.rulelist count before %ld ",toolkit.ruleList.count);
+    
     toolkit.ruleList=toolkit.ruleList==nil?[NSMutableArray new]:toolkit.ruleList;
     NSLog(@"toolkit.rulelist count after %ld ",toolkit.ruleList.count);
     for(Rule *rule  in toolkit.ruleList){

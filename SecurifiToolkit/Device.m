@@ -23,6 +23,7 @@
 +(Device*)getDeviceForID:(sfi_id)deviceID{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     for(Device *device in toolkit.devices){
+//        NSLog(@"device id: %d, deviceid: %d", device.ID, deviceID);
         if(device.ID == deviceID){
             return device;
         }
