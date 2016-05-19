@@ -307,7 +307,6 @@
     NSDictionary *payload = payloadDevice[@"Data"];
     device.name = payload[D_NAME];
     device.location = payload[LOCATION];
-    NSLog(@"devicetype: %@", payload[D_TYPE]);
     device.type =[payload[D_TYPE] intValue];
 
     NSDictionary *valuesDic = payloadDevice[DEVICE_VALUE];

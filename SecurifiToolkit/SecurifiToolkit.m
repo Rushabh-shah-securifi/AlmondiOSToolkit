@@ -3453,7 +3453,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     [network.networkState markModeForAlmond:self.currentAlmond.almondplusMAC mode:res.mode];
     NSDictionary *modeNotifyDict =  @{
-                                      @"CommandType": @"DynamicAlmondModeUpdated",
+                                      @"CommandType": @"AlmondModeResponse",
                                       @"Mode" : @(res.mode).stringValue
                                       
                                       };
