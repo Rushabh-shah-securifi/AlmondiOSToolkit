@@ -34,10 +34,49 @@
 }
 +(void)sendrouterSummary{
     NSLog(@"router summery %@",[self getAlmondMac]);
+    NSString *macRushab = @"";
+    NSString *urlRushab = @"";
+    NSString *loginRushab = @"";
+    NSString *passRushab = @"";
+    
+    NSString *macRoja = @"251176215905264";
+    NSString *urlRoja = @"10.1.1.125";
+    NSString *loginRoja = @"admin";
+    NSString *passRoja = @"root";
+    
+    NSString *macNagasai = @"251176215905200";
+    NSString *urlNagasai = @"20.10.10.5";
+    NSString *loginNagasai = @"admin";
+    NSString *passNagasai = @"root";
+    
+    NSString *macMasood = @"251176216953264";
+    NSString *urlMasood = @"10.10.11.11";
+    NSString *loginMasood = @"root";
+    NSString *passMasood = @"root";
+    
+    NSString *mac = [self getAlmondMac];
+    NSString *url = urlRoja;
+    NSString *login = loginRoja;
+    NSString *pass = passRoja;
+    
+    if([mac isEqualToString:@"251176215905264"]){
+        url = urlRoja;
+        login = loginRoja;
+        pass = passRoja;
+    }else if([mac isEqualToString:@"251176215905200"]){
+        url = urlNagasai;
+        login = loginNagasai;
+        pass = passNagasai;
+    }else if([mac isEqualToString:@"251176216953264"]){
+        url = urlMasood;
+        login = loginMasood;
+        pass = passMasood;
+    }
+    
     NSDictionary *routerSumary = @{
                                    @"CommandType":@"RouterSummary",
                                    @"MobileInternalIndex":@"123456",
-                                   @"AlmondMAC":[self getAlmondMac],
+                                   @"AlmondMAC":mac,
                                    @"AppID":@"123",
                                    @"Success":@"true",
                                    @"WirelessSetting":@[
@@ -53,9 +92,9 @@
                                                }
                                            ],
                                    @"Uptime":@"12633321",
-                                   @"URL":@"10.10.1.125",
-                                   @"Login":@"admin",
-                                   @"TempPass":@"root",
+                                   @"URL":url,
+                                   @"Login":login,
+                                   @"TempPass":pass,
                                    @"RouterUptime":@"5 days, 6:15hrs",
                                    @"FirmwareVersion":@"AL2-R091"
                                    
