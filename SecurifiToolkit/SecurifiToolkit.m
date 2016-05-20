@@ -1188,20 +1188,19 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self cleanUp];
     NSLog(@"device request send");
     GenericCommand *cmd = [GenericCommand requestSensorDeviceList:mac];
-    [[SecurifiToolkit sharedInstance] asyncSendCommand:cmd];
+    [self asyncSendCommand:cmd];
+    
+    NSLog(@"clients request send");
+    cmd = [GenericCommand requestAlmondClients:mac];
+    [self asyncSendCommand:cmd];
     
     NSLog(@"scene request send ");
     cmd = [GenericCommand requestSceneList:mac];
-    [self asyncSendToCloud:cmd];
+    [self asyncSendCommand:cmd];
     
-    //send request foe wifi client cloud
-    NSLog(@"clients request send");
-    cmd = [GenericCommand requestAlmondClients:mac];
-    [self asyncSendToCloud:cmd];
-    // send rule request
     NSLog(@" rule request send ");
     cmd = [GenericCommand requestAlmondRules:mac];
-    [self asyncSendToCloud:cmd];
+    [self asyncSendCommand:cmd];
     
     // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
 //    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser

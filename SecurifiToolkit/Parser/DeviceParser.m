@@ -19,6 +19,7 @@
 #import "DeviceIndex.h"
 #import "AlmondJsonCommandKeyConstants.h"
 #import "Client.h"
+#import "RouterParser.h"
 
 @implementation DeviceParser
 
@@ -193,7 +194,11 @@
         }
         NSLog(@"addobjects");
         toolkit.devices = deviceList;
-        [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
+        if(!local){
+            [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
+            [RouterParser sendrouterSummary]; //need to change its
+        }
+        
 
 //        //    genericdevices
 //        NSMutableArray *genericDeviceTypesArray = [Device getDeviceTypes];
