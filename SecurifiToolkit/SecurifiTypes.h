@@ -72,6 +72,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_BuiltInSiren_60               = 60,
     SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
     SFIDeviceType_REBOOT_ALMOND                 = 501,
+    SFIDeviceType_Weather                       = 502,
     
     SFIDeviceType_count                         = 61, // always set to the last value; assumes sequence is continuous
 };
