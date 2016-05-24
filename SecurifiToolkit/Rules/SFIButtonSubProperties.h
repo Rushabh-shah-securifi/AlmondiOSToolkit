@@ -10,6 +10,14 @@
 #include "SecurifiToolkit/SecurifiTypes.h"
 #import "RulesTimeElement.h"
 
+typedef NS_ENUM(NSUInteger, conditionType) {
+    isEqual,
+    isLessThan,
+    isGreaterThan,
+    isLessThanOrEqual,
+    isGreaterThanOrEqual
+    
+};
 @interface SFIButtonSubProperties : NSObject
 @property(nonatomic) sfi_id deviceId;
 @property(nonatomic) int index;
@@ -25,10 +33,14 @@
 @property(nonatomic) NSString *type;
 @property(nonatomic) RulesTimeElement *time;
 @property(nonatomic) BOOL valid;
+@property(nonatomic) conditionType condition;
+
 
 @property bool isMode;
 @property bool isWiFi;
 
 
 - (SFIButtonSubProperties *)createNew;
+- (NSString*)getcondition;
+-(NSString*)getconditionPayload;
 @end

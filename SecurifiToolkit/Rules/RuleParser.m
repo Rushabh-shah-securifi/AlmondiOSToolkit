@@ -138,12 +138,28 @@
         subProperties.type = [triggersDict valueForKey:@"Type"];
         subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
         subProperties.valid= [[triggersDict valueForKey:@"Valid"] boolValue];
+        NSLog(@"conditions %@",[triggersDict valueForKey:@"Condition"]);
+        subProperties.condition = [self getconditionType:[triggersDict valueForKey:@"Condition"]]?[self getconditionType:[triggersDict valueForKey:@"Condition"]]:isEqual;
+        
         [self addTime:triggersDict timeProperty:subProperties];
         NSLog(@"subproperty.matchdata %@",subProperties.matchData);
         [list addObject:subProperties];
     }
 }
+-(conditionType)getconditionType:(NSString *)condition{
+    NSLog(@"getconditionType  condition type %@",condition);
+    if([condition isEqualToString:@"lt"])
+        return  isLessThan;
+    else if([condition isEqualToString:@"gt"])
+        return  isGreaterThan;
+    else if([condition isEqualToString:@"le"])
+        return  isLessThanOrEqual;
+    else if([condition isEqualToString:@"ge"])
+        return  isGreaterThanOrEqual;
+    else
+        return  isEqual;
 
+}
 -(void)addTime:(NSDictionary*)timeDict timeProperty:(SFIButtonSubProperties *)timeProperty{
     
     if(![[timeDict valueForKey:@"Type"] isEqualToString:@"TimeTrigger"])

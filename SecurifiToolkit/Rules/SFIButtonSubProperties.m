@@ -33,11 +33,57 @@
     butProperties.deviceName = self.deviceName;
     butProperties.type=self.type;
     butProperties.valid=self.valid;
+    butProperties.condition = self.condition;
     
     if([self.eventType isEqualToString: @"TimeTrigger"])
         butProperties.time=[self.time createNew];
 
     return butProperties;
+}
+-(NSString*)getcondition{
+    switch (self.condition) {
+        case isEqual:
+            return @" = ";
+        
+        case isLessThan:
+            return @" < ";
+           
+        case isLessThanOrEqual:
+            return @"<=";
+            
+        case isGreaterThan:
+            return @" > ";
+           
+        case isGreaterThanOrEqual:
+            return @">=";
+          
+            
+        default:
+            break;
+    }
+}
+-(NSString*)getconditionPayload{
+    NSLog(@"self.condition %d",self.condition);
+    switch (self.condition) {
+        case isEqual:
+            return @"eq";
+            
+        case isLessThan:
+            return @"lt";
+            
+        case isLessThanOrEqual:
+            return @"le";
+            
+        case isGreaterThan:
+            return @"gt";
+            
+        case isGreaterThanOrEqual:
+            return @"ge";
+            
+            
+        default:
+            break;
+    }
 }
 
 @end
