@@ -12,7 +12,6 @@
 
 @implementation RuleParser
 
-
 - (instancetype)init {
     self = [super init];
     [self initNotification];
@@ -41,7 +40,8 @@
 
     NSString *commandType=[mainDict valueForKey:@"CommandType"];
     NSDictionary *rulesDict = mainDict[@"Rules"];
-    NSLog(@"onRuleList: %@",mainDict);
+    
+    //NSLog(@"onRuleList: %@",mainDict);
     //RuleList
     if([commandType isEqualToString:@"RuleList"]){
         NSDictionary *rulesPayload = [mainDict valueForKey:@"Rules"];
@@ -50,9 +50,8 @@
         NSArray *sortedPostKeys = [rulePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
         }];
-        
         for (NSString *key in sortedPostKeys) {
-            NSLog(@"create rule:: %@",rulesPayload[key]);
+            //NSLog(@"create rule:: %@",rulesPayload[key]);
             [self createRule:rulesPayload[key] ruleID:key];
         }
     }
@@ -63,7 +62,7 @@
     }
     else if([commandType isEqualToString:@"DynamicRuleRemoved"]){
         NSString *Id = [[rulesDict allKeys] objectAtIndex:0]; //use this when ID key is removed
-        NSLog(@"dynamic rule removed %@",Id);
+        //NSLog(@"dynamic rule removed %@",Id);
         Rule *deleteRule = [self findRule:Id];
         if(toolkit.ruleList!=nil && toolkit.ruleList.count>0)
             [toolkit.ruleList removeObject:deleteRule];
@@ -98,12 +97,11 @@
 
 -(Rule*)findRule:(NSString *)ID{
     SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
-    NSLog(@"toolkit.rulelist count before %ld ",toolkit.ruleList.count);
+    //NSLog(@"toolkit.rulelist count before %ld ",toolkit.ruleList.count);
     
     toolkit.ruleList=toolkit.ruleList==nil?[NSMutableArray new]:toolkit.ruleList;
-    NSLog(@"toolkit.rulelist count after %ld ",toolkit.ruleList.count);
+    //NSLog(@"toolkit.rulelist count after %ld ",toolkit.ruleList.count);
     for(Rule *rule  in toolkit.ruleList){
-        NSLog(@"rule id %@==%@",rule.ID,ID);
         if([rule.ID isEqualToString:ID]){
             return rule;
         }
@@ -131,23 +129,23 @@
         }
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
         subProperties.deviceId = [self getIntegerValue:[triggersDict valueForKey:@"ID"]];
-        NSLog(@"[triggersDict index id %@ eventType %@",[triggersDict valueForKey:@"Index"],[triggersDict valueForKey:@"EventType"]);
+        //NSLog(@"[triggersDict index id %@ eventType %@",[triggersDict valueForKey:@"Index"],[triggersDict valueForKey:@"EventType"]);
         subProperties.index = indexID;
         subProperties.matchData = [triggersDict valueForKey:@"Value"];
         subProperties.eventType = [triggersDict valueForKey:@"EventType"];
         subProperties.type = [triggersDict valueForKey:@"Type"];
         subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
         subProperties.valid= [[triggersDict valueForKey:@"Valid"] boolValue];
-        NSLog(@"conditions %@",[triggersDict valueForKey:@"Condition"]);
+        //NSLog(@"conditions %@",[triggersDict valueForKey:@"Condition"]);
         subProperties.condition = [self getconditionType:[triggersDict valueForKey:@"Condition"]]?[self getconditionType:[triggersDict valueForKey:@"Condition"]]:isEqual;
         
         [self addTime:triggersDict timeProperty:subProperties];
-        NSLog(@"subproperty.matchdata %@",subProperties.matchData);
+        //NSLog(@"subproperty.matchdata %@",subProperties.matchData);
         [list addObject:subProperties];
     }
 }
 -(conditionType)getconditionType:(NSString *)condition{
-    NSLog(@"getconditionType  condition type %@",condition);
+    //NSLog(@"getconditionType  condition type %@",condition);
     if([condition isEqualToString:@"lt"])
         return  isLessThan;
     else if([condition isEqualToString:@"gt"])
