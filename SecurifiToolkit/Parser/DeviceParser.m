@@ -196,7 +196,7 @@
         toolkit.devices = deviceList;
         if(!local){
             [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
-            [RouterParser sendrouterSummary]; //need to change its
+//            [RouterParser sendrouterSummary]; //need to change its
         }
         
 
