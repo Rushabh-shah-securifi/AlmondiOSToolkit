@@ -43,16 +43,16 @@
 -(NSString*)getcondition{
     switch (self.condition) {
         case isEqual:
-            return @" = ";
+            return @"=";
         
         case isLessThan:
-            return @" < ";
+            return @"<";
            
         case isLessThanOrEqual:
             return @"<=";
             
         case isGreaterThan:
-            return @" > ";
+            return @">";
            
         case isGreaterThanOrEqual:
             return @">=";
