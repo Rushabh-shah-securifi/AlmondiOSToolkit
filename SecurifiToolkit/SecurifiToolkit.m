@@ -99,6 +99,7 @@ NSString *const kSFINotificationDidStore = @"kSFINotificationDidStore";
 NSString *const kSFINotificationDidMarkViewed = @"kSFINotificationDidMarkViewed";
 NSString *const kSFINotificationBadgeCountDidChange = @"kSFINotificationBadgeCountDidChange";
 NSString *const kSFINotificationPreferencesDidChange = @"kSFINotificationPreferencesDidChange";
+NSString *const kSFINotificationPreferencesListDidChange = @"kSFINotificationPreferencesListDidChange";
 
 NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
 NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
@@ -3060,7 +3061,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
 
-    [self postNotification:kSFINotificationPreferencesDidChange data:res];
+    [self postNotification:kSFINotificationPreferencesListDidChange data:res];
 }
 
 - (void)onNotificationRegistrationResponseCallback:(NotificationRegistrationResponse *)obj {

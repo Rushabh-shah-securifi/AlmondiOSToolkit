@@ -149,7 +149,17 @@
 -(void)initNotification{
     NSLog(@"init device notification");
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(parseDeviceListAndDynamicDeviceResponse:) name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
+    
+    [center addObserver:self
+               selector:@selector(parseDeviceListAndDynamicDeviceResponse:)
+                   name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
+                 object:nil];
+    
+    [center addObserver:self
+               selector:@selector(onNotificationPrefDidChange:)
+                   name:kSFINotificationPreferencesDidChange
+                 object:nil];
+    
 }
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
@@ -274,8 +284,51 @@
         }
     }
 
-
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
+}
+
+- (void)onNotificationPrefDidChange:(id)sender {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *almond = [toolkit currentAlmond];
+
+    
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    NSString *cloudMAC = [data valueForKey:@"data"];
+    if([almond.almondplusMAC isEqualToString:cloudMAC] == NO){
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^() {
+        [self configureNotificationModesForDevices];
+    });
+}
+
+-(void)configureNotificationModesForDevices{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSArray *notificationList = [toolkit notificationPrefList:toolkit.currentAlmond.almondplusMAC];
+    for (Device *device in toolkit.devices) {
+        [self configureNotificationMode:device preferences:notificationList];
+    }
+}
+
+- (void)configureNotificationMode:(Device *)device preferences:(NSArray *)notificationList {
+    sfi_id device_id = device.ID;
+    
+    //Check if current device ID is in the notification list
+    for (SFINotificationDevice *currentDevice in notificationList) {
+        if (currentDevice.deviceID == device_id) {
+            //Set the notification mode for that notification preference
+            NSLog(@"device name: %@, current device notification mode: %d", device.name, currentDevice.notificationMode);
+            device.notificationMode = currentDevice.notificationMode;
+            return;
+        }
+    }
+    // missing preference means none has been set and is equivalent to 'off'
+    device.notificationMode = SFINotificationMode_off;
 }
 
 

@@ -24,7 +24,16 @@
 
 -(void)initNotification{
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(onWiFiClientsListResAndDynamicCallbacks:) name:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER object:nil];
+    
+    [center addObserver:self
+               selector:@selector(onWiFiClientsListResAndDynamicCallbacks:)
+                   name:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
+                 object:nil];
+    
+    [center addObserver:self
+               selector:@selector(onGetClientsPreferences:)
+                   name:NOTIFICATION_WIFI_CLIENT_GET_PREFERENCE_REQUEST_NOTIFIER
+                 object:nil];
 }
 
 -(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
@@ -63,7 +72,8 @@
             [wifiClientsArray addObject:device];
         }
         toolkit.clients = wifiClientsArray;
-        [toolkit getClientsNotificationPreferences];
+        if(!local)
+            [toolkit getClientsNotificationPreferences];
     }
     
     else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED]){
@@ -149,6 +159,40 @@
     
     NSArray *sortDescriptors = [NSArray arrayWithObjects:firstDescriptor, secondDescriptor, nil];
     return [[toolkit.clients sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
+}
+
+- (void)onGetClientsPreferences:(id)sender {
+    
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    NSDictionary * mainDict = [[data valueForKey:@"data"] objectFromJSONData];
+    
+    if ([[mainDict valueForKey:@"Success"] isEqualToString:@"true"]) {
+        dispatch_async(dispatch_get_main_queue(), ^() {
+            [self configureNotificationModesForClients:[mainDict valueForKey:@"ClientPreferences"]];
+        });
+    }
+}
+
+-(void)configureNotificationModesForClients:(NSArray*)clientsPreferences{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    for(Client *client in toolkit.clients){
+        [self setClientPreference:client clientsPreferences:clientsPreferences];
+    }
+}
+
+-(void)setClientPreference:(Client*)client clientsPreferences:(NSArray*)clientsPreferences{
+    for (NSDictionary * dict in clientsPreferences) {
+        if ([[dict valueForKey:@"ClientID"] intValue]==[client.deviceID intValue]) {
+            client.notificationMode =  [dict[@"NotificationType"] intValue];
+            NSLog(@"clientname: %@, client notification mode: %d",client.name, client.notificationMode);
+            return;
+        }
+    }
+    client.notificationMode = SFINotificationMode_off;
 }
 
 

@@ -154,6 +154,9 @@ extern NSString *const kSFINotificationDidMarkViewed;
 // Preferences for device notifications have changed; payload is Almond MAC address
 extern NSString *const kSFINotificationPreferencesDidChange;
 
+//Preference for individual device has changed
+extern NSString *const kSFINotificationPreferencesListDidChange;
+
 // Value used for the method asyncRequestNotificationPreferenceChange:deviceList:action: to enable notifications
 extern NSString *const kSFINotificationPreferenceChangeActionAdd;
 
