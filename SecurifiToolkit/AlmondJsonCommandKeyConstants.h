@@ -74,8 +74,8 @@
 #define LIST @"LIST"
 
 //clients constants
-#define ACTIVE @"Active"
-#define INACTIVE @"InActive"
+#define ACTIVE @"ACTIVE"
+#define INACTIVE @"INACTIVE"
 #define UNKNOWN @"UnKnown"
 
 #define ALLOWED_TYPE_ALWAYS @"Always"

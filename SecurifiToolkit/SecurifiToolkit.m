@@ -405,11 +405,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
         settings.login = summary.login;
     }
     if (summary.password) {
-//        NSString *decrypted = [summary decryptPassword:almondMac];
-//        if (decrypted) {
-//            settings.password = decrypted;
+        NSString *decrypted = [summary decryptPassword:almondMac];
+        if (decrypted) {
+            settings.password = decrypted;
             settings.password = summary.password;
-//        }
+        }
+        NSLog(@"settings.password: %@", settings.password);
     }
     if (summary.url) {
         settings.host = summary.url;
