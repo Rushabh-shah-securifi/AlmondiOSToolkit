@@ -47,7 +47,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSString *login = config.login;
     NSString *password = config.password;
     NSString *host = config.host;
-    
+    NSLog(@"connect - login: %@, password: %@, host: %@", config.login, config.password, config.host);
     if (!host || !login || !password) {
         [self.delegate networkEndpointDidDisconnect:self];
         return;
@@ -89,6 +89,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 #pragma mark - PSWebSocketDelegate methods
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
+    NSLog(@"webSocketDidOpen");
     [self.delegate networkEndpointDidConnect:self];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     [toolkit cleanUp];
@@ -362,7 +363,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  // just send back raw dictionary for now
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ALMOND_NAME_AND_MAC_RESPONSE];
              },
-             @"AlmondNameUpdated":  ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+             @"DynamicAlmondNameUpdated":  ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  DynamicAlmondNameChangeResponse *res = [DynamicAlmondNameChangeResponse new];
                  res.almondplusMAC = endpoint.config.almondMac;
                  res.almondplusName = payload[@"Name"];
