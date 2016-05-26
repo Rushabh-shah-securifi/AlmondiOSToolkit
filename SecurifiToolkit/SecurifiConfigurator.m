@@ -8,7 +8,7 @@
 
 #import "SecurifiConfigurator.h"
 
-#define CLOUD_PROD_SERVER   @"54.226.113.110" //@"cloud.securifi.com"
+#define CLOUD_PROD_SERVER   @"54.146.50.206" //@"cloud.securifi.com" //
 //#define CLOUD_DEV_SERVER    @"ec2-54-226-113-110.compute-1.amazonaws.com"
 #define CLOUD_DEV_SERVER    @"clouddev.securifi.com" //can you connect to the 54.226.113.110
 #define CLOUD_SERVER_PORT   1028
