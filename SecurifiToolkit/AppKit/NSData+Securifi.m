@@ -43,7 +43,7 @@
 
 - (NSData *)securifiInternalAesOp:(const CCOperation)op payload:(const NSData *)payload key:(const char[])key iv:(const char[])iv {
     const size_t payload_length = payload.length;
-
+    NSLog(@"password payload length %ld",payload.length);
     // See the doc: For block ciphers, the output size will always be less than or
     // equal to the input size plus the size of one block.
     // That's why we need to add the size of one block here
@@ -56,6 +56,7 @@
     size_t numBytesProcessed = 0;
     CCCryptorStatus cryptStatus = CCCrypt(op, kCCAlgorithmAES128, options, key, kCCKeySizeAES128, iv, payload.bytes, payload_length, buffer_out, buffer_size, &numBytesProcessed);
     if (cryptStatus != kCCSuccess) {
+        NSLog(@"cryptStatus ::");
         return nil;
     }
 

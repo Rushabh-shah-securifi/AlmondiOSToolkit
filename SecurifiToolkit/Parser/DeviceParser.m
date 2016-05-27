@@ -20,6 +20,7 @@
 #import "AlmondJsonCommandKeyConstants.h"
 #import "Client.h"
 #import "RouterParser.h"
+//#import "SFIRouterSummary.h"
 
 @implementation DeviceParser
 
@@ -159,6 +160,9 @@
                selector:@selector(onNotificationPrefDidChange:)
                    name:kSFINotificationPreferencesDidChange
                  object:nil];
+    [center addObserver:self selector:@selector(onAlmondRouterCommandResponse:)
+                   name:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER
+                 object:nil];// router summery response to store DB
     
 }
 
@@ -509,6 +513,28 @@
     }
     return data;
 }
+-(void)onAlmondRouterCommandResponse:(id)sender{
+    NSLog(@"onAlmondRouterCommandResponse");
+    NSNotification *notifier = (NSNotification *) sender;
+        NSDictionary *data = [notifier userInfo];
+        if (data == nil) {
+            return;
+        }
+        
+        SFIGenericRouterCommand *genericRouterCommand = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
+        SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+                    NSLog(@"genericcommdntype: %d", genericRouterCommand.commandType);
+            switch (genericRouterCommand.commandType) {
+                case SFIGenericRouterCommandType_WIRELESS_SUMMARY: {
+                    NSLog(@"SFIGenericRouterCommandType_WIRELESS_SUMMARY - router summary");
+                    SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
+                    NSLog(@"routersummary: %@", routerSummary);
+                    [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
+                    NSString *currentVersion = routerSummary.firmwareVersion;
+//                    [self tryCheckAlmondVersion:currentVersion];
+                    break;
+                }
 
-
+}
+}
 @end

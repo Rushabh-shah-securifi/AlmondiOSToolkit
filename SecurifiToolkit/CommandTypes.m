@@ -233,6 +233,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"SCENE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
         case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
             return [NSString stringWithFormat:@"RULE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
+        case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
+        return [NSString stringWithFormat:@"CommandType_ROUTER_COMMAND_REQUEST_RESPONSE",type];
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -348,6 +350,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
             return YES;
             
         default:
@@ -378,6 +381,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
         case (CommandType) 1551:
         case (CommandType) 99:
             return YES;

@@ -137,8 +137,8 @@ typedef NS_ENUM(unsigned int, CommandType) {
     
 
     
-    CommandType_ROUTER_COMMAND_REQUEST                  = 1320,
-    CommandType_ROUTER_COMMAND_RESPONSE                 = 1321,
+    CommandType_ROUTER_COMMAND_REQUEST_RESPONSE         = 1100,
+   
 };
 
 // returns a string name for the specified type; useful for logging

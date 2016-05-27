@@ -229,10 +229,12 @@
 
 +(void)parseRouterCommandResponse:(NSNotification *)sender{
     NSNotification *notifier = sender;
+    NSLog(@"parseRouterCommandResponse %@",[notifier userInfo]);
     NSDictionary *dataInfo = [notifier userInfo];
     if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
         return;
     }
+    
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *almond = [toolkit currentAlmond];
     BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
@@ -240,14 +242,15 @@
     if(local){
         payload = [dataInfo valueForKey:@"data"];
     }else{
-//        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
-        payload = [dataInfo valueForKey:@"data"];
+        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+    
     }
-
-    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-    if(!isMatchingAlmondOrLocal) //for cloud
-        return;
     NSLog(@"router payload: %@", payload);
+
+//    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+//    if(!isMatchingAlmondOrLocal) //for cloud
+//        return;
+//    NSLog(@"router payload: %@", payload);
     SFIGenericRouterCommand *genericRouterCommand;
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"RouterSummary"]){
         genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0];

@@ -370,6 +370,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+                                    case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
                                     
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
@@ -418,6 +419,11 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             if (parsedPayload) {
                                 // Tell the world the connection is up and running
                                 [self tryPostNetworkUpNotification];
+                                if([responsePayload isKindOfClass:[NSData class]])
+                                NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:responsePayload encoding:NSUTF8StringEncoding]);
+                                else
+                                NSLog(@"Cloud receive: %@", responsePayload);
+                                
 
                                 // Process the request by passing it to the delegate
                                 [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
@@ -433,6 +439,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             }
 
         case NSStreamEventErrorOccurred: {
+            NSLog(@"NSStreamEventHasSpaceAvailable");
             if (theStream == self.outputStream) {
                 NSLog(@"Output stream error: %@", theStream.streamError.localizedDescription);
                 [self shutdown];
@@ -442,6 +449,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         }
 
         case NSStreamEventHasSpaceAvailable: {
+            NSLog(@"NSStreamEventHasSpaceAvailable");
             // Evaluate the SSL connection
             if (self.networkConfig.enableCertificateValidation && !self.certificateTrusted) {
                 BOOL trusted = [self isTrustedCertificate:theStream];
@@ -456,8 +464,9 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         }
 
         case NSStreamEventEndEncountered: {
+            NSLog(@"NSStreamEventHasSpaceAvailable");
             if (theStream == self.inputStream) {
-                DLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+                NSLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 [self shutdown];
             }
 
@@ -712,12 +721,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
                 case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
                 case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
-                case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
-                    commandPayload = command.command;
-                    break;
-                }
-                case CommandType_RULE_LIST: {
+                case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
+                case CommandType_RULE_LIST:{
                     commandPayload = command.command;
                     break;
                 }

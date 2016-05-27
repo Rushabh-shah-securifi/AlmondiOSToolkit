@@ -149,21 +149,21 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (NSDictionary *)buildResponseHandlers {
     return @{
              //new router commands
-             @"RouterSummary" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_RESPONSE];
-             },
-             @"GetWirelessSettings" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_RESPONSE];
-             },
-             @"SetWirelessSettings" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_RESPONSE];
-             },
-             @"RebootRouter" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_RESPONSE];
-             },
-             @"SendLogs" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_RESPONSE];
-             },
+//             @"RouterSummary" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
+//             },
+//             @"GetWirelessSettings" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
+//             },
+//             @"SetWirelessSettings" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
+//             },
+//             @"RebootRouter" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
+//             },
+//             @"SendLogs" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
+//             },
              
              //new device commands
              @"DeviceList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {

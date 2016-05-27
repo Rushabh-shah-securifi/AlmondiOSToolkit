@@ -202,7 +202,7 @@
     if (unit) {
         [unit markResponse:success];
         [self.delegate networkDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess responseType:responseType];
-        DLog(@"Marking response %i for unit: %@", responseType, unit.description);
+        NSLog(@"Marking response %i for unit: %@", responseType, unit.description);
     }
     else {
         [self.delegate networkDidReceiveCommandResponse:self command:nil timeToCompletion:0 responseType:responseType];
@@ -667,7 +667,7 @@
 //            [self postData:NOTIFICATION_UPDATE_DEVICE_NAME_NOTIFIER data:payload];
 //            break;
 //        };
-        case CommandType_ROUTER_COMMAND_RESPONSE: {
+        case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
             break;
