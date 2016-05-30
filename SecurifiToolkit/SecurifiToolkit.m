@@ -467,9 +467,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     NetworkConnectionStatus state = [self cloudNetworkStatus];
-    NSLog(@"state:: %d ",state);
     enum SFIAlmondConnectionStatus status = [self connectionStatusFromNetworkState:state];
-    NSLog(@"status:: %d ",status);
     return status == SFIAlmondConnectionStatus_connected;
 }
 
@@ -3641,8 +3639,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     SFIAlmondPlus *almond = [self currentAlmond];
     BOOL local = [self useLocalNetwork:almond.almondplusMAC];
     if(local){
+        NSLog(@"asyncSendCommand local");
         [self asyncSendToLocal:command almondMac:almond.almondplusMAC];
     }else{
+        NSLog(@"asyncSendCommand cloud");
         [self asyncSendToCloud:command];
     }
 }

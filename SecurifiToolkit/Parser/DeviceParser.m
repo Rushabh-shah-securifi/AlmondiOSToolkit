@@ -517,20 +517,20 @@
 -(void)onAlmondRouterCommandResponse:(id)sender{
     NSLog(@"onAlmondRouterCommandResponse");
     NSNotification *notifier = (NSNotification *) sender;
-        NSDictionary *data = [notifier userInfo];
-        if (data == nil) {
-            return;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    
+    SFIGenericRouterCommand *genericRouterCommand = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    switch (genericRouterCommand.commandType) {
+        case SFIGenericRouterCommandType_WIRELESS_SUMMARY: {
+            SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
+            NSLog(@"routersummary: %@", routerSummary);
+            [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
+            break;
         }
-        
-        SFIGenericRouterCommand *genericRouterCommand = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
-        SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-        switch (genericRouterCommand.commandType) {
-            case SFIGenericRouterCommandType_WIRELESS_SUMMARY: {
-                SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
-                NSLog(@"routersummary: %@", routerSummary);
-                [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
-                break;
-            }
-        }
+    }
 }
 @end
