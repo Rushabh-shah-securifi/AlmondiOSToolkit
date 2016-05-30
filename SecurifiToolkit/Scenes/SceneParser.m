@@ -11,7 +11,6 @@
 #import "AlmondJsonCommandKeyConstants.h"
 #import "AlmondPlusSDKConstants.h"
 
-
 @implementation SceneParser
 
 - (instancetype)init {
@@ -45,6 +44,9 @@
         mainDict = [data valueForKey:@"data"];
     }else{
         //till cloud changes are integrated
+        if(![[data valueForKey:@"data"] isKindOfClass:[NSData class]])
+            return;
+
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     
@@ -58,7 +60,6 @@
     
     
     if([commandType isEqualToString:@"DynamicSceneList"] || [commandType isEqualToString:@"SceneList"]){
-        [toolkit.scenesArray removeAllObjects];
         NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
         NSLog(@"scenesPayload sceneList %@",scenesPayload);
         NSArray *scenePosKeys = scenesPayload.allKeys;
@@ -66,6 +67,7 @@
             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
         }];
         
+        NSMutableArray *scenesList = [NSMutableArray new];
         for (NSString *key in sortedPostKeys) {
             if([[NSString stringWithFormat:@"%@", [scenesPayload[key] valueForKey:@"SceneEntryList"]] isEqualToString:@""])
                 continue;
@@ -73,9 +75,10 @@
             NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
             [mutableScene setValue:mutableEntryList forKey:@"SceneEntryList"];
             [mutableScene setValue:key forKey:@"ID"];
-            [toolkit.scenesArray addObject:mutableScene];
+            [scenesList addObject:mutableScene];
             NSLog(@"scene list");
         }
+        toolkit.scenesArray = scenesList;
     }
     
     else if ([commandType isEqualToString:@"DynamicSceneAdded"]){

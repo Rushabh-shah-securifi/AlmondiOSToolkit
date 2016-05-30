@@ -49,6 +49,8 @@
     if(local){
         mainDict = [data valueForKey:@"data"];
     }else{
+        if(![[data valueForKey:@"data"] isKindOfClass:[NSData class]])
+            return;
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     

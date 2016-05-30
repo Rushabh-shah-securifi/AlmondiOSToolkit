@@ -10,6 +10,7 @@
 #import "SFIButtonSubProperties.h"
 #import "SecurifiToolkit.h"
 
+
 @implementation RuleParser
 
 - (instancetype)init {
@@ -32,9 +33,12 @@
     SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
     BOOL local = [toolkit useLocalNetwork:[toolkit currentAlmond].almondplusMAC];
     NSDictionary *mainDict=[[(NSNotification *) sender userInfo] valueForKey:@"data"];
-    if(!local)
+    if(!local){
+        if(![[[(NSNotification *) sender userInfo] valueForKey:@"data"] isKindOfClass:[NSData class]])
+            return;
+
          mainDict = [[[(NSNotification *) sender userInfo] valueForKey:@"data"] objectFromJSONData];
-    
+    }
     if([mainDict valueForKey:@"CommandType"]==nil)
         return;
 
@@ -72,6 +76,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:SAVED_TABLEVIEW_RULE_COMMAND object:nil userInfo:nil];
 }
+
 -(BOOL)validateResponse:(id)sender{
     if(sender==nil)
         return NO;
