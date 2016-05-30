@@ -43,6 +43,8 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)requestSceneList:(NSString *)almondMac;
 
++ (instancetype)requestRouterSummary:(NSString *)almondMac;
+
 // constructs a generic command for updating a sensor's index value
 + (instancetype)cloudSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue almondMac:(NSString *)almondMac;
 

@@ -182,6 +182,8 @@
         payload = [dataInfo valueForKey:@"data"];
     }else{
         NSLog(@"cloud data");
+        if(![[dataInfo valueForKey:@"data"] isKindOfClass:[NSData class]])
+        return;
         payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
     }
     
@@ -210,7 +212,6 @@
         toolkit.devices = deviceList;
         if(!local){
             [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
-//            [RouterParser sendrouterSummary]; //need to change its
         }
         
 
@@ -523,18 +524,13 @@
         
         SFIGenericRouterCommand *genericRouterCommand = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
         SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-                    NSLog(@"genericcommdntype: %d", genericRouterCommand.commandType);
-            switch (genericRouterCommand.commandType) {
-                case SFIGenericRouterCommandType_WIRELESS_SUMMARY: {
-                    NSLog(@"SFIGenericRouterCommandType_WIRELESS_SUMMARY - router summary");
-                    SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
-                    NSLog(@"routersummary: %@", routerSummary);
-                    [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
-                    NSString *currentVersion = routerSummary.firmwareVersion;
-//                    [self tryCheckAlmondVersion:currentVersion];
-                    break;
-                }
-
-}
+        switch (genericRouterCommand.commandType) {
+            case SFIGenericRouterCommandType_WIRELESS_SUMMARY: {
+                SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
+                NSLog(@"routersummary: %@", routerSummary);
+                [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
+                break;
+            }
+        }
 }
 @end

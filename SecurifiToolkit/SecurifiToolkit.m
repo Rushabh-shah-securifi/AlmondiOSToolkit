@@ -395,6 +395,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSLog(@"tryUpdateLocalNetworkSettingsForAlmond - mac: %@", almondMac);
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
     NSLog(@"settings: %@", settings);
+    NSLog(@"summary: %@", summary);
     if (!settings) {
         settings = [SFIAlmondLocalNetworkSettings new];
         settings.almondplusMAC = almondMac;
@@ -410,7 +411,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         settings.login = summary.login;
     }
     if (summary.password) {
-        NSLog(@"summary.password = %@",summary.password);
+        NSLog(@"summary.password = %@, uptime: %@",summary.password, summary.uptime);
         NSString *decrypted = [summary decryptPassword:almondMac];
         NSLog(@"decrypted: %@", decrypted);
         if (decrypted) {
@@ -440,6 +441,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [block_self tearDownCloudNetwork];
         }
         else {
+            NSLog(@"calling _asyncInitCloud...1 ");
             [block_self _asyncInitCloud];
             [block_self tearDownLocalNetwork];
         }
@@ -533,11 +535,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void)initToolkit {
+    NSLog(@"calling _asyncInitCloud...2 ");
     [self _asyncInitCloud];
     
+    
     SFIAlmondPlus *plus = self.currentAlmond;
+    NSLog(@"%d = isLocal connection",[self useLocalNetwork:plus.almondplusMAC]);
     if (plus) {
         [self _asyncInitLocal:plus.almondplusMAC];
+         NSLog(@"%d = isLocal connection in lcal",[self useLocalNetwork:plus.almondplusMAC]);
     }
 }
 
@@ -546,7 +552,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"guard: INIT SDK. Already shutdown. Returning.");
         return;
     }
-    
+    NSLog(@"_asyncInitCloud called");
     __weak SecurifiToolkit *block_self = self;
     
     dispatch_async(self.commandDispatchQueue, ^() {
@@ -816,6 +822,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 
                 cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
+                
+                cmd = [GenericCommand requestRouterSummary:plus.almondplusMAC];
+                [block_self internalInitializeCloud:network command:cmd];
+                
             }
             [block_self tryRequestAlmondMode:mac];
         }
@@ -857,7 +867,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (network == nil || (!network.isStreamConnected && network.connectionState != NetworkConnectionStatusInitializing)) {
         // Set up network and wait
         //
-        
+        NSLog(@"calling _asyncInitCloud...3 ");
         [self _asyncInitCloud];
     }
     
@@ -1210,6 +1220,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NSLog(@" rule request send ");
     cmd = [GenericCommand requestAlmondRules:mac];
+    [self asyncSendCommand:cmd];
+    
+     NSLog(@" requestRouterSummary request send ");
+    cmd = [GenericCommand requestRouterSummary:mac];
     [self asyncSendCommand:cmd];
     
     // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
@@ -2097,6 +2111,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (Network *)setupLocalNetworkForAlmond:(NSString *)almondMac {
+    NSLog(@"setupLocalNetworkForAlmond %@",almondMac);
     Network *network = self.localNetwork;
     
     if ([self isCurrentLocalNetworkForAlmond:almondMac]) {
@@ -2147,7 +2162,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     Network *old = self.localNetwork;
     
     if (old) {
-        
+        NSLog(@"tearDownLocalNetwork turningOff local");
         old.delegate = nil; // no longer interested in callbacks from this instance
         [old shutdown];
         

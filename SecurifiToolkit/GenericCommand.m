@@ -145,6 +145,19 @@
     return [self jsonPayloadCommand:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];
 }
 
++ (instancetype)requestRouterSummary:(NSString *)almondMac {
+    
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+    NSDictionary *payload = @{
+                              @"MobileInternalIndex" : @(correlationId).stringValue,
+                              @"CommandType" : @"RouterSummary",
+                              @"AppID" : @"1001",
+                              @"AlmondMAC" : almondMac? almondMac: @""
+                              };
+    
+    return [self jsonPayloadCommand:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
+}
+
 + (instancetype)requestAlmondClients:(NSString *)almondMac {
     
     sfi_id correlationId = [GenericCommand nextCorrelationId];
