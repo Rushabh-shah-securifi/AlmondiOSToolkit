@@ -128,7 +128,7 @@
 #define DEVICES @"Devices"
 #define DYNAMIC_DEVICE_UPDATED @"DynamicDeviceUpdated"
 #define DYNAMIC_DEVICE_REMOVED @"DynamicDeviceRemoved"
-#define DYNAMIC_DEVICE_REMOVED_ALL @"DynamicDeviceRemoveAll"
+#define DYNAMIC_ALL_DEVICES_REMOVED @"DynamicAllDevicesRemoved"
 #define DYNAMIC_INDEX_UPDATE @"DynamicIndexUpdated"
 #define DEVICE_VALUE @"DeviceValues"
 #define D_TYPE @"Type"

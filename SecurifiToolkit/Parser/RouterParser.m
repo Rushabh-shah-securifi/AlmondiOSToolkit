@@ -278,7 +278,7 @@
                  @"data" : genericRouterCommand
                  };
     }
-    
+    NSLog(@"posting router summery");
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER object:nil userInfo:data];
 }
 

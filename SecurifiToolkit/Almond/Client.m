@@ -14,60 +14,60 @@
 
 - (NSString *)iconName {
     if ([[self.deviceType lowercaseString] isEqualToString:@"tv"]) {
-        return @"icon_appleTV";
+        return @"appletv_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"other"]) {
-        return @"icon_help";
+        return @"help_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"mac"]) {
-        return @"icon_pc";
+        return @"pc_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"hub"]) {
-        return @"icon_hubrouter";
+        return @"hubrouter_icon";
     }
 
     if ([[self.deviceType lowercaseString] isEqualToString:@"router_switch"]) {
-        return @"icon_hubrouter";
+        return @"hubrouter_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"tablet"]) {
-        return @"icon_iphone";
+        return @"tablet_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"android_stick"]) {
-        return @"icon_android_stick";
+        return @"android_stick_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"chromecast"]) {
-        return @"icon_chrome_cast";
+        return @"chrome_cast_icon";
     }
 
     if ([[self.deviceType lowercaseString] isEqualToString:@"nest"]) {
-        return @"icon_nest_google";
+        return @"nest_google_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"printer"]) {
-        return @"icon_printer";
+        return @"printer_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"pc"]) {
-        return @"icon_pc";
+        return @"pc_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"laptop"]) {
-        return @"icon_laptop";
+        return @"laptop_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"smartphone"]) {
-        return @"icon_smartphone";
+        return @"smartphone_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"iphone"]) {
-        return @"icon_iphone";
+        return @"iphone_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"ipad"]) {
-        return @"icon_iPad";
+        return @"ipad_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"ipod"]) {
-        return @"icon_iPod";
+        return @"ipod_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"appletv"]) {
-        return @"icon_appleTV";
+        return @"appletv_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"camera"]) {
-        return @"icon_camera";
+        return @"camera_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_echo"]) {
         return @"amazon_echo";

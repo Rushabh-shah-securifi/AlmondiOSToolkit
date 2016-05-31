@@ -268,7 +268,7 @@
         }
         [toolkit.devices removeObject:toBeRemovedDevice];
     }
-    else if([commandType isEqualToString:DYNAMIC_DEVICE_REMOVED_ALL]){
+    else if([commandType isEqualToString:DYNAMIC_ALL_DEVICES_REMOVED]){
         [toolkit.devices removeAllObjects];
     }
 
