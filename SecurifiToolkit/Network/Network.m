@@ -202,7 +202,6 @@
     if (unit) {
         [unit markResponse:success];
         [self.delegate networkDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess responseType:responseType];
-        NSLog(@"Marking response %i for unit: %@", responseType, unit.description);
     }
     else {
         [self.delegate networkDidReceiveCommandResponse:self command:nil timeToCompletion:0 responseType:responseType];
