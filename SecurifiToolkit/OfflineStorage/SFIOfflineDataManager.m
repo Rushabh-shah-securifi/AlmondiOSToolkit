@@ -365,12 +365,9 @@
 
 - (id)readDictionaryEntryForFilePath:(NSString *)filePath key:(NSString *)dictKey locker:(NSObject *)locker {
     NSDictionary *dictionary = [self readDictionaryForFilePath:filePath locker:locker];
-    NSLog(@"dictKey(mac) : %@",dictKey);
-    NSLog(@"local router setting dictionary %@",dictionary);
     id value = nil;
     if (dictionary != nil) {
         value = [dictionary valueForKey:dictKey];
-        NSLog(@"value :: %@",(SFIAlmondLocalNetworkSettings*)value);
     }
     return value;
 }
