@@ -28,14 +28,24 @@
     bzero(IV, sizeof(IV));
     
     for (int i = 0; i < blockSize; i++) {
-        IV[i] = (char) ((MAC[i] + UPTIME[i]) % 94 + 33);
+        char myUptime =UPTIME[i];
+        char myMAC =MAC[i];
+        if(i>=almondUptimeInt.length){
+            myUptime = 0;
+        } if (i >=almondMac.length){
+            myMAC = 0;
+        }
+        IV[i] = (char) ((myMAC + myUptime) % 94 + 33);
+        NSLog(@"IV: %d, uptime: %d, mac: %d", IV[i], myUptime, myMAC);
     }
     char KEY[] = {0x6e, (char) 0xcc, (char) 0x94, (char) 0xed, 0x6a, (char) 0x90, 1, 0x3d, 0x30, (char) 0xaf, 0x52, 0xd, 0x18, 0x77, 0x44, 0x2f};
     
     // Decrypt
     NSData *decrypted = [self securifiInternalAesOp:kCCDecrypt payload:self key:KEY iv:IV];
+    NSLog(@"nsdata decrypt: %@", decrypted);
     // Convert back to string; we expect the plain text password to be UTF-8 encoded
     NSString *decrypted_str = [[NSString alloc] initWithData:decrypted encoding:NSUTF8StringEncoding];
+    NSLog(@"decrypted_str: %@", decrypted_str);
     return decrypted_str;
 }
 
@@ -59,6 +69,8 @@
     }
     
     NSData *data = [NSData dataWithBytes:buffer_out length:numBytesProcessed];
+    NSLog(@"data: %@", data);
+    NSLog(@"[[NSString alloc] initWithData:decrypted encoding:NSUTF8StringEncoding]: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     return [self securifiTrimToNull:data];
 }
 
