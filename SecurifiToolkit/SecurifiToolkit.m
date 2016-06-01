@@ -2254,7 +2254,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self postNotification:kSFIDidCompleteMobileCommandRequest data:payload];
     }
     
-    NSLog(@"Command completion: cmd:%@, %0.3f secs", cmd, roundTripTime);
 }
 
 - (void)networkDidReceiveResponse:(Network *)network response:(id)payload responseType:(enum CommandType)commandType {

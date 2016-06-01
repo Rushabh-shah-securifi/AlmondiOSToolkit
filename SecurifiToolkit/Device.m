@@ -152,7 +152,7 @@
     for (DeviceKnownValues *knownValue in knownValuesList) {
         SFINotificationDevice *notificationDevice = [[SFINotificationDevice alloc] init];
         notificationDevice.deviceID = self.ID;
-        notificationDevice.notificationMode = self.notificationMode;
+        notificationDevice.notificationMode = mode;
         notificationDevice.valueIndex = knownValue.index;
         
         [settings addObject:notificationDevice];
