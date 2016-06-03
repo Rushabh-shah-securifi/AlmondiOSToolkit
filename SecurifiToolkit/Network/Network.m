@@ -648,6 +648,11 @@
             [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
+        case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE data:payload];
+            break;
+        };
         case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
 //            .s
@@ -656,16 +661,6 @@
 //            [self postData:kSFIAlmondModeDidChange data:payload];
             break;
         };
-//        case CommandType_UPDATE_DEVICE_INDEX: {
-//            [self tryMarkUnitCompletion:YES responseType:commandType];
-//            [self postData:NOTIFICATION_UPDATE_DEVICE_INDEX_NOTIFIER data:payload];
-//            break;
-//        };
-//        case CommandType_UPDATE_DEVICE_NAME: {
-//            [self tryMarkUnitCompletion:YES responseType:commandType];
-//            [self postData:NOTIFICATION_UPDATE_DEVICE_NAME_NOTIFIER data:payload];
-//            break;
-//        };
         case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];

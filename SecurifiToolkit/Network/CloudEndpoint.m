@@ -371,6 +371,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
+                                    case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
                                     
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
@@ -402,6 +403,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 //                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
                                     CommandParser *parser = [CommandParser new];
+                                    NSLog(@"xml Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
                                     responsePayload = temp.command;
 
@@ -420,9 +422,9 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                 // Tell the world the connection is up and running
                                 [self tryPostNetworkUpNotification];
                                 if([responsePayload isKindOfClass:[NSData class]])
-                                NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:responsePayload encoding:NSUTF8StringEncoding]);
+                                    NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:responsePayload encoding:NSUTF8StringEncoding]);
                                 else
-                                NSLog(@"Cloud receive: %@", responsePayload);
+                                    NSLog(@"Cloud receive: %@", responsePayload);
                                 
 
                                 // Process the request by passing it to the delegate

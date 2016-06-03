@@ -34,6 +34,12 @@
                selector:@selector(onGetClientsPreferences:)
                    name:NOTIFICATION_WIFI_CLIENT_GET_PREFERENCE_REQUEST_NOTIFIER
                  object:nil];
+    
+    [center addObserver:self
+               selector:@selector(onDynamicClientPreferenceUpdate:) //dynamic 93 - need to put in device parser/ client parser
+                   name:NOTIFICATION_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_NOTIFIER
+                 object:nil];
+    
 }
 
 -(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
@@ -195,6 +201,36 @@
     client.notificationMode = SFINotificationMode_off;
 }
 
+- (void)onDynamicClientPreferenceUpdate:(id)sender {//client individual dynamic 93
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    NSDictionary * mainDict = [[data valueForKey:@"data"] objectFromJSONData];
+    NSLog(@"client preferecne: %@", mainDict);
+    
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *plus = [toolkit currentAlmond];
+    NSString *aMac = [mainDict valueForKey:@"AlmondMAC"];
+    int clientID = [mainDict[@"ClientID"] intValue];
+    if(![aMac isEqualToString:plus.almondplusMAC])
+    return;
+    
+    if ([mainDict[@"CommandType"] isEqualToString:@"UpdatePreference"]) {
+        Client *client = [Client findClientByID:@(clientID).stringValue];
+        client.notificationMode = [mainDict[@"NotificationType"] intValue];
+    }
+    
+    NSDictionary *resData = nil;
+    if (mainDict) {
+        resData = @{
+                    @"data" : mainDict
+                    };
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil userInfo:resData];
+}
 
 
 @end

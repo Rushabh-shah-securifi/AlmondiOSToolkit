@@ -122,8 +122,9 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DYNAMIC_CLIENT_LEFT_REQUEST             = 1549,
     CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL         = 1551,
     
-    CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST   = 1525,
     CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST      = 1526,
+    CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST   = 1525,
+    
     
     CommandType_RULE_LIST                               = 1420,
     CommandType_RULE_COMMAND_RESPONSE                   = 7064,
@@ -134,6 +135,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES       = 1500,
     
     CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE   = 93,
+    CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE = 90,
     
 
     

@@ -380,7 +380,7 @@
     @synchronized (locker) {
         NSMutableDictionary *dictionary = [self readDictionaryForFilePath:filePath locker:locker];
         dictionary[dictKey] = dictValue;
-        NSLog(@"writing local DB %@ ,mac = %@,",dictionary ,dictKey);
+        //NSLog(@"writing local DB %@ ,mac = %@,",dictionary ,dictKey);
         [self writeDictionary:dictionary filePath:filePath locker:locker];
     }
 }

@@ -20,6 +20,8 @@
 #import "AlmondJsonCommandKeyConstants.h"
 #import "Client.h"
 #import "RouterParser.h"
+#import "NotificationPreferenceListResponse.h"
+
 //#import "SFIRouterSummary.h"
 
 @implementation DeviceParser
@@ -155,15 +157,21 @@
                selector:@selector(parseDeviceListAndDynamicDeviceResponse:)
                    name:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER
                  object:nil];
+
+    [center addObserver:self
+               selector:@selector(onAlmondRouterCommandResponse:)
+                   name:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER
+                 object:nil];// router summery response to store DB
     
     [center addObserver:self
                selector:@selector(onNotificationPrefDidChange:)
                    name:kSFINotificationPreferencesDidChange
                  object:nil];
-    [center addObserver:self selector:@selector(onAlmondRouterCommandResponse:)
-                   name:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER
-                 object:nil];// router summery response to store DB
     
+    [center addObserver:self
+               selector:@selector(onDynamicNotificationPreference:)
+                   name:NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE
+                 object:nil];
 }
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
@@ -334,6 +342,32 @@
     }
     // missing preference means none has been set and is equivalent to 'off'
     device.notificationMode = SFINotificationMode_off;
+}
+
+- (void)onDynamicNotificationPreference:(id)sender{
+    NSLog(@"onDynamicNotificationPreference");
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *data = [notifier userInfo];
+    if (data == nil) {
+        return;
+    }
+    NotificationPreferenceListResponse *prefResponse = [data valueForKey:@"data"];
+    if(prefResponse.almondMAC.length == 0 || ![prefResponse.almondMAC isEqualToString:almond.almondplusMAC])
+        return;
+    
+    NSArray *notificationList = prefResponse.notificationDeviceList;
+    SFINotificationDevice *updatedDevice = notificationList.firstObject;
+    NSLog(@"dynamic mode: %d", updatedDevice.notificationMode);
+    for (Device *device in toolkit.devices) {
+        if(device.ID == updatedDevice.deviceID){
+            device.notificationMode = updatedDevice.notificationMode;
+            NSLog(@"updated");
+            break;
+        }
+    }
 }
 
 
