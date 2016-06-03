@@ -42,7 +42,6 @@
     
     // Decrypt
     NSData *decrypted = [self securifiInternalAesOp:kCCDecrypt payload:self key:KEY iv:IV];
-    NSLog(@"nsdata decrypt: %@", decrypted);
     // Convert back to string; we expect the plain text password to be UTF-8 encoded
     NSString *decrypted_str = [[NSString alloc] initWithData:decrypted encoding:NSUTF8StringEncoding];
     NSLog(@"decrypted_str: %@", decrypted_str);
@@ -50,8 +49,10 @@
 }
 
 - (NSData *)securifiInternalAesOp:(const CCOperation)op payload:(const NSData *)payload key:(const char[])key iv:(const char[])iv {
-    const size_t payload_length = payload.length;
-    NSLog(@"payload length: %d", payload_length);
+    int pay_length_rem = payload.length % kCCKeySizeAES128;
+    
+    const size_t payload_length = 32;
+    NSLog(@"actual length: %d, payload length: %d", payload.length, payload_length);
     // See the doc: For block ciphers, the output size will always be less than or
     // equal to the input size plus the size of one block.
     // That's why we need to add the size of one block here
@@ -65,12 +66,11 @@
     CCCryptorStatus cryptStatus = CCCrypt(op, kCCAlgorithmAES128, options, key, kCCKeySizeAES128, iv, payload.bytes, payload_length, buffer_out, buffer_size, &numBytesProcessed);
     if (cryptStatus != kCCSuccess) {
         NSLog(@"CCCrypt Failed! - Status: %d", cryptStatus);
-//        return nil;
+        return nil;
     }
     
     NSData *data = [NSData dataWithBytes:buffer_out length:numBytesProcessed];
     NSLog(@"data: %@", data);
-    NSLog(@"[[NSString alloc] initWithData:decrypted encoding:NSUTF8StringEncoding]: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     return [self securifiTrimToNull:data];
 }
 
