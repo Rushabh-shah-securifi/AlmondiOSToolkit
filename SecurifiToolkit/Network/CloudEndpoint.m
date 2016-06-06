@@ -332,6 +332,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 
                                     buffer = [dataBuffer subdataWithRange:parseRange];
                                 }
+                                
+                                NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
                                 switch (commandType) {
                                     // these are the only command responses so far that uses a JSON payload; we special case them for now
@@ -421,12 +423,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             if (parsedPayload) {
                                 // Tell the world the connection is up and running
                                 [self tryPostNetworkUpNotification];
-                                if([responsePayload isKindOfClass:[NSData class]])
-                                    NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:responsePayload encoding:NSUTF8StringEncoding]);
-                                else
-                                    NSLog(@"Cloud receive: %@", responsePayload);
-                                
-
                                 // Process the request by passing it to the delegate
                                 [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
                             }

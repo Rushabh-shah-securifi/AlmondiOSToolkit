@@ -22,6 +22,7 @@
  */
 
 + (instancetype)parseNotificationPayload:(NSDictionary *)payload {
+    //NSLog(@"sfi notification - parseNotificationPayload");
     SFINotification *obj = [SFINotification new];
     obj.almondMAC = payload[@"mac"];
     
@@ -49,22 +50,22 @@
     
     //md01<<<<
     str = payload[@"client_type"];
-    if ([str length] > 0 || [payload[@"client_id"] length] > 0) {
-       
-            NSString * name = @"";
-            if (payload[@"client_name"]) {
-                name = payload[@"client_name"];
-            }
-            NSString * type = @"other";
-            if (payload[@"client_type"]) {
-                type = payload[@"client_type"];
-            }
-            NSString * alert = payload[@"alert"];
+    NSString *notiType = payload[@"NotiType"];
+    if (notiType.length > 0 || [notiType isEqualToString:@"wifiClients"]) {
+        //NSLog(@"wifi client - alert: %@", payload[@"alert"]);
+        NSString * name = @"";
+        if (payload[@"client_name"]) {
+            name = payload[@"client_name"];
+        }
+        NSString * type = @"other";
+        if (payload[@"client_type"]) {
+            type = payload[@"client_type"];
+        }
+        NSString * alert = payload[@"alert"];
 
-            obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
+        obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
        
         obj.deviceType = SFIDeviceType_WIFIClient;
-        
     }
     //md01>>>
     
@@ -129,7 +130,7 @@
 //            if ([alert rangeOfString:name].location != NSNotFound) {
 //                alert = [alert stringByReplacingOccurrencesOfString:name withString:@""];;
 //            }
-            NSLog(@"alert - sfinotification: %@", alert);
+            //NSLog(@"alert - sfinotification: %@", alert);
             obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
             obj.deviceType = SFIDeviceType_WIFIClient;
         }
