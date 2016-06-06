@@ -95,7 +95,7 @@
 +(SFIRouterSummary*)parseRouterSummary:(NSDictionary*)payload{
     SFIRouterSummary *routerSummary = [[SFIRouterSummary alloc]init];
     routerSummary.uptime = payload[@"Uptime"];
-    routerSummary.url = payload[@"URL"];
+    routerSummary.url = payload[@"URL"]? payload[@"URL"]: payload[@"Url"]; //temp fix, till changes are done in firmware.
     routerSummary.login = payload[@"Login"];
     routerSummary.password = payload[@"TempPass"];
     routerSummary.routerUptime = payload[@"RouterUptime"];
