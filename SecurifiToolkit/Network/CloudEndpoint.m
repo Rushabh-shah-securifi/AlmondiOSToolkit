@@ -742,7 +742,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
             unsigned int header_commandType = (unsigned int) htonl(commandType);
 
-            NSLog(@"Sending payload: %@, Type: %d", commandPayload, commandType);
+            NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
 
             NSOutputStream *outputStream = cloudEndpoint.outputStream;
             if (outputStream == nil) {

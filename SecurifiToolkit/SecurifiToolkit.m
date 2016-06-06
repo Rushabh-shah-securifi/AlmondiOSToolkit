@@ -208,9 +208,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     self.genericDevices = [DeviceParser parseGenericDevicesDict:[self.deviceParser parseJson:@"deviceListJson"]];
     self.genericIndexes = [DeviceParser parseGenericIndexesDict:[self.deviceParser parseJson:@"GenericIndexesData"]];
-    
-    NSLog(@"toolkit.genericDevice: %@", self.genericDevices);
-    NSLog(@"toolkit.genericDevice 500: %@", self.genericDevices[@"500"]);
 }
 
 #pragma mark - Connection management
@@ -3188,6 +3185,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     DatabaseStore *store = self.notificationsDb;
     
     NSUInteger newCount = res.newCount;
+    NSLog(@"toolkit 801 new count: %d", newCount);
     NSArray *notificationsToStore = res.notifications;
     NSUInteger totalCount = notificationsToStore.count;
     
