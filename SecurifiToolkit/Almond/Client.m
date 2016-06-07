@@ -75,7 +75,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_dash"]) {
         return @"amazon_dash";
     }
-    return @"icon_help";
+    return @"help_icon";
 }
 
 - (NSString *)getNotificationTypeByName:(NSString *)name {
@@ -115,6 +115,7 @@
     }
     return nil;
 }
+
 + (BOOL)findClientByMAC:(NSString *)mac{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     for(Client *client in toolkit.clients){
@@ -123,6 +124,18 @@
     }
     return NO;
 }
+
++ (BOOL)getClientByMAC:(NSString *)mac{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    for(Client *client in toolkit.clients){
+        if([mac isEqualToString:client.deviceMAC]){
+            return client;
+        }
+        
+    }
+    return nil;
+}
+
 +(NSString *)getScheduleById:(NSString*)clientId{
     Client *client = [self findClientByID:clientId];
     return client.deviceSchedule;
