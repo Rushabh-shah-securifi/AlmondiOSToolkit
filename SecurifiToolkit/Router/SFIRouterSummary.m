@@ -15,7 +15,7 @@
 
 - (NSString *)decryptPassword:(NSString *)almondMac {
     NSString *pwd = self.password;
-    if (!pwd) {
+    if (!pwd || pwd.length == 0) {
         return nil;
     }
 

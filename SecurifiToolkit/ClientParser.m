@@ -66,7 +66,7 @@
     
     NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
     
-    if ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:CLIENTLIST]) {        
+    if ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:CLIENTLIST] || [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:@"DynamicClientList"]) {
         NSDictionary *clientsPayload = [mainDict valueForKey:CLIENTS];
         NSArray *clientKeys = clientsPayload.allKeys;
         NSMutableArray *wifiClientsArray = [NSMutableArray new];

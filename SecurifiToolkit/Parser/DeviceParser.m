@@ -202,7 +202,7 @@
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
     NSString *commandType = [payload valueForKey:COMMAND_TYPE];
-    if([commandType isEqualToString:DEVICE_LIST]){
+    if([commandType isEqualToString:DEVICE_LIST] || [commandType isEqualToString:@"DynamicDeviceList"]){
         NSDictionary *devicesPayload = payload[DEVICES];
         NSArray *devicePosKeys = devicesPayload.allKeys;
         NSArray *sortedPostKeys = [devicePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {

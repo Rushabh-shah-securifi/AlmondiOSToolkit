@@ -47,7 +47,7 @@
     
     //NSLog(@"onRuleList: %@",mainDict);
     //RuleList
-    if([commandType isEqualToString:@"RuleList"]){
+    if([commandType isEqualToString:@"RuleList"] || [commandType isEqualToString:@"DynamicRuleList"]){
         NSDictionary *rulesPayload = [mainDict valueForKey:@"Rules"];
         
         NSArray *rulePosKeys = rulesPayload.allKeys;
