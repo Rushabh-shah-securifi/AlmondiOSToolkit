@@ -51,23 +51,23 @@
 //    NSLog(@"router payload: %@", payload);
     SFIGenericRouterCommand *genericRouterCommand;
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"RouterSummary"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
         
     }else if([[payload valueForKey:@"CommandType"] isEqualToString:@"GetWirelessSettings"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
     else if([[payload valueForKey:@"CommandType"] isEqualToString:@"SetWirelessSettings"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
 
     else if([[payload valueForKey:@"CommandType"] isEqualToString:@"FirmwareUpdate"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE success:(payload[@"Success"] == nil)? true: [payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:[payload[@"Percentage"] intValue]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE success:(payload[@"Success"] == nil)? true: [payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:[payload[@"Percentage"] intValue] reason:payload[@"Reason"]];
     }
     else if([[payload valueForKey:@"CommandType"] isEqualToString:@"RebootRouter"]){
-        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_REBOOT success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0];
+        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_REBOOT success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue ] completionPercentage:0 reason:payload[@"Reason"]];
     }
     else if([[payload valueForKey:@"CommandType"] isEqualToString:@"SendLogs"]){
-        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_SEND_LOGS_RESPONSE success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0];
+        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_SEND_LOGS_RESPONSE success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
     
     NSDictionary *data = nil;
@@ -80,7 +80,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER object:nil userInfo:data];
 }
 
-+(SFIGenericRouterCommand*)createGenericRouterCommand:(id)command commandType:(SFIGenericRouterCommandType)type success:(BOOL)success MAC:(NSString*)MAC mii:(int)mii completionPercentage:(unsigned int)completionPercentage{
++(SFIGenericRouterCommand*)createGenericRouterCommand:(id)command commandType:(SFIGenericRouterCommandType)type success:(BOOL)success MAC:(NSString*)MAC mii:(int)mii completionPercentage:(unsigned int)completionPercentage reason:(NSString*)reason{
     SFIGenericRouterCommand *genericRouterCommand = [SFIGenericRouterCommand new];
     genericRouterCommand.command = command;
     genericRouterCommand.commandType = type;
@@ -88,6 +88,8 @@
     genericRouterCommand.almondMAC = MAC;
     genericRouterCommand.mii = mii;
     genericRouterCommand.completionPercentage = completionPercentage;
+    genericRouterCommand.responseMessage = reason;
+    NSLog(@"generic command response msg: %@", genericRouterCommand.responseMessage);
     return  genericRouterCommand;
 }
 

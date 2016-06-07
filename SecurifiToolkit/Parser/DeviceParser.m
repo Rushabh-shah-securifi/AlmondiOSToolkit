@@ -549,7 +549,7 @@
     return data;
 }
 -(void)onAlmondRouterCommandResponse:(id)sender{
-    NSLog(@"onAlmondRouterCommandResponse");
+    NSLog(@"Device parser - onAlmondRouterCommandResponse");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil) {
