@@ -5,7 +5,7 @@
 #ifdef __OBJC__
     #import <Foundation/Foundation.h>
 #endif
-
+#define NSLog // 
 #if( DEBUG )
 // Debug logging
 //#define DLog(args...) NSLog(args)
@@ -13,6 +13,7 @@
 // Special logging in the SDK networking layer
 //#define SLog(args...) NSLog(args)
 #define SLog(args...)
+
 #else
 // Strip debug logging
 #define DLog(args...)
