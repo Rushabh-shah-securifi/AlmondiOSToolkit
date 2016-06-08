@@ -9,6 +9,8 @@
 #import "RuleParser.h"
 #import "SFIButtonSubProperties.h"
 #import "SecurifiToolkit.h"
+#import "AlmondPlusSDKConstants.h"
+#import "AlmondJsonCommandKeyConstants.h"
 
 
 @implementation RuleParser
@@ -41,7 +43,11 @@
     }
     if([mainDict valueForKey:@"CommandType"]==nil)
         return;
-
+    
+    BOOL isMatchingAlmondOrLocal = ([[mainDict valueForKey:ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
+    
     NSString *commandType=[mainDict valueForKey:@"CommandType"];
     NSDictionary *rulesDict = mainDict[@"Rules"];
     
