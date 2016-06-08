@@ -15,10 +15,11 @@
 
 - (NSString *)decryptPassword:(NSString *)almondMac {
     NSString *pwd = self.password;
-    if (!pwd || pwd.length == 0) {
+    NSLog(@"Pwd: %@, length: %d", pwd, pwd.length);
+    if (pwd == nil || pwd.length == 0) {
         return nil;
     }
-
+    NSLog(@"passed");
     NSData *payload = [[NSData alloc] initWithBase64EncodedString:pwd options:NSDataBase64DecodingIgnoreUnknownCharacters];
     return [payload securifiDecryptPasswordForAlmond:almondMac almondUptime:self.uptime];
 }
