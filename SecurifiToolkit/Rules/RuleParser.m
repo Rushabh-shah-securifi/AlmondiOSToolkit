@@ -55,6 +55,7 @@
     //RuleList
     if([commandType isEqualToString:@"RuleList"] || [commandType isEqualToString:@"DynamicRuleList"]){
         NSDictionary *rulesPayload = [mainDict valueForKey:@"Rules"];
+        [toolkit.ruleList removeAllObjects];
         
         NSArray *rulePosKeys = rulesPayload.allKeys;
         NSArray *sortedPostKeys = [rulePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {

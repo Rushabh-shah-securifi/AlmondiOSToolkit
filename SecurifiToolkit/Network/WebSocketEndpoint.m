@@ -93,7 +93,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSLog(@"webSocketDidOpen");
     [self.delegate networkEndpointDidConnect:self];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    [toolkit cleanUp];
+//    [toolkit cleanUp];
     
     SFIAlmondPlus *plus = [toolkit currentAlmond];
     [toolkit asyncSendToLocal:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] almondMac:plus.almondplusMAC];

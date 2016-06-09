@@ -805,7 +805,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
                 [block_self internalInitializeCloud:network command:cmd];
 
-                [self cleanUp];
+//                [self cleanUp];
                 
                 cmd = [GenericCommand requestSensorDeviceList:plus.almondplusMAC];
                 [block_self internalInitializeCloud:network command:cmd];
@@ -1201,7 +1201,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // Fetch the Almond Mode
     [self tryRequestAlmondMode:mac];
     
-    [self cleanUp];
+//    [self cleanUp];
     NSLog(@"device request send");
     GenericCommand *cmd = [GenericCommand requestSensorDeviceList:mac];
     [self asyncSendCommand:cmd];
