@@ -408,14 +408,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
         settings.login = summary.login;
     }
     if (summary.password) {
-//        NSLog(@"summary.password = %@, uptime: %@",summary.password, summary.uptime);
-//        NSString *decrypted = [summary decryptPassword:almondMac];
-//        NSLog(@"decrypted: %@", decrypted);
-//        if (decrypted) {
-//            settings.password = decrypted;
-//        }
-//        NSLog(@"settings.password: %@", settings.password);
-        settings.password = summary.password;
+        NSLog(@"summary.password = %@, uptime: %@",summary.password, summary.uptime);
+        NSString *decrypted = [summary decryptPassword:almondMac];
+        NSLog(@"decrypted: %@", decrypted);
+        if (decrypted) {
+            settings.password = decrypted;
+        }
+        NSLog(@"settings.password: %@", settings.password);
+//        settings.password = summary.password;
     }
     if (summary.url) {
         settings.host = summary.url;
