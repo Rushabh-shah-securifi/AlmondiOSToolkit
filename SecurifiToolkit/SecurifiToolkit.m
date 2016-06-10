@@ -770,7 +770,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     dispatch_async(self.commandDispatchQueue, ^() {
         DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
         GenericCommand *cmd = [block_self makeAlmondListCommand];
+        NSLog(@"almond list command send1");
         [block_self internalInitializeCloud:network command:cmd];
+//        [block_self asyncSendCommand:cmd];
     });
 }
 -(void)cleanUp{
@@ -790,10 +792,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // After successful login, refresh the Almond list and hash values.
     // This routine is important because the UI will listen for outcomes to these requests.
     // Specifically, the event kSFIDidUpdateAlmondList.
-    
+    NSLog(@"asyncInitializeConnection2");
     __weak SecurifiToolkit *block_self = self;
+    
     dispatch_async(self.commandDispatchQueue, ^() {
         SFIAlmondPlus *plus = [block_self currentAlmond];
+        
+        NSLog(@"asyncInitializeConnection plus mac %@",plus.almondplusMAC);
         if (plus != nil) {
             NSString *mac = plus.almondplusMAC;
             
@@ -801,28 +806,35 @@ static SecurifiToolkit *toolkit_singleton = nil;
             if (![state wasHashFetchedForAlmond:mac]) {
                 [state markHashFetchedForAlmond:mac];
                 
-                DLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
+                NSLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
                 GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
-                [block_self internalInitializeCloud:network command:cmd];
+                [block_self asyncSendCommand:cmd];
+//                [block_self internalInitializeCloud:network command:cmd];
 
 //                [self cleanUp];
-                
+                NSLog(@"commandDispatchQueue 1..");
                 cmd = [GenericCommand requestSensorDeviceList:plus.almondplusMAC];
-                [block_self internalInitializeCloud:network command:cmd];
+//                [block_self internalInitializeCloud:network command:cmd];
+                [block_self asyncSendCommand:cmd];
                 
                 cmd = [GenericCommand requestSceneList:plus.almondplusMAC];
-                [block_self internalInitializeCloud:network command:cmd];
+//                [block_self internalInitializeCloud:network command:cmd];
+                [block_self asyncSendCommand:cmd];
 
                 cmd = [GenericCommand requestAlmondClients:plus.almondplusMAC];
-                [block_self internalInitializeCloud:network command:cmd];
+//                [block_self internalInitializeCloud:network command:cmd];
+                [block_self asyncSendCommand:cmd];
                 
                 cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
-                [block_self internalInitializeCloud:network command:cmd];
+//                [block_self internalInitializeCloud:network command:cmd];
+                [block_self asyncSendCommand:cmd];
                 
                 cmd = [GenericCommand requestRouterSummary:plus.almondplusMAC];
-                [block_self internalInitializeCloud:network command:cmd];
+//                [block_self internalInitializeCloud:network command:cmd];
+                [block_self asyncSendCommand:cmd];
                 
             }
+            NSLog(@"almond mode command send");
             [block_self tryRequestAlmondMode:mac];
         }
         

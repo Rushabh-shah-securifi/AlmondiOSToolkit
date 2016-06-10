@@ -198,10 +198,11 @@
 
 - (void)tryMarkUnitCompletion:(BOOL)success responseType:(CommandType)responseType {
     SUnit *unit = self.currentUnit;
-    
+    NSLog(@"trymarkunit: %@ - command type : %d", unit, responseType);
     if (unit) {
         [unit markResponse:success];
         [self.delegate networkDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess responseType:responseType];
+        
     }
     else {
         [self.delegate networkDidReceiveCommandResponse:self command:nil timeToCompletion:0 responseType:responseType];
@@ -317,12 +318,12 @@
 - (BOOL)submitCloudInitializationCommand:(GenericCommand *)command {
     if (self.connectionState == NetworkConnectionStatusInitialized) {
         NSLog(@"Rejected cloud initialization command submission: already marked as initialized");
-        //        return NO; //todo fix me.
+//                return NO; //todo fix me.
     }
     
     dispatch_queue_t queue = self.initializationQueue;
     BOOL waitForInit = NO;
-    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:5];
+    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:1];
 }
 
 - (BOOL)submitCommand:(GenericCommand *)command {
@@ -368,12 +369,12 @@
         return NO;
     }
     
-    DLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
+    NSLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
     
     __weak Network *block_self = self;
     dispatch_async(queue, ^() {
         if (!block_self.isStreamConnected) {
-            SLog(@"Command Queue: aborting unit: network is shutdown");
+            NSLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
         if (waitForNetworkInitializedLatch) {
@@ -381,7 +382,7 @@
             [block_self waitForCloudInitialization:timeOutSecs];
         }
         if (!block_self.isStreamConnected) {
-            SLog(@"Command Queue: aborting unit: network is shutdown");
+            NSLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
         
@@ -391,7 +392,7 @@
         [unit markWorking:tag];
         block_self.currentUnit = unit;
         
-        SLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
+        NSLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
         
         NSError *error;
         
@@ -404,12 +405,12 @@
         }
         [block_self.delegate networkDidSendCommand:block_self command:command];
         
-        SLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
+        NSLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
         
         //        int const waitAtMostSecs = 1;
         [unit waitForResponse:waitAtMostSecs];
         
-        SLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
+        NSLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
     });
     
     return YES;
