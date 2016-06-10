@@ -50,9 +50,7 @@
 }
 
 - (NSData *)securifiInternalAesOp:(const CCOperation)op payload:(const NSData *)payload key:(const char[])key iv:(const char[])iv {
-    int pay_length_rem = payload.length % kCCKeySizeAES128;
-    
-    const size_t payload_length = 32;
+    const size_t payload_length = payload.length;
     //NSLog(@"actual length: %d, payload length: %d", payload.length, payload_length);
     // See the doc: For block ciphers, the output size will always be less than or
     // equal to the input size plus the size of one block.
@@ -79,7 +77,7 @@
 - (NSData *)securifiTrimToNull:(NSData *)payload {
     NSUInteger nullIndex = 0;
     for (nullIndex = 0; nullIndex < payload.length; nullIndex++) {
-        char val;
+        unichar val;
         [payload getBytes:&val range:NSMakeRange(nullIndex, 1)];
 //        NSLog(@"null val: %d", val);
         if (val == 0) {
