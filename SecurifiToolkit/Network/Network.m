@@ -369,12 +369,12 @@
         return NO;
     }
     
-    NSLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
+//    NSLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
     
     __weak Network *block_self = self;
     dispatch_async(queue, ^() {
         if (!block_self.isStreamConnected) {
-            NSLog(@"Command Queue: aborting unit: network is shutdown");
+//            NSLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
         if (waitForNetworkInitializedLatch) {
@@ -382,7 +382,7 @@
             [block_self waitForCloudInitialization:timeOutSecs];
         }
         if (!block_self.isStreamConnected) {
-            NSLog(@"Command Queue: aborting unit: network is shutdown");
+//            NSLog(@"Command Queue: aborting unit: network is shutdown");
             return;
         }
         
@@ -392,25 +392,25 @@
         [unit markWorking:tag];
         block_self.currentUnit = unit;
         
-        NSLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
+//        NSLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
         
         NSError *error;
         
         BOOL success = [block_self.endpoint sendCommand:command error:&error];
         if (!success) {
-            NSLog(@"sending command error %@,Discription %@",command,error.description);
-            NSLog(@"Command Queue: send error, command:%@, error:%@, tag:%ld", command, error.description, (long) tag);
+//            NSLog(@"sending command error %@,Discription %@",command,error.description);
+//            NSLog(@"Command Queue: send error, command:%@, error:%@, tag:%ld", command, error.description, (long) tag);
             [unit markResponse:NO];
             return;
         }
         [block_self.delegate networkDidSendCommand:block_self command:command];
         
-        NSLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
+//        NSLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
         
         //        int const waitAtMostSecs = 1;
         [unit waitForResponse:waitAtMostSecs];
         
-        NSLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
+//        NSLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
     });
     
     return YES;
