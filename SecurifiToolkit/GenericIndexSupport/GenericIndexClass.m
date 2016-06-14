@@ -44,6 +44,7 @@
         self.readOnly = genericIndex.readOnly;
         self.excludeFrom = genericIndex.excludeFrom;
         self.showToggleInRules = genericIndex.showToggleInRules;
+        self.rowID = genericIndex.rowID;
     }
     return self;
 }
