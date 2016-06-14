@@ -279,6 +279,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (SFIAlmondPlus *)cloudAlmond:(NSString*)almondMac;
 
+//mode_src for almond mode
+@property int mode_src;
+
 // Fetch the local copy of the Almond's attached to the logon account
 - (NSArray *)almondList;
 

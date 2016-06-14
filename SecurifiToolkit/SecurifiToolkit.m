@@ -3490,6 +3490,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                                           @"Mode" : @(res.mode).stringValue
                                           
                                           };
+         self.mode_src = res.mode;
         [self postNotification:kSFIAlmondModeDidChange data:modeNotifyDict];
     }
 }
@@ -3513,7 +3514,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                                             @"Mode" : @(res.mode).stringValue
                                                  
                                                     };
-        
+        self.mode_src = res.mode;
         [self postNotification:kSFIAlmondModeDidChange data:modeNotifyDict];
     }
 }
