@@ -198,7 +198,6 @@
 
 - (void)tryMarkUnitCompletion:(BOOL)success responseType:(CommandType)responseType {
     SUnit *unit = self.currentUnit;
-    NSLog(@"trymarkunit: %@ - command type : %d", unit, responseType);
     if (unit) {
         [unit markResponse:success];
         [self.delegate networkDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess responseType:responseType];

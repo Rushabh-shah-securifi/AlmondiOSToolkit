@@ -42,5 +42,5 @@ typedef NS_ENUM(NSUInteger, conditionType) {
 
 - (SFIButtonSubProperties *)createNew;
 - (NSString*)getcondition;
--(NSString*)getconditionPayload;
+- (NSString*)getconditionPayload;
 @end

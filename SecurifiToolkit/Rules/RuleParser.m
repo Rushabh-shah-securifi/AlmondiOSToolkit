@@ -136,17 +136,23 @@
         else if ([[triggersDict valueForKey:@"EventType"] isEqualToString:@"AlmondModeUpdated"]){
             indexID = 1;
         }
+        else if([[triggersDict valueForKey:@"Type"] isEqualToString:@"WeatherTrigger"]){
+            indexID = [self getWeatherTriggerIndex:triggersDict];
+            NSLog(@"weather type: %@, index: %d", triggersDict[@"WeatherType"], indexID);
+        }
         else{
             indexID = [self getIntegerValue:[triggersDict valueForKey:@"Index"]];
         }
+        
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
+        BOOL isSunRiseSet = [triggersDict[@"WeatherType"] isEqualToString:@"SunRiseTime"] ||[triggersDict[@"WeatherType"] isEqualToString:@"SunSetTime"];
         subProperties.deviceId = [self getIntegerValue:[triggersDict valueForKey:@"ID"]];
         //NSLog(@"[triggersDict index id %@ eventType %@",[triggersDict valueForKey:@"Index"],[triggersDict valueForKey:@"EventType"]);
         subProperties.index = indexID;
-        subProperties.matchData = [triggersDict valueForKey:@"Value"];
-        subProperties.eventType = [triggersDict valueForKey:@"EventType"];
+        subProperties.matchData = isSunRiseSet? triggersDict[@"WeatherType"]: [triggersDict valueForKey:@"Value"];
+        subProperties.eventType = [triggersDict valueForKey:@"WeatherType"]? [triggersDict valueForKey:@"WeatherType"]: [triggersDict valueForKey:@"EventType"];
         subProperties.type = [triggersDict valueForKey:@"Type"];
-        subProperties.delay=[triggersDict valueForKey:@"PreDelay"];
+        subProperties.delay= isSunRiseSet? [triggersDict valueForKey:@"Value"]: [triggersDict valueForKey:@"PreDelay"];
         subProperties.valid= [[triggersDict valueForKey:@"Valid"] boolValue];
         //NSLog(@"conditions %@",[triggersDict valueForKey:@"Condition"]);
         subProperties.condition = [self getconditionType:[triggersDict valueForKey:@"Condition"]]?[self getconditionType:[triggersDict valueForKey:@"Condition"]]:isEqual;
@@ -156,6 +162,20 @@
         [list addObject:subProperties];
     }
 }
+
+-(int)getWeatherTriggerIndex:(NSDictionary*)triggerDict{
+    if([triggerDict[@"WeatherType"] isEqualToString:@"SunRiseTime"] || [triggerDict[@"WeatherType"] isEqualToString:@"SunSetTime"])
+        return 1;
+    else if([triggerDict[@"WeatherType"] isEqualToString:@"WeatherCondition"])
+        return 2;
+    else if([triggerDict[@"WeatherType"] isEqualToString:@"Temperature"])
+        return 3;
+    else if([triggerDict[@"WeatherType"] isEqualToString:@"Humidity"])
+        return 4;
+    else if([triggerDict[@"WeatherType"] isEqualToString:@"Pressure"])
+        return 5;
+}
+
 -(conditionType)getconditionType:(NSString *)condition{
     //NSLog(@"getconditionType  condition type %@",condition);
     if([condition isEqualToString:@"lt"])
