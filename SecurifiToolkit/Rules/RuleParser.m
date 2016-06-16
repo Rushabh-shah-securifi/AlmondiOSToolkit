@@ -130,6 +130,8 @@
     
     for(NSDictionary *triggersDict in triggers){
         int indexID;
+        int ID = [self getIntegerValue:[triggersDict valueForKey:@"ID"]];
+        
         if([[triggersDict valueForKey:@"EventType"] isEqualToString:@"ClientJoined"] || [[triggersDict valueForKey:@"EventType"] isEqualToString:@"ClientLeft"]){
             indexID = 1;
         }
@@ -138,6 +140,7 @@
         }
         else if([[triggersDict valueForKey:@"Type"] isEqualToString:@"WeatherTrigger"]){
             indexID = [self getWeatherTriggerIndex:triggersDict];
+            ID = -1;
             NSLog(@"weather type: %@, index: %d", triggersDict[@"WeatherType"], indexID);
         }
         else{
@@ -146,7 +149,7 @@
         
         SFIButtonSubProperties* subProperties = [[SFIButtonSubProperties alloc] init];
         BOOL isSunRiseSet = [triggersDict[@"WeatherType"] isEqualToString:@"SunRiseTime"] ||[triggersDict[@"WeatherType"] isEqualToString:@"SunSetTime"];
-        subProperties.deviceId = [self getIntegerValue:[triggersDict valueForKey:@"ID"]];
+        subProperties.deviceId = ID;
         //NSLog(@"[triggersDict index id %@ eventType %@",[triggersDict valueForKey:@"Index"],[triggersDict valueForKey:@"EventType"]);
         subProperties.index = indexID;
         subProperties.matchData = isSunRiseSet? triggersDict[@"WeatherType"]: [triggersDict valueForKey:@"Value"];
