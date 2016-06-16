@@ -2380,6 +2380,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_NOTIFICATIONS_SYNC_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationListResponse *res = payload;
+                NSLog(@"CommandType_NOTIFICATIONS_SYNC_RESPONSE");
                 [self onNotificationListSyncResponse:res network:network];
             }
             break;
@@ -3217,25 +3218,26 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     NSInteger storedCount = [store storeNotifications:notificationsToStore syncPoint:requestId];
+    NSLog(@"storedCount == totalCount %ld == %ld ",storedCount,totalCount);
     BOOL allStored = (storedCount == totalCount);
     
     if (allStored) {
-        DLog(@"asyncRefreshNotifications: stored:%li", (long) totalCount);
+        NSLog(@"asyncRefreshNotifications: stored:%li", (long) totalCount);
     }
     else {
-        DLog(@"asyncRefreshNotifications: stored partial notifications:%li of %li", (long) storedCount, (long) totalCount);
+        NSLog(@"asyncRefreshNotifications: stored partial notifications:%li of %li", (long) storedCount, (long) totalCount);
     }
-    
+    NSLog(@"storedCount isZero");
     if (storedCount == 0) {
         [self setNotificationsBadgeCount:newCount];
         
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
-        
+        [self postNotification:kSFINotificationDidStore data:nil];
         // if nothing stored, then no need to tell the world
         return;
     }
-    
+     NSLog(@"AllStore is zero");
     if (!allStored) {
         // stopped early
         // nothing more to do
@@ -3366,7 +3368,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.isCloudLoggedIn) {
         return;
     }
-    
+    NSLog(@"internalAsyncFetchNotifications");
     [self internalAsyncFetchNotifications:nil];
 }
 
