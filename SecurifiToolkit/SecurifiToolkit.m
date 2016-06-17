@@ -1912,11 +1912,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
     
-    SFIAlmondMode mode = [self tryCachedAlmondModeValue:almondMac];
-    if (mode != SFIAlmondMode_unknown) {
-        // a valid value already exists
-        return;
-    }
+//    SFIAlmondMode mode = [self tryCachedAlmondModeValue:almondMac];
+//    if (mode != SFIAlmondMode_unknown) {
+//        // a valid value already exists
+//        return;
+//    }
     
     AlmondModeRequest *req = [AlmondModeRequest new];
     req.almondMAC = almondMac;
@@ -3478,6 +3478,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)onAlmondModeResponse:(AlmondModeResponse *)res network:(Network *)network {
+    NSLog(@"onAlmondModeResponse ");
     if (res == nil) {
         return;
     }
@@ -3498,6 +3499,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)onDynamicAlmondModeChange:(DynamicAlmondModeChange *)res network:(Network *)network {
+    NSLog(@"onAlmondModeResponse::: ");
     if (res == nil) {
         return;
     }
@@ -3659,5 +3661,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self asyncSendToCloud:command];
     }
 }
+
 
 @end
