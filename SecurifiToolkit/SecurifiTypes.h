@@ -70,6 +70,10 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_NestThermostat_57             = 57,
     SFIDeviceType_NestSmokeDetector_58          = 58,
     SFIDeviceType_BuiltInSiren_60               = 60,
+    SFIDeviceType_SecurifiButton_61             = 61,
+    SFIDeviceType_ZenThermostat_62              = 62,
+    SFIDeviceType_AlmondSiren_63                = 63,
+    SFIDeviceType_AlmondBlink_64                = 64,
     SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
     SFIDeviceType_REBOOT_ALMOND                 = 501,
     SFIDeviceType_Weather                       = 502,
