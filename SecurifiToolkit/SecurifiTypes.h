@@ -193,6 +193,11 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_SWITCH_BINARY2,
     SFIDevicePropertyType_TONE_SELECTED, //mk
     SFIDevicePropertyType_REBOOT,
+    SFIDevicePropertyType_ENABLE,
+    SFIDevicePropertyType_BUZZ_STATE,
+    SFIDevicePropertyType_TONE,
+    SFIDevicePropertyType_VOLUME,
+    SFIDevicePropertyType_SECONDS,
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 

@@ -176,7 +176,12 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"UNITS" : @(SFIDevicePropertyType_UNITS),
                         @"UP_DOWN" : @(SFIDevicePropertyType_UP_DOWN),
                         @"USER_CODE" : @(SFIDevicePropertyType_USER_CODE),
-                        @"TONE_SELECTED" : @(SFIDevicePropertyType_TONE_SELECTED)
+                        @"TONE_SELECTED" : @(SFIDevicePropertyType_TONE_SELECTED),
+                        @"ENABLE" : @(SFIDevicePropertyType_ENABLE),
+                        @"BUZZ_STATE" : @(SFIDevicePropertyType_BUZZ_STATE),
+                        @"TONE" : @(SFIDevicePropertyType_TONE),
+                        @"VOLUME" : @(SFIDevicePropertyType_VOLUME),
+                        @"SECONDS" : @(SFIDevicePropertyType_SECONDS)
                         };
     }
     return
