@@ -55,4 +55,6 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 
 + (Client *)getClientByMAC:(NSString *)mac;
 
++ (int)activeClientCount;
+
 @end
