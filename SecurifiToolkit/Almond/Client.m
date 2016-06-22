@@ -253,6 +253,7 @@
         if(client.isActive)
             count++;
     }
+    return count;
 }
 
 +(NSString*)getAllowedOnNetworkTypeForType:(DeviceAllowedType)type{
