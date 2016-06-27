@@ -5,7 +5,9 @@
 #ifdef __OBJC__
     #import <Foundation/Foundation.h>
 #endif
-#define NSLog // 
+
+//#define NSLog //
+
 #if( DEBUG )
 // Debug logging
 //#define DLog(args...) NSLog(args)

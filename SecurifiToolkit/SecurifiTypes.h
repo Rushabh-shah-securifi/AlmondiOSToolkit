@@ -78,7 +78,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_REBOOT_ALMOND                 = 501,
     SFIDeviceType_Weather                       = 502,
     
-    SFIDeviceType_count                         = 61, // always set to the last value; assumes sequence is continuous
+    SFIDeviceType_count                         = 65, // always set to the last value; assumes sequence is continuous
 };
 
 // Converts a type into a standard mnemonic name suitable for event logging

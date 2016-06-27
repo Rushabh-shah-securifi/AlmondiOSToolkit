@@ -60,7 +60,11 @@ NSString *securifi_name_to_device_type(SFIDeviceType type) {
         case SFIDeviceType_EnergyReader_56:return @"56_EnergyReader";
         case SFIDeviceType_NestThermostat_57:return @"57_NestThermostat";
         case SFIDeviceType_NestSmokeDetector_58:return @"58_NestSmokeDetector";
-//        case SFIDeviceType_BuiltInSiren_60: return @"60_BuiltInSiren";
+        case SFIDeviceType_BuiltInSiren_60: return @"60_BuiltInSiren";
+        case SFIDeviceType_SecurifiButton_61: return @"61_SecurifiButton";
+        case SFIDeviceType_ZenThermostat_62: return @"62_ZenThermostat";
+        case SFIDeviceType_AlmondSiren_63: return @"63_AlmondSiren";
+        case SFIDeviceType_AlmondBlink_64: return @"64_AlmondBlink";
         case SFIDeviceType_WIFIClient:return @"WIFIClient";
         case SFIDeviceType_count:return @"count_iterator_FIX_ME!";
         default: return [NSString stringWithFormat:@"%d_UnknownDevice", type];
