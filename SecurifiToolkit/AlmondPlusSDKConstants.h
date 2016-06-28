@@ -74,6 +74,8 @@
 //Notification
 #define NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE    @"NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE"
 
+
+#define NOTIFICATION_IMAGE_FETCH    @"NOTIFICATION_IMAGE_FETCH"
 // XML
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
 #define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"
