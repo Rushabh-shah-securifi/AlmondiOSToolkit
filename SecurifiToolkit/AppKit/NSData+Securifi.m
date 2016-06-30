@@ -11,6 +11,7 @@
 @implementation NSData (Securifi)
 
 - (NSString *)securifiDecryptPasswordForAlmond:(NSString *)almondMac almondUptime:(NSString *)almondUptimeInt {
+    NSLog(@"mac: %@, uptime: %@", almondMac, almondUptimeInt);
     if (!almondMac) {
         return nil;
     }
@@ -44,8 +45,8 @@
     NSData *decrypted = [self securifiInternalAesOp:kCCDecrypt payload:self key:KEY iv:IV];
     // Convert back to string; we expect the plain text password to be UTF-8 encoded
     NSString *decrypted_str = [[NSString alloc] initWithData:decrypted encoding:NSUTF8StringEncoding];
-    //NSLog(@"decrypted_str: %@", decrypted_str);
-    //NSLog(@"length: %d", decrypted_str.length);
+    NSLog(@"decrypted_str: %@", decrypted_str);
+    NSLog(@"length: %d", decrypted_str.length);
     return decrypted_str;
 }
 
@@ -55,14 +56,15 @@
     // See the doc: For block ciphers, the output size will always be less than or
     // equal to the input size plus the size of one block.
     // That's why we need to add the size of one block here
-    unichar buffer_out[kCCBlockSizeAES128 + 1];
+    unichar buffer_out[kCCBlockSizeAES128 + payload_length];
     const size_t buffer_size = sizeof(buffer_out);
     bzero(buffer_out, buffer_size);
-    
+    NSLog(@"buffer size: %d", buffer_size);
     const CCOptions options = ccNoPadding;  // defaults to CBC without padding
     
     size_t numBytesProcessed = 0;
     CCCryptorStatus cryptStatus = CCCrypt(op, kCCAlgorithmAES128, options, key, kCCKeySizeAES128, iv, payload.bytes, payload_length, buffer_out, buffer_size, &numBytesProcessed);
+        
     if (cryptStatus != kCCSuccess) {
         NSLog(@"CCCrypt Failed! - Status: %d", cryptStatus);
         return nil;
