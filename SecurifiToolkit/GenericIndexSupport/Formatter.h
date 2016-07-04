@@ -15,7 +15,7 @@
 @property (nonatomic)NSString* units;
 
 -(id)initWithFactor:(float)factor min:(int)min max:(int)max units:(NSString*)units;
--(NSString*)transform:(NSString*)value;
+-(NSString*)transform:(NSString*)value genericId:(NSString*)genericIndexID;
 -(NSString*)transformValue:(NSString*)value;
 +(Formatter*)getFormatterCopy:(Formatter*)formatter;
 @end
