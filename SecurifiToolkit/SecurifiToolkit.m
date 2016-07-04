@@ -2588,7 +2588,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
-    
+    [self.devices removeAllObjects];
+    [self.clients removeAllObjects];
+    [self.scenesArray removeAllObjects];
+    [self.ruleList removeAllObjects];
     [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
