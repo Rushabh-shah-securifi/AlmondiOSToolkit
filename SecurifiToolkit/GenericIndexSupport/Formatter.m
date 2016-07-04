@@ -36,7 +36,7 @@
     float fVal = [value floatValue];
     float roundVal = roundf(fVal*self.factor);
     NSLog(@"actual value:%f, multiplied value: %f, rounded value: %f", fVal, fVal*self.factor, roundVal);
-    return [NSString stringWithFormat:@"%d%@", (int)roundVal, self.units];
+    return [NSString stringWithFormat:@"%d%@", (int)roundVal, self.units == nil? @"": self.units];
 }
 
 -(NSString*)transformValue:(NSString*)value{
