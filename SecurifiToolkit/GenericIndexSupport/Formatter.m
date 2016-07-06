@@ -32,11 +32,15 @@
     return copy;
 }
 
--(NSString*)transform:(NSString*)value{
+-(NSString*)transform:(NSString*)value genericId:(NSString *)genericIndexID{
     float fVal = [value floatValue];
     float roundVal = roundf(fVal*self.factor);
     NSLog(@"actual value:%f, multiplied value: %f, rounded value: %f", fVal, fVal*self.factor, roundVal);
-    return [NSString stringWithFormat:@"%d%@", (int)roundVal, self.units];
+    int genId = [genericIndexID intValue];
+    if(genId == 86 || genId == 52 || genId == 53) //power, voltage, current
+        return [NSString stringWithFormat:@"%.2f%@", fVal, self.units == nil? @"": self.units];
+    else
+        return [NSString stringWithFormat:@"%d%@", (int)roundVal, self.units == nil? @"": self.units];
 }
 
 -(NSString*)transformValue:(NSString*)value{

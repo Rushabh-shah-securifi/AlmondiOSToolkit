@@ -133,6 +133,7 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"HUMIDITY" : @(SFIDevicePropertyType_HUMIDITY),
                         @"HVAC_STATE" : @(SFIDevicePropertyType_HVAC_STATE),
                         @"ILLUMINANCE_PERCENT" : @(SFIDevicePropertyType_ILLUMINANCE_PERCENT),
+                        @"ILLUMINANCE OR LUMINANCE_PERCENT" : @(SFIDevicePropertyType_ILLUMINANCE),
                         @"ILLUMINANCE" : @(SFIDevicePropertyType_ILLUMINANCE),
                         @"IR CODE" : @(SFIDevicePropertyType_IR_CODE),
                         @"IS_USING_EMERGENCY_HEAT" : @(SFIDevicePropertyType_IS_USING_EMERGENCY_HEAT),
