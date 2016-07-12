@@ -15,4 +15,7 @@
 
 + (NSMutableDictionary*)getDevicesForIds:(NSArray*)deviceIds;
 + (NSMutableDictionary*)getDeviceIndexesForIds:(NSArray*)indexIds;
++ (NSMutableDictionary*)getHistory:(NSArray *)dateArr;
++ (void)InsertRecords:(NSDictionary *)dict;
++ (NSDictionary *)getHistoryData;
 @end
