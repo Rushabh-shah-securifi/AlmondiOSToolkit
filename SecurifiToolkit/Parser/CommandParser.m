@@ -65,6 +65,7 @@ static const char *kName_KeepAlive =                        "KeepAlive";
 static const char *kName_AffiliationCode =                  "Code";
 static const char *kName_AlmondplusMAC =                    "AlmondplusMAC";
 static const char *kName_AlmondName =                       "AlmondplusName";
+static const char *kName_FirmwareVersion =                  "FirmwareVersion";
 //Response
 static const char *kName_LoginResponse =                    "LoginResponse";
 static const char *kName_SanityResponse =                   "SanityResponse";
@@ -1801,6 +1802,7 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
                                                           || (!strncmp((const char *)localname, kName_AffiliationCode, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_AlmondName, kLength_MaxTag))
+                                                          || (!strncmp((const char *)localname, kName_FirmwareVersion, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_Hash, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_DeviceName, kLength_MaxTag))
                                                           || (!strncmp((const char *)localname, kName_OZWNode, kLength_MaxTag))
@@ -2285,16 +2287,20 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ALMOND_LIST_RESPONSE))
         {
-            
             [parser.tmpAlmond setAlmondplusMAC:[parser currentString]];
-            
         }
         else if (!strncmp((const char *)localname, kName_AlmondName, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ALMOND_LIST_RESPONSE))
         {
             [parser.tmpAlmond setAlmondplusName:[parser currentString]];
-            
         }
+        else if (!strncmp((const char *)localname, kName_FirmwareVersion, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ALMOND_LIST_RESPONSE))
+        {
+//            [parser.tmpAlmond setFirmware:[parser currentString]];
+            parser.tmpAlmond.firmware = [parser currentString];
+        }
+        
         else if (!strncmp((const char *)localname, kName_AlmondPlus, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ALMOND_LIST_RESPONSE))
         {

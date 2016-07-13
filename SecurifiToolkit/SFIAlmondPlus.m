@@ -63,6 +63,7 @@
     if (self) {
         self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
         self.almondplusName = [coder decodeObjectForKey:@"self.almondplusName"];
+        self.firmware = [coder decodeObjectForKey:@"self.firmware"];
         self.index = [coder decodeIntForKey:@"self.index"];
         self.colorCodeIndex = [coder decodeIntForKey:@"self.colorCodeIndex"];
         //PY 190914 - Owned Almond information
@@ -81,6 +82,7 @@
 
     [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
     [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
+    [coder encodeObject:self.firmware forKey:@"self.firmware"];
     [coder encodeInt:self.index forKey:@"self.index"];
     [coder encodeInt:self.colorCodeIndex forKey:@"self.colorCodeIndex"];
 
@@ -97,6 +99,7 @@
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.almondplusMAC=%@", self.almondplusMAC];
     [description appendFormat:@", self.almondplusName=%@", self.almondplusName];
+    [description appendFormat:@", self.firmware=%@", self.firmware];
     [description appendFormat:@", self.index=%i", self.index];
     [description appendFormat:@", self.colorCodeIndex=%i", self.colorCodeIndex];
     [description appendFormat:@", self.userCount=%i", self.userCount];
@@ -114,6 +117,7 @@
     if (copy != nil) {
         copy.almondplusMAC = self.almondplusMAC;
         copy.almondplusName = self.almondplusName;
+        copy.firmware = self.firmware;
         copy.index = self.index;
         copy.colorCodeIndex = self.colorCodeIndex;
         copy.userCount = self.userCount;
@@ -149,6 +153,61 @@
     }
 
     return (result == AlmondVersionCheckerResult_currentSameAsLatest) || (result == AlmondVersionCheckerResult_currentOlderThanLatest);
+}
+
+- (BOOL)supportsGenericIndexes:(NSString *)almondVersion{
+    if (!almondVersion) {
+        return NO;
+    }
+    NSLog(@"almondversion: %@", almondVersion);
+    //latest is what almond has, current is constant
+    //AL2-R092 and above supports generic indexes
+    //AP2-R086 and above supports generic indexes
+//    almondVersion = [almondVersion uppercaseString];
+    BOOL result = NO;
+    if ([almondVersion hasPrefix:@"AL2-"]) {
+        result = [self compareVersions:almondVersion supportedVersion:@"AL2-R091a"];
+    }
+    else if ([almondVersion hasPrefix:@"AP2-"]) {
+        result = [self compareVersions:almondVersion supportedVersion:@"AP2-R085a"];
+    }
+    else if([almondVersion hasPrefix:@"AL3-"]){
+        result = YES;
+    }
+    NSLog(@"result: %d", result);
+    return result;
+}
+
+
+- (BOOL)compareVersions:(NSString *)almondVersion supportedVersion:(NSString *)supportedVersion {
+    if (!almondVersion || !supportedVersion) {
+        return NO;
+    }
+    
+    NSArray *cur_alm_splits = [almondVersion componentsSeparatedByString:@"-"];
+    NSArray *supported_alm_splits = [supportedVersion componentsSeparatedByString:@"-"];
+    
+    
+    if (supported_alm_splits.count < 2 || cur_alm_splits.count < 2) {
+        return NO;
+    }
+    
+    NSString *current_str = cur_alm_splits[1];
+    NSString *supported_str = supported_alm_splits[1];
+    
+    NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
+    NSComparisonResult result = [current_str compare:supported_str];
+    NSLog(@"result %d", result);
+    switch (result) {
+        case NSOrderedAscending:
+            return NO;
+        case NSOrderedSame:
+            return YES;
+        case NSOrderedDescending:
+            return YES;
+        default:
+            return NO;
+    }
 }
 
 - (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other {
