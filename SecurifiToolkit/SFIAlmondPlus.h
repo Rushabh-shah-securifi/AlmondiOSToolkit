@@ -26,6 +26,7 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 
 @property(nonatomic, copy) NSString *almondplusMAC; // mac decimal value
 @property(nonatomic, copy) NSString *almondplusName;
+@property(nonatomic) NSString *firmware;
 @property(nonatomic) int index;
 @property(nonatomic) int colorCodeIndex;
 
@@ -48,6 +49,8 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 // the version string is attained dynamically from the almond, and this method tests whether it is a
 // current enough version.
 - (BOOL)supportsSendLogs:(NSString *)almondVersion;
+
+- (BOOL)supportsGenericIndexes:(NSString *)almondVersion;
 
 - (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other;
 
