@@ -54,6 +54,8 @@
     //NSLog(@"onRuleList: %@",mainDict);
     //RuleList
     if([commandType isEqualToString:@"RuleList"] || [commandType isEqualToString:@"DynamicRuleList"]){
+        if([[mainDict valueForKey:@"Rules"] isKindOfClass:[NSArray class]])
+            return;
         NSDictionary *rulesPayload = [mainDict valueForKey:@"Rules"];
         [toolkit.ruleList removeAllObjects];
         
