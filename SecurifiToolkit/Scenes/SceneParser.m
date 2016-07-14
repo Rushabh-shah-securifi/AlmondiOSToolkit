@@ -60,6 +60,8 @@
     
     
     if([commandType isEqualToString:@"DynamicSceneList"] || [commandType isEqualToString:@"SceneList"]){
+        if([[mainDict valueForKey:@"Scenes"] isKindOfClass:[NSArray class]])
+            return;
         NSDictionary *scenesPayload = [mainDict valueForKey:@"Scenes"];
         NSLog(@"scenesPayload sceneList %@",scenesPayload);
         NSArray *scenePosKeys = scenesPayload.allKeys;
