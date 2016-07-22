@@ -2297,8 +2297,7 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_FirmwareVersion, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ALMOND_LIST_RESPONSE))
         {
-//            [parser.tmpAlmond setFirmware:[parser currentString]];
-            parser.tmpAlmond.firmware = [parser currentString];
+            [parser.tmpAlmond setFirmware:[parser currentString]];
         }
         
         else if (!strncmp((const char *)localname, kName_AlmondPlus, kLength_MaxTag)
@@ -2683,6 +2682,11 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
                  && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
         {
             [parser.tmpAlmond setAlmondplusName:[parser currentString]];
+        }
+        else if (!strncmp((const char *)localname, kName_FirmwareVersion, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
+        {
+            [parser.tmpAlmond setFirmware:[parser currentString]];
         }
         else if (!strncmp((const char *)localname, kName_EmailID, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ALMOND_AFFILIATION_DATA_RESPONSE))
