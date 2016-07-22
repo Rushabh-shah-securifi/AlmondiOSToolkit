@@ -2817,6 +2817,11 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         {
             [parser.tmpAlmond setAlmondplusName:[parser currentString]];
         }
+        else if (!strncmp((const char *)localname, kName_FirmwareVersion, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
+        {
+            [parser.tmpAlmond setFirmware:[parser currentString]];
+        }
         else if (!strncmp((const char *)localname, kName_OwnerEmailID, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_ME_AS_SECONDARY_USER_RESPONSE))
         {
