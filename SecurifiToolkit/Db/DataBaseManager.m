@@ -9,11 +9,13 @@
 #import "DataBaseManager.h"
 #import <sqlite3.h>
 
+
 #define DATABASE_FILE @"devices.db"
 
 #define DEVICE_TABLE @"devices"
 #define DEVICE_INDEX_TABLE @"deviceIndexes"
 #define HISTORY_TABLE @"historyTable"
+#define HISTORYTABLE @"HistoryTB"
 
 @interface DataBaseManager()
 
@@ -73,6 +75,13 @@ static sqlite3 *DB = nil;
     [self insertData:devicesJson query:@"INSERT INTO historyTable (date,uris) VALUES(?,?)"];
 
 }
++(void)setHistoryTable{
+    NSFileManager *filemgr = [NSFileManager defaultManager];
+    if ([filemgr fileExistsAtPath: databasePath ] == NO){
+        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUE TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,COUNT TEXT,TIME TEXT)"];
+    }
+}
+
 
 +(BOOL)createTable:(NSString*)query{
     BOOL isSuccess = YES;
@@ -111,9 +120,51 @@ static sqlite3 *DB = nil;
     }
     return data;
 }
++(void)insertHistoryRecord:(NSDictionary *)hDict{
+    NSString *query = @"INSERT INTO HistoryTB (DATE,UNIQUE,AMAC,CMAC, URIS,COUNT,TIME) VALUES(?,?,?,?,?,?)";
+    [self insertHistoryData:hDict query:query];
+}
++ (void)insertHistoryEntries:(NSDictionary *)hDict query:(NSString *)query{
+    sqlite3_stmt *statement;
+    const char *dbpath = [databasePath UTF8String];
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+        const char *insert_stmt = [query UTF8String];
+        sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
+        for (NSDictionary *dateDict  in hDict[@"Data"])
+        {
+            for (NSString *date in [dateDict allKeys])
+            {
+                NSArray *uriArr = dateDict[date];
+                
+                for(NSDictionary *uriObj in uriArr)
+                {
+                    sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
+                    sqlite3_bind_text(statement, 1, [date UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 2, [hDict[@"UNIQUE"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 3, [hDict[@"AMAC"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 4, [hDict[@"CMAC"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 5, [uriObj[@"URIS"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 6, [uriObj[@"COUNT"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 7, [uriObj[@"TIME"] UTF8String], -1, SQLITE_TRANSIENT);
+                        if (sqlite3_step(statement) == SQLITE_DONE){
+                            NSLog(@" success");
+                        }
+                        else {
+                            NSLog(@" error");
+                        }
+                    
+                }
+            }
+            
+        }
+      sqlite3_close(database);
+    }
+
+}
 
 + (void)insertData:(NSDictionary*)deviceIndexDict query:(NSString*)query
-{
+{   NSLog(@"deviceIndexDict = %@",deviceIndexDict);
     sqlite3_stmt *statement;
     const char *dbpath = [databasePath UTF8String];
     
@@ -245,7 +296,7 @@ static sqlite3 *DB = nil;
 
 + (void)deleteTable{
     NSLog(@"deleteTable");
-    NSString *query = @"DELETE FROM deviceIndexDetail";
+    NSString *query = @"DROP TABLE historyTable";
     const char *sqlStatement = [query UTF8String];
     const char *dbpath = [databasePath UTF8String];
     sqlite3_stmt *compiledStatement;
@@ -306,75 +357,11 @@ static sqlite3 *DB = nil;
 {
     [self insertHistoryData:dict query:@"INSERT INTO historyTable (date,uris) VALUES(?,?)"];
     
-    
-    
-//    [self hisTable];
-//    sqlite3_stmt *stmt;
-//    const char *dbpath = [databasePath UTF8String];
-//    NSLog(@"dict == %@",dict);
-//    
-//    if (sqlite3_open(dbpath, &DB) == SQLITE_OK)
-//    {
-//         for(NSString *indexID in [dict allKeys]){
-//          NSMutableString *statement = [NSMutableString stringWithFormat:@"Insert into history(date,uris) VALUES('%@','%@')",indexID,[dict valueForKey:indexID]];
-//             const char *insert_stmt = [statement UTF8String];
-//             sqlite3_prepare_v2(DB, insert_stmt,-1, &stmt, NULL);
-//             if (sqlite3_step(stmt) == SQLITE_DONE){
-//                 NSLog(@"success");
-//             }
-//             else {
-//                 NSLog(@"error");
-//             }
-//         }
-//        sqlite3_close(DB);
-//    }
-//    else
-//    {
-//        NSLog(@"An error has occured: %s",sqlite3_errmsg(database));
-//    }
-
-    
-//    [self createHistoryTable:HISTORY_TABLE];
-//    NSMutableString *statement = [NSMutableString stringWithFormat:@"Insert into history(date,uris) VALUES(?,?)"];
-//    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
-//    {
-//        const char *insert_stmt = [statement UTF8String];
-//        sqlite3_prepare_v2(database, insert_stmt,-1, &stmt, NULL);
-//        
-//        
-//        for(NSString *indexID in [dict allKeys]){
-//           
-//            NSData * jsonData = [NSJSONSerialization dataWithJSONObject:[dict valueForKey:indexID] options:NSJSONReadingAllowFragments error:nil];
-//            NSString * indexData = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-//            NSDictionary *dictdata = [dict valueForKey:indexID];
-//            
-//            if(sqlite3_prepare_v2(database, insert_stmt,-1, &stmt, NULL))
-//                NSLog(@"prepareDone");
-//            
-//            if(sqlite3_bind_text(stmt, 1, [indexID UTF8String], -1, SQLITE_TRANSIENT))
-//                NSLog(@"sqlite3_bind_text 1");
-//            
-//            if(sqlite3_bind_text(stmt, 2, [indexData UTF8String],-1, SQLITE_TRANSIENT))
-//                NSLog(@"sqlite3_bind_text 2");
-//            
-//            if (sqlite3_step(stmt) == SQLITE_DONE){
-//                NSLog(@"success");
-//            }
-//            else {
-//                NSLog(@"error");
-//            }
-//        }
-//        sqlite3_close(database);
-//    }
-//    else
-//    {
-//        NSLog(@"An error has occured: %s",sqlite3_errmsg(database));
-//    }
 }
 
 + (void)insertHistoryData:(NSDictionary*)dict query:(NSString*)query
 {
-     [self createDataBasePath:DATABASE_FILE];
+//     [self createDataBasePath:DATABASE_FILE];
     [self createHistoryTable:HISTORY_TABLE];
     sqlite3_stmt *statement;
     const char *dbpath = [databasePath UTF8String];
@@ -398,10 +385,10 @@ static sqlite3 *DB = nil;
             sqlite3_bind_text(statement, 1, [indexID UTF8String], -1, SQLITE_TRANSIENT);
             sqlite3_bind_text(statement, 2, [indexData UTF8String],-1, SQLITE_TRANSIENT);
             if (sqlite3_step(statement) == SQLITE_DONE){
-                NSLog(@" success");
+                NSLog(@" success history");
             }
             else {
-                NSLog(@" error" @"'%s'", sqlite3_errmsg(database));
+                NSLog(@" error history" @"'%s'", sqlite3_errmsg(database));
             }
         }
         sqlite3_close(database);
@@ -411,30 +398,92 @@ static sqlite3 *DB = nil;
 }
 + (NSDictionary *)getHistoryData
 {
-    
+     [self createHistoryTable:HISTORY_TABLE];
+    NSLog(@"getHistory data method");
+    char *err;
     if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
     {
-        const char *sqlStatement = "SELECT * FROM historyTable";  // Your Tablename
-        
+        NSString *sqlStatement = @"SELECT * FROM historyTable";  // Your Tablename
+        NSMutableDictionary *historyDict = [[NSMutableDictionary alloc]init];
         sqlite3_stmt *compiledStatement;
+        NSLog(@"getHistory data method %@ ,%@",sqlStatement,databasePath);
         
-        if(sqlite3_prepare_v2(database, sqlStatement, -1, &compiledStatement, NULL) == SQLITE_OK)
+        if(sqlite3_prepare_v2(database, [sqlStatement UTF8String], -1, &compiledStatement, err) == SQLITE_OK)
         {
-            if (sqlite3_step(compiledStatement) == SQLITE_ROW)
+            NSLog(@"sqlite3_prepare_v2 method");
+            while (sqlite3_step(compiledStatement) == SQLITE_ROW)
             {
-                NSString *indexDetail = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 0)];
-                NSData *data = [indexDetail dataUsingEncoding:NSUTF8StringEncoding];
-                NSDictionary *historyDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-                return historyDict;
-            }
-            else{
-                NSLog(@"Not found - need to put entry in table");
+                 NSLog(@"sqlite3_step method");
+                NSString *uriString = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 1)];
+                 NSLog(@"indexDetail %@",uriString);
+                NSData *data = [uriString dataUsingEncoding:NSUTF8StringEncoding];
+                NSDictionary *uriDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                NSLog(@"historyDict %@",uriDict);
+                
+                
+                NSString *dateKey = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 0)];
+                NSLog(@"indexDetail %@",dateKey);
+
+                [historyDict setValue:uriDict forKey:dateKey];
+                NSLog(@"historyDict %@",uriDict);
                 
             }
-            
+
         }
+        else
+            NSLog(@"fail to read %s",err);
+        NSLog(@"history allKeys count %ld",[historyDict allKeys].count);
+        return historyDict;
         sqlite3_finalize(compiledStatement);
     }
+    NSLog(@"fail to get database ");
     sqlite3_close(database);
+}
++ (void)updateDB:(NSString *)date with:(NSDictionary *)dict{
+    [self createHistoryTable:HISTORY_TABLE];
+    NSLog(@"getHistory data method");
+    NSError *err;
+    NSData * jsonData = [NSJSONSerialization dataWithJSONObject:[dict valueForKey:date] options:0 error:&err];
+    NSLog(@"err errormsg %@",err);
+    //            NSData *jsonData = [NSKeyedArchiver archivedDataWithRootObject:[dict valueForKey:indexID]];
+    NSString * uriString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    NSLog(@"index data = %@",uriString);
+    
+    sqlite3_stmt *statement;
+    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSLog(@"Exitsing data, Update Please");
+        NSString *qury = [NSString stringWithFormat:@"UPDATE historyTable set uris = '%@' WHERE date = ?",uriString];
+        const char *update_stmt = [qury UTF8String];
+        sqlite3_prepare_v2(database, update_stmt, -1, &statement, NULL );
+        sqlite3_bind_text(statement, 1, [date UTF8String], -1, SQLITE_TRANSIENT);
+        if (sqlite3_step(statement) == SQLITE_DONE){
+            NSLog(@"Update Success");
+        }
+        else
+            NSLog(@"upade fail");
+         sqlite3_finalize(statement);
+    
+    }
+    sqlite3_close(database);
+    
+    
+}
++ (void)deleteHistoryTable{
+    NSString *query = @"DELETE from historyTable";
+    const char *sql = [query cStringUsingEncoding:NSUTF8StringEncoding];
+    sqlite3_stmt *statement = nil;
+    if(sqlite3_prepare_v2(database,sql, -1, &statement, NULL)!= SQLITE_OK)
+    {
+        NSAssert1(0,@"error preparing statement",sqlite3_errmsg(database));
+        NSLog(@"not deleted");
+    }
+    else
+    {
+        sqlite3_step(statement);
+        NSLog(@"successFully deleted");
+    }
+    sqlite3_finalize(statement);
+    
 }
 @end

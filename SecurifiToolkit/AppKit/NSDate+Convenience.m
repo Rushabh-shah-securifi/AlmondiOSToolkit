@@ -105,6 +105,12 @@
     
     return [NSString stringWithFormat:@"%@ %d %@",[self getDayString], day, [self getMonthString]];
 }
+-(NSString *)getDay{//6
+    NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth fromDate:self];
+    NSInteger day = [components day];
+    
+    return [NSString stringWithFormat:@"%d", day];
+}
 
 + (NSDate *)convertStirngToDate:(NSString*)dateString{
 //    NSString *dateString = @"2015/04/11";

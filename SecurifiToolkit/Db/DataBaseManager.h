@@ -18,4 +18,7 @@
 + (NSMutableDictionary*)getHistory:(NSArray *)dateArr;
 + (void)InsertRecords:(NSDictionary *)dict;
 + (NSDictionary *)getHistoryData;
++ (void)deleteHistoryTable;
++ (void)updateDB:(NSString *)date with:(NSDictionary *)dict;
+
 @end

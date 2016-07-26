@@ -29,4 +29,8 @@
 + (NSDate *)convertStirngToDate:(NSString*)dateString;
 
 - (NSString *)stringFromDate;
+
+-(NSString *)getDay;//6
+
+-(NSString *)getMonthString;
 @end

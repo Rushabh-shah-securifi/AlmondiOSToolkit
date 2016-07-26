@@ -254,6 +254,8 @@
 		CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */; };
 		CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */; };
+		CE3EDAEC1D46390600C153A6 /* BrowsingHistoryUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */; };
+		CE3EDAED1D46390600C153A6 /* BrowsingHistoryUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */; };
 		CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE458D5D19EBBBC000689251 /* SFICredentialsValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = CE458D5B19EBBBC000689251 /* SFICredentialsValidator.m */; };
 		CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -264,6 +266,8 @@
 		CE466A601823CFF900E55DF9 /* ResetPasswordRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A5E1823CFF900E55DF9 /* ResetPasswordRequest.m */; };
 		CE466A631823D01E00E55DF9 /* ResetPasswordResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE466A611823D01E00E55DF9 /* ResetPasswordResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */; };
+		CE484C9D1D41E1E3006C1388 /* BrowsingHistoryDataBase.h in Headers */ = {isa = PBXBuildFile; fileRef = CE484C9A1D41E1E3006C1388 /* BrowsingHistoryDataBase.h */; };
+		CE484C9E1D41E1E3006C1388 /* BrowsingHistoryDataBase.m in Sources */ = {isa = PBXBuildFile; fileRef = CE484C9B1D41E1E3006C1388 /* BrowsingHistoryDataBase.m */; };
 		CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */; };
 		CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -628,6 +632,8 @@
 		CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserRequest.m; sourceTree = "<group>"; };
 		CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMeAsSecondaryUserResponse.h; sourceTree = "<group>"; };
 		CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserResponse.m; sourceTree = "<group>"; };
+		CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowsingHistoryUtil.h; sourceTree = "<group>"; };
+		CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowsingHistoryUtil.m; sourceTree = "<group>"; };
 		CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFICredentialsValidator.h; sourceTree = "<group>"; };
 		CE458D5B19EBBBC000689251 /* SFICredentialsValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFICredentialsValidator.m; sourceTree = "<group>"; };
 		CE466A551823C2E800E55DF9 /* ValidateAccountRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValidateAccountRequest.h; sourceTree = "<group>"; };
@@ -638,6 +644,8 @@
 		CE466A5E1823CFF900E55DF9 /* ResetPasswordRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResetPasswordRequest.m; sourceTree = "<group>"; };
 		CE466A611823D01E00E55DF9 /* ResetPasswordResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResetPasswordResponse.h; sourceTree = "<group>"; };
 		CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResetPasswordResponse.m; sourceTree = "<group>"; };
+		CE484C9A1D41E1E3006C1388 /* BrowsingHistoryDataBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowsingHistoryDataBase.h; sourceTree = "<group>"; };
+		CE484C9B1D41E1E3006C1388 /* BrowsingHistoryDataBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowsingHistoryDataBase.m; sourceTree = "<group>"; };
 		CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SFIAlmondPlus.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SFIAlmondPlus.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlmondPlusSDKConstants.h; path = SecurifiToolkit/AlmondPlusSDKConstants.h; sourceTree = SOURCE_ROOT; };
@@ -1081,6 +1089,7 @@
 		221185BF178D371200EE23ED /* SecurifiToolkit */ = {
 			isa = PBXGroup;
 			children = (
+				CE484C991D41E179006C1388 /* BrowsingHistoryDB */,
 				A52163F51C983E4E00E7B79D /* GenericIndexSupport */,
 				CEF6F4951C92CAAF00C68975 /* Rules */,
 				A54EAF981C44D8C700CF2837 /* WiFiClients */,
@@ -1300,6 +1309,17 @@
 			name = util;
 			sourceTree = "<group>";
 		};
+		CE484C991D41E179006C1388 /* BrowsingHistoryDB */ = {
+			isa = PBXGroup;
+			children = (
+				CE484C9A1D41E1E3006C1388 /* BrowsingHistoryDataBase.h */,
+				CE484C9B1D41E1E3006C1388 /* BrowsingHistoryDataBase.m */,
+				CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */,
+				CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */,
+			);
+			name = BrowsingHistoryDB;
+			sourceTree = "<group>";
+		};
 		CE5EB63617E852AA00985636 /* models */ = {
 			isa = PBXGroup;
 			children = (
@@ -1374,9 +1394,11 @@
 				CE5EB65617EAD44E00985636 /* SFIDeviceValue.h in Headers */,
 				22A76D3C17912F980099CD8F /* SignupResponse.h in Headers */,
 				CE6DC94517EC60C2006F48C4 /* MobileCommandRequest.h in Headers */,
+				CE484C9D1D41E1E3006C1388 /* BrowsingHistoryDataBase.h in Headers */,
 				1CD1D5521A660B7A00C030E9 /* NotificationPreferences.h in Headers */,
 				1C3EEFC31B37999300DFCF62 /* SFIDevicesList.h in Headers */,
 				A54EAFB01C44DC4A00CF2837 /* SceneParser.h in Headers */,
+				CE3EDAEC1D46390600C153A6 /* BrowsingHistoryUtil.h in Headers */,
 				22A76D491791347D0099CD8F /* AffiliationUserComplete.h in Headers */,
 				2204C20E1794349400B05F17 /* GenericCommand.h in Headers */,
 				22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */,
@@ -1694,6 +1716,7 @@
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
 				1C2F60571B69D5B9001CCA34 /* ScenesListRequest.m in Sources */,
+				CE484C9E1D41E1E3006C1388 /* BrowsingHistoryDataBase.m in Sources */,
 				A52164081C983E4E00E7B79D /* GenericValue.m in Sources */,
 				1C414BC71A79F02600C448A4 /* ZHDatabase.m in Sources */,
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
@@ -1794,6 +1817,7 @@
 				1DF03CBA2B45BFB97D3A8E79 /* NotificationCountResponse.m in Sources */,
 				1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */,
 				1DF033F86547E8B8555F3561 /* NotificationClearCountResponse.m in Sources */,
+				CE3EDAED1D46390600C153A6 /* BrowsingHistoryUtil.m in Sources */,
 				1DF0318029A6D5169BBF1BAA /* AlmondVersionChecker.m in Sources */,
 				1DF034303C37A11B7DC547A6 /* Network.m in Sources */,
 				1DF0334B41969F41A2277D18 /* NetworkState.m in Sources */,
