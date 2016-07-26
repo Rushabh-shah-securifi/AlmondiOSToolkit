@@ -134,4 +134,18 @@
 #define D_TYPE @"Type"
 #define D_NAME @"Name"
 
+//help screen
+#define GUIDES @"Guides"
+#define WIZARDS @"Wizards"
+#define HELP_TOPICS @"Help Topics"
+#define SUPPORT @"Support"
+
+#define COLOR @"color"
+#define ITEMS @"items"
+#define SCREENCOUNT @"screencount"
+#define SCREENS @"screens"
+#define TITLE @"title"
+#define DESCRIPTION @"description"
+#define IMAGE @"image"
+#define S_ICON @"icon"
 #endif /* AlmondJsonCommandKeyConstants_h */
