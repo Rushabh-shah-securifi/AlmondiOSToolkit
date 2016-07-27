@@ -55,7 +55,7 @@ static sqlite3 *DB = nil;
     NSFileManager *filemgr = [NSFileManager defaultManager];
      //NSLog(@"database path = %@",databasePath);
     if ([filemgr fileExistsAtPath: databasePath ] == NO){
-        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUEKEY TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,COUNT TEXT,TIME TEXT)"];
+        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUEKEY TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,COUNT TEXT,TIME TEXT,ENDIDENTIFIER TEXT)"];
     }
 }
 
@@ -124,6 +124,7 @@ static sqlite3 *DB = nil;
         
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:@"All" andSearchSting:@""];
         NSLog(@"search ddict %@",dict);
+        [self maximumEpoch];
         return dict;
     }
     
@@ -174,6 +175,8 @@ static sqlite3 *DB = nil;
                                       @"Epoc":uriString6,
                                       @"count":uriString5
                                       };
+            
+            NSLog(@"upadte time epoc ",[[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 7)]);
             if([self isToaddDict:uriString6 searchPatten:searchPatten andSearchString:search])
             [self addToDictionary:dayDict uriInfo:uriInfo rowID:uriString0];
         }
@@ -283,6 +286,7 @@ static sqlite3 *DB = nil;
     NSString *query = @"INSERT INTO HistoryTB (DATE,UNIQUEKEY,AMAC,CMAC, URIS,COUNT,TIME) VALUES(?,?,?,?,?,?,?)";
     [self setHistoryTable];
     [self insertHistoryEntries:hDict query:query];
+    [self updateEndIdentifier:@""];
 }
 + (void)insertHistoryEntries:(NSDictionary *)hDict query:(NSString *)query{
     sqlite3_stmt *statement;
@@ -329,5 +333,69 @@ static sqlite3 *DB = nil;
         NSLog(@"fail to open %s",sqlite3_errmsg(database));
     }
     
+}
++(void)updateEndIdentifier:(NSString *)endIdntifier{
+    const char *dbpath = [databasePath UTF8String];
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+
+    sqlite3_stmt *statement;
+    const char *insert_stmt = "UPDATE HistoryTB SET ENDIDENTIFIER = ? WHERE AMAC = ? AND CMAC = ?";
+    if (sqlite3_prepare_v2(database, insert_stmt, -1, &statement, nil)
+        == SQLITE_OK)
+    {
+        {
+            sqlite3_bind_text(statement, 1, [@"1468493266" UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 2, [@"251176215905264" UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 3, [@"14:30:c6:46:b7:15" UTF8String], -1, SQLITE_TRANSIENT);
+        }
+        NSLog(@"error: %s", sqlite3_errmsg(database));
+        if (sqlite3_step(statement) != SQLITE_DONE)
+        {
+            NSLog(@"error: %s", sqlite3_errmsg(database));
+        }
+        else
+        {
+            NSLog(@"updateContact SUCCESS - executed command ");
+        }
+//        sqlite3_reset(statement);
+        sqlite3_step(statement);
+        sqlite3_finalize(statement);
+        
+        // sqlite3_finalize(statement);
+    }
+    else
+    NSLog(@"error: %s", sqlite3_errmsg(database));
+    }
+    [self maximumEpoch];
+}
++(void)maximumEpoch{
+    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSString *selectSql = [NSString stringWithFormat:@"SELECT  MAX(TIME) FROM HistoryTB"];
+        sqlite3_stmt *statement;
+        if (sqlite3_prepare_v2(database, [selectSql UTF8String], -1, &statement, NULL) == SQLITE_OK)
+        {
+            while (sqlite3_step(statement) == SQLITE_ROW)
+            {
+                //[result addObject:[[NSMutableDictionary alloc] init]];
+//                favid=(NSInteger)sqlite3_column_int64(statement,10);
+//                //favid =  [[NSString stringWithUTF8String:(char *)sqlite3_column_text(statement, 10)] intValue];
+//                count++;
+                NSString *uriString6 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 6)];
+                NSLog(@"max value = %@",uriString6);
+            }
+            sqlite3_finalize(statement);
+        }
+        else
+        {
+            NSLog(@"Sql Preparing Error %s",sqlite3_errmsg(database));
+        }
+        sqlite3_close(database);
+    }
+    else
+    {
+        NSLog(@"Database not opening");
+    }
 }
 @end
