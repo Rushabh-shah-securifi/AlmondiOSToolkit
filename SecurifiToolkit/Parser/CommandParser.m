@@ -2406,6 +2406,13 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             [parser.tmpAlmond setAlmondplusMAC:[parser currentString]];
             
         }
+        else if (!strncmp((const char *)localname, kName_FirmwareVersion, kLength_MaxTag)
+                 && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_ADD))
+        {
+            
+            [parser.tmpAlmond setFirmware:[parser currentString]];
+            
+        }
         else if (!strncmp((const char *)localname, kName_AlmondName, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_ADD))
         {
