@@ -74,6 +74,9 @@
 //Notification
 #define NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE    @"NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE"
 
+//Mesh
+#define NOTIFICATION_CommandType_MESH_RESPONSE    @"NOTIFICATION_CommandType_MESH_RESPONSE"
+
 // XML
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
 #define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"

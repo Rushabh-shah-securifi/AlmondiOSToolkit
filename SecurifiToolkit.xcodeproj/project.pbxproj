@@ -352,6 +352,8 @@
 		CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */; };
 		CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
 		CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
+		F459A8F91D4B6A240056024F /* MeshParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F459A8F71D4B6A240056024F /* MeshParser.h */; };
+		F459A8FA1D4B6A240056024F /* MeshParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F459A8F81D4B6A240056024F /* MeshParser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -723,6 +725,8 @@
 		CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesTimeElement.m; sourceTree = "<group>"; };
 		CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIButtonSubProperties.h; sourceTree = "<group>"; };
 		CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIButtonSubProperties.m; sourceTree = "<group>"; };
+		F459A8F71D4B6A240056024F /* MeshParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshParser.h; sourceTree = "<group>"; };
+		F459A8F81D4B6A240056024F /* MeshParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MeshParser.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1081,6 +1085,7 @@
 		221185BF178D371200EE23ED /* SecurifiToolkit */ = {
 			isa = PBXGroup;
 			children = (
+				F459A8F61D4B6A110056024F /* Mesh */,
 				A52163F51C983E4E00E7B79D /* GenericIndexSupport */,
 				CEF6F4951C92CAAF00C68975 /* Rules */,
 				A54EAF981C44D8C700CF2837 /* WiFiClients */,
@@ -1360,6 +1365,15 @@
 			path = Rules;
 			sourceTree = "<group>";
 		};
+		F459A8F61D4B6A110056024F /* Mesh */ = {
+			isa = PBXGroup;
+			children = (
+				F459A8F71D4B6A240056024F /* MeshParser.h */,
+				F459A8F81D4B6A240056024F /* MeshParser.m */,
+			);
+			path = Mesh;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1483,6 +1497,7 @@
 				1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */,
 				1DF03C9FE842023F0F9D0202 /* SFINotificationStore.h in Headers */,
 				1C3EEFC71B379B3800DFCF62 /* SFIGenericRouterCommand.h in Headers */,
+				F459A8F91D4B6A240056024F /* MeshParser.h in Headers */,
 				1DF037531EF66D6AA5504BD5 /* NotificationStoreImpl.h in Headers */,
 				1DF03EAA8828BEC034BDCA43 /* AlmondModeChangeResponse.h in Headers */,
 				1DF03C8BC24C649E0B09C2BE /* DynamicAlmondModeChange.h in Headers */,
@@ -1802,6 +1817,7 @@
 				CEED64341C7C370E008A7412 /* DeviceKnownValues.m in Sources */,
 				1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */,
 				1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */,
+				F459A8FA1D4B6A240056024F /* MeshParser.m in Sources */,
 				CEF6F49F1C92CAAF00C68975 /* Rule.m in Sources */,
 				1DF0391E21650F9E90235929 /* Login.m in Sources */,
 				1DF03DBC398A267A9DC97053 /* Logout.m in Sources */,

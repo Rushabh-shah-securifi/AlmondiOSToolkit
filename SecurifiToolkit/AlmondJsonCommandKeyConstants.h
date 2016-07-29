@@ -134,4 +134,27 @@
 #define D_TYPE @"Type"
 #define D_NAME @"Name"
 
+//Mesh_command
+/*
+ "{
+ "CommandMode":"Reply",
+ "CommandType":"MeshList",
+ "MasterName":"Living Room"
+ "Slaves":[
+ {"SlaveUniqueName":"Almond123","SlaveName":"Den","Interface":"Wired","SignalStrength":"Good (-40dBm)"},
+ {"SlaveUniqueName":"Almond456","SlaveName":"Bedroom","Interface":"Wireless","SignalStrength":"Excellent (-10dBm)"},
+ ]
+ "MobileInternalIndex":"jUEppXS7ky0gbHnhGgo0uP6g15W27Gop",
+ "Success":"true",
+ "ReasonCode":"0"
+ }"
+ */
+#define  COMMAND_MODE @"CommandMode"
+#define  MASTER_NAME @"MasterName"
+#define  SLAVES @"Slaves"
+#define  SLAVE_UNIQUE_NAME @"SlaveUniqueName"
+#define  SLAVE_NAME @"SlaveName"
+#define  INTERFACE @"Interface"
+
+
 #endif /* AlmondJsonCommandKeyConstants_h */
