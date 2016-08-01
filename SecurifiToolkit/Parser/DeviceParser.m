@@ -198,10 +198,10 @@
 //    payload = [self parseJson:@"DeviceListResponse"];
     NSLog(@"devices - payload: %@", payload);
 
-    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+    BOOL isMatchingAlmondOrLocal = ([payload[ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
-    NSString *commandType = [payload valueForKey:COMMAND_TYPE];
+    NSString *commandType = payload[COMMAND_TYPE];
     if([commandType isEqualToString:DEVICE_LIST] || [commandType isEqualToString:@"DynamicDeviceList"]){
         NSDictionary *devicesPayload = payload[DEVICES];
         NSArray *devicePosKeys = devicesPayload.allKeys;
