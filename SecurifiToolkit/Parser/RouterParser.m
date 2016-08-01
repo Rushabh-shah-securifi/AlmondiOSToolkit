@@ -40,15 +40,19 @@
     if(local){
         payload = [dataInfo valueForKey:@"data"];
     }else{
+        if(![[dataInfo valueForKey:@"data"] isKindOfClass:[NSData class]])
+            return;
         payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
     
     }
     NSLog(@"router payload: %@", payload);
 
+    //disabled check for almond mac as it has no almond mac key, anyways we need no check, the response is based on request and not dynamic.
 //    BOOL isMatchingAlmondOrLocal = ([[payload valueForKey:@"AlmondMAC"] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
 //    if(!isMatchingAlmondOrLocal) //for cloud
 //        return;
-//    NSLog(@"router payload: %@", payload);
+    
+    NSLog(@"router payload: %@", payload);
     SFIGenericRouterCommand *genericRouterCommand;
     if([[payload valueForKey:@"CommandType"] isEqualToString:@"RouterSummary"]){
         genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
