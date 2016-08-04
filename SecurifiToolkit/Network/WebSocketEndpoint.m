@@ -21,8 +21,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 @interface WebSocketEndpoint () <PSWebSocketDelegate>
 @property(nonatomic, strong) PSWebSocket *socket;
+@property(nonatomic, strong) PSWebSocket *socket_mesh;
+
 @property(nonatomic, strong) NetworkConfig *config;
 @property(nonatomic, readonly) NSDictionary *responseHandlers;
+@property BOOL isMesh;
 @end
 
 @implementation WebSocketEndpoint
@@ -43,7 +46,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (void)connect {
     NetworkConfig *config = self.config;
-    
+    self.isMesh = NO;
     NSString *login = config.login;
     NSString *password = config.password;
     NSString *host = config.host;
@@ -71,26 +74,69 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     [self.socket open];
 }
 
+-(void)connectMesh{
+    NSLog(@"connect mesh");
+    NetworkConfig *config = self.config;
+    self.isMesh = YES;
+    NSString *login = config.login;
+    NSString *password = config.password;
+    NSString *host = config.host;
+    NSInteger meshPort = 7682;
+    NSLog(@"connect - login: %@, password: %@, host: %@, %ld", config.login, config.password, config.host, config.port);
+    if (!host || !login || !password) {
+        [self.delegate networkEndpointDidDisconnect:self];
+        return;
+    }
+    
+    password = [password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+    // ws://192.168.1.102:7681/<password>
+    NSString *connect_str_mesh = [NSString stringWithFormat:@"ws://%@:%lu/%@/%@", host, (unsigned long) meshPort, login, password];
+    NSLog(@"connect_str_mesh: %@", connect_str_mesh);
+    NSURL *url_mesh = [NSURL URLWithString:connect_str_mesh];
+    
+    if (!url_mesh){
+        NSLog(@"disconnect disconnected");
+        [self.delegate networkEndpointDidDisconnect:self];
+        return;
+    }
+    
+    NSURLRequest *request_mesh = [NSURLRequest requestWithURL:url_mesh];
+
+    self.socket_mesh = [PSWebSocket clientSocketWithRequest:request_mesh];
+    self.socket_mesh.delegate = self;
+    
+    [self.socket_mesh open];
+}
 - (void)shutdown {
     NSLog(@"websocket shutDown");
     [self.socket close];
+    [self.socket_mesh close];
 }
 
 - (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
     NSData *data = obj.command;
-    [self.socket send:data];
+    if(obj.isMesh)
+        [self.socket_mesh send:data];
+    else
+        [self.socket send:data];
 
 
     if([data isKindOfClass:[NSData class]])
         NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     else
-            NSLog(@"websocket send: %@", data);
+        NSLog(@"websocket send: %@", data);
     return YES;
 }
 
 #pragma mark - PSWebSocketDelegate methods
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     NSLog(@"webSocketDidOpen");
+    if(self.isMesh){
+        return;
+    }
+    [self connectMesh];
+    
     [self.delegate networkEndpointDidConnect:self];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
 //    [toolkit cleanUp];
@@ -149,23 +195,28 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (NSDictionary *)buildResponseHandlers {
     return @{
-             //new router commands
-//             @"RouterSummary" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
-//             },
-//             @"GetWirelessSettings" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
-//             },
-//             @"SetWirelessSettings" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
-//             },
-//             @"RebootRouter" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
-//             },
-//             @"SendLogs" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_ROUTER_COMMAND_REQUEST_RESPONSE];
-//             },
-             
+             //meshcommands
+             @"MeshList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
+             @"CheckForAddableWiredSlave" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
+             @"CheckForAddableWirelessSlave" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
+             @"AddWiredSlave" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
+             @"AddWirelessSlave" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
+             @"BlinkLed" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
+             @"SetSlaveName" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
              //new device commands
              @"DeviceList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES];

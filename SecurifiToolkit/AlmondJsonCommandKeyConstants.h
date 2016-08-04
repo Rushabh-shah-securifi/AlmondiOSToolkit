@@ -11,6 +11,9 @@
 
 //common
 #define COMMAND_TYPE @"CommandType"
+#define MOBILE_INTERNAL_INDEX @"MobileInternalIndex"
+#define SUCCESS @"Success"
+#define REASON @"Reason"
 
 //generic index key constants
 #define INDEX_NAME @"Name"
@@ -83,7 +86,6 @@
 #define ALLOWED_TYPE_ONSCHEDULE @"OnSchedule"
 
 //DevicePayload
-#define MOBILE_INTERNAL_INDEX @"MobileInternalIndex"
 #define UPDATE_DEVICE_INDEX @"UpdateDeviceIndex"
 #define D_ID @"ID"
 #define INDEX @"Index"
@@ -139,7 +141,13 @@
  "{
  "CommandMode":"Reply",
  "CommandType":"MeshList",
- "MasterName":"Living Room"
+ "MasterName":"Den",
+ "ConnectedVia":"Directly",
+ "AlmondMode":"Router Mode",
+ "2.4GHzSSID":"Almond-6683",
+ "5GHZSSID":"Almond-6683_5G",
+ "Interface":"wired",
+ 
  "Slaves":[
  {"SlaveUniqueName":"Almond123","SlaveName":"Den","Interface":"Wired","SignalStrength":"Good (-40dBm)"},
  {"SlaveUniqueName":"Almond456","SlaveName":"Bedroom","Interface":"Wireless","SignalStrength":"Excellent (-10dBm)"},
@@ -149,12 +157,16 @@
  "ReasonCode":"0"
  }"
  */
-#define  COMMAND_MODE @"CommandMode"
-#define  MASTER_NAME @"MasterName"
-#define  SLAVES @"Slaves"
-#define  SLAVE_UNIQUE_NAME @"SlaveUniqueName"
-#define  SLAVE_NAME @"SlaveName"
-#define  INTERFACE @"Interface"
-
-
+#define COMMAND_MODE @"CommandMode"
+#define MASTER_NAME @"MasterName"
+#define SLAVES @"Slaves"
+#define SLAVE_UNIQUE_NAME @"SlaveUniqueName"
+#define SLAVE_NAME @"SlaveName"
+#define INTERFACE @"Interface"
+#define CONNECTED_VIA @"ConnectedVia"
+#define ALMOND_MODE @"AlmondMode"
+#define TwoGHzSSID @"2.4GHzSSID"
+#define FiveGHZSSID @"5GHZSSID"
+#define ONLINE @"Online"
+#define SIGNAL_STRENGTH @"SignalStrength"
 #endif /* AlmondJsonCommandKeyConstants_h */
