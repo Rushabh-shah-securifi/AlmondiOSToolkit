@@ -76,6 +76,9 @@
 
 
 #define NOTIFICATION_IMAGE_FETCH    @"NOTIFICATION_IMAGE_FETCH"
+//Mesh
+#define NOTIFICATION_CommandType_MESH_RESPONSE    @"NOTIFICATION_CommandType_MESH_RESPONSE"
+
 // XML
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
 #define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"

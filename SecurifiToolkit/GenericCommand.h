@@ -58,6 +58,7 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
+@property(nonatomic) BOOL isMesh;
 
 // optional function that will be called upon submission of the command to a network for processing.
 // can be used for storing state and validating that the command should continue processing.

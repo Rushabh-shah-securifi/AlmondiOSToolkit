@@ -33,6 +33,9 @@
 }
 
 -(NSString*)transform:(NSString*)value genericId:(NSString *)genericIndexID{
+    if(value.length == 0)
+        return @"";
+    
     float fVal = [value floatValue];
     float roundVal = roundf(fVal*self.factor);
     NSLog(@"actual value:%f, multiplied value: %f, rounded value: %f", fVal, fVal*self.factor, roundVal);

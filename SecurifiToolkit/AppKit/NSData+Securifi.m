@@ -71,15 +71,15 @@
     }
     
     NSData *data = [NSData dataWithBytes:buffer_out length:numBytesProcessed];
-    //NSLog(@"data: %@", data);
-    //NSLog(@"datalength: %d", data.length);
+    NSLog(@"data: %@", data);
+    NSLog(@"datalength: %d", data.length);
     return [self securifiTrimToNull:data];
 }
 
 - (NSData *)securifiTrimToNull:(NSData *)payload {
     NSUInteger nullIndex = 0;
     for (nullIndex = 0; nullIndex < payload.length; nullIndex++) {
-        unichar val;
+        char val;
         [payload getBytes:&val range:NSMakeRange(nullIndex, 1)];
 //        NSLog(@"null val: %d", val);
         if (val == 0) {
