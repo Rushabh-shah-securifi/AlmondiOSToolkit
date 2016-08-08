@@ -8,6 +8,7 @@
 
 #import "RouterParser.h"
 #import "SecurifiToolkit.h"
+#import "AlmondJsonCommandKeyConstants.h"
 
 @implementation RouterParser
 
@@ -18,6 +19,7 @@
     }
     return self;
 }
+
 -(void)initNotification{
     NSLog(@"init device notification");
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -56,23 +58,23 @@
     SFIGenericRouterCommand *genericRouterCommand;
     NSString *commandType = payload[@"CommandType"];
     if([commandType isEqualToString:@"RouterSummary"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
         
     }else if([commandType isEqualToString:@"GetWirelessSettings"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
     else if([commandType isEqualToString:@"SetWirelessSettings"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
 
     else if([commandType isEqualToString:@"FirmwareUpdate"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE success:(payload[@"Success"] == nil)? true: [payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:[payload[@"Percentage"] intValue] reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE success:(payload[@"Success"] == nil)? true: [payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:[payload[@"Percentage"] intValue] reason:payload[@"Reason"]];
     }
     else if([commandType isEqualToString:@"RebootRouter"]){
-        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_REBOOT success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue ] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_REBOOT success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue ] completionPercentage:0 reason:payload[@"Reason"]];
     }
     else if([commandType isEqualToString:@"SendLogs"]){
-        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_SEND_LOGS_RESPONSE success:[payload[@"Success"] boolValue] MAC:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_SEND_LOGS_RESPONSE success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
     
     NSDictionary *data = nil;
@@ -85,12 +87,12 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER object:nil userInfo:data];
 }
 
-+(SFIGenericRouterCommand*)createGenericRouterCommand:(id)command commandType:(SFIGenericRouterCommandType)type success:(BOOL)success MAC:(NSString*)MAC mii:(int)mii completionPercentage:(unsigned int)completionPercentage reason:(NSString*)reason{
++(SFIGenericRouterCommand*)createGenericRouterCommand:(id)command commandType:(SFIGenericRouterCommandType)type success:(BOOL)success Mac:(NSString*)Mac mii:(int)mii completionPercentage:(unsigned int)completionPercentage reason:(NSString*)reason{
     SFIGenericRouterCommand *genericRouterCommand = [SFIGenericRouterCommand new];
     genericRouterCommand.command = command;
     genericRouterCommand.commandType = type;
     genericRouterCommand.commandSuccess = success;
-    genericRouterCommand.almondMAC = MAC;
+    genericRouterCommand.almondMAC = Mac;
     genericRouterCommand.mii = mii;
     genericRouterCommand.completionPercentage = completionPercentage;
     genericRouterCommand.responseMessage = reason;
@@ -108,8 +110,17 @@
     routerSummary.routerUptime = payload[@"RouterUptime"];
     routerSummary.firmwareVersion = payload[@"FirmwareVersion"];
     routerSummary.wirelessSummaries = [self parseWirelessSettingsSummary:payload[@"WirelessSetting"]];
+    routerSummary.almondsList = [self getAlmondsList:payload];
     return routerSummary;
 }
+
++(NSArray*)getAlmondsList:(NSDictionary*)payload{
+    NSMutableArray *almondsList = [payload[SLAVES] mutableCopy];
+    NSDictionary *masterAlmond = @{@"Name":[SecurifiToolkit sharedInstance].currentAlmond.almondplusName};
+    [almondsList insertObject:masterAlmond atIndex:0];
+    return almondsList;
+}
+
 
 +(NSArray*)parseWirelessSettingsSummary:(NSArray*)wirelessSettingsPayloadArray{
     NSMutableArray *wirelessSettingsObjsArray = [NSMutableArray new];
@@ -140,211 +151,6 @@
     
     return wirelessSettingsArray;
 }
-
-/**** testing *********/
-+(void)testRouterParser{
-    [self sendrouterSummary];
-    [self getWirelessSetting];
-    [self setWirelessSetting];
-}
-+(NSString *)getAlmondMac{
-    return [SecurifiToolkit sharedInstance].currentAlmond.almondplusMAC;
-}
-+(void)sendrouterSummary{
-    NSLog(@"router summery %@",[self getAlmondMac]);
-    NSString *macRushab = @"";
-    NSString *urlRushab = @"";
-    NSString *loginRushab = @"";
-    NSString *passRushab = @"";
-    
-    NSString *macRoja = @"251176215905264";
-    NSString *urlRoja = @"10.1.1.125";
-    NSString *loginRoja = @"admin";
-    NSString *passRoja = @"root";
-    
-    NSString *macNagasai = @"251176215905200";
-    NSString *urlNagasai = @"20.10.10.5";
-    NSString *loginNagasai = @"admin";
-    NSString *passNagasai = @"root";
-    
-    NSString *macMasood = @"251176216953264";
-    NSString *urlMasood = @"10.10.11.11";
-    NSString *loginMasood = @"root";
-    NSString *passMasood = @"root";
-    
-    NSString *mac = [self getAlmondMac];
-    NSString *url = urlRoja;
-    NSString *login = loginRoja;
-    NSString *pass = passRoja;
-    
-    if([mac isEqualToString:@"251176215905264"]){
-        url = urlRoja;
-        login = loginRoja;
-        pass = passRoja;
-    }else if([mac isEqualToString:@"251176215905200"]){
-        url = urlNagasai;
-        login = loginNagasai;
-        pass = passNagasai;
-    }else if([mac isEqualToString:@"251176216953264"]){
-        url = urlMasood;
-        login = loginMasood;
-        pass = passMasood;
-    }
-    
-    NSDictionary *routerSumary = @{
-                                   @"CommandType":@"RouterSummary",
-                                   @"MobileInternalIndex":@"123456",
-                                   @"AlmondMAC":mac,
-                                   @"AppID":@"123",
-                                   @"Success":@"true",
-                                   @"WirelessSetting":@[
-                                           @{
-                                               @"Type":@"2G",
-                                               @"Enabled":@"true",
-                                               @"SSID":@"Main2.4GHz"
-                                               },
-                                           @{
-                                               @"Type":@"Guest2G",
-                                               @"Enabled":@"false",
-                                               @"SSID":@"Guest2.4GHz"
-                                               }
-                                           ],
-                                   @"Uptime":@"12633321",
-                                   @"URL":url,
-                                   @"Login":login,
-                                   @"TempPass":pass,
-                                   @"RouterUptime":@"5 days, 6:15hrs",
-                                   @"FirmwareVersion":@"AL2-R091"
-                                   
-                                   };
-    [self parseRouterCommandResponse:[self getcommand:routerSumary]];
-}
-
-+(void)getWirelessSetting{
-    NSDictionary *getWirelessSettings = @{
-                                          @"CommandType":@"GetWirelessSettings",
-                                          @"AlmondMAC":[self getAlmondMac],
-                                          @"AppID":@"123",
-                                          @"Success":@"true",
-                                          @"MobileInternalIndex":@"123",
-                                          
-                                          @"WirelessSetting":@[
-                                                  @{
-                                                      @"Type":@"2G",
-                                                      @"Enabled":@"true",
-                                                      @"SSID":@"AlmondNetwork",
-                                                      @"Channel":@"1",
-                                                      @"EncryptionType":@"AES",
-                                                      @"Security":@"WPA2PSK",
-                                                      @"WirelessMode":@"802.11bgn",
-                                                      @"CountryRegion":@"0"
-                                                      },
-                                                  @{
-                                                      @"Type":@"Guest2G",
-                                                      @"Enabled":@"true",
-                                                      @"SSID":@"Guest",
-                                                      @"Channel":@"1",
-                                                      @"EncryptionType":@"AES",
-                                                      @"Security":@"WPA2PSK",
-                                                      @"WirelessMode":@"802.11bgn",
-                                                      @"CountryRegion":@"0"
-                                                      }
-                                                  ]
-                                          
-                                          
-                                          };
-    [self parseRouterCommandResponse:[self getcommand:getWirelessSettings]];
-}
-
-+(void)setWirelessSetting{
-    NSDictionary *setWirelessSettings = @{
-                                          @"CommandType":@"SetWirelessSettings",
-                                          @"AlmondMAC":[self getAlmondMac],
-                                          @"AppID":@"123",
-                                          @"Success":@"true",
-                                          @"MobileInternalIndex":@"123",
-                                          
-                                          @"WirelessSetting":@[
-                                                  @{
-                                                      @"Type":@"2G",
-                                                      @"Enabled":@"true",
-                                                      @"SSID":@"AlmondNetwork",
-                                                      @"Channel":@"1",
-                                                      @"EncryptionType":@"AES",
-                                                      @"Security":@"WPA2PSK",
-                                                      @"WirelessMode":@"802.11bgn",
-                                                      @"CountryRegion":@"0"
-                                                      }
-                                                  ]
-                                          
-                                          };
-    [self parseRouterCommandResponse:[self getcommand:setWirelessSettings]];
-}
-
-+(void)updateFirmwareResponse{
-    //{"CommandType":"FirmwareUpdate","AppID":"1001","Success":"false","ReasonCode":"1"}
-    //{"CommandType":"FirmwareUpdate","AppID":"1001","Percentage":"10"}
-    NSLog(@"updateFirmwareResponse");
-    NSDictionary *firmwareRes1 = @{
-                                   
-                                   @"CommandType": @"FirmwareUpdate",
-                                   @"Success":@"true",
-                                   @"AppID":@"123",
-                                   @"ReasonCode":@"1",
-                                   @"AlmondMAC": [self getAlmondMac]
-                                   };
-    NSDictionary *firmwareRes2 = @{
-                                   
-                                   @"CommandType": @"FirmwareUpdate",
-                                   @"AppID":@"123",
-                                   @"Percentage":@"10",
-                                   @"AlmondMAC": [self getAlmondMac]
-                                   };
-    [self parseRouterCommandResponse:[self getcommand:firmwareRes2]];
-}
-
-+(void)setRebootResponce{
-    NSDictionary *rebootRes = @{
-                                
-                                @"CommandType": @"RebootRouter",
-                                @"Success":@"true",
-                                @"AlmondMAC": [self getAlmondMac],
-                                @"AppID":@"123",
-                                @"MobileInternalIndex":@"123"
-                                };
-    [self parseRouterCommandResponse:[self getcommand:rebootRes]];
-}
-
-+(void)setLogsResponce{
-    NSDictionary *logDict = @{
-                              
-                              @"CommandType": @"SendLogs",
-                              @"Success":@"true",
-                              @"ReasonCode":@"0",
-                              @"AlmondMAC": [self getAlmondMac],
-                              @"AppID":@"123",
-                              @"MobileInternalIndex":@"123"
-                              };
-    [self parseRouterCommandResponse:[self getcommand:logDict]];
-}
-
-+(NSNotification*)getcommand:(NSDictionary*)payload{
-    NSDictionary *data = [self getDataDictionary:payload];
-    NSNotification *notifier = [[NSNotification alloc]initWithName:@"command" object:nil userInfo:data];
-    return notifier;
-}
-
-
-+(NSDictionary*)getDataDictionary:(NSDictionary*)payload{
-    NSDictionary *data = nil;
-    if (payload) {
-        data = @{
-                 @"data" : payload
-                 };
-    }
-    return data;
-}
-
 
 
 @end

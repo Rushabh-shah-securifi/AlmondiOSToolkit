@@ -196,7 +196,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (NSDictionary *)buildResponseHandlers {
     return @{
              //meshcommands
-             @"MeshList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+             @"SlaveDetails" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
              },
              @"CheckForAddableWiredSlave" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {

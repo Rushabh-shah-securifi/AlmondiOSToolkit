@@ -626,6 +626,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 }
 
 - (BOOL)internalSendToCloud:(CloudEndpoint *)cloudEndpoint command:(GenericCommand*)command error:(NSError **)outError {
+    NSLog(@"internal send to cloud");
     if (!cloudEndpoint) {
         DLog(@"%s: aborting send. endoint is null", __PRETTY_FUNCTION__);
         return NO;
@@ -722,7 +723,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                 case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
-                case CommandType_RULE_LIST:{
+                case CommandType_RULE_LIST:
+                case CommandType_MESH_COMMAND:{
                     commandPayload = command.command;
                     break;
                 }
