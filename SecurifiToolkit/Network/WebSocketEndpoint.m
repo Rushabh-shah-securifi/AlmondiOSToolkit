@@ -44,70 +44,50 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     return self;
 }
 
-- (void)connect {
+-(PSWebSocket *)connectSocketToPort:(NSUInteger)almondPort{
+    NSLog(@"connect almond socket");
     NetworkConfig *config = self.config;
-    self.isMesh = NO;
     NSString *login = config.login;
     NSString *password = config.password;
     NSString *host = config.host;
-    NSLog(@"connect - login: %@, password: %@, host: %@", config.login, config.password, config.host);
+    NSLog(@"connect - login: %@, password: %@, host: %@, port: %d", config.login, config.password, config.host, almondPort);
     if (!host || !login || !password) {
         [self.delegate networkEndpointDidDisconnect:self];
-        return;
+        return nil;
     }
     
     password = [password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     
     // ws://192.168.1.102:7681/<password>
-    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@/%@", host, (unsigned long) config.port, login, password];
+    NSString *connect_str = [NSString stringWithFormat:@"ws://%@:%lu/%@/%@", host, (unsigned long) almondPort, login, password];
+    NSLog(@"connected_str: %@", connect_str);
     NSURL *url = [NSURL URLWithString:connect_str];
     if (!url) {
         [self.delegate networkEndpointDidDisconnect:self];
-        return;
+        return nil;
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     
-    self.socket = [PSWebSocket clientSocketWithRequest:request];
-    self.socket.delegate = self;
+    PSWebSocket *almondSocket = [PSWebSocket clientSocketWithRequest:request];
+    almondSocket.delegate = self;
     
-    [self.socket open];
+    [almondSocket open];
+    return almondSocket;
+}
+
+- (void)connect {
+    NSLog(@"connect websocket");
+    self.isMesh = NO;
+    self.socket = [self connectSocketToPort:self.config.port];
 }
 
 -(void)connectMesh{
     NSLog(@"connect mesh");
-    NetworkConfig *config = self.config;
     self.isMesh = YES;
-    NSString *login = config.login;
-    NSString *password = config.password;
-    NSString *host = config.host;
-    NSInteger meshPort = 7682;
-    NSLog(@"connect - login: %@, password: %@, host: %@, %ld", config.login, config.password, config.host, config.port);
-    if (!host || !login || !password) {
-        [self.delegate networkEndpointDidDisconnect:self];
-        return;
-    }
-    
-    password = [password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    
-    // ws://192.168.1.102:7681/<password>
-    NSString *connect_str_mesh = [NSString stringWithFormat:@"ws://%@:%lu/%@/%@", host, (unsigned long) meshPort, login, password];
-    NSLog(@"connect_str_mesh: %@", connect_str_mesh);
-    NSURL *url_mesh = [NSURL URLWithString:connect_str_mesh];
-    
-    if (!url_mesh){
-        NSLog(@"disconnect disconnected");
-        [self.delegate networkEndpointDidDisconnect:self];
-        return;
-    }
-    
-    NSURLRequest *request_mesh = [NSURLRequest requestWithURL:url_mesh];
-
-    self.socket_mesh = [PSWebSocket clientSocketWithRequest:request_mesh];
-    self.socket_mesh.delegate = self;
-    
-    [self.socket_mesh open];
+    self.socket_mesh = [self connectSocketToPort:7682];
 }
+
 - (void)shutdown {
     NSLog(@"websocket shutDown");
     [self.socket close];
@@ -120,8 +100,8 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         [self.socket_mesh send:data];
     else
         [self.socket send:data];
-
-
+    
+    
     if([data isKindOfClass:[NSData class]])
         NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     else
@@ -135,17 +115,18 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     if(self.isMesh){
         return;
     }
-    [self connectMesh];
+    
     
     [self.delegate networkEndpointDidConnect:self];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-//    [toolkit cleanUp];
     
     SFIAlmondPlus *plus = [toolkit currentAlmond];
     [toolkit asyncSendToLocal:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand requestAlmondClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand requestSceneList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand requestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];   
+    [toolkit asyncSendToLocal:[GenericCommand requestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];
+    
+//    [self connectMesh];
 }
 
 
@@ -183,7 +164,6 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
-    
     [self.delegate networkEndpointDidDisconnect:self];
     NSLog(@"The websocket did fail with error: %@", error.description);
 }
@@ -209,6 +189,9 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
              },
              @"AddWirelessSlave" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+             },
+             @"MeshDynamicSlaveAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
              },
              @"BlinkLed" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
@@ -258,7 +241,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
              @"DynamicRuleUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES];
              },
-            
+             
              @"AddRule" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_RULE_COMMAND_RESPONSE];
              },
@@ -382,24 +365,24 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  res.type = DeviceListResponseType_deviceList;
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
              },
-//             @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-//                 AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
-//             },
+             //             @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+             //                 AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
+             //                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];
+             //             },
              @"DynamicAlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
                  res.almondMAC = endpoint.config.almondMac;
                  
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
                  NSLog(@"DynamicAlmondModeUpdated ");
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
+                 //                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
              },
-//             @"AlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-//                 DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
-//                 res.almondMAC = endpoint.config.almondMac;
-//                 
-//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
-//             },
+             //             @"AlmondModeUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+             //                 DynamicAlmondModeChange *res = [DynamicAlmondModeChange parseJson:payload];
+             //                 res.almondMAC = endpoint.config.almondMac;
+             //
+             //                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_MODE_CHANGE];
+             //             },
              @"ClientsList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
                  SFIDevicesList *res = [SFIDevicesList parseJson:payload];
                  

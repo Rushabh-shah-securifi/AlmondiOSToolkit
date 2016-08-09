@@ -15,6 +15,7 @@
 #define SUCCESS @"Success"
 #define REASON @"Reason"
 #define NAME @"Name"
+#define S_NAME @"name"
 
 //generic index key constants
 #define INDEX_NAME @"Name"
