@@ -205,7 +205,7 @@
         case -20:
         {
             client.rssi=get? client.rssi:newValue;
-            return client.rssi;
+            return [NSString stringWithFormat:@"%@ dBm", client.rssi];
         }
         case -21:{
             if(get)
