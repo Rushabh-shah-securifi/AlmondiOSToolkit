@@ -217,11 +217,14 @@
     NSString *aMac = [mainDict valueForKey:@"AlmondMAC"];
     int clientID = [mainDict[@"ClientID"] intValue];
     if(![aMac isEqualToString:plus.almondplusMAC])
-    return;
+        return;
     
-    if ([mainDict[@"CommandType"] isEqualToString:@"UpdatePreference"]) {
+    NSString *commandType = mainDict[@"CommandType"];
+    
+    if ([commandType isEqualToString:@"UpdatePreference"]) {
         Client *client = [Client findClientByID:@(clientID).stringValue];
         client.notificationMode = [mainDict[@"NotificationType"] intValue];
+        NSLog(@"client: %@, noti mode: %d", client, client.notificationMode);
     }
     
     NSDictionary *resData = nil;
