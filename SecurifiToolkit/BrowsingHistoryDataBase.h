@@ -17,4 +17,6 @@
 +(void)insertRecordFromFile:(NSString *)fileName;
 + (NSDictionary *)getSearchString:(NSString *)searchPatten andSearchSting:(NSString *)search;
 + (NSDictionary *)getManualString:(NSString *)searchPatten andSearchSting:(NSString *)search;
++ (int)GetHistoryDatabaseCount;
+
 @end
