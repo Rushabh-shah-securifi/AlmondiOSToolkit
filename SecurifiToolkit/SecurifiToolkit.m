@@ -808,9 +808,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
             if (![state wasHashFetchedForAlmond:mac]) {
                 [state markHashFetchedForAlmond:mac];
                 
-                NSLog(@"%s: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
-                GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
-                [block_self asyncSendCommand:cmd];
+                GenericCommand *cmd;
+//                GenericCommand *cmd = [block_self makeDeviceHashCommand:mac];
+//                [block_self asyncSendCommand:cmd];
 //                [block_self internalInitializeCloud:network command:cmd];
 
 //                [self cleanUp];
@@ -1185,32 +1185,33 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"%s: devices empty: requesting device list for current almond: %@", __PRETTY_FUNCTION__, mac);
         [self asyncRequestDeviceList:mac];
     }
+    NSLog(@"almond.linktype: %d", almond.linkType);
     
-    if (almond.linkType == SFIAlmondPlusLinkType_cloud_local) {
-        // If the network is down, then do not send Hash request:
-        // 1. it's not needed
-        // 2. it will be sent automatically when the connection comes up
-        // 3. sending it now will stimulate connection establishment and sending the command prior to other normal-bring up
-        // commands will cause the connection to fail IF the currently selected almond is no longer linked to the account.
-        Network *network = self.cloudNetwork;
-        
-        if (network == nil) {
-            DLog(@"%s: network is down; not sending request for hash or mode: %@", __PRETTY_FUNCTION__, mac);
-            return;
-        }
-        
-        NetworkState *state = network.networkState;
-        if (![state wasHashFetchedForAlmond:mac]) {
-            [state markHashFetchedForAlmond:mac];
-            
-            DLog(@"%s: hash not checked on this connection: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
-            GenericCommand *cmd = [self makeDeviceHashCommand:mac];
-            [self asyncSendToCloud:cmd];
-        }
-        else {
-            DLog(@"%s: hash already checked on this connection for current almond: %@", __PRETTY_FUNCTION__, mac);
-        }
-    }
+//    if (almond.linkType == SFIAlmondPlusLinkType_cloud_local) {
+//        // If the network is down, then do not send Hash request:
+//        // 1. it's not needed
+//        // 2. it will be sent automatically when the connection comes up
+//        // 3. sending it now will stimulate connection establishment and sending the command prior to other normal-bring up
+//        // commands will cause the connection to fail IF the currently selected almond is no longer linked to the account.
+//        Network *network = self.cloudNetwork;
+//        
+//        if (network == nil) {
+//            DLog(@"%s: network is down; not sending request for hash or mode: %@", __PRETTY_FUNCTION__, mac);
+//            return;
+//        }
+//        
+//        NetworkState *state = network.networkState;
+//        if (![state wasHashFetchedForAlmond:mac]) {
+//            [state markHashFetchedForAlmond:mac];
+//            
+//            DLog(@"%s: hash not checked on this connection: requesting hash for current almond: %@", __PRETTY_FUNCTION__, mac);
+//            GenericCommand *cmd = [self makeDeviceHashCommand:mac];
+//            [self asyncSendToCloud:cmd];
+//        }
+//        else {
+//            DLog(@"%s: hash already checked on this connection for current almond: %@", __PRETTY_FUNCTION__, mac);
+//        }
+//    }
     
     // Fetch the Almond Mode
     [self tryRequestAlmondMode:mac];
@@ -3658,6 +3659,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSLog(@"asyncSendCommand");
     SFIAlmondPlus *almond = [self currentAlmond];
     BOOL local = [self useLocalNetwork:almond.almondplusMAC];
+    NSLog(@"local value: %d", local);
     if(local){
         NSLog(@"asyncSendCommand local");
         [self asyncSendToLocal:command almondMac:almond.almondplusMAC];
