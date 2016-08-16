@@ -430,11 +430,8 @@
 
 - (void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
     values.valueName = payload[D_NAME];
-    values.value = payload[VALUE];
+    values.value = ![payload[VALUE] isKindOfClass:[NSString class]]? [payload[VALUE] stringValue]: payload[VALUE];
 }
-
-
-
 
 //generic device parsing methods
 +(NSDictionary*)parseGenericDevicesDict:(NSDictionary*)genericDevicesDict{
