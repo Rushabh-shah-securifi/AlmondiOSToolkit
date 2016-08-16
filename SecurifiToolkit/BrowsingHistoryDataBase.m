@@ -42,7 +42,7 @@ static sqlite3 *DB = nil;
 }
 
 +(void)createDataBasePath:(NSString*)dbPath{
-    //NSLog(@"createDataBasePath");
+    ////NSLog(@"createDataBasePath");
     NSArray * dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString * docsDir = dirPaths[0];
     // Build the path to the database file
@@ -53,16 +53,16 @@ static sqlite3 *DB = nil;
 
 +(void)setHistoryTable{
     NSFileManager *filemgr = [NSFileManager defaultManager];
-     //NSLog(@"database path = %@",databasePath);
+     ////NSLog(@"database path = %@",databasePath);
     if ([filemgr fileExistsAtPath: databasePath ] == NO){
-        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUEKEY TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,COUNT TEXT,TIME TEXT,ENDIDENTIFIER TEXT)"];
+        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUEKEY TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,COUNT TEXT,TIME INTEGER,ENDIDENTIFIER TEXT)"];
     }
 }
 
 
 +(BOOL)createTable:(NSString*)query{
     BOOL isSuccess = YES;
-    NSLog(@"create table %@",query);
+    //NSLog(@"create table %@",query);
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
@@ -70,15 +70,15 @@ static sqlite3 *DB = nil;
         const char *sql_stmt = [query UTF8String];
         if (sqlite3_exec(database, sql_stmt, NULL, NULL, &errMsg) != SQLITE_OK){
             isSuccess = NO;
-            NSLog(@"Failed to create table  %s",errMsg);
+            //NSLog(@"Failed to create table  %s",errMsg);
         }
-        NSLog(@"created successfully");
+        //NSLog(@"created successfully");
         sqlite3_close(database);
         return  isSuccess;
     }
     else {
         isSuccess = NO;
-        NSLog(@"Failed to open/create database");
+        //NSLog(@"Failed to open/create database");
     }
     return isSuccess;
 }
@@ -94,7 +94,7 @@ static sqlite3 *DB = nil;
                                                            error:&error];
     
     if (error != nil) {
-        NSLog(@"Error: was not able to load json file: %@.",fileName);
+        //NSLog(@"Error: was not able to load json file: %@.",fileName);
     }
     return data;
 }
@@ -107,7 +107,7 @@ static sqlite3 *DB = nil;
         sqlite3_stmt *compiledStatement;
     
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:searchPatten andSearchSting:search];
-        NSLog(@"search ddict %@",dict);
+        //NSLog(@"search ddict %@",dict);
     return dict;
     }
     
@@ -115,11 +115,11 @@ static sqlite3 *DB = nil;
 + (NSDictionary *)getAllBrowsingHistory{
     if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
     {
-        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC",@"251176215905264",@"14:30:c6:46:b7:15"];
+        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84"];
         sqlite3_stmt *compiledStatement;
         
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:@"All" andSearchSting:@""];
-        NSLog(@"search ddict %@",dict);
+        //NSLog(@"search ddict %@",dict);
         return dict;
     }
     
@@ -127,11 +127,11 @@ static sqlite3 *DB = nil;
 + (NSDictionary *)getManualString:(NSString *)searchPatten andSearchSting:(NSString *)search{
     if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
     {
-         NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC",@"251176215905264",@"14:30:c6:46:b7:15"];
+         NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84"];
         sqlite3_stmt *compiledStatement;
         
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:searchPatten andSearchSting:search];
-        NSLog(@"search ddict %@",dict);
+        //NSLog(@"search ddict %@",dict);
         return dict;
     }
     
@@ -150,7 +150,7 @@ static sqlite3 *DB = nil;
             
         }
         NSMutableDictionary *dayDict = [NSMutableDictionary new];
-        NSLog(@"success msg %s",sqlite3_errmsg(database));
+        //NSLog(@"success msg %s",sqlite3_errmsg(database));
         while (sqlite3_step(compiledStatement) == SQLITE_ROW)
         {
             NSString *uriString0 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 0)];
@@ -161,17 +161,19 @@ static sqlite3 *DB = nil;
             
             
             NSString *uriString4 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 4)];
-            NSLog(@"uriString4 %@",uriString4);
+            //NSLog(@"uriString4 %@",uriString4);
             NSString *uriString5 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 5)];
-            NSLog(@"uriString5 %@",uriString5);
-            NSString *uriString6 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 6)];
-            NSLog(@"uriString6 %@",uriString6);
+            //NSLog(@"uriString5 %@",uriString5);
+//            NSString *uriString6 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 6)];
+             int field1 =  sqlite3_column_int(compiledStatement, 6);
+            NSString *uriString6 = [NSString stringWithFormat:@"%d",field1];
+            //NSLog(@"uriString6 %@",uriString6);
             NSDictionary *uriInfo = @{@"hostName":uriString4,
                                       @"Epoc":uriString6,
                                       @"count":uriString5
                                       };
             
-            NSLog(@"upadte time epoc %@",[[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 7)]);
+//            //NSLog(@"upadte time epoc %@",[[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 7)]);
            
             if([self isToaddDict:uriString6 searchPatten:searchPatten andSearchString:search])
             [self addToDictionary:dayDict uriInfo:uriInfo rowID:uriString0];
@@ -181,7 +183,7 @@ static sqlite3 *DB = nil;
         
     }
     else{
-        NSLog(@"errMSg %s",sqlite3_errmsg(database));
+        //NSLog(@"errMSg %s",sqlite3_errmsg(database));
     }
     sqlite3_step(compiledStatement);
     sqlite3_finalize(compiledStatement);
@@ -190,7 +192,7 @@ static sqlite3 *DB = nil;
     return clientBrowsingHistory;
 }
 +(BOOL)isToaddDict:(NSString *)timeEpoc searchPatten:(NSString *)searchPatten andSearchString:(NSString *)search{
-    NSLog(@"searchPatten %@,search %@",searchPatten,search);
+    //NSLog(@"searchPatten %@,search %@",searchPatten,search);
     if([searchPatten isEqualToString:@"All"])
         return YES;
     
@@ -228,57 +230,62 @@ static sqlite3 *DB = nil;
     [self insertHistoryRecord:dict];
 }
 
-+(void)insertHistoryRecord:(NSDictionary *)hDict{
-    NSString *query = @"INSERT INTO HistoryTB (DATE,UNIQUEKEY,AMAC,CMAC, URIS,COUNT,TIME) VALUES(?,?,?,?,?,?,?)";
++(NSString *)insertHistoryRecord:(NSDictionary *)hDict{
+    NSString *query = @"INSERT OR REPLACE INTO HistoryTB (DATE,UNIQUEKEY,AMAC,CMAC, URIS,COUNT,TIME) VALUES(?,?,?,?,?,?,?)";
     [self setHistoryTable];
-    [self insertHistoryEntries:hDict query:query];
+    return [self insertHistoryEntries:hDict query:query];
 //    [self updateEndIdentifier:@""];
 }
-+ (void)insertHistoryEntries:(NSDictionary *)hDict query:(NSString *)query{
++ (NSString *)insertHistoryEntries:(NSDictionary *)hDict query:(NSString *)query{
     sqlite3_stmt *statement;
+    NSString *endtag;
     
     //NSLog(@"dict = %@",hDict);
+    
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         const char *insert_stmt = [query UTF8String];
         sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
-        NSArray *allDate = hDict[@"Data"];
-        //NSLog(@"allDate %@",allDate);
-        for(NSDictionary *dayDict in allDate)
+        NSArray *allObj = hDict[@"Data"];
+        
+        ////NSLog(@"allDate %@",allDate);
+        for(NSDictionary *uriDict in allObj)
         {
-            NSString *date = dayDict[@"Date"];
-            NSArray *uriArr = dayDict[@"URIs"];
-            for(NSDictionary *uriObj in uriArr)
-                {
-                    //NSLog(@"uriObj %@",uriObj);
-
+//            NSString *date = dayDict[@"Date"];
+//            NSArray *uriArr = dayDict[@"URIs"];
+//            for(NSDictionary *uriObj in uriArr)
+//                {
+                    ////NSLog(@"uriObj %@",uriObj);
+                    NSString *str = @"-2";
                     sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
-                    //NSLog(@"fail to sqlite3_prepare_v2 %s",sqlite3_errmsg(database));
-                    sqlite3_bind_text(statement, 1, [date UTF8String], -1, SQLITE_TRANSIENT);
-                    sqlite3_bind_text(statement, 2, [uriObj[@"key"] UTF8String], -1, SQLITE_TRANSIENT);
-                    sqlite3_bind_text(statement, 3, [hDict[@"almondMAC"] UTF8String], -1, SQLITE_TRANSIENT);
-                    sqlite3_bind_text(statement, 4, [hDict[@"clientMAC"] UTF8String], -1, SQLITE_TRANSIENT);
-                    sqlite3_bind_text(statement, 5, [uriObj[@"Hostname"] UTF8String], -1, SQLITE_TRANSIENT);
+                    ////NSLog(@"fail to sqlite3_prepare_v2 %s",sqlite3_errmsg(database));
+                    sqlite3_bind_text(statement, 1, [uriDict[@"Date"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 2, [str UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 3, [hDict[@"AlmondMAC"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 4, [hDict[@"ClientMAC"] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 5, [uriDict[@"Domain"] UTF8String], -1, SQLITE_TRANSIENT);
                     
-                    sqlite3_bind_text(statement, 6, [[NSString stringWithFormat:@"%@",uriObj[@"Count"]] UTF8String], -1, SQLITE_TRANSIENT);
-                    
-                    sqlite3_bind_text(statement, 7, [[NSString stringWithFormat:@"%@",uriObj[@"Epoch"]] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_text(statement, 6, [[NSString stringWithFormat:@"%@",uriDict[@"Count"]] UTF8String], -1, SQLITE_TRANSIENT);
+                    sqlite3_bind_int(statement, 7, [[NSString stringWithFormat:@"%@",uriDict[@"LastVisitedEpoch"]] integerValue]);
+//                    sqlite3_bind_text(statement, 7, [[NSString stringWithFormat:@"%@",uriDict[@"LastVisitedEpoch"]] UTF8String], -1, SQLITE_TRANSIENT);
                     if (sqlite3_step(statement) == SQLITE_DONE){
-                        NSLog(@" successS");
+                        //NSLog(@" successS");
                     }
                     else {
-                        NSLog(@" errorSS");
+                        //NSLog(@" errorSS");
                     }
-                }
+//                }
+            endtag = uriDict[@"LastVisitedEpoch"];
+            //NSLog(@"LastVisitedEpoch == %@",endtag);
         }
 
         sqlite3_close(database);
     }
     else{
-        NSLog(@"fail to open %s",sqlite3_errmsg(database));
+        //NSLog(@"fail to open %s",sqlite3_errmsg(database));
     }
-    
+    return  endtag;
 }
 +(void)updateEndIdentifier:(NSString *)endIdntifier{
     const char *dbpath = [databasePath UTF8String];
@@ -295,14 +302,14 @@ static sqlite3 *DB = nil;
             sqlite3_bind_text(statement, 2, [@"251176215905264" UTF8String], -1, SQLITE_TRANSIENT);
             sqlite3_bind_text(statement, 3, [@"14:30:c6:46:b7:15" UTF8String], -1, SQLITE_TRANSIENT);
         }
-        NSLog(@"error: %s", sqlite3_errmsg(database));
+        //NSLog(@"error: %s", sqlite3_errmsg(database));
         if (sqlite3_step(statement) != SQLITE_DONE)
         {
-            NSLog(@"error on updating ens identifier: %s", sqlite3_errmsg(database));
+            //NSLog(@"error on updating ens identifier: %s", sqlite3_errmsg(database));
         }
         else
         {
-            NSLog(@"updateContact SUCCESS - executed command ");
+            //NSLog(@"updateContact SUCCESS - executed command ");
         }
 //        sqlite3_reset(statement);
 //        sqlite3_step(statement);
@@ -314,56 +321,24 @@ static sqlite3 *DB = nil;
     NSLog(@"error: %s", sqlite3_errmsg(database));
     }
 }
-+ (int) GetHistoryDatabaseCount
-{
-    int count = 0;
-    [self getCount];
-//    const char *dbpath = [databasePath UTF8String];
-//    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
-//    {
-//        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT COUNT(*) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"251176215905264",@"14:30:c6:46:b7:15"];
-////        const char* sqlcountStat = "SELECT COUNT(*) FROM HistoryTB WHERE AMAC = ? AND CMAC = ?";
-//        sqlite3_stmt *statement;
-//        NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
-//       if( sqlite3_prepare_v2(database, [sqlcountStat UTF8String],-1, &statement, NULL)== SQLITE_OK)
-//        {
-//            //Loop through all the returned rows (should be just one)
-//            while( sqlite3_step(statement) == SQLITE_ROW )
-//            {
-//                
-//                count = sqlite3_column_int(statement, 0);
-//                
-//            }
-//        }
-//        else
-//        {
-//            NSLog( @"Failed from sqlite3_prepare_v2. Error is:  %s", sqlite3_errmsg(database) );
-//        }
-//        
-//        // Finalize and close database.
-//        sqlite3_finalize(statement);
-//        sqlite3_close(database);
-//    }
-//    NSLog(@"database count = %d",count);
-////    [self removeSegmentWithSegmentId:2];
-    return count;
-}
-+(void)getCount{
-    int count = 0;
++(NSString *)getStartTag{
+    int max = 0;
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
-        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT COUNT(*) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"251176215905264",@"14:30:c6:46:b7:15"];
-        //        const char* sqlcountStat = "SELECT COUNT(*) FROM HistoryTB WHERE AMAC = ? AND CMAC = ?";
+        
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MAX(TIME) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84"];
+        
         sqlite3_stmt *statement;
-        NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
+        //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
         if( sqlite3_prepare_v2(database, [sqlcountStat UTF8String],-1, &statement, NULL)== SQLITE_OK)
         {
             //Loop through all the returned rows (should be just one)
             while( sqlite3_step(statement) == SQLITE_ROW )
             {
                 
-                count = sqlite3_column_int(statement, 0);
+                max = sqlite3_column_int(statement, 0);
+                NSLog(@"database max db= %d",max);
                 
             }
         }
@@ -379,48 +354,75 @@ static sqlite3 *DB = nil;
     else{
         NSLog(@"error whilw opening database file");
     }
-    NSLog(@"database count = %d",count);
-        [self removeSegmentWithSegmentId:2];
-    return;
+    NSLog(@"total dict = %@",[self getAllBrowsingHistory]);
+    NSLog(@"database max = %d",max);
+    return [NSString stringWithFormat:@"%d",max];
 }
-+ (BOOL) removeSegmentWithSegmentId:(NSInteger)sId
-{
-    BOOL success = NO;
-//    const char *dbpath = [databasePath UTF8String];
-//    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
-//    {
-//       
-//        
-//        sqlite3_stmt *statement;
-//        NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryDB WHERE TIME IN(SELECT TIME FROM HistoryDB ORDRR BY TIME LIMIT 5 ASC)"];
-//        
-//        
-//        NSString *removeKeyword = [NSString stringWithFormat:@"DELETE FROM segment WHERE segment.segment_id = %d",sId];
-//        
-//        if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
-//        {
-//            if(sqlite3_step(statement) == SQLITE_DONE)
-//            {
-//                success = YES;
-//            }
-//            else
-//            {
-//                NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
-//            }
-//            sqlite3_finalize(statement);
-//        }
-//        else
-//        {
-//            NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
-//        }
-//    }
-//    else
-//    {
-//        NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
-//    }
-    [self deleteHitory];
-    return success;
++(int)GetHistoryDatabaseCount{
+    int count = 0;
+    const char *dbpath = [databasePath UTF8String];
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT COUNT(*) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84"];
+        //        const char* sqlcountStat = "SELECT COUNT(*) FROM HistoryTB WHERE AMAC = ? AND CMAC = ?";
+        sqlite3_stmt *statement;
+        //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
+        if( sqlite3_prepare_v2(database, [sqlcountStat UTF8String],-1, &statement, NULL)== SQLITE_OK)
+        {
+            //Loop through all the returned rows (should be just one)
+            while( sqlite3_step(statement) == SQLITE_ROW )
+            {
+                
+                count = sqlite3_column_int(statement, 0);
+                
+            }
+        }
+        else
+        {
+            //NSLog( @"Failed from sqlite3_prepare_v2. Error is:  %s", sqlite3_errmsg(database) );
+        }
+        
+        // Finalize and close database.
+        sqlite3_finalize(statement);
+        sqlite3_close(database);
+    }
+    else{
+        //NSLog(@"error whilw opening database file");
+    }
+    //NSLog(@"database count = %d",count);
+//    [self deleteOldEntries];
+    return count;
 }
++(void)deleteOldEntries{
+    const char *dbpath = [databasePath UTF8String];
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+        sqlite3_stmt *statement;
+        NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryDB WHERE ORDRR BY TIME ASC LIMIT 5)"];
+        if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
+        {
+            if(sqlite3_step(statement) == SQLITE_DONE)
+            {
+                //NSLog(@"succes true done");
+            }
+            else
+            {
+                //NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
+            }
+            sqlite3_finalize(statement);
+        }
+        else
+        {
+            //NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
+        }
+    }
+    else
+    {
+        //NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
+    }
+    return ;
+}
+
 +(void)deleteHitory{
      BOOL success = NO;
     const char *dbpath = [databasePath UTF8String];
@@ -433,7 +435,7 @@ static sqlite3 *DB = nil;
         
         
 //        NSString *removeKeyword = [NSString stringWithFormat:@"DELETE FROM segment WHERE segment.segment_id = %d",sId];
-        
+        //NSLog(@"delete statment = %@",delStatmrnt);
         if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
         {
             if(sqlite3_step(statement) == SQLITE_DONE)
@@ -442,19 +444,41 @@ static sqlite3 *DB = nil;
             }
             else
             {
-                NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
+                //NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
             }
             sqlite3_finalize(statement);
         }
         else
         {
-            NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
+            //NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
         }
     }
     else
     {
-        NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
+        //NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
     }
     return ;
+}
++(void)deleteDB{
+   
+    const char *dbpath = [databasePath UTF8String];
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+         //NSLog(@"delete db method");
+//        NSString *query = @"DROP TABLE historyTable";
+        const char *sql = "DROP TABLE HistoryDB";
+        sqlite3_stmt *statement;
+        if(sqlite3_prepare_v2(database, sql,-1, &statement, NULL) == SQLITE_OK)
+        {
+            if(sqlite3_step(statement) == SQLITE_DONE){
+                // executed
+                //NSLog(@"success deleted all");
+            }else{
+                //NSLog(@"fail delete %s",sqlite3_errmsg(database));
+            }
+        }
+        sqlite3_finalize(statement);
+    }
+    sqlite3_close(database);
 }
 @end

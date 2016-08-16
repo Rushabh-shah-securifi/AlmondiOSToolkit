@@ -11,12 +11,14 @@
 @interface BrowsingHistoryDataBase : NSObject
 
 //+(DBManager*)getSharedInstance;
-+(void)initializeDataBase;
-+(void)insertHistoryRecord:(NSDictionary *)hDict;
++ (void)initializeDataBase;
++ (NSString *)insertHistoryRecord:(NSDictionary *)hDict;
 + (NSDictionary *)getAllBrowsingHistory;
-+(void)insertRecordFromFile:(NSString *)fileName;
++ (void)insertRecordFromFile:(NSString *)fileName;
 + (NSDictionary *)getSearchString:(NSString *)searchPatten andSearchSting:(NSString *)search;
 + (NSDictionary *)getManualString:(NSString *)searchPatten andSearchSting:(NSString *)search;
 + (int)GetHistoryDatabaseCount;
-
++ (NSString *)getStartTag;
++ (void)deleteDB;
++ (void)deleteOldEntries;
 @end
