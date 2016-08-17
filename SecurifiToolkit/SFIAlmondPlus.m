@@ -165,6 +165,7 @@
     //AP2-R086 and above supports generic indexes
 //    almondVersion = [almondVersion uppercaseString];
     BOOL result = NO;
+    //"a" just to make sure internal beta's also support.
     if ([almondVersion hasPrefix:@"AL2-"]) {
         result = [self compareVersions:almondVersion supportedVersion:@"AL2-R091a"];
     }
@@ -173,6 +174,9 @@
     }
     else if([almondVersion hasPrefix:@"AL3-"]){
         result = YES;
+    }
+    else if([almondVersion hasPrefix:@"A1A-"]){
+        result = [self compareVersions:almondVersion supportedVersion:@"A1A-R007"];
     }
     NSLog(@"result: %d", result);
     return result;
