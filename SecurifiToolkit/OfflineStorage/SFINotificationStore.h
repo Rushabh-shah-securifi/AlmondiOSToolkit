@@ -35,6 +35,7 @@
 
 - (void)deleteAllNotifications;
 
+- (NSArray *)fetchRecentNotifications:(NSString *)mac isSensor:(BOOL)isSensor;
 @end
 
 

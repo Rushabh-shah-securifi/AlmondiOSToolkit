@@ -96,16 +96,17 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
     NSData *data = obj.command;
+    //logs
+    if([data isKindOfClass:[NSData class]])
+        NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    else
+        NSLog(@"websocket send: %@", data);
+    
     if(obj.isMesh)
         [self.socket_mesh send:data];
     else
         [self.socket send:data];
     
-    
-    if([data isKindOfClass:[NSData class]])
-        NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-    else
-        NSLog(@"websocket send: %@", data);
     return YES;
 }
 

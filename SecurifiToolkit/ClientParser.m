@@ -60,16 +60,17 @@
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     
-    BOOL isMatchingAlmondOrLocal = ([[mainDict valueForKey:ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
+    BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
     
     NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
+    NSString * commandType = mainDict[COMMAND_TYPE];
     
-    if ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:CLIENTLIST] || [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:@"DynamicClientList"]) {
-        if([[mainDict valueForKey:CLIENTS] isKindOfClass:[NSArray class]])
+    if ([commandType isEqualToString:CLIENTLIST] || [commandType isEqualToString:@"DynamicClientList"]) {
+        if([mainDict[CLIENTS] isKindOfClass:[NSArray class]])
             return;
-        NSDictionary *clientsPayload = [mainDict valueForKey:CLIENTS];
+        NSDictionary *clientsPayload = mainDict[CLIENTS];
         NSArray *clientKeys = clientsPayload.allKeys;
         NSMutableArray *wifiClientsArray = [NSMutableArray new];
         
@@ -84,8 +85,8 @@
             [toolkit getClientsNotificationPreferences];
     }
     
-    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_ADDED]){
-        NSDictionary * dict = [mainDict valueForKey:CLIENTS];
+    else if([commandType isEqualToString:DYNAMIC_CLIENT_ADDED]){
+        NSDictionary * dict = mainDict[CLIENTS];
         NSString *ID = [[dict allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         Client *client = [Client findClientByID:ID];
         if(client){
@@ -98,11 +99,11 @@
         }
     }
     else if (
-               ([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_UPDATED]||
-                [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_JOINED]||
-                [[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_LEFT])
+               ([commandType isEqualToString:DYNAMIC_CLIENT_UPDATED]||
+                [commandType isEqualToString:DYNAMIC_CLIENT_JOINED]||
+                [commandType isEqualToString:DYNAMIC_CLIENT_LEFT])
             ){
-        NSDictionary *clientPayload = [mainDict valueForKey:CLIENTS];
+        NSDictionary *clientPayload = mainDict[CLIENTS];
         NSString *ID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
         NSDictionary *updatedClientPayload = [clientPayload objectForKey:ID];
         
@@ -110,7 +111,7 @@
         if(client)
             [self setDeviceProperties:client forDict:updatedClientPayload];
     }
-    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVED]) {
+    else if([commandType isEqualToString:DYNAMIC_CLIENT_REMOVED]) {
         NSDictionary *clientPayload = mainDict[CLIENTS];
         
         NSString *clientID = [[clientPayload allKeys] objectAtIndex:0]; // Assumes payload always has one device.
@@ -126,7 +127,7 @@
             [toolkit.clients removeObject:toBeRemovedClient];
          NSLog(@"toolkit client list count %ld",toolkit.clients.count);
     }
-    else if([[mainDict valueForKey:COMMAND_TYPE] isEqualToString:DYNAMIC_CLIENT_REMOVEALL]){
+    else if([commandType isEqualToString:DYNAMIC_CLIENT_REMOVEALL]){
         [toolkit.clients removeAllObjects];
     }
     toolkit.clients = [self getSortedDevices];
@@ -143,21 +144,21 @@
 }
 
 -(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{
-    device.name = [dict valueForKey:CLIENT_NAME];
-    device.manufacturer = [dict valueForKey:MANUFACTURER];
-    device.rssi = [dict valueForKey:RSSI];
-    device.deviceMAC = [dict valueForKey:MAC];
-    device.deviceIP = [dict valueForKey:LAST_KNOWN_IP];
-    device.deviceConnection = [dict valueForKey:CONNECTION];
-    device.deviceLastActiveTime = [dict valueForKey:LAST_ACTIVE_EPOCH];
-    device.deviceType = [dict valueForKey:CLIENT_TYPE];
-    device.deviceUseAsPresence = [[dict valueForKey:USE_AS_PRESENCE] boolValue];
-    device.isActive = [[dict valueForKey:ACTIVE] boolValue];
-    device.timeout = [[dict valueForKey:WAIT] integerValue];
-    device.deviceAllowedType = [[dict valueForKey:BLOCK] intValue];
-    device.deviceSchedule = [dict valueForKey:SCHEDULE]==nil? @"": [dict valueForKey:SCHEDULE];
-    device.canBeBlocked = [[dict valueForKey:CAN_BLOCK] boolValue];
-    device.category = [dict valueForKey:CATEGORY];
+    device.name = dict[CLIENT_NAME];
+    device.manufacturer = dict[MANUFACTURER];
+    device.rssi = dict[RSSI];
+    device.deviceMAC = dict[MAC];
+    device.deviceIP = dict[LAST_KNOWN_IP];
+    device.deviceConnection = dict[CONNECTION];
+    device.deviceLastActiveTime = dict[LAST_ACTIVE_EPOCH];
+    device.deviceType = dict[CLIENT_TYPE];
+    device.deviceUseAsPresence = [dict[USE_AS_PRESENCE] boolValue];
+    device.isActive = [dict[ACTIVE] boolValue];
+    device.timeout = [dict[WAIT] integerValue];
+    device.deviceAllowedType = [dict[BLOCK] intValue];
+    device.deviceSchedule = dict[SCHEDULE]==nil? @"": dict[SCHEDULE];
+    device.canBeBlocked = [dict[CAN_BLOCK] boolValue];
+    device.category = dict[CATEGORY];
 }
 
 -(NSMutableArray*)getSortedDevices{
@@ -177,10 +178,10 @@
         return;
     }
     NSDictionary * mainDict = [[data valueForKey:@"data"] objectFromJSONData];
-    
-    if ([[mainDict valueForKey:@"Success"] isEqualToString:@"true"]) {
+    BOOL isSuccess = [mainDict[@"Success"] boolValue];
+    if (isSuccess) {
         dispatch_async(dispatch_get_main_queue(), ^() {
-            [self configureNotificationModesForClients:[mainDict valueForKey:@"ClientPreferences"]];
+            [self configureNotificationModesForClients:mainDict[@"ClientPreferences"]];
         });
     }
 }
@@ -194,7 +195,7 @@
 
 -(void)setClientPreference:(Client*)client clientsPreferences:(NSArray*)clientsPreferences{
     for (NSDictionary * dict in clientsPreferences) {
-        if ([[dict valueForKey:@"ClientID"] intValue]==[client.deviceID intValue]) {
+        if ([dict[@"ClientID"] intValue]==[client.deviceID intValue]) {
             client.notificationMode =  [dict[@"NotificationType"] intValue];
             NSLog(@"clientname: %@, client notification mode: %d",client.name, client.notificationMode);
             return;
@@ -214,7 +215,7 @@
     
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *plus = [toolkit currentAlmond];
-    NSString *aMac = [mainDict valueForKey:@"AlmondMAC"];
+    NSString *aMac = mainDict[@"AlmondMAC"];
     int clientID = [mainDict[@"ClientID"] intValue];
     if(![aMac isEqualToString:plus.almondplusMAC])
         return;

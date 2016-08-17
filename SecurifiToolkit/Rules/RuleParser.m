@@ -41,14 +41,14 @@
 
          mainDict = [[[(NSNotification *) sender userInfo] valueForKey:@"data"] objectFromJSONData];
     }
-    if([mainDict valueForKey:@"CommandType"]==nil)
+    if([mainDict isKindOfClass:[NSDictionary class]] == NO)
         return;
     
-    BOOL isMatchingAlmondOrLocal = ([[mainDict valueForKey:ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
+    BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
     
-    NSString *commandType=[mainDict valueForKey:@"CommandType"];
+    NSString *commandType=mainDict[@"CommandType"];
     NSDictionary *rulesDict = mainDict[@"Rules"];
     
     NSLog(@"onRuleList: %@",mainDict);

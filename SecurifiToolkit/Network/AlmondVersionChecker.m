@@ -66,6 +66,9 @@ https://firmware.securifi.com/AP2/version [ap2]
     else if ([almondVersion hasPrefix:@"AP2"]) {
         return [NSURL URLWithString:@"https://firmware.securifi.com/AP2/version"];
     }
+    else if ([almondVersion hasPrefix:@"A1A"]) {
+        return [NSURL URLWithString:@"https://firmware.securifi.com/A1A/version"];
+    }
     else {
         // not recognized version
         return nil;

@@ -50,14 +50,16 @@
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     
-    BOOL isMatchingAlmondOrLocal = ([[mainDict valueForKey:ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
-    if(!isMatchingAlmondOrLocal) //for cloud
+    if([mainDict isKindOfClass:[NSDictionary class]] == NO)
         return;
     
+    BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
+    if(!isMatchingAlmondOrLocal) //for cloud
+        return;
+
     NSLog(@"main scene dict %@",mainDict);
     NSDictionary *dict;
-    NSString * commandType = [mainDict valueForKey:@"CommandType"];
-    
+    NSString * commandType = mainDict[COMMAND_TYPE];
     
     if([commandType isEqualToString:@"DynamicSceneList"] || [commandType isEqualToString:@"SceneList"]){
         if([[mainDict valueForKey:@"Scenes"] isKindOfClass:[NSArray class]])
