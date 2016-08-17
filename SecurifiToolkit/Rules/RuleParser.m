@@ -41,7 +41,7 @@
 
          mainDict = [[[(NSNotification *) sender userInfo] valueForKey:@"data"] objectFromJSONData];
     }
-    if(mainDict[@"CommandType"]==nil)
+    if([mainDict isKindOfClass:[NSDictionary class]] == NO)
         return;
     
     BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;

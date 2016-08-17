@@ -50,6 +50,9 @@
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
     
+    if([mainDict isKindOfClass:[NSDictionary class]] == NO)
+        return;
+    
     BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
