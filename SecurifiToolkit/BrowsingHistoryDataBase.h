@@ -21,4 +21,7 @@
 + (NSString *)getStartTag;
 + (void)deleteDB;
 + (void)deleteOldEntries;
++ (NSDictionary *)todaySearch;
++ (NSDictionary* )LastHourSearch;
+
 @end

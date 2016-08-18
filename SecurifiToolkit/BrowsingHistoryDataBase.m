@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "BrowsingHistoryDataBase.h"
 #import "BrowsingHistoryUtil.h"
+#import "NSDate+Convenience.h"
 
 #import <sqlite3.h>
 
@@ -103,7 +104,7 @@ static sqlite3 *DB = nil;
 + (NSDictionary *)getSearchString:(NSString *)searchPatten andSearchSting:(NSString *)search{
     if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
     {
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND URIS LIKE  '%%%@%%'  ORDER BY TIME DESC",@"251176215905264",@"14:30:c6:46:b7:15",search];
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND URIS LIKE  '%%%@%%'  ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84",search];
         sqlite3_stmt *compiledStatement;
     
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:searchPatten andSearchSting:search];
@@ -131,7 +132,7 @@ static sqlite3 *DB = nil;
         sqlite3_stmt *compiledStatement;
         
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:searchPatten andSearchSting:search];
-        //NSLog(@"search ddict %@",dict);
+        NSLog(@"search ddict %@",dict);
         return dict;
     }
     
@@ -149,11 +150,14 @@ static sqlite3 *DB = nil;
             
             
         }
+        else
+             NSLog(@"step fail 1");
         NSMutableDictionary *dayDict = [NSMutableDictionary new];
         //NSLog(@"success msg %s",sqlite3_errmsg(database));
         while (sqlite3_step(compiledStatement) == SQLITE_ROW)
         {
             NSString *uriString0 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 0)];
+            NSDate *date = [NSDate convertStirngToDate:uriString0];
             if([[dayDict allKeys] containsObject:uriString0]){
                 
             }
@@ -167,23 +171,22 @@ static sqlite3 *DB = nil;
 //            NSString *uriString6 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 6)];
              int field1 =  sqlite3_column_int(compiledStatement, 6);
             NSString *uriString6 = [NSString stringWithFormat:@"%d",field1];
-            //NSLog(@"uriString6 %@",uriString6);
-            NSDictionary *uriInfo = @{@"hostName":uriString4,
-                                      @"Epoc":uriString6,
-                                      @"count":uriString5
-                                      };
+            NSMutableDictionary *uriInfo = [NSMutableDictionary new];
+            [uriInfo setObject:uriString4 forKey:@"hostName"];
+            [uriInfo setObject:uriString6 forKey:@"Epoc"];
+            [uriInfo setObject:uriString5 forKey:@"count"];
+            [uriInfo setObject:[UIImage imageNamed:@"help-icon" ] forKey:@"image"];
             
 //            //NSLog(@"upadte time epoc %@",[[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 7)]);
            
             if([self isToaddDict:uriString6 searchPatten:searchPatten andSearchString:search])
             [self addToDictionary:dayDict uriInfo:uriInfo rowID:uriString0];
         }
-        
         [clientBrowsingHistory setObject:dayDict forKey:@"Data"];
         
     }
     else{
-        //NSLog(@"errMSg %s",sqlite3_errmsg(database));
+        NSLog(@"prepare errMSg %s",sqlite3_errmsg(database));
     }
     sqlite3_step(compiledStatement);
     sqlite3_finalize(compiledStatement);
@@ -192,7 +195,6 @@ static sqlite3 *DB = nil;
     return clientBrowsingHistory;
 }
 +(BOOL)isToaddDict:(NSString *)timeEpoc searchPatten:(NSString *)searchPatten andSearchString:(NSString *)search{
-    //NSLog(@"searchPatten %@,search %@",searchPatten,search);
     if([searchPatten isEqualToString:@"All"])
         return YES;
     
@@ -200,6 +202,7 @@ static sqlite3 *DB = nil;
         return [BrowsingHistoryUtil isTodaySearch:timeEpoc];
     }
     else if ([searchPatten isEqualToString:@"weekDay"]){
+//        NSLog(@"week day search... %d",[BrowsingHistoryUtil searchByWeeKDay:timeEpoc andSearchString:search]);
         return [BrowsingHistoryUtil searchByWeeKDay:timeEpoc andSearchString:search];
     }
     else if ([searchPatten isEqualToString:@"monthDay"]){
@@ -214,7 +217,7 @@ static sqlite3 *DB = nil;
         return NO;
 }
 
-+ (void)addToDictionary:(NSMutableDictionary *)rowIndexValDict uriInfo:(NSDictionary *)uriInfo rowID:(NSString *)day{
++ (void)addToDictionary:(NSMutableDictionary *)rowIndexValDict uriInfo:(NSMutableDictionary *)uriInfo rowID:(NSString *)day{
     NSMutableArray *augArray = [rowIndexValDict valueForKey:[NSString stringWithFormat:@"%@",day]];
     if(augArray != nil){
         [augArray addObject:uriInfo];
@@ -354,8 +357,8 @@ static sqlite3 *DB = nil;
     else{
         NSLog(@"error whilw opening database file");
     }
-    NSLog(@"total dict = %@",[self getAllBrowsingHistory]);
-    NSLog(@"database max = %d",max);
+//    NSLog(@"total dict = %@",[self getAllBrowsingHistory]);
+//    NSLog(@"database max = %d",max);
     return [NSString stringWithFormat:@"%d",max];
 }
 +(int)GetHistoryDatabaseCount{
@@ -395,70 +398,36 @@ static sqlite3 *DB = nil;
 }
 +(void)deleteOldEntries{
     const char *dbpath = [databasePath UTF8String];
+    
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
+        NSLog(@"database path %s",dbpath);
         sqlite3_stmt *statement;
-        NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryDB WHERE ORDRR BY TIME ASC LIMIT 5)"];
+        NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE TIME IN(SELECT TIME FROM HistoryTB order by TIME ASC limit 50)"];
         if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
         {
             if(sqlite3_step(statement) == SQLITE_DONE)
             {
-                //NSLog(@"succes true done");
+                NSLog(@"succes true done");
             }
             else
             {
-                //NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
+                NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
             }
             sqlite3_finalize(statement);
         }
         else
         {
-            //NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
+            NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(database));
         }
     }
     else
     {
-        //NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
+        NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(database));
     }
     return ;
 }
 
-+(void)deleteHitory{
-     BOOL success = NO;
-    const char *dbpath = [databasePath UTF8String];
-    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
-    {
-        
-        
-        sqlite3_stmt *statement;
-        NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryDB WHERE TIME IN(SELECT TIME FROM HistoryDB ORDRR BY TIME LIMIT 5 ASC)"];
-        
-        
-//        NSString *removeKeyword = [NSString stringWithFormat:@"DELETE FROM segment WHERE segment.segment_id = %d",sId];
-        //NSLog(@"delete statment = %@",delStatmrnt);
-        if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
-        {
-            if(sqlite3_step(statement) == SQLITE_DONE)
-            {
-                success = YES;
-            }
-            else
-            {
-                //NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
-            }
-            sqlite3_finalize(statement);
-        }
-        else
-        {
-            //NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
-        }
-    }
-    else
-    {
-        //NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(dbpath));
-    }
-    return ;
-}
 +(void)deleteDB{
    
     const char *dbpath = [databasePath UTF8String];
@@ -466,7 +435,7 @@ static sqlite3 *DB = nil;
     {
          //NSLog(@"delete db method");
 //        NSString *query = @"DROP TABLE historyTable";
-        const char *sql = "DROP TABLE HistoryDB";
+        const char *sql = "DROP TABLE HistoryTB";
         sqlite3_stmt *statement;
         if(sqlite3_prepare_v2(database, sql,-1, &statement, NULL) == SQLITE_OK)
         {
@@ -481,4 +450,97 @@ static sqlite3 *DB = nil;
     }
     sqlite3_close(database);
 }
+
++(NSDictionary* )todaySearch{
+    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE IN(SELECT DATE FROM HistoryTB WHERE DATE = \"%@\" ) ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84",@"10-8-2016"];
+        sqlite3_stmt *compiledStatement;
+        
+        NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:@"All" andSearchSting:@""];
+//        NSLog(@"search ddict %@",dict);
+        return dict;
+    }
+
+}
++(NSDictionary* )LastHourSearch{
+    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME >= \"%f\" ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84",[[NSDate date] timeIntervalSince1970] - 3600];
+//        NSLog(@"crrent time epoch %d",[[NSDate date] timeIntervalSince1970] - 3600);
+        
+        sqlite3_stmt *compiledStatement;//[[NSDate date] timeIntervalSince1970] - 3600
+        
+        NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:@"All" andSearchSting:@""];
+        NSLog(@"search ddict time %@",dict);
+        [self weekDaySearch];
+        return dict;
+    }
+    
+}
++(NSDictionary* )weekDaySearch{
+    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB WHERE strftime('%w', TIME)= \'0\' ) ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84"];
+        sqlite3_stmt *compiledStatement;//[[NSDate date] timeIntervalSince1970] - 3600
+         NSLog(@"sql statement week = %@",sqlStatement);
+        NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:@"All" andSearchSting:@""];
+        NSLog(@"search ddict weekDay %@",dict);
+        
+        [self week1];
+//        [self DaySearch];
+        [self getTodayDate];
+        return dict;
+    }
+    
+}
++(void)week1{
+    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSString *sqlStatement2 =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB WHERE strftime('%w', TIME)= \'%f\' ) ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84",2];
+        sqlite3_stmt *compiledStatement2;//[[NSDate date] timeIntervalSince1970] - 3600
+        NSLog(@"sql statement week1 = %@",sqlStatement2);
+        NSDictionary *dict1 = [self prepareMethod:compiledStatement2 andsqlStatement:sqlStatement2 searchPatten:@"All" andSearchSting:@""];
+        NSLog(@"search ddict weekDay1 %@",dict1);
+        
+         }
+    [self week2];
+}
++(void)week2{
+    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSString *sqlStatement3 =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB WHERE strftime('%w', TIME)= '0' ) ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84"];
+        sqlite3_stmt *compiledStatement3;//[[NSDate date] timeIntervalSince1970] - 3600
+        NSLog(@"sql statement week3 = %@",sqlStatement3);
+        NSDictionary *dict3 = [self prepareMethod:compiledStatement3 andsqlStatement:sqlStatement3 searchPatten:@"All" andSearchSting:@""];
+        NSLog(@"search ddict weekDay3 %@",dict3);
+        [self getTodayDate];
+    }
+    
+}
++(void)week3{
+    
+}
++(NSDictionary* )DaySearch{
+    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+    {
+        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB WHERE strftime('%Y-%m-%d',TIME) = \"%@\") ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84",@"2016-8-10"];
+        NSLog(@"sql statement = %@",sqlStatement);
+        sqlite3_stmt *compiledStatement;//[[NSDate date] timeIntervalSince1970] - 3600
+        
+        NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement searchPatten:@"All" andSearchSting:@""];
+        NSLog(@"search ddict mday %@",dict);
+        return dict;
+    }
+    
+}
++ (NSString *)getTodayDate{
+    NSDateFormatter *dateformate=[[NSDateFormatter alloc]init];
+    [dateformate setDateFormat:@"dd-MM-yyyy"]; // Date formater
+    NSString *date = [dateformate stringFromDate:[NSDate date]]; // Convert date to string
+    NSLog(@"date getTodayDate:%@",date);
+    return date;
+}
+//@"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB WHERE strftime('%w', TIME) = \"%@\" ) ORDER BY TIME DESC",@"e4:71:85:20:0b:c4",@"10:60:4b:d9:60:84",@"1"
+
 @end

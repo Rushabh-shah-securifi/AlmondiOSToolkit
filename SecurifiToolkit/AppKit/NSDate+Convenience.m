@@ -96,6 +96,7 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"MMMM"];
     NSString *monString = [dateFormatter stringFromDate:self];
+    NSLog(@"monString = %@",monString);
     return monString;
 }
 
@@ -108,7 +109,7 @@
 -(NSString *)getDay{//6
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth fromDate:self];
     NSInteger day = [components day];
-    
+    NSLog(@"day = %@",[NSString stringWithFormat:@"%d", day]);
     return [NSString stringWithFormat:@"%d", day];
 }
 
@@ -117,7 +118,8 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     // this is imporant - we set our input date format to match our input string
     // if format doesn't match you'll get nil from your string, so be careful
-    [dateFormatter setDateFormat:@"yyyy/MM/dd"];
+//    [dateFormatter setDateFormat:@"yyyy/MM/dd"];
+    [dateFormatter setDateFormat:@"dd-MM-yyyy"];
     NSDate *dateFromString = [[NSDate alloc] init];
     // voila!
     dateFromString = [dateFormatter dateFromString:dateString];
