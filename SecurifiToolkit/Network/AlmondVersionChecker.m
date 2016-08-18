@@ -69,6 +69,13 @@ https://firmware.securifi.com/AP2/version [ap2]
     else if ([almondVersion hasPrefix:@"A1A"]) {
         return [NSURL URLWithString:@"https://firmware.securifi.com/A1A/version"];
     }
+    else if ([almondVersion hasPrefix:@"AL3"]) {
+        if([almondVersion.lowercaseString containsString:@"beta"])
+            return [NSURL URLWithString:@"https://firmware.securifi.com/AL3_BETA/version"];
+        else
+            return [NSURL URLWithString:@"https://firmware.securifi.com/AL3/version"];
+    }
+    
     else {
         // not recognized version
         return nil;
