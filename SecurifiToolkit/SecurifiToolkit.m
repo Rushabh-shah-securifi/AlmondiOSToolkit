@@ -64,6 +64,13 @@
 #define kPREF_USER_DEFAULT_LOGGED_IN_ONCE                   @"kLoggedInOnce"
 #define kPREF_DEFAULT_CONNECTION_MODE                       @"kDefaultConnectionMode"
 
+#define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
+#define kDEVICES_HELP_SHOWN                                 @"kDevicesHelpShown"
+#define kRULES_HELP_SHOWN                                   @"kRulesHelpShown"
+#define kSCENES_HELP_SHOWN                                  @"kScenesHelpShown"
+#define kWIFI_HELP_SHOWN                                    @"kWifiHelpShown"
+
+
 #define SEC_SERVICE_NAME                                    @"securifiy.login_service"
 #define SEC_EMAIL                                           @"com.securifi.email"
 #define SEC_PWD                                             @"com.securifi.pwd"
@@ -210,6 +217,50 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     self.genericDevices = [DeviceParser parseGenericDevicesDict:[self.deviceParser parseJson:@"deviceListJson"]];
     self.genericIndexes = [DeviceParser parseGenericIndexesDict:[self.deviceParser parseJson:@"GenericIndexesData"]];
+}
+#pragma mark - helpscreen management
+//called form login page, on each login help screen will be shown
+- (void)initializeHelpScreenUserDefaults{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:NO forKey:kDASHBOARD_HELP_SHOWN];
+    [defaults setBool:NO forKey:kDEVICES_HELP_SHOWN];
+    [defaults setBool:NO forKey:kSCENES_HELP_SHOWN];
+    [defaults setBool:NO forKey:kRULES_HELP_SHOWN];
+    [defaults setBool:NO forKey:kWIFI_HELP_SHOWN];
+    
+    NSLog(@"initialize dashboard default value: %d", [defaults boolForKey:kDASHBOARD_HELP_SHOWN]);
+}
+
+- (void)setScreenDefault:(NSString *)screen{
+    NSLog(@"setScreenDefault");
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if([screen isEqualToString:@"dashboard"])
+        [defaults setBool:YES forKey:kDASHBOARD_HELP_SHOWN];
+    else if([screen isEqualToString:@"devices"])
+        [defaults setBool:YES forKey:kDEVICES_HELP_SHOWN];
+    else if([screen isEqualToString:@"scenes"])
+        [defaults setBool:YES forKey:kSCENES_HELP_SHOWN];
+    else if([screen isEqualToString:@"rules"])
+        [defaults setBool:YES forKey:kRULES_HELP_SHOWN];
+    else if([screen isEqualToString:@"wifi"])
+        [defaults setBool:YES forKey:kWIFI_HELP_SHOWN];
+    NSLog(@"screen : %@");
+}
+
+- (BOOL)isScreenShown:(NSString *)screen{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if([screen isEqualToString:@"dashboard"])
+        return [defaults boolForKey:kDASHBOARD_HELP_SHOWN];
+    else if([screen isEqualToString:@"devices"])
+        return [defaults boolForKey:kDEVICES_HELP_SHOWN];
+    else if([screen isEqualToString:@"scenes"])
+        return [defaults boolForKey:kSCENES_HELP_SHOWN];
+    else if([screen isEqualToString:@"rules"])
+        return [defaults boolForKey:kRULES_HELP_SHOWN];
+    else if([screen isEqualToString:@"wifi"])
+        return [defaults boolForKey:kWIFI_HELP_SHOWN];
+    else
+        return YES;
 }
 
 #pragma mark - Connection management

@@ -415,6 +415,14 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network;
 
 -(void)cleanUp;
+
 - (void)asyncSendCommand:(GenericCommand *)command;
+
 - (GenericCommand *)makeAlmondListCommand;
+
+- (void)initializeHelpScreenUserDefaults;
+
+- (void)setScreenDefault:(NSString *)screen;
+
+- (BOOL)isScreenShown:(NSString *)screen;
 @end
