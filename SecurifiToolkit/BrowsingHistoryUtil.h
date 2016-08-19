@@ -14,4 +14,8 @@
 + (BOOL)monthDateSearch:(NSString *)timeEpoc andSearch:(NSString *)search;
 + (BOOL)isLastWeek:(NSString *)timeEpoc;
 + (BOOL)isLastHour:(NSString*)timeEpoc;
++(BOOL)isContainMonth:(NSString*)search;
++(BOOL)checkValidation:(NSString*)search date:(NSString *)date monthname:(NSString *)monthName;
++(NSString *)getFormateOfDate:(NSString*)search;
++(int)getWeeKdayNumber:(NSString*)search;
 @end

@@ -23,5 +23,10 @@
 + (void)deleteOldEntries;
 + (NSDictionary *)todaySearch;
 + (NSDictionary* )LastHourSearch;
++ (NSDictionary* )ThisWeekSearch;
++(NSDictionary* )DaySearch:(NSString *)search;
++(NSDictionary* )weekDaySearch:(NSString *)search;
++ (NSString *)getTodayDate;
+
 
 @end

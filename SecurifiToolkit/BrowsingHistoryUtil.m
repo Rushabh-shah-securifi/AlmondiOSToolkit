@@ -27,12 +27,12 @@
 +(BOOL)searchByWeeKDay:(NSString *)timeEpoc andSearchString:(NSString *)search{
     NSDate *date = [NSDate getDateFromEpoch:timeEpoc];
     NSDateComponents *components1 = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:date];
-    
+    NSLog(@"date week day %@ ",date);
     NSString *weekDay = [self stringFromWeekday:[components1 weekday]];
-    
+    NSLog(@"searchWeek Day = %@ ,%@",search ,weekDay);
     
     if([weekDay rangeOfString:search].location != NSNotFound){
-       NSLog(@"searchWeek Day = %@ ,%@",search ,weekDay);
+       
         return YES;
     }
     else
@@ -53,6 +53,17 @@
     };
     
     return strings[weekday - 1];
+}
++(int)getWeeKdayNumber:(NSString*)search{
+    NSArray *weekDay = @[@"sunday", @"monday", @"tuesday", @"wednesday", @"thursday", @"friday", @"saturday"];
+    int count = -1;
+    for (NSString *day  in weekDay) {
+        count++;
+        if([[day uppercaseString] rangeOfString:[search uppercaseString]].location != NSNotFound){
+            return count;
+        }
+    }
+    
 }
 + (BOOL)monthDateSearch:(NSString *)timeEpoc andSearch:(NSString *)search{
     NSDate *date = [NSDate getDateFromEpoch:timeEpoc];
@@ -83,13 +94,30 @@
     }
     return NO;
 }
++(NSString *)getFormateOfDate:(NSString*)search{
+     NSArray * searchArr = [search componentsSeparatedByString:@" "];
+    NSString *day;
+    int month;
+    for(NSString *str in searchArr){
+        if([self isContainMonth:str]){
+        month = [self getMonthNo:str];
+            NSLog(@" month == %d ",month);
+        }
+        if([self isNumeric:str])
+            day = str;
+        
+    }
+    NSLog(@" month and date %@,%d",day,month);
+    return [NSString stringWithFormat:@"%@-%d",day,month];
+}
 + (BOOL)isNumeric:(NSString *)code{
     
     NSScanner *ns = [NSScanner scannerWithString:code];
     int the_value;
     if ( [ns scanInt:&the_value] )
     {
-        NSLog(@"INSIDE IF");
+        NSLog(@"INSIDE IF %d",the_value);
+        if(the_value>0 && the_value<32)
         return YES;
     }
     else {
@@ -98,13 +126,33 @@
 }
 +(BOOL)isContainMonth:(NSString*)search{
     NSArray *monthArr = @[@"January", @"February", @"March", @"April", @"May", @"June", @"July", @"August", @"September", @"October", @"November", @"December"];
+    int count = 0;
+    NSLog(@"search str = %@",search);
     for (NSString *month  in monthArr) {
+        count++;
         if([[search uppercaseString] rangeOfString:[month uppercaseString]].location != NSNotFound)
+        {
+        NSLog(@"count monthNo = %d",count);
         return YES;
+        }
     }
     return  NO;
     
 }
++(int)getMonthNo:(NSString*)search{
+    NSArray *monthArr = @[@"January", @"February", @"March", @"April", @"May", @"June", @"July", @"August", @"September", @"October", @"November", @"December"];
+    int count = 0;
+    NSLog(@"search str = %@",search);
+    for (NSString *month  in monthArr) {
+        count++;
+        if([[search uppercaseString] rangeOfString:[month uppercaseString]].location != NSNotFound)
+        {
+            NSLog(@"count monthNo = %d",count);
+            return count;
+        }
+    }
+}
+
 +(BOOL)isLastHour:(NSString*)timeEpoc{
     NSDate *currentTime = [NSDate date];
     NSMutableArray *arrObj = [[NSMutableArray alloc]init];
