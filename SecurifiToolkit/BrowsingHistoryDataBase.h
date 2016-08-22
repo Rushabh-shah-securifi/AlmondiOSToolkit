@@ -15,7 +15,8 @@
 + (NSString *)insertHistoryRecord:(NSDictionary *)hDict;
 + (NSDictionary *)getAllBrowsingHistory;
 + (void)insertRecordFromFile:(NSString *)fileName;
-+ (NSDictionary *)getSearchString:(NSString *)searchPatten andSearchSting:(NSString *)search;
++ (NSDictionary *)getSearchString:(NSString *)search;
+
 + (NSDictionary *)getManualString:(NSString *)searchPatten andSearchSting:(NSString *)search;
 + (int)GetHistoryDatabaseCount;
 + (NSString *)getStartTag;
