@@ -69,7 +69,7 @@
 #define kRULES_HELP_SHOWN                                   @"kRulesHelpShown"
 #define kSCENES_HELP_SHOWN                                  @"kScenesHelpShown"
 #define kWIFI_HELP_SHOWN                                    @"kWifiHelpShown"
-
+#define kWIFI_TRIGGER_HELP_SHOWN                            @"kWifiTriggerHelpShown"
 
 #define SEC_SERVICE_NAME                                    @"securifiy.login_service"
 #define SEC_EMAIL                                           @"com.securifi.email"
@@ -227,6 +227,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [defaults setBool:NO forKey:kSCENES_HELP_SHOWN];
     [defaults setBool:NO forKey:kRULES_HELP_SHOWN];
     [defaults setBool:NO forKey:kWIFI_HELP_SHOWN];
+    [defaults setBool:NO forKey:kWIFI_TRIGGER_HELP_SHOWN];
     
     NSLog(@"initialize dashboard default value: %d", [defaults boolForKey:kDASHBOARD_HELP_SHOWN]);
 }
@@ -244,10 +245,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [defaults setBool:YES forKey:kRULES_HELP_SHOWN];
     else if([screen isEqualToString:@"wifi"])
         [defaults setBool:YES forKey:kWIFI_HELP_SHOWN];
-    NSLog(@"screen : %@");
+    else if([screen isEqualToString:@"wifitrigger"])
+        [defaults setBool:YES forKey:kWIFI_TRIGGER_HELP_SHOWN];
 }
 
 - (BOOL)isScreenShown:(NSString *)screen{
+    NSLog(@"isScreenShown");
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if([screen isEqualToString:@"dashboard"])
         return [defaults boolForKey:kDASHBOARD_HELP_SHOWN];
@@ -259,6 +262,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return [defaults boolForKey:kRULES_HELP_SHOWN];
     else if([screen isEqualToString:@"wifi"])
         return [defaults boolForKey:kWIFI_HELP_SHOWN];
+    else if([screen isEqualToString:@"wifitrigger"])
+        return [defaults boolForKey:kWIFI_TRIGGER_HELP_SHOWN];
     else
         return YES;
 }

@@ -185,8 +185,10 @@
     // need to handle empty SceneEntryList
     for(NSDictionary *entryList in sceneEntryListPayload){
         NSMutableDictionary *mutableEntry = [entryList mutableCopy];
-        
-        if([mutableEntry[@"ID"] isEqualToString:@"0"] &&  [mutableEntry[@"Index"] isEqualToString:@"1"] && ([mutableEntry[@"Value"] isEqualToString:@"home"] ||[mutableEntry[@"Value"] isEqualToString:@"away"])){
+        NSInteger deviceID = [mutableEntry[@"ID"] integerValue];
+        NSInteger index = [mutableEntry[@"Index"] integerValue];
+        NSString *value = mutableEntry[@"Value"];
+        if(deviceID == 0 &&  index == 1 && ([value isEqualToString:@"home"] ||[value isEqualToString:@"away"])){
             [self changeModeProperties:mutableEntry];
             NSLog(@"mutableEntry %@",mutableEntry);
         }

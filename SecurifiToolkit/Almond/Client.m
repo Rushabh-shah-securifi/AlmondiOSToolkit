@@ -246,6 +246,7 @@
     }
     client.deviceSchedule = blockedString;
 }
+
 + (int)activeClientCount{
     int count = 0;
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
@@ -254,6 +255,11 @@
             count++;
     }
     return count;
+}
+
++(int)inactiveClientCount{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    return toolkit.clients.count - [self activeClientCount];
 }
 
 +(NSString*)getAllowedOnNetworkTypeForType:(DeviceAllowedType)type{

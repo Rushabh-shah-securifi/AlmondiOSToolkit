@@ -45,11 +45,11 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 
 + (Client *)findClientByID:(NSString *)clientID;
 
-+(NSArray*) getClientGenericIndexes;
++ (NSArray*) getClientGenericIndexes;
 
-+(NSString*)getOrSetValueForClient:(Client*)client genericIndex:(int)genericIndex newValue:(NSString*)newValue ifGet:(BOOL)get;
++ (NSString*)getOrSetValueForClient:(Client*)client genericIndex:(int)genericIndex newValue:(NSString*)newValue ifGet:(BOOL)get;
 
-+(NSString *)getScheduleById:(NSString*)clientId;
++ (NSString *)getScheduleById:(NSString*)clientId;
 
 + (BOOL)findClientByMAC:(NSString *)mac;
 
@@ -57,4 +57,5 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 
 + (int)activeClientCount;
 
++ (int)inactiveClientCount;
 @end
