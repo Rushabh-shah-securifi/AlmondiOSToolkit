@@ -13,13 +13,14 @@
 //+(DBManager*)getSharedInstance;
 + (void)initializeDataBase;
 + (NSString *)insertHistoryRecord:(NSDictionary *)hDict;
-+ (NSDictionary *)getAllBrowsingHistory;
++ (NSDictionary *)getAllBrowsingHistorywithLimit:(int )limit;
 + (void)insertRecordFromFile:(NSString *)fileName;
 + (NSDictionary *)getSearchString:(NSString *)search;
 
 + (NSDictionary *)getManualString:(NSString *)searchPatten andSearchSting:(NSString *)search;
 + (int)GetHistoryDatabaseCount;
 + (NSString *)getStartTag;
++ (NSString *)getEndTag;
 + (void)deleteDB;
 + (void)deleteOldEntries;
 + (NSDictionary *)todaySearch;
@@ -28,6 +29,7 @@
 +(NSDictionary* )DaySearch:(NSString *)search;
 +(NSDictionary* )weekDaySearch:(NSString *)search;
 + (NSString *)getTodayDate;
++(NSDictionary *)searchBYCategoty:(NSString*)search;
 
 
 @end
