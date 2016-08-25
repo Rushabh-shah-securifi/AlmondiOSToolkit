@@ -71,8 +71,8 @@ static sqlite3 *DB = nil;
     if ([filemgr fileExistsAtPath: databasePath ] == NO){
         [self createTable:@"CREATE TABLE IF NOT EXISTS historyTable (DATE TEXT PRIMARY KEY, URIS TEXT)"];
     }
-     NSDictionary *devicesJson = [self parseJson:@"temp_copy"];
-    [self insertData:devicesJson query:@"INSERT INTO historyTable (date,uris) VALUES(?,?)"];
+//     NSDictionary *devicesJson = [self parseJson:@"temp_copy"];
+//    [self insertData:devicesJson query:@"INSERT INTO historyTable (date,uris) VALUES(?,?)"];
 
 }
 +(void)setHistoryTable{
