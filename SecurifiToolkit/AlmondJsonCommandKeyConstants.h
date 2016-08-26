@@ -152,6 +152,7 @@
 #define DESCRIPTION @"description"
 #define IMAGE @"image"
 #define S_ICON @"icon"
+#define S_URL @"url"
 
 #define COMMAND_MODE @"CommandMode"
 #define MASTER_NAME @"MasterName"
