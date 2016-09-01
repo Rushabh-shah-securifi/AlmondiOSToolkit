@@ -157,7 +157,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         [self markConnectionState:CloudEndpointConnectionStatus_shutdown];
         [block_self.delegate networkEndpointDidDisconnect:block_self];
     });
-
 }
 
 - (void)shutdown {
@@ -462,7 +461,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         }
 
         case NSStreamEventEndEncountered: {
-            NSLog(@"NSStreamEventHasSpaceAvailable");
+            NSLog(@"NSStreamEventEndEncountered");
             if (theStream == self.inputStream) {
                 NSLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
                 [self shutdown];

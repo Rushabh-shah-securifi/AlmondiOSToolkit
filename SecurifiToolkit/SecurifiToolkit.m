@@ -212,8 +212,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.clientParser =[[ClientParser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
     self.routerParser = [[RouterParser alloc]init];
-    [DataBaseManager initializeDataBase];
-    [BrowsingHistoryDataBase initializeDataBase];
+//    [DataBaseManager initializeDataBase];
+//    [BrowsingHistoryDataBase initializeDataBase];
     
     self.genericDevices = [DeviceParser parseGenericDevicesDict:[self.deviceParser parseJson:@"deviceListJson"]];
     self.genericIndexes = [DeviceParser parseGenericIndexesDict:[self.deviceParser parseJson:@"GenericIndexesData"]];
@@ -532,8 +532,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (BOOL)isCloudLoggedIn {
+    NSLog(@"isCloudLoggedIn");
     Network *network = self.cloudNetwork;
     return network && network.loginStatus == NetworkLoginStatusLoggedIn;
+    NSLog(@"status: %d", network.loginStatus);
 }
 
 - (BOOL)isAccountActivated {
