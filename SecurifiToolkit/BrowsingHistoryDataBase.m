@@ -157,7 +157,7 @@ static sqlite3 *DB = nil;
             [uriInfo setObject:uriString0 forKey:@"date"];
             [uriInfo setObject:categoryObj forKey:@"categoryObj"];
             
-            [uriInfo setObject:[UIImage imageNamed:@"help-icon" ] forKey:@"image"];
+            [uriInfo setObject:[UIImage imageNamed:@"globe" ] forKey:@"image"];
             
             
             [self addToDictionary:dayDict uriInfo:uriInfo rowID:uriString0];
@@ -246,7 +246,7 @@ static sqlite3 *DB = nil;
             printf("db error: %s\n", sqlite3_errmsg(database));
             return NO;
         }
-        
+//
         const char *insert_stmt = [query UTF8String];
         sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
         NSArray *allObj = hDict[@"Data"];
@@ -300,7 +300,7 @@ static sqlite3 *DB = nil;
             return NO;
         }
         
-        //     sqlite3_finalize(beginStatement);
+//             sqlite3_finalize(beginStatement);
         sqlite3_finalize(statement);
         sqlite3_finalize(commitStatement);
         sqlite3_close(database);
