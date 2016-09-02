@@ -54,4 +54,5 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 
 - (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other;
 
++ (BOOL)checkIfFirmwareIsCompatible:(SFIAlmondPlus *)almond;
 @end
