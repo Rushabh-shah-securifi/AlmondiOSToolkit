@@ -232,4 +232,15 @@
     return [this_mac isEqualToString:other_mac];
 }
 
+-(BOOL)checkIfFirmwareIsCompatible{
+//    SFIAlmondPlus *currentAlmond = [[SecurifiToolkit sharedInstance] currentAlmond];
+//    BOOL local = [[SecurifiToolkit sharedInstance] useLocalNetwork:currentAlmond.almondplusMAC];
+    
+    //Ignoring the screen in local connection and when firmware is nil
+    if(self.firmware == nil){
+        return YES;
+    }
+    return [self supportsGenericIndexes:self.firmware];
+}
+
 @end

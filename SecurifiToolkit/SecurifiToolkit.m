@@ -212,8 +212,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.clientParser =[[ClientParser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
     self.routerParser = [[RouterParser alloc]init];
-    [DataBaseManager initializeDataBase];
-    [BrowsingHistoryDataBase initializeDataBase];
+//    [DataBaseManager initializeDataBase];
+//    [BrowsingHistoryDataBase initializeDataBase];
     
     self.genericDevices = [DeviceParser parseGenericDevicesDict:[self.deviceParser parseJson:@"deviceListJson"]];
     self.genericIndexes = [DeviceParser parseGenericIndexesDict:[self.deviceParser parseJson:@"GenericIndexesData"]];
@@ -2299,6 +2299,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing local connection", __PRETTY_FUNCTION__);
     }
     
+    [self clearAlmondData];
     [self postNotification:NETWORK_DOWN_NOTIFIER data:nil];
 }
 
@@ -2649,11 +2650,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
+    
+    [self clearAlmondData];
+    [self postNotification:kSFIDidUpdateAlmondList data:plus];
+}
+
+-(void)clearAlmondData{
     [self.devices removeAllObjects];
     [self.clients removeAllObjects];
     [self.scenesArray removeAllObjects];
     [self.ruleList removeAllObjects];
-    [self postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
 - (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)obj {
