@@ -236,7 +236,7 @@
 //    SFIAlmondPlus *currentAlmond = [[SecurifiToolkit sharedInstance] currentAlmond];
 //    BOOL local = [[SecurifiToolkit sharedInstance] useLocalNetwork:currentAlmond.almondplusMAC];
     
-    //Ignoring the screen in local connection and when firmware is nil
+    //Ignoring the screen when firmware is nil
     if(almond.firmware == nil){
         return YES;
     }

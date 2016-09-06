@@ -2588,8 +2588,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Almond Updates
 
 - (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network {
-    
-    
     [network markCloudInitialized];
     
     if (!obj.isSuccessful) {
@@ -2598,6 +2596,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NSArray *almondList = obj.almondPlusMACList;
     
+    NSLog(@"almond list object array: %@", almondList);
     // Store the new list
     [self.dataManager writeAlmondList:almondList];
     
@@ -2620,7 +2619,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     NSArray *almondList = obj.almondPlusMACList;
-    
+    NSLog(@"onDynamicAlmondListAdd: %@", almondList);
     // Store the new list
     [self.dataManager writeAlmondList:almondList];
     
