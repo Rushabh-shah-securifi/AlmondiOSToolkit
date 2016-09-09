@@ -64,7 +64,7 @@
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
     
-    NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
+//    NSLog(@"onWiFiClientsListResAndDynamicCallbacks: %@",mainDict);
     NSString * commandType = mainDict[COMMAND_TYPE];
     
     if ([commandType isEqualToString:CLIENTLIST] || [commandType isEqualToString:@"DynamicClientList"]) {
