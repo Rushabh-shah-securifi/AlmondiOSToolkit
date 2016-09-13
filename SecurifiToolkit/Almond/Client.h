@@ -33,6 +33,7 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 @property(nonatomic) DeviceAllowedType deviceAllowedType;
 @property(nonatomic) NSString *deviceSchedule;
 @property(nonatomic) NSString *category;
+@property(nonatomic) BOOL webHistoryEnable;
 @property(nonatomic) BOOL *canBeBlocked;
 
 @property(nonatomic) SFINotificationMode notificationMode;
