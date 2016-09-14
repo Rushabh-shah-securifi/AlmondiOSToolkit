@@ -30,6 +30,7 @@
 +(NSDictionary* )weekDaySearch:(NSString *)search;
 + (NSString *)getTodayDate;
 +(NSDictionary *)searchBYCategoty:(NSString*)search;
++(NSString *)getPageState;
 
 
 @end
