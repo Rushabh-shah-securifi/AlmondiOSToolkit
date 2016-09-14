@@ -835,6 +835,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 //        [block_self asyncSendCommand:cmd];
     });
 }
+
 -(void)cleanUp{
     [self removeObjectFromArray:self.devices];
     [self removeObjectFromArray:self.scenesArray];
@@ -2596,13 +2597,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NSArray *almondList = obj.almondPlusMACList;
     
-    NSLog(@"almond list object array: %@", almondList);
+    NSLog(@"almond list - object array: %@", almondList);
     // Store the new list
     [self.dataManager writeAlmondList:almondList];
     
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
     
+    NSLog(@"almond list - plus: %@", plus);
     // After requesting the Almond list, we then want to get additional info
     [self asyncInitializeConnection2:network];
     
@@ -2714,6 +2716,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             for (SFIAlmondPlus *almond in almondList) {
                 if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
                     // Current one is still in list, so leave it as current.
+                    [self writeCurrentAlmond:almond]; //need to write to reflect updated firmware
                     return almond;
                 }
             }

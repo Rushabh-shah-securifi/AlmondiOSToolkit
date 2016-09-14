@@ -332,7 +332,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     buffer = [dataBuffer subdataWithRange:parseRange];
                                 }
                                 
-                                NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                NSLog(@"Cloud receive:  %@\n\n\n", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
                                 switch (commandType) {
                                     // these are the only command responses so far that uses a JSON payload; we special case them for now
@@ -404,7 +404,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 //                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
 
                                     CommandParser *parser = [CommandParser new];
-                                    NSLog(@"xml Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    NSLog(@"xml Cloud receive:  %@\n\n\n", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
                                     responsePayload = temp.command;
 

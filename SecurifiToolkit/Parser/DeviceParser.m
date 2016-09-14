@@ -220,6 +220,12 @@
         toolkit.devices = deviceList;
         if(!local){
             [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
+            
+            //temp fix - to fetch almond list after firmware update
+            if([commandType isEqualToString:@"DynamicDeviceList"]){
+                NSLog(@"sending almond list payload");
+                [toolkit asyncSendCommand:[toolkit makeAlmondListCommand]];
+            }
         }
         
 
