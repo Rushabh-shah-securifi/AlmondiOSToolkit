@@ -182,17 +182,17 @@
     
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *dataInfo = [notifier userInfo];
-    if (dataInfo == nil || [dataInfo valueForKey:@"data"]==nil ) {
+    if (dataInfo == nil || dataInfo[@"data"]==nil ) {
         return;
     }
     
     if(local){
-        payload = [dataInfo valueForKey:@"data"];
+        payload = dataInfo[@"data"];
     }else{
         NSLog(@"cloud data");
-        if(![[dataInfo valueForKey:@"data"] isKindOfClass:[NSData class]])
+        if(![dataInfo[@"data"] isKindOfClass:[NSData class]])
         return;
-        payload = [[dataInfo valueForKey:@"data"] objectFromJSONData];
+        payload = [dataInfo[@"data"] objectFromJSONData];
     }
     
 //    payload = [self parseJson:@"DeviceListResponse"];
@@ -317,7 +317,7 @@
     if (data == nil) {
         return;
     }
-    NSString *cloudMAC = [data valueForKey:@"data"];
+    NSString *cloudMAC = data[@"data"];
     if([almond.almondplusMAC isEqualToString:cloudMAC] == NO){
         return;
     }
@@ -360,7 +360,7 @@
     if (data == nil) {
         return;
     }
-    NotificationPreferenceListResponse *prefResponse = [data valueForKey:@"data"];
+    NotificationPreferenceListResponse *prefResponse = data[@"data"];
     if(prefResponse.almondMAC.length == 0 || ![prefResponse.almondMAC isEqualToString:almond.almondplusMAC])
         return;
     
@@ -559,7 +559,7 @@
         return;
     }
     
-    SFIGenericRouterCommand *genericRouterCommand = (SFIGenericRouterCommand *) [data valueForKey:@"data"];
+    SFIGenericRouterCommand *genericRouterCommand = (SFIGenericRouterCommand *) data[@"data"];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     switch (genericRouterCommand.commandType) {
         case SFIGenericRouterCommandType_WIRELESS_SUMMARY: {
