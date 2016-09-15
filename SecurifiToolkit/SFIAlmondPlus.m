@@ -237,7 +237,7 @@
 //    BOOL local = [[SecurifiToolkit sharedInstance] useLocalNetwork:currentAlmond.almondplusMAC];
     
     //Ignoring the screen when firmware is nil
-    if(almond.firmware == nil){
+    if([almond.firmware length] == 0){
         return YES;
     }
     return [almond supportsGenericIndexes:almond.firmware];

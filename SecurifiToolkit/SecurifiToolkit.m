@@ -1276,23 +1276,23 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self tryRequestAlmondMode:mac];
     
 //    [self cleanUp];
-    NSLog(@"device request send");
+    NSLog(@"Device request send");
     GenericCommand *cmd = [GenericCommand requestSensorDeviceList:mac];
     [self asyncSendCommand:cmd];
     
-    NSLog(@"clients request send");
+    NSLog(@"Clients request send");
     cmd = [GenericCommand requestAlmondClients:mac];
     [self asyncSendCommand:cmd];
     
-    NSLog(@"scene request send ");
+    NSLog(@"Scene request send ");
     cmd = [GenericCommand requestSceneList:mac];
     [self asyncSendCommand:cmd];
     
-    NSLog(@" rule request send ");
+    NSLog(@"Rule request send");
     cmd = [GenericCommand requestAlmondRules:mac];
     [self asyncSendCommand:cmd];
     
-     NSLog(@" requestRouterSummary request send ");
+     NSLog(@"RequestRouterSummary request send");
     cmd = [GenericCommand requestRouterSummary:mac];
     [self asyncSendCommand:cmd];
     
