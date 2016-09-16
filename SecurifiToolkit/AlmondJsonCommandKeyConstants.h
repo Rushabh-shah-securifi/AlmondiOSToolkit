@@ -150,6 +150,7 @@
 #define SCREENS @"screens"
 #define TITLE @"title"
 #define DESCRIPTION @"description"
+#define DESCRIPTION_BELOW @"description_below"
 #define IMAGE @"image"
 #define S_ICON @"icon"
 #define S_URL @"url"
