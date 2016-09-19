@@ -33,4 +33,8 @@
 -(NSString *)getDay;//6
 
 -(NSString *)getMonthString;
+
++ (NSString *)DateTimeString;
+
++ (NSDate*)getDateFromEpochFormatted:(NSString*)epoch;
 @end

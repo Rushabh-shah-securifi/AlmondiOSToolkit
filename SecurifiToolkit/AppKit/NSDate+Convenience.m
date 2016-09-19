@@ -67,7 +67,16 @@
 - (NSString *)formattedDateTimeString {
     return [self formattedStringUsingFormat:@"MMM dd, yyyy hh:mm:ss"];
 }
++ (NSString *)DateTimeString {
+    return [self formattedStringUsingFormated:@"MMM dd, yyyy hh:mm"];
+}
 
++ (NSString *)formattedStringUsingFormated:(NSString *)dateFormat {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:dateFormat];
+    NSString *ret = [formatter stringFromDate:self];
+    return ret;
+}
 - (NSString *)formattedStringUsingFormat:(NSString *)dateFormat {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:dateFormat];
@@ -80,10 +89,17 @@
     NSString *formattedString = [epochNSDate formattedStringUsingFormat:@"yyyy-MM-dd HH:mm:ss zzz"];//required to return converted date in the form of date.
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss zzz"];
+    [dateFormatter setDateFormat:@"yyyy-MMM-dd HH:mm:ss zzz"];
     return [dateFormatter dateFromString:formattedString];
 }
-
++ (NSDate*)getDateFromEpochFormatted:(NSString*)epoch{
+    NSDate *epochNSDate = [[NSDate alloc] initWithTimeIntervalSince1970:[epoch integerValue]];
+    NSString *formattedString = [epochNSDate formattedStringUsingFormat:@"MMM dd HH:mm zzz"];//required to return converted date in the form of date.
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"MMM dd HH:mm zzz"];
+    return [dateFormatter dateFromString:formattedString];
+}
 - (NSString*)getDayString{
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"EEEE"];
@@ -118,8 +134,8 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     // this is imporant - we set our input date format to match our input string
     // if format doesn't match you'll get nil from your string, so be careful
-//    [dateFormatter setDateFormat:@"yyyy/MM/dd"];
-    [dateFormatter setDateFormat:@"dd-MM-yyyy"];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+//    [dateFormatter setDateFormat:@"dd-MM-yyyy"];
     NSDate *dateFromString = [[NSDate alloc] init];
     // voila!
     dateFromString = [dateFormatter dateFromString:dateString];

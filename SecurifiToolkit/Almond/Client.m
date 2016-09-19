@@ -142,7 +142,7 @@
 }
 
 +(NSArray*) getClientGenericIndexes{
-    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,nil];
+    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-23,@-22,@-19,@-20,@-3,@-25,nil];
     return genericIndexesArray;
 }
 
@@ -214,16 +214,23 @@
                 client.canBeBlocked = newValue.boolValue;
             }
         }
-        case -36:{
+        case -22:{
+            client.category = get? client.category: newValue;
+            return  client.category;
+        }
+        case -23:{
             if(get)
             return client.webHistoryEnable? @"true": @"false";
             else{
                 client.webHistoryEnable = newValue.boolValue;
             }
         }
-        case -22:{
-            client.category = get? client.category: newValue;
-            return  client.category;
+        case -25:{
+            if(get)
+            return client.bW_Enable? @"true": @"false";
+            else{
+                client.bW_Enable = newValue.boolValue;
+            }
         }
         case -3:
         {

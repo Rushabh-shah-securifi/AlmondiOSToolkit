@@ -97,11 +97,11 @@ static sqlite3 *DB = nil;
     return data;
 }
 #pragma mark getBrowsingHistoryMethods
-+ (NSDictionary *)getAllBrowsingHistorywithLimit:(int)limit{
++ (NSDictionary *)getAllBrowsingHistorywithLimit:(int)limit almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
     
     if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
     {
-        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC  limit %d",@"6",@"18005775442052",limit];
+        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC  limit %d",amac,cmac,limit];
         sqlite3_stmt *compiledStatement;
         
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement];
@@ -199,11 +199,11 @@ static sqlite3 *DB = nil;
 +(NSString *)insertHistoryRecord:(NSDictionary *)hDict{
     NSString *query = @"INSERT OR REPLACE INTO HistoryTB (DATE,UNIQUEKEY,AMAC,CMAC, URIS,CATEGORYID,TIME,CATEGORY,CATEGORYNAME,PS) VALUES(?,?,?,?,?,?,?,?,?,?)";
     [self setHistoryTable];
-    NSString *mac = @"6";
-    NSString *cmac = @"18005775442052";
+//    NSString *mac = amac;
+//    NSString *cmac = cmac;
 //    hDict=   @{
-//               @"AlmondMAC": @"6",
-//               @"ClientMAC": @"18005775442052",
+//               @"AlmondMAC": amac,
+//               @"ClientMAC": cmac,
 //               @"Data": @[@{
 //                              
 //                              @"Domain": @"torrentz11.eu",
@@ -277,8 +277,8 @@ static sqlite3 *DB = nil;
                 sqlite3_bind_text(statement, 8, [categoryName[@"category"] UTF8String], -1, SQLITE_TRANSIENT);
                 sqlite3_bind_text(statement, 9, [categoryName[@"categoryName"] UTF8String], -1, SQLITE_TRANSIENT);
                 int rc;
-                 NSLog(@"pageState == %@",hDict[@"pageState"]);
-                sqlite3_bind_text(statement, 10, [hDict[@"pageState"] UTF8String], -1, SQLITE_TRANSIENT);
+                NSString *ps = hDict[@"pageState"]?hDict[@"pageState"]:@"**";
+                sqlite3_bind_text(statement, 10, [ps UTF8String], -1, SQLITE_TRANSIENT);
                 
                 if (sqlite3_step(statement) == SQLITE_DONE){
                     NSLog(@" successS");
@@ -291,7 +291,7 @@ static sqlite3 *DB = nil;
                 NSLog(@" preparev2 error %s",sqlite3_errmsg(database));
             }
             
-            endtag = uriDict[@"pageState"];
+            endtag = hDict[@"pageState"];
             //NSLog(@"LastVisitedEpoch == %@",endtag);
         }
 //        statement1 = @"COMMIT TRANSACTION";
@@ -350,13 +350,13 @@ static sqlite3 *DB = nil;
             NSLog(@"error: %s", sqlite3_errmsg(database));
     }
 }
-+(NSString *)getEndTag{
++(NSString *)getEndTag:(NSString *)amac clientMac:(NSString *)cmac{
     int max = 0;
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         
-        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MIN(TIME) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"6",@"18005775442052"];
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MIN(TIME) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
         
         sqlite3_stmt *statement;
         //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
@@ -385,29 +385,24 @@ static sqlite3 *DB = nil;
     }
     return [NSString stringWithFormat:@"%d",max];
 }
-+(NSString *)getPageState{
++(NSString *)getPageState:(NSString *)amac clientMac:(NSString *)cmac{
     int max = 0;
     char *ps;
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         
-        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT PS from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"6",@"18005775442052"];
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT PS from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
         
         sqlite3_stmt *statement;
         //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
         if( sqlite3_prepare_v2(database, [sqlcountStat UTF8String],-1, &statement, NULL)== SQLITE_OK)
         {
             //Loop through all the returned rows (should be just one)
-//            while( sqlite3_step(statement) == SQLITE_ROW )
-//            {
-//                
-//                max = sqlite3_column_int(statement, 0);
-//                NSLog(@"database max db= %d",max);
-//                
-//            }
-            if(sqlite3_step(statement) == SQLITE_ROW){
+            NSLog(@"getPageState prepare method ");
+            while(sqlite3_step(statement) == SQLITE_ROW){
                 ps = sqlite3_column_text(statement, 0);
+                NSLog(@"ps = %s",ps);
             }
         }
         else
@@ -422,15 +417,17 @@ static sqlite3 *DB = nil;
     else{
         NSLog(@"error while opening database file");
     }
+    if(ps == NULL)
+    ps = "*";
     return [NSString stringWithFormat:@"%s",ps];
 }
-+(NSString *)getStartTag{
++(NSString *)getStartTag:(NSString *)amac clientMac:(NSString *)cmac{
     int max = 0;
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         
-        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MAX(TIME) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"6",@"18005775442052"];
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MAX(TIME) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
         
         sqlite3_stmt *statement;
         //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
@@ -459,12 +456,12 @@ static sqlite3 *DB = nil;
     }
     return [NSString stringWithFormat:@"%d",max];
 }
-+(int)GetHistoryDatabaseCount{
++(int)GetHistoryDatabaseCount:(NSString *)amac clientMac:(NSString *)cmac{
     int count = 0;
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
-        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT COUNT(*) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",@"6",@"18005775442052"];
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT COUNT(*) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
         //        const char* sqlcountStat = "SELECT COUNT(*) FROM HistoryTB WHERE AMAC = ? AND CMAC = ?";
         sqlite3_stmt *statement;
         //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
@@ -493,7 +490,7 @@ static sqlite3 *DB = nil;
     
     return count;
 }
-+(void)deleteOldEntries{
++(void)deleteOldEntries:(NSString *)amac clientMac:(NSString *)cmac{
     const char *dbpath = [databasePath UTF8String];
     
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
@@ -525,7 +522,7 @@ static sqlite3 *DB = nil;
     return ;
 }
 
-+(void)deleteDB{
++(void)deleteDB:(NSString *)amac clientMac:(NSString *)cmac{
     
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
@@ -552,7 +549,7 @@ static sqlite3 *DB = nil;
     [self insertCategoryRecord:dict query:query];
     
 }
-+(void)insertCategoryRecord:(NSDictionary *)dict query:(NSString*)query{
++(void)insertCategoryRecord:(NSDictionary *)dict query:(NSString*)query {
     sqlite3_stmt *statement;
     NSLog(@"insertCategoryRecord");
     
@@ -595,9 +592,9 @@ static sqlite3 *DB = nil;
     }
     
 }
-+(void)updateCategory:(NSString *)category categoryID:(NSString *)categoryID{
-    NSString *mac = @"6";
-    NSString *cmac = @"18005775442052";
++(void)updateCategory:(NSString *)category categoryID:(NSString *)categoryID almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
+    NSString *mac = amac;
+    cmac = cmac;
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
@@ -631,11 +628,11 @@ static sqlite3 *DB = nil;
     }
 }
 
-+(NSString*)getCategoryFromID:(NSString*)categoryId{
++(NSString*)getCategoryFromID:(NSString*)categoryId almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
     //    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
     //    {//categoryDB
     NSString *categoryName ;
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT CATEGORY from categoryDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND CATEGORYTAG = \"%@\" ",@"6",@"18005775442052",categoryId];
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT CATEGORY from categoryDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND CATEGORYTAG = \"%@\" ",amac,cmac,categoryId];
     
     sqlite3_stmt *compiledStatement;
     if (sqlite3_prepare_v2(database,[sqlStatement UTF8String], -1, &compiledStatement, NULL) == SQLITE_OK){
@@ -676,45 +673,45 @@ static sqlite3 *DB = nil;
     }
 }
 
-+(NSDictionary* )todaySearch{
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE = \"%@\" ORDER BY TIME DESC",@"6",@"18005775442052",@"10-8-2016"];
++(NSDictionary* )todaySearch:(NSString *)amac clientMac:(NSString *)cmac{
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE = \"%@\" ORDER BY TIME DESC",amac,cmac,@"10-8-2016"];
     return [self runQuery:sqlStatement];
 }
 
-+(NSDictionary* )ThisWeekSearch{
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE IN(SELECT DATE FROM HistoryTB WHERE DATE != \"%@\" )  AND TIME >= \"%f\" ORDER BY TIME DESC",@"6",@"18005775442052",@"10-8-2016",[[NSDate date] timeIntervalSince1970] - 3600*24*7];
++(NSDictionary* )ThisWeekSearch:(NSString *)amac clientMac:(NSString *)cmac{
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE IN(SELECT DATE FROM HistoryTB WHERE DATE != \"%@\" )  AND TIME >= \"%f\" ORDER BY TIME DESC",amac,cmac,@"10-8-2016",[[NSDate date] timeIntervalSince1970] - 3600*24*7];
     return [self runQuery:sqlStatement];
     
 }
-+(NSDictionary* )LastHourSearch{
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME >= \"%f\" ORDER BY TIME DESC",@"6",@"18005775442052",[[NSDate date] timeIntervalSince1970] - 3600];
++(NSDictionary* )LastHourSearch:(NSString *)amac clientMac:(NSString *)cmac{
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME >= \"%f\" ORDER BY TIME DESC",amac,cmac,[[NSDate date] timeIntervalSince1970] - 3600];
     return [self runQuery:sqlStatement];
 }
 
-+(NSDictionary* )weekDaySearch:(NSString *)search{
++(NSDictionary* )weekDaySearch:(NSString *)search almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
     int weekDayNum = [BrowsingHistoryUtil getWeeKdayNumber:search];
     NSString *sqlStatement2 =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE TIME IN(SELECT TIME FROM HistoryTB WHERE strftime('%%w', datetime(TIME,'unixepoch'))= '%d' ) ORDER BY TIME DESC",weekDayNum];
     return [self runQuery:sqlStatement2];
     
 }
-+(NSDictionary *)searchBYCategoty:(NSString*)search{
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND CATEGORY = \"%@\"  ORDER BY TIME DESC",@"6",@"18005775442052",search];
++(NSDictionary *)searchBYCategoty:(NSString*)search almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND CATEGORY = \"%@\"  ORDER BY TIME DESC",amac,cmac,search];
     return  [self runQuery:sqlStatement];
 }
-+(NSDictionary* )DaySearch:(NSString *)search{
++(NSDictionary* )DaySearch:(NSString *)search almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
     NSString *str = [BrowsingHistoryUtil getFormateOfDate:search];
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE LIKE  '%%%@%%'  ORDER BY TIME DESC",@"6",@"18005775442052",str];
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE LIKE  '%%%@%%'  ORDER BY TIME DESC",amac,cmac,str];
     NSLog(@"sql statement = %@",sqlStatement);
     return  [self runQuery:sqlStatement];
     
 }
-+ (NSDictionary *)getSearchString:(NSString *)search{
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND URIS LIKE  '%%%@%%'  ORDER BY TIME DESC",@"6",@"18005775442052",search];
++ (NSDictionary *)getSearchString:(NSString *)search almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND URIS LIKE  '%%%@%%'  ORDER BY TIME DESC",amac,cmac,search];
     return  [self runQuery:sqlStatement];
 }
 + (NSString *)getTodayDate{
     NSDateFormatter *dateformate=[[NSDateFormatter alloc]init];
-    [dateformate setDateFormat:@"dd-MM-yyyy"]; // Date formater
+    [dateformate setDateFormat:@"yyyy-MM-dd"]; // Date formater
     NSString *date = [dateformate stringFromDate:[NSDate date]]; // Convert date to string
     NSLog(@"date getTodayDate:%@",date);
     return date;

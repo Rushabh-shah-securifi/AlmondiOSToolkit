@@ -43,6 +43,7 @@
 }
 
 -(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
+    NSLog(@"onWiFiClientsListResAndDynamicCallbacks");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
     if (data == nil || [data valueForKey:@"data"]==nil ) {
@@ -159,6 +160,9 @@
     device.deviceSchedule = dict[SCHEDULE]==nil? @"": dict[SCHEDULE];
     device.canBeBlocked = [dict[CAN_BLOCK] boolValue];
     device.category = dict[CATEGORY];
+    NSLog(@"dict[SM_ENABLE] = %@ device.name %@",dict[SM_ENABLE],device.name);
+    device.webHistoryEnable = [dict[SM_ENABLE] boolValue];
+    device.bW_Enable = [dict[BW_ENABLE] boolValue];
 }
 
 -(NSMutableArray*)getSortedDevices{
