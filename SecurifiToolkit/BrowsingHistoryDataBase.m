@@ -674,12 +674,12 @@ static sqlite3 *DB = nil;
 }
 
 +(NSDictionary* )todaySearch:(NSString *)amac clientMac:(NSString *)cmac{
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE = \"%@\" ORDER BY TIME DESC",amac,cmac,@"10-8-2016"];
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE = \"%@\" ORDER BY TIME DESC",amac,cmac,[self getTodayDate]];
     return [self runQuery:sqlStatement];
 }
 
 +(NSDictionary* )ThisWeekSearch:(NSString *)amac clientMac:(NSString *)cmac{
-    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE IN(SELECT DATE FROM HistoryTB WHERE DATE != \"%@\" )  AND TIME >= \"%f\" ORDER BY TIME DESC",amac,cmac,@"10-8-2016",[[NSDate date] timeIntervalSince1970] - 3600*24*7];
+    NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE IN(SELECT DATE FROM HistoryTB WHERE DATE != \"%@\" )  AND TIME >= \"%f\" ORDER BY TIME DESC",amac,cmac,[self getTodayDate],[[NSDate date] timeIntervalSince1970] - 3600*24*7];
     return [self runQuery:sqlStatement];
     
 }
