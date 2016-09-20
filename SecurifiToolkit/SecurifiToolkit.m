@@ -447,10 +447,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary {
-    NSLog(@"tryUpdateLocalNetworkSettingsForAlmond - mac: %@", almondMac);
     SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-    NSLog(@"settings: %@", settings);
-    NSLog(@"summary: %@", summary);
+    NSLog(@"toolkit - tryUpdateLocalNetworkSettingsForAlmond - mac: %@, settings: %@, summary: %@", almondMac, settings, summary);
     if (!settings) {
         settings = [SFIAlmondLocalNetworkSettings new];
         settings.almondplusMAC = almondMac;
