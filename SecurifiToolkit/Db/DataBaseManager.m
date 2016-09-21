@@ -164,7 +164,8 @@ static sqlite3 *DB = nil;
 }
 
 + (void)insertData:(NSDictionary*)deviceIndexDict query:(NSString*)query
-{   NSLog(@"deviceIndexDict = %@",deviceIndexDict);
+{
+//    NSLog(@"deviceIndexDict = %@",deviceIndexDict);
     sqlite3_stmt *statement;
     const char *dbpath = [databasePath UTF8String];
     

@@ -745,7 +745,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
         
         // Request updates to the almond; See onLoginResponse handler for logic handling first-time login and follow-on requests.
-        [block_self asyncInitializeConnection1:block_self.cloudNetwork];
+        //m-connection1 will only fetch almondlist, which is any how being fetched on loginresponse, so we don't want to request it here.
+//        [block_self asyncInitializeConnection1:block_self.cloudNetwork];
         
     });
    
@@ -2365,7 +2366,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             
         case CommandType_DEVICE_DATA_HASH_RESPONSE: {
             DeviceDataHashResponse *res = payload;
-            [self onDeviceHashResponse:res];
+//            [self onDeviceHashResponse:res];
             break;
         }
             
@@ -2803,8 +2804,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Device List Update callbacks
 
 - (void)onDeviceHashResponse:(DeviceDataHashResponse*)res {
-    
-    
     if (!res) {
         return;
     }
