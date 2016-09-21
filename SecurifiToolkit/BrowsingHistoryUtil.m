@@ -108,7 +108,7 @@
         
     }
     NSLog(@" month and date %@,%d",day,month);
-    return [NSString stringWithFormat:@"%@-%d",day,month];
+    return [NSString stringWithFormat:@"%d-%@",month,day];
 }
 + (BOOL)isNumeric:(NSString *)code{
     
