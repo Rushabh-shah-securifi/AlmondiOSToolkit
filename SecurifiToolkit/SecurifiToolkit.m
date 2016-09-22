@@ -1630,8 +1630,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     cmd.command = req;
     
     // make sure cloud connection is set up
-    [self tearDownLoginSession];
-    [self setSecEmail:email];
+//    [self tearDownLoginSession];
+//    [self setSecEmail:email];
     
     [self asyncSendToCloud:cmd];
 }
