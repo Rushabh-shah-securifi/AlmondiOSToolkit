@@ -10,6 +10,7 @@
 #import "BrowsingHistoryDataBase.h"
 #import "BrowsingHistoryUtil.h"
 #import "NSDate+Convenience.h"
+#import "CompleteDB.h"
 
 #import <sqlite3.h>
 
@@ -26,11 +27,13 @@ static NSString *databasePath;
 static BrowsingHistoryDataBase *dbSharedInstance = nil;
 static sqlite3 *database = nil;
 static sqlite3 *DB = nil;
-
+NSMutableDictionary *inCompleteDB;
 #pragma mark initializeMethods
 +(void)initializeDataBase{
     [self createDataBasePath:DATABASE_FILE];
     [self setHistoryTable];
+    [self setCompleteDBTable];
+    inCompleteDB = [[NSMutableDictionary alloc]init];
     //    [self setCategoryTable];
 }
 
@@ -47,9 +50,17 @@ static sqlite3 *DB = nil;
 +(void)setHistoryTable{
     NSFileManager *filemgr = [NSFileManager defaultManager];
     if ([filemgr fileExistsAtPath: databasePath ] == NO){
-        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUEKEY TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,CATEGORYID TEXT,TIME INTEGER,CATEGORY TEXT,CATEGORYNAME TEXT,PS TEXT)"];
+        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUEKEY TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,CATEGORYID TEXT,TIME INTEGER,CATEGORY TEXT,CATEGORYNAME TEXT,PS TEXT,PRIMARY KEY (DATE, AMAC,CMAC))"];
     }
 }
++(void)setCompleteDBTable{
+    NSFileManager *filemgr = [NSFileManager defaultManager];
+    NSLog(@"file manager %@",[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
+    if ([filemgr fileExistsAtPath: databasePath ] == NO){
+        [self createTable:@"CREATE TABLE IF NOT EXISTS CompleteDB (DATE TEXT,AMAC TEXT,CMAC TEXT)"];
+    }
+}
+
 +(void)setCategoryTable{
     [self createDataBasePath:DATABASE_FILE];
     NSFileManager *filemgr = [NSFileManager defaultManager];
@@ -60,6 +71,7 @@ static sqlite3 *DB = nil;
 
 +(BOOL)createTable:(NSString*)query{
     BOOL isSuccess = YES;
+    
     NSLog(@"create table %@",query);
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
@@ -112,6 +124,8 @@ static sqlite3 *DB = nil;
 }
 
 + (NSDictionary *)prepareMethod:(sqlite3_stmt *)compiledStatement andsqlStatement:(NSString *)sqlStatement{
+    [CompleteDB betweenDays:@"2010-09-01" date2:@"2010-12-01" previousDate:NULL];
+    
     NSLog(@"prepare method Querie: = %s",[sqlStatement UTF8String]);
     NSMutableDictionary *clientBrowsingHistory = [[NSMutableDictionary alloc]init];
     if(sqlite3_prepare_v2(database, [sqlStatement UTF8String], -1, &compiledStatement, NULL) == SQLITE_OK){
@@ -228,9 +242,46 @@ static sqlite3 *DB = nil;
 
 + (NSString *)insertHistoryEntries:(NSDictionary *)hDict query:(NSString *)query{
     sqlite3_stmt *statement;
+    NSLog(@"hDict == %@",hDict);
     NSString *endtag;
     NSDictionary *catogeryDict = [self parseJson:@"CategoryMap"];
+    NSArray *allObj = hDict[@"Data"];
+    NSDictionary *first_uriDict = [allObj firstObject];
+    NSString *first_date = first_uriDict[@"Date"];
     
+    NSDictionary *last_uriDict = [allObj lastObject];
+    NSString *last_date = last_uriDict[@"Date"];
+    
+    
+    NSString *ps = hDict[@"pageState"];
+    
+    // put last_date and & ps in incomplete DB
+    [inCompleteDB setObject:last_date forKey:@"lastDate"];
+//    [inCompleteDB setObject:ps forKey:@"PS"];
+    NSDateFormatter *f = [[NSDateFormatter alloc] init];
+    [f setDateFormat:@"yyyy-MM-dd"];
+      NSString *todayDate = [f stringFromDate:[NSDate date]];
+    NSLog(@"inCompleteDB %@",inCompleteDB);
+    if([first_date isEqualToString:last_date]){
+        NSLog(@"do nothing first and last day are same");
+    }
+    else{
+        if([first_date isEqualToString:todayDate]){
+            // take b/w date
+            NSArray *arr = [CompleteDB betweenDays:todayDate date2:last_date previousDate:NULL];
+            for(NSString *dateStr in arr){
+                [CompleteDB insertInCompleteDB:dateStr cmac:hDict[@"CMAC"] amac:hDict[@"AMAC"]];
+            }
+        }
+        else{
+           NSArray *arr = [CompleteDB betweenDays:first_date date2:last_date previousDate:NULL];
+            for(long int i = 0;i < arr.count - 1;i++){// skipping last obj
+                [CompleteDB insertInCompleteDB:[arr objectAtIndex:i] cmac:hDict[@"CMAC"] amac:hDict[@"AMAC"]];
+            }
+        }
+//    [CompleteDB betweenDays:first_date date2:last_date previousDate:NULL];
+//    [CompleteDB insertInCompleteDB:last_date cmac:hDict[@"CMAC"] amac:hDict[@"AMAC"]];
+    }
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
@@ -250,7 +301,7 @@ static sqlite3 *DB = nil;
 //
         const char *insert_stmt = [query UTF8String];
         sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
-        NSArray *allObj = hDict[@"Data"];
+               // store this nsarr to completeDB table
         
         ////NSLog(@"allDate %@",allDate);
         for(NSDictionary *uriDict in allObj)
@@ -313,8 +364,10 @@ static sqlite3 *DB = nil;
     else{
         //NSLog(@"fail to open %s",sqlite3_errmsg(database));
     }
+    
     return  endtag;
 }
+
 #pragma mark update_count_deleteMethods
 +(void)updateEndIdentifier:(NSString *)endIdntifier{
     const char *dbpath = [databasePath UTF8String];

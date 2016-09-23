@@ -58,6 +58,7 @@
 #import "DataBaseManager.h"
 #import "RouterParser.h"
 #import "BrowsingHistoryDataBase.h"
+#import "CompleteDB.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -214,6 +215,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.routerParser = [[RouterParser alloc]init];
     [DataBaseManager initializeDataBase];
     [BrowsingHistoryDataBase initializeDataBase];
+    [CompleteDB initializeCompleteDataBase];
     
     self.genericDevices = [DeviceParser parseGenericDevicesDict:[self.deviceParser parseJson:@"deviceListJson"]];
     self.genericIndexes = [DeviceParser parseGenericIndexesDict:[self.deviceParser parseJson:@"GenericIndexesData"]];

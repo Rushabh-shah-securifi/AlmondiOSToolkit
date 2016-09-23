@@ -268,6 +268,8 @@
 		CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */; };
 		CE484C9D1D41E1E3006C1388 /* BrowsingHistoryDataBase.h in Headers */ = {isa = PBXBuildFile; fileRef = CE484C9A1D41E1E3006C1388 /* BrowsingHistoryDataBase.h */; };
 		CE484C9E1D41E1E3006C1388 /* BrowsingHistoryDataBase.m in Sources */ = {isa = PBXBuildFile; fileRef = CE484C9B1D41E1E3006C1388 /* BrowsingHistoryDataBase.m */; };
+		CE5C1DB31D950FFB007BCE50 /* CompleteDB.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5C1DB11D950FFB007BCE50 /* CompleteDB.h */; };
+		CE5C1DB41D950FFB007BCE50 /* CompleteDB.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5C1DB21D950FFB007BCE50 /* CompleteDB.m */; };
 		CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */; };
 		CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -646,6 +648,8 @@
 		CE466A621823D01E00E55DF9 /* ResetPasswordResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResetPasswordResponse.m; sourceTree = "<group>"; };
 		CE484C9A1D41E1E3006C1388 /* BrowsingHistoryDataBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowsingHistoryDataBase.h; sourceTree = "<group>"; };
 		CE484C9B1D41E1E3006C1388 /* BrowsingHistoryDataBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowsingHistoryDataBase.m; sourceTree = "<group>"; };
+		CE5C1DB11D950FFB007BCE50 /* CompleteDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompleteDB.h; sourceTree = "<group>"; };
+		CE5C1DB21D950FFB007BCE50 /* CompleteDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompleteDB.m; sourceTree = "<group>"; };
 		CE5D0C19180811EE00224009 /* SFIAlmondPlus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = SFIAlmondPlus.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CE5D0C1A180811EE00224009 /* SFIAlmondPlus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SFIAlmondPlus.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AlmondPlusSDKConstants.h; path = SecurifiToolkit/AlmondPlusSDKConstants.h; sourceTree = SOURCE_ROOT; };
@@ -1317,6 +1321,8 @@
 				CE484C9B1D41E1E3006C1388 /* BrowsingHistoryDataBase.m */,
 				CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */,
 				CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */,
+				CE5C1DB11D950FFB007BCE50 /* CompleteDB.h */,
+				CE5C1DB21D950FFB007BCE50 /* CompleteDB.m */,
 			);
 			name = BrowsingHistoryDB;
 			sourceTree = "<group>";
@@ -1460,6 +1466,7 @@
 				A52164041C983E4E00E7B79D /* GenericIndexClass.h in Headers */,
 				A52164171C9927D400E7B79D /* DeviceIndex.h in Headers */,
 				1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */,
+				CE5C1DB31D950FFB007BCE50 /* CompleteDB.h in Headers */,
 				CE5EB65217EAD43000985636 /* DeviceValueResponse.h in Headers */,
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
@@ -1757,6 +1764,7 @@
 				A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */,
 				1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */,
 				1C4382EC1B2FDD5200F6AB7A /* PSWebSocket.m in Sources */,
+				CE5C1DB41D950FFB007BCE50 /* CompleteDB.m in Sources */,
 				1C3EEFC01B37999300DFCF62 /* SFIBlockedDevice.m in Sources */,
 				CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */,
 				CE2EA25219D00B3E00C6D6A8 /* UserInviteRequest.m in Sources */,
