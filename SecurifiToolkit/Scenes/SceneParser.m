@@ -122,7 +122,7 @@
         NSDictionary *newScene = [mainDict[@"Scenes"] objectForKey:updatedID];
         if([[NSString stringWithFormat:@"%@", [newScene[updatedID] objectForKey:@"SceneEntryList"]] isEqualToString:@""])
             return;
-        NSInteger index = 0;
+        NSInteger index = -1;
         for (NSDictionary *sceneDict in toolkit.scenesArray) {
             NSLog(@"sceneDict active:: %@",sceneDict);
             if ([sceneDict[@"ID"] intValue] == [updatedID intValue]) {
@@ -130,12 +130,17 @@
                 break;
             }
         }
+        
         NSMutableDictionary *mutableScene = [newScene mutableCopy];
         [mutableScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
         [mutableScene setValue:updatedID forKey:@"ID"];
-
-        NSLog(@"index replace %d",index);
-        [toolkit.scenesArray replaceObjectAtIndex:index withObject:mutableScene];
+        
+        if(index == -1){//if the id is not found, the new scene is just added
+            [toolkit.scenesArray addObject:mutableScene];
+        }else{
+            NSLog(@"index replace %d",index);
+            [toolkit.scenesArray replaceObjectAtIndex:index withObject:mutableScene];
+        }
     }
     else if ([commandType isEqualToString:@"DynamicSceneActivated"]){
         NSString *updatedID = [[mainDict[@"Scenes"] allKeys] objectAtIndex:0];
