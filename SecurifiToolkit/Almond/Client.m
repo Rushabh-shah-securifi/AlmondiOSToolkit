@@ -142,7 +142,9 @@
 }
 
 +(NSArray*) getClientGenericIndexes{
-    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-23,@-22,@-19,@-20,@-3,@-25,nil];
+        NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-23,@-22,@-19,@-20,@-3,@-25,nil];
+    //for commenting browsing history code
+//    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,nil];
     return genericIndexesArray;
 }
 
