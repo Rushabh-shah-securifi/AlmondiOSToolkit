@@ -51,7 +51,7 @@
     NSString *commandType=mainDict[@"CommandType"];
     NSDictionary *rulesDict = mainDict[@"Rules"];
     
-    NSLog(@"onRuleList: %@",mainDict);
+    //NSLog(@"onRuleList: %@",mainDict);
     //RuleList
     if([commandType isEqualToString:@"RuleList"] || [commandType isEqualToString:@"DynamicRuleList"]){
         if([mainDict[@"Rules"] isKindOfClass:[NSArray class]])

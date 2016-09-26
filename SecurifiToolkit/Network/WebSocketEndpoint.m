@@ -62,7 +62,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSString *login = config.login;
     NSString *password = config.password;
     NSString *host = config.host;
-    NSLog(@"connect - login: %@, password: %@, host: %@, port: %d", config.login, config.password, config.host, almondPort);
+    NSLog(@" logiconnect -n: %@, password: %@, host: %@, port: %d", config.login, config.password, config.host, almondPort);
     if (!host || !login || !password) {
         [self.delegate networkEndpointDidDisconnect:self];
         return nil;
@@ -93,6 +93,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (void)shutdown {
     NSLog(@"websocket shutDown");
     [self.socket close];
+}
+
+- (void)shutdownMesh {
+    NSLog(@"Mesh websocket shutdown");
     [self.socket_mesh close];
 }
 
@@ -104,7 +108,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     else
         NSLog(@"websocket send: %@", data);
     
-    if(obj.isMesh)
+    if(obj.isMeshCmd)
         [self.socket_mesh send:data];
     else
         [self.socket send:data];
@@ -115,21 +119,21 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 #pragma mark - PSWebSocketDelegate methods
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     NSLog(@"webSocketDidOpen");
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     if(self.isMesh){
+        [toolkit asyncSendToLocal:[GenericCommand requestRai2UpMobile] almondMac:toolkit.currentAlmond.almondplusMAC];
         return;
     }
     
     
     [self.delegate networkEndpointDidConnect:self];
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    
     
     SFIAlmondPlus *plus = [toolkit currentAlmond];
     [toolkit asyncSendToLocal:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand requestAlmondClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand requestSceneList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
     [toolkit asyncSendToLocal:[GenericCommand requestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];
-    
-    [self connectMesh];
 }
 
 
@@ -167,13 +171,25 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
-    [self.delegate networkEndpointDidDisconnect:self];
+    if(self.isMesh){
+        //need to work on logic
+        NSLog(@"mesh web socket did fail");
+        self.isMesh = NO;
+        return;
+    }
     NSLog(@"The websocket did fail with error: %@", error.description);
+    [self.delegate networkEndpointDidDisconnect:self];
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
-    [self.delegate networkEndpointDidDisconnect:self];
+    if(self.isMesh){
+        //need to work on logic
+        NSLog(@"mesh websocket did close");
+        self.isMesh = NO;
+        return;
+    }
     NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
+    [self.delegate networkEndpointDidDisconnect:self];
 }
 
 - (NSDictionary *)buildResponseHandlers {

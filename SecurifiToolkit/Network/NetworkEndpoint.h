@@ -27,9 +27,10 @@
 @property(nonatomic, weak) id <NetworkEndpointDelegate> delegate;
 
 - (void)connect;
+- (void)connectMesh;
 
 - (void)shutdown;
-
+- (void)shutdownMesh;
 // Send the specified command to the cloud
 // Returns YES on successful submission
 // Returns NO on failure to send

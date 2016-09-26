@@ -56,9 +56,11 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)requestSensorDeviceList:(NSString*)mac;
 
++ (instancetype)requestRai2UpMobile;
+
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
-@property(nonatomic) BOOL isMesh;
+@property(nonatomic) BOOL isMeshCmd;
 
 // optional function that will be called upon submission of the command to a network for processing.
 // can be used for storing state and validating that the command should continue processing.

@@ -425,4 +425,8 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (void)setScreenDefault:(NSString *)screen;
 
 - (BOOL)isScreenShown:(NSString *)screen;
+
+- (BOOL)connectMesh;
+
+- (void)shutDownMesh;
 @end

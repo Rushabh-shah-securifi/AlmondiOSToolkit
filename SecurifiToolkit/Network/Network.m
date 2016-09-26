@@ -94,8 +94,20 @@
     [self.endpoint connect];
 }
 
+- (void)connectMesh{
+    if(self.endpoint && [self.endpoint isKindOfClass:[WebSocketEndpoint class]]){
+        [self.endpoint connectMesh];
+    }
+}
+
+- (void)shutdownMesh{
+    if(self.endpoint && [self.endpoint isKindOfClass:[WebSocketEndpoint class]]){
+        [self.endpoint shutdownMesh];
+    }
+}
+
 - (void)shutdown {
-    NSLog(@"Shutting down network Network");
+    NSLog(@"Shutting down network Network 2");
     
     if (!self.endpoint) {
         return;

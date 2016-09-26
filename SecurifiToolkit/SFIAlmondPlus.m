@@ -159,7 +159,7 @@
     if (!almondVersion) {
         return NO;
     }
-    NSLog(@"almondversion: %@", almondVersion);
+    //NSLog(@"almondversion: %@", almondVersion);
     //latest is what almond has, current is constant
     //AL2-R092 and above supports generic indexes
     //AP2-R086 and above supports generic indexes
@@ -178,7 +178,7 @@
     else if([almondVersion hasPrefix:@"A1A-"]){
         result = [self compareVersions:almondVersion supportedVersion:@"A1A-R007"];
     }
-    NSLog(@"result: %d", result);
+    //NSLog(@"result: %d", result);
     return result;
 }
 
@@ -199,9 +199,9 @@
     NSString *current_str = cur_alm_splits[1];
     NSString *supported_str = supported_alm_splits[1];
     
-    NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
+    //NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
     NSComparisonResult result = [current_str compare:supported_str];
-    NSLog(@"result %d", result);
+    //NSLog(@"result %d", result);
     switch (result) {
         case NSOrderedAscending:
             return NO;

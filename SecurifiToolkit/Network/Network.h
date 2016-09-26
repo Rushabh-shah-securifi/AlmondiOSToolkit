@@ -64,8 +64,11 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 // Initializes and opens the connection. This method must be called before submitting work.
 - (void)connect;
 
+- (void)connectMesh;
+
 - (void)shutdown;
 
+- (void)shutdownMesh;
 // Queues the specified command to the cloud. This is a special command queue that is used for initializing the Network.
 - (BOOL)submitCloudInitializationCommand:(GenericCommand *)command;
 

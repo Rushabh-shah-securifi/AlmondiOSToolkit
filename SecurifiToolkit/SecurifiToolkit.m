@@ -366,7 +366,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     NSString *almondMac = settings.almondplusMAC;
     enum SFIAlmondConnectionMode mode = [self connectionModeForAlmond:almondMac];
-    
     [self storeLocalNetworkSettings:settings];
     [self tryShutdownAndStartNetworks:mode almondMac:almondMac];
 }
@@ -444,7 +443,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         NSLog(@"storeLocalNetworkSettings");
         return;
     }
-    
     [self.dataManager writeAlmondLocalNetworkSettings:settings];
 }
 
@@ -2165,8 +2163,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Network management
 
 - (Network *)setupCloudNetwork {
-    
-    
     [self tearDownCloudNetwork];
     
     NetworkConfig *networkConfig = [NetworkConfig cloudConfig:self.config useProductionHost:self.useProductionCloud];
@@ -2207,11 +2203,21 @@ static SecurifiToolkit *toolkit_singleton = nil;
     network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
     
-    _localNetwork = network;
+    _localNetwork = network; //self.localnetwork
     
     [network connect];
     
     return network;
+}
+
+- (void)connectMesh{
+    if(self.localNetwork)
+        [self.localNetwork connectMesh];
+}
+
+- (void)shutDownMesh{
+    if(self.localNetwork)
+        [self.localNetwork shutdownMesh];
 }
 
 - (void)tearDownCloudNetwork {
@@ -2230,6 +2236,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)tearDownLocalNetwork {
+    NSLog(@"Toolkit - Local network shutdown 1");
     Network *old = self.localNetwork;
     
     if (old) {
