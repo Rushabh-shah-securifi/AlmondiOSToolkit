@@ -565,7 +565,8 @@
         case SFIGenericRouterCommandType_WIRELESS_SUMMARY: {
             SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
             NSLog(@"routersummary: %@", routerSummary);
-            [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
+            if([toolkit currentConnectionMode] == SFIAlmondConnectionMode_cloud)
+                [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
             break;
         }
     }

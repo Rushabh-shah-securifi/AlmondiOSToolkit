@@ -54,7 +54,6 @@
 //    if(!isMatchingAlmondOrLocal) //for cloud
 //        return;
     
-    NSLog(@"router payload: %@", payload);
     SFIGenericRouterCommand *genericRouterCommand;
     NSString *commandType = payload[@"CommandType"];
     if([commandType isEqualToString:@"RouterSummary"]){

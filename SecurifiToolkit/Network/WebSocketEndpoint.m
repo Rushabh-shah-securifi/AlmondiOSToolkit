@@ -97,6 +97,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (void)shutdownMesh {
     NSLog(@"Mesh websocket shutdown");
+    //ismesh NO will be set on delegate response
     [self.socket_mesh close];
 }
 
