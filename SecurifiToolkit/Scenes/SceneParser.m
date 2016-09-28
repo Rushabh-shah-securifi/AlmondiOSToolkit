@@ -87,9 +87,9 @@
     
     else if ([commandType isEqualToString:@"DynamicSceneAdded"]){
         NSString *updatedID = [[mainDict[@"Scenes"] allKeys] objectAtIndex:0];
-        NSMutableDictionary *newScene = [mainDict[@"Scenes"] mutableCopy];
+        NSDictionary *newScene = [mainDict[@"Scenes"] objectForKey:updatedID];
         
-        if([[NSString stringWithFormat:@"%@", [newScene[updatedID] objectForKey:@"SceneEntryList"]] isEqualToString:@""])
+        if([self isValidScene:mainDict[@"Scenes"] updatedID:updatedID] == NO)
             return;
             
         for (NSMutableDictionary *sceneDict in toolkit.scenesArray) {
@@ -102,16 +102,10 @@
             [toolkit.scenesArray removeObject:dict];
         }
         
-//         NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
-        NSLog( @"new scene add updated id %@",newScene[updatedID]);
-         NSMutableDictionary *mutableScene = [newScene[updatedID] mutableCopy];
-        [mutableScene setValue:[self getMutableSceneEntryList:newScene[updatedID]] forKey:@"SceneEntryList"];
+        NSMutableDictionary *mutableScene = [newScene mutableCopy];
+        [mutableScene setValue:[self getMutableSceneEntryList:newScene] forKey:@"SceneEntryList"];
         [mutableScene setValue:updatedID forKey:@"ID"];
-         NSLog( @"new scene add after updated id %@",mutableScene);
-        
 
-        [newScene setValue:mutableScene forKey:updatedID];
-        NSLog(@"final new scene %@",newScene);
         [toolkit.scenesArray addObject:mutableScene];
     }
     
@@ -120,8 +114,10 @@
         //scenes has been activated
         NSString *updatedID = [[mainDict[@"Scenes"] allKeys] objectAtIndex:0];
         NSDictionary *newScene = [mainDict[@"Scenes"] objectForKey:updatedID];
-        if([[NSString stringWithFormat:@"%@", [newScene[updatedID] objectForKey:@"SceneEntryList"]] isEqualToString:@""])
+        
+        if([self isValidScene:mainDict[@"Scenes"] updatedID:updatedID] == NO)
             return;
+        
         NSInteger index = -1;
         for (NSDictionary *sceneDict in toolkit.scenesArray) {
             NSLog(@"sceneDict active:: %@",sceneDict);
@@ -173,6 +169,15 @@
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_UPDATE_SCENE_TABLEVIEW object:nil userInfo:data];
+}
+
+-(BOOL)isValidScene:(NSDictionary *)scenesDict updatedID:(NSString *)ID{
+    //there were some exceptions that were causing crash
+    if([scenesDict[ID] isKindOfClass:[NSDictionary class]] == NO)
+        return NO;
+    else if([[NSString stringWithFormat:@"%@", [scenesDict[ID] objectForKey:@"SceneEntryList"]] isEqualToString:@""])
+        return NO;
+    return YES;
 }
 
 -(BOOL)isLocal{

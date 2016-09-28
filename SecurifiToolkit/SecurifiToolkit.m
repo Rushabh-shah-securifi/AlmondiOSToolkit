@@ -532,8 +532,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (BOOL)isCloudLoggedIn {
     NSLog(@"isCloudLoggedIn");
     Network *network = self.cloudNetwork;
-    return network && network.loginStatus == NetworkLoginStatusLoggedIn;
     NSLog(@"status: %d", network.loginStatus);
+    return network && network.loginStatus == NetworkLoginStatusLoggedIn;
 }
 
 - (BOOL)isAccountActivated {
