@@ -208,6 +208,18 @@
     return genericCmd;
 }
 
++ (instancetype)requestRai2DownMobile{
+    sfi_id correlationId = [GenericCommand nextCorrelationId];
+    NSDictionary *payload = @{
+                              @"CommandMode":@"Request",
+                              @"CommandType":@"Rai2DownMobile",
+                              @"MobileInternalIndex":@(correlationId).stringValue
+                              };
+    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_MESH_COMMAND];
+    genericCmd.isMeshCmd = YES;
+    return genericCmd;
+}
+
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
     NSError *error;
     NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:NSJSONWritingPrettyPrinted error:&error];

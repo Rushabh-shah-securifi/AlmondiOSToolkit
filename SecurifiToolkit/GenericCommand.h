@@ -58,6 +58,8 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)requestRai2UpMobile;
 
++ (instancetype)requestRai2DownMobile;
+
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
 @property(nonatomic) BOOL isMeshCmd;

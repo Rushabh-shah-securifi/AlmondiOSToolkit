@@ -98,6 +98,8 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (void)shutdownMesh {
     NSLog(@"Mesh websocket shutdown");
     //ismesh NO will be set on delegate response
+    GenericCommand *cmd = [GenericCommand requestRai2DownMobile];
+    [self.socket_mesh send:cmd.command];
     [self.socket_mesh close];
 }
 
@@ -174,11 +176,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
     if(self.isMesh){
         //need to work on logic
-        NSLog(@"mesh web socket did fail");
+        NSLog(@"mesh web socket did fail: %@", webSocket);
         self.isMesh = NO;
         return;
     }
-    NSLog(@"The websocket did fail with error: %@", error.description);
+    NSLog(@"The websocket did fail with error: %@, socket: %@", error.description, webSocket);
     [self.delegate networkEndpointDidDisconnect:self];
 }
 
@@ -189,7 +191,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         self.isMesh = NO;
         return;
     }
-    NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@", @(code), reason, (wasClean) ? @"YES" : @"NO");
+    NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@, socket: %@", @(code), reason, (wasClean) ? @"YES" : @"NO", webSocket);
     [self.delegate networkEndpointDidDisconnect:self];
 }
 
