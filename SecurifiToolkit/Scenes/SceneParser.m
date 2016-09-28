@@ -73,7 +73,7 @@
         
         NSMutableArray *scenesList = [NSMutableArray new];
         for (NSString *key in sortedPostKeys) {
-            if([[NSString stringWithFormat:@"%@", [scenesPayload[key] objectForKey:@"SceneEntryList"]] isEqualToString:@""])
+            if([self isValidScene:scenesPayload updatedID:key] == NO)
                 continue;
             NSMutableArray *mutableEntryList = [self getMutableSceneEntryList:scenesPayload[key]];
             NSMutableDictionary *mutableScene = [scenesPayload[key] mutableCopy];
