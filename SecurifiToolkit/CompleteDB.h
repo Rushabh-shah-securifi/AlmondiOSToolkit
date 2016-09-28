@@ -19,4 +19,6 @@
 +(NSString *)getMaxDate:(NSString *)amac clientMac:(NSString *)cmac;
 
 +(NSString *)getLastDate:(NSString *)amac clientMac:(NSString *)cmac;
+
++(void)deleteDateEntries:(NSString *)amac clientMac:(NSString *)cmac date:(NSString *)date;
 @end

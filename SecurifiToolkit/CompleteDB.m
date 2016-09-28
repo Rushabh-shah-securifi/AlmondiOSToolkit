@@ -82,7 +82,10 @@ static sqlite3 *DB = nil;
             NSDateFormatter *objDateformat = [[NSDateFormatter alloc] init];
             [objDateformat setDateFormat:@"yyyy-MM-dd"];
             NSString    *strUTCTime = [self GetUTCDateTimeFromLocalTime:date];
-             sqlite3_bind_int(statement, 4, [strUTCTime integerValue]);
+            NSDate *objUTCDate  = [objDateformat dateFromString:strUTCTime];
+            long long milliseconds = (long long)([objUTCDate timeIntervalSince1970] * 1000.0);
+            NSLog(@"strUTCTime %ld ",milliseconds);
+             sqlite3_bind_int(statement, 4, milliseconds);
             NSLog(@" preparev2 CompleteDB success ");
         }
         else{
@@ -107,8 +110,8 @@ static sqlite3 *DB = nil;
     
     NSCalendar *gregorianCalendar1 = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *components = [gregorianCalendar components:NSCalendarUnitDay
-                                                        fromDate:startDate
-                                                          toDate:endDate
+                                                        fromDate:endDate
+                                                          toDate:startDate
                                                          options:0];
     NSDateComponents *components1 = [[NSDateComponents alloc]init];
     NSLog(@"nos of day %ld", [components day]);
@@ -126,13 +129,14 @@ static sqlite3 *DB = nil;
     return dateArr;
     
 }
+
 +(NSString *)getLastDate:(NSString *)amac clientMac:(NSString *)cmac{
     int max = 0;
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         
-        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MIN(DATE) from CompleteDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MIN(DATEINT) from CompleteDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
         
         sqlite3_stmt *statement;
         //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
@@ -172,7 +176,7 @@ static sqlite3 *DB = nil;
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
         
-        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MIN(DATE) from CompleteDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
+        NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MIN(DATEINT) from CompleteDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
         
         sqlite3_stmt *statement;
         //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
@@ -212,5 +216,38 @@ static sqlite3 *DB = nil;
     NSDate  *objDate    = [dateFormatter dateFromString:IN_strLocalTime];
     NSString *strDateTime   = [dateFormatter stringFromDate:objDate];
     return strDateTime;
+}
++(void)deleteDateEntries:(NSString *)amac clientMac:(NSString *)cmac date:(NSString *)date{
+    const char *dbpath = [databasePath UTF8String];
+    
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+        NSLog(@"database path %s",dbpath);
+        sqlite3_stmt *statement;
+        //NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE TIME IN(SELECT TIME FROM HistoryTB order by TIME ASC limit 50)"];
+        
+        NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM CompleteDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE = \"%@\"",amac,cmac,date];
+        if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
+        {
+            if(sqlite3_step(statement) == SQLITE_DONE)
+            {
+                NSLog(@"succes true done");
+            }
+            else
+            {
+                NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
+            }
+            sqlite3_finalize(statement);
+        }
+        else
+        {
+            NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(database));
+        }
+    }
+    else
+    {
+        NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(database));
+    }
+    return ;
 }
 @end

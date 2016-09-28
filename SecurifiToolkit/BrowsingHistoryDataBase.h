@@ -12,7 +12,7 @@
 
 //+(DBManager*)getSharedInstance;
 + (void)initializeDataBase;
-+ (NSString *)insertHistoryRecord:(NSDictionary *)hDict;
++ (NSDictionary *)insertHistoryRecord:(NSDictionary *)hDict;
 
 + (NSDictionary *)getAllBrowsingHistorywithLimit:(int)limit almonsMac:(NSString *)amac clientMac:(NSString *)cmac;
 
@@ -30,7 +30,7 @@
 
 +(void)deleteDB:(NSString *)amac clientMac:(NSString *)cmac;
 
-+(void)deleteOldEntries:(NSString *)amac clientMac:(NSString *)cmac;
++(void)deleteOldEntries:(NSString *)amac clientMac:(NSString *)cmac date:(NSString *)date;
 
 +(NSDictionary* )todaySearch:(NSString *)amac clientMac:(NSString *)cmac;
 
@@ -48,5 +48,6 @@
 
 +(NSString *)getPageState:(NSString *)amac clientMac:(NSString *)cmac;
 
++(NSString *)getLastDate:(NSString *)amac clientMac:(NSString *)cmac;
 
 @end
