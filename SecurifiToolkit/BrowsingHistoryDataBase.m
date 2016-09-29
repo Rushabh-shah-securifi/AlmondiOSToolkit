@@ -110,7 +110,7 @@ NSMutableDictionary *inCompleteDB;
         sqlite3_stmt *compiledStatement;
         
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement];
-        NSLog(@"search ddict %@",dict);
+//        NSLog(@"search ddict %@",dict);
         return dict;
     }
     
@@ -118,7 +118,7 @@ NSMutableDictionary *inCompleteDB;
 
 + (NSDictionary *)prepareMethod:(sqlite3_stmt *)compiledStatement andsqlStatement:(NSString *)sqlStatement{
     
-    NSLog(@"prepare method Querie: = %s",[sqlStatement UTF8String]);
+//    NSLog(@"prepare method Querie: = %s",[sqlStatement UTF8String]);
     NSMutableDictionary *clientBrowsingHistory = [[NSMutableDictionary alloc]init];
     if(sqlite3_prepare_v2(database, [sqlStatement UTF8String], -1, &compiledStatement, NULL) == SQLITE_OK){
         if (sqlite3_step(compiledStatement) == SQLITE_ROW)
@@ -154,7 +154,7 @@ NSMutableDictionary *inCompleteDB;
             NSString *uriString8 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 8)];
              NSString *pageState = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 9)];
             NSMutableDictionary *uriInfo = [NSMutableDictionary new];
-            NSLog(@"category List == %@,%@,%@",uriString5,uriString7,uriString8);
+//            NSLog(@"category List == %@,%@,%@",uriString5,uriString7,uriString8);
             NSDictionary *categoryObj = @{@"ID":uriString5,
                                           @"categoty":uriString7,
                                           @"subCategory":uriString8};
@@ -170,7 +170,7 @@ NSMutableDictionary *inCompleteDB;
             [self addToDictionary:dayDict uriInfo:uriInfo rowID:uriString0];
             
         }
-        NSLog(@"while not running errMSg %s",sqlite3_errmsg(database));
+//        NSLog(@"while not running errMSg %s",sqlite3_errmsg(database));
         [clientBrowsingHistory setObject:dayDict forKey:@"Data"];
         
     }
@@ -303,16 +303,13 @@ NSMutableDictionary *inCompleteDB;
                 NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
                 [dateFormatter setDateFormat:@"yyyy-MM-dd"];
                 NSDate *date = [NSDate dateWithTimeIntervalSince1970:milliseconds];
-                NSLog(@"date from int: %@ ",date);
                 //returning min date
-                NSLog(@"Date from date: %@ ",[NSString stringWithFormat:@"%@",[dateFormatter stringFromDate:date]]);
                 
                 sqlite3_bind_int(statement, 11, milliseconds);
                 if (sqlite3_step(statement) == SQLITE_DONE){
                     NSLog(@" successS");
                 }
                 else {
-                    NSLog(@" errorSS %s",sqlite3_errmsg(database));
                 }
             }
             else{
@@ -344,18 +341,14 @@ NSMutableDictionary *inCompleteDB;
     
     
     
-    NSLog(@"before returning INComplete Db %@",inCompleteDB);
-    NSLog(@"hDict == %@",hDict);
     
    
     
     NSDictionary *first_uriDict = [allObj firstObject];
     NSString *first_date = first_uriDict[@"Date"];
-    NSLog(@"first_uri %@",first_uriDict[@"Domain"]);
     
     
     NSDictionary *last_uriDict = [allObj lastObject];
-    NSLog(@"last_uri %@",last_uriDict[@"Domain"]);
     NSString *last_date = last_uriDict[@"Date"];
     
     
@@ -368,9 +361,7 @@ NSMutableDictionary *inCompleteDB;
     NSDateFormatter *f = [[NSDateFormatter alloc] init];
     [f setDateFormat:@"yyyy-MM-dd"];
     NSString *todayDate = [f stringFromDate:[NSDate date]];
-    NSLog(@"inCompleteDB after adding %@",inCompleteDB);
     if([first_date isEqualToString:last_date]){
-        NSLog(@"do nothing first and last day are same");
         
         
     }
@@ -386,8 +377,8 @@ NSMutableDictionary *inCompleteDB;
         else{
             NSArray *arr = [CompleteDB betweenDays:first_date date2:last_date previousDate:NULL];
             NSLog(@" in between days arr %@",arr);
+            if(arr.count > 1)
             for(long int i = 0;i < arr.count - 1;i++){// skipping last obj
-                
                 [CompleteDB insertInCompleteDB:[arr objectAtIndex:i] cmac:hDict[@"CMAC"] amac:hDict[@"AMAC"]];
             }
         }
@@ -457,7 +448,6 @@ NSMutableDictionary *inCompleteDB;
             {
                 
                 max = sqlite3_column_int(statement, 0);
-                NSLog(@"database max db= %d",max);
                 
             }
         }
@@ -528,7 +518,6 @@ NSMutableDictionary *inCompleteDB;
             {
                 
                 max = sqlite3_column_int(statement, 0);
-                NSLog(@"database max db= %d",max);
                 
             }
         }
@@ -577,7 +566,6 @@ NSMutableDictionary *inCompleteDB;
     else{
         //NSLog(@"error whilw opening database file");
     }
-    NSLog(@"datbase count = %d",count);
     return count;
 }
 +(void)deleteOldEntries:(NSString *)amac clientMac:(NSString *)cmac date:(NSString *)date{
@@ -630,7 +618,6 @@ NSMutableDictionary *inCompleteDB;
             {
                 
                 max = sqlite3_column_int(statement, 0);
-                NSLog(@"database max db= %d",max);
                 
             }
         }
@@ -712,7 +699,6 @@ NSMutableDictionary *inCompleteDB;
                 //                NSLog(@"cat successS");
             }
             else {
-                NSLog(@"cat errorSS");
             }
             //                }
         }

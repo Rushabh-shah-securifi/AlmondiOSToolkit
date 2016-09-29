@@ -147,7 +147,6 @@ static sqlite3 *DB = nil;
             {
                 
                 max = sqlite3_column_int(statement, 0);
-                NSLog(@"database max db= %d",max);
                 
             }
         }
@@ -187,7 +186,6 @@ static sqlite3 *DB = nil;
             {
                 
                 max = sqlite3_column_int(statement, 0);
-                NSLog(@"database max db= %d",max);
                 
             }
         }

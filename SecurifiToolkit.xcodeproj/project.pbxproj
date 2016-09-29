@@ -332,6 +332,8 @@
 		CEAD85AE19CACE43006D1048 /* UpdateUserProfileRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAD85AC19CACE42006D1048 /* UpdateUserProfileRequest.m */; };
 		CEAD85B119CAEED1006D1048 /* UpdateUserProfileResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAD85AF19CAEED1006D1048 /* UpdateUserProfileResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAD85B019CAEED1006D1048 /* UpdateUserProfileResponse.m */; };
+		CEC53DE81D9B9B9D00514DB3 /* RecentSearchDB.h in Headers */ = {isa = PBXBuildFile; fileRef = CEC53DE61D9B9B9D00514DB3 /* RecentSearchDB.h */; };
+		CEC53DEB1D9BC7A400514DB3 /* RecentSearchDB.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC53DEA1D9BC7A400514DB3 /* RecentSearchDB.m */; };
 		CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE19EE8181F9D9500F91AAD /* GenericCommandRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE19EE9181F9D9500F91AAD /* GenericCommandRequest.m */; };
 		CEE19EF4181FB01300F91AAD /* GenericCommandResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CEE19EF2181FB01300F91AAD /* GenericCommandResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -711,6 +713,8 @@
 		CEAD85AC19CACE42006D1048 /* UpdateUserProfileRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateUserProfileRequest.m; sourceTree = "<group>"; };
 		CEAD85AF19CAEED1006D1048 /* UpdateUserProfileResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpdateUserProfileResponse.h; sourceTree = "<group>"; };
 		CEAD85B019CAEED1006D1048 /* UpdateUserProfileResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateUserProfileResponse.m; sourceTree = "<group>"; };
+		CEC53DE61D9B9B9D00514DB3 /* RecentSearchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecentSearchDB.h; sourceTree = "<group>"; };
+		CEC53DEA1D9BC7A400514DB3 /* RecentSearchDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecentSearchDB.m; sourceTree = "<group>"; };
 		CEE19EE8181F9D9500F91AAD /* GenericCommandRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericCommandRequest.h; sourceTree = "<group>"; };
 		CEE19EE9181F9D9500F91AAD /* GenericCommandRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericCommandRequest.m; sourceTree = "<group>"; };
 		CEE19EF2181FB01300F91AAD /* GenericCommandResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericCommandResponse.h; sourceTree = "<group>"; };
@@ -1323,6 +1327,8 @@
 				CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */,
 				CE5C1DB11D950FFB007BCE50 /* CompleteDB.h */,
 				CE5C1DB21D950FFB007BCE50 /* CompleteDB.m */,
+				CEC53DE61D9B9B9D00514DB3 /* RecentSearchDB.h */,
+				CEC53DEA1D9BC7A400514DB3 /* RecentSearchDB.m */,
 			);
 			name = BrowsingHistoryDB;
 			sourceTree = "<group>";
@@ -1434,6 +1440,7 @@
 				CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */,
 				22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */,
 				CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */,
+				CEC53DE81D9B9B9D00514DB3 /* RecentSearchDB.h in Headers */,
 				CEED642F1C7C351E008A7412 /* Device.h in Headers */,
 				CE5EB64117E8549200985636 /* DeviceDataHashResponse.h in Headers */,
 				CEE19EEA181F9D9500F91AAD /* GenericCommandRequest.h in Headers */,
@@ -1830,6 +1837,7 @@
 				1DF03CA0928047DC7842F144 /* NotificationListRequest.m in Sources */,
 				1C3EEFC41B37999300DFCF62 /* SFIDevicesList.m in Sources */,
 				1DF03D5707598F4315C494FC /* NotificationCountRequest.m in Sources */,
+				CEC53DEB1D9BC7A400514DB3 /* RecentSearchDB.m in Sources */,
 				1DF03CBA2B45BFB97D3A8E79 /* NotificationCountResponse.m in Sources */,
 				1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */,
 				1DF033F86547E8B8555F3561 /* NotificationClearCountResponse.m in Sources */,

@@ -43,9 +43,9 @@
 }
 
 -(void)onWiFiClientsListResAndDynamicCallbacks:(id)sender {
-    NSLog(@"onWiFiClientsListResAndDynamicCallbacks");
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
+   
     if (data == nil || [data valueForKey:@"data"]==nil ) {
         return;
     }
@@ -56,11 +56,13 @@
     if(local){
         mainDict = [data valueForKey:@"data"];
     }else{
-        if(![[data valueForKey:@"data"] isKindOfClass:[NSData class]])
+        if(![[data valueForKey:@"data"] isKindOfClass:[NSData class]]){
+            NSLog(@"returning... %@",[data valueForKey:@"data"]);
             return;
+        }
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
-    
+     NSLog(@"onWiFiClientsListResAndDynamicCallbacks %@",mainDict);
     BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
@@ -111,6 +113,8 @@
         Client *client = [Client findClientByID:ID];
         if(client)
             [self setDeviceProperties:client forDict:updatedClientPayload];
+        NSLog(@"dynamic client updated mainDict = %@",mainDict);
+        
     }
     else if([commandType isEqualToString:DYNAMIC_CLIENT_REMOVED]) {
         NSDictionary *clientPayload = mainDict[CLIENTS];

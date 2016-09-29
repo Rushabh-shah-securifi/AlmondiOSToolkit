@@ -226,6 +226,7 @@
             else{
                 client.webHistoryEnable = newValue.boolValue;
             }
+            break;
         }
         case -25:{
             if(get)
@@ -233,6 +234,7 @@
             else{
                 client.bW_Enable = newValue.boolValue;
             }
+            break;
         }
         case -3:
         {
