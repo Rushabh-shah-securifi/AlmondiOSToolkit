@@ -376,7 +376,6 @@ NSMutableDictionary *inCompleteDB;
         }
         else{
             NSArray *arr = [CompleteDB betweenDays:first_date date2:last_date previousDate:NULL];
-            NSLog(@" in between days arr %@",arr);
             if(arr.count > 1)
             for(long int i = 0;i < arr.count - 1;i++){// skipping last obj
                 [CompleteDB insertInCompleteDB:[arr objectAtIndex:i] cmac:hDict[@"CMAC"] amac:hDict[@"AMAC"]];

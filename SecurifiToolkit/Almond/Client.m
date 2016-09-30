@@ -312,6 +312,8 @@
         copy.deviceSchedule = self.deviceSchedule;
         copy.canBeBlocked = self.canBeBlocked;
         copy.category = self.category;
+        copy.webHistoryEnable = self.webHistoryEnable;
+        copy.bW_Enable = self.bW_Enable;
     }
     return copy;
 }

@@ -144,8 +144,9 @@
 
 - (NSString *)stringFromDate{
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"hh:mm"];
+    [dateFormatter setDateFormat:@"HH:mm"];
     NSString *stringDate = [dateFormatter stringFromDate:self];
+    NSLog(@"time +== %@",stringDate);
     return stringDate;
 }
 

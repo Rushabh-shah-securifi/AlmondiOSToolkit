@@ -114,7 +114,6 @@ static sqlite3 *DB = nil;
                                                           toDate:startDate
                                                          options:0];
     NSDateComponents *components1 = [[NSDateComponents alloc]init];
-    NSLog(@"nos of day %ld", [components day]);
     NSMutableArray *dateArr = [[NSMutableArray alloc]init];
     for (long int i = 1; i<[components day]; i++) {
         [components1 setDay:-i];
