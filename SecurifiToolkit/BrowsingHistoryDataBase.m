@@ -511,7 +511,37 @@ NSMutableDictionary *inCompleteDB;
     }
     sqlite3_close(database);
 }
-
++(void)deleteOldEntries:(NSString *)amac clientMac:(NSString *)cmac nosRecord:(int)record{
+    const char *dbpath = [databasePath UTF8String];
+    
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+        NSLog(@"database path %s",dbpath);
+        sqlite3_stmt *statement;
+        NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB order by TIME ASC limit %d)",amac,cmac,record];
+        if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
+        {
+            if(sqlite3_step(statement) == SQLITE_DONE)
+            {
+                NSLog(@"succes delete done");
+            }
+            else
+            {
+                NSLog(@"%s: step not ok: %s", __FUNCTION__, sqlite3_errmsg(database));
+            }
+            sqlite3_finalize(statement);
+        }
+        else
+        {
+            NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(database));
+        }
+    }
+    else
+    {
+        NSLog(@"%s: open failure: %s", __FUNCTION__, sqlite3_errmsg(database));
+    }
+    return ;
+}
 #pragma mark method for searchPage
 +(NSDictionary *)runQuery:(NSString *)sqlStatement{
     if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)

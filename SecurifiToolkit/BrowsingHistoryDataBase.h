@@ -50,4 +50,5 @@
 
 +(NSString *)getLastDate:(NSString *)amac clientMac:(NSString *)cmac;
 
++(void)deleteOldEntries:(NSString *)amac clientMac:(NSString *)cmac nosRecord:(int)record;
 @end
