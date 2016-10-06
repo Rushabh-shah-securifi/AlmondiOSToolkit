@@ -269,7 +269,7 @@ NSMutableDictionary *inCompleteDB;
                 sqlite3_bind_text(statement, 5, [uriDict[@"Domain"] UTF8String], -1, SQLITE_TRANSIENT);
                 
                 //categoryID instead of count
-                int ID = [uriDict[@"SubCategory"] intValue] ;
+                int ID = [uriDict[@"subCategory"] intValue] ;
                 
                 NSDictionary *categoryName = catogeryDict[@(ID).stringValue];
                 if(categoryName == NULL){
