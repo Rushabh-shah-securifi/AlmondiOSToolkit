@@ -241,17 +241,17 @@ NSMutableDictionary *inCompleteDB;
     {
         NSString* statement1;
         static sqlite3_stmt *init_statement = nil;
-//        statement1 = @"BEGIN EXCLUSIVE TRANSACTION";
-//        
-//        if (sqlite3_prepare_v2(database, [statement1 UTF8String], -1, &init_statement, NULL) != SQLITE_OK) {
-//            printf("db error: %s\n", sqlite3_errmsg(database));
-//            return NO;
-//        }
-//        if (sqlite3_step(init_statement) != SQLITE_DONE) {
-//            sqlite3_finalize(init_statement);
-//            printf("db error: %s\n", sqlite3_errmsg(database));
-//            return NO;
-//        }
+        statement1 = @"BEGIN EXCLUSIVE TRANSACTION";
+        
+        if (sqlite3_prepare_v2(database, [statement1 UTF8String], -1, &init_statement, NULL) != SQLITE_OK) {
+            printf("db error: %s\n", sqlite3_errmsg(database));
+            return NO;
+        }
+        if (sqlite3_step(init_statement) != SQLITE_DONE) {
+            sqlite3_finalize(init_statement);
+            printf("db error: %s\n", sqlite3_errmsg(database));
+            return NO;
+        }
 //
         const char *insert_stmt = [query UTF8String];
         sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
@@ -308,20 +308,19 @@ NSMutableDictionary *inCompleteDB;
             endtag = hDict[@"pageState"];
             //NSLog(@"LastVisitedEpoch == %@",endtag);
         }
-//        statement1 = @"COMMIT TRANSACTION";
-//        sqlite3_stmt *commitStatement;
-//        if (sqlite3_prepare_v2(database, [statement1 UTF8String], -1, &commitStatement, NULL) != SQLITE_OK) {
-//            printf("db error: %s\n", sqlite3_errmsg(database));
-//            return NO;
-//        }
-//        if (sqlite3_step(commitStatement) != SQLITE_DONE) {
-//            printf("db error: %s\n", sqlite3_errmsg(database));
-//            return NO;
-//        }
+        statement1 = @"COMMIT TRANSACTION";
+        sqlite3_stmt *commitStatement;
+        if (sqlite3_prepare_v2(database, [statement1 UTF8String], -1, &commitStatement, NULL) != SQLITE_OK) {
+            printf("db error: %s\n", sqlite3_errmsg(database));
+            return NO;
+        }
+        if (sqlite3_step(commitStatement) != SQLITE_DONE) {
+            printf("db error: %s\n", sqlite3_errmsg(database));
+            return NO;
+        }
         
-//             sqlite3_finalize(beginStatement);
         sqlite3_finalize(statement);
-//        sqlite3_finalize(commitStatement);
+        sqlite3_finalize(commitStatement);
         sqlite3_close(database);
     }
     else{
