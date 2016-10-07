@@ -686,11 +686,6 @@
 //            break;
 //        };
         //mesh
-        case CommandType_MESH_COMMAND:{
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:NOTIFICATION_CommandType_MESH_RESPONSE data:payload];
-            break;
-        }
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:

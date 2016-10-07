@@ -203,7 +203,7 @@
                               @"CommandType":@"Rai2UpMobile",
                               @"MobileInternalIndex":@(correlationId).stringValue
                               };
-    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_MESH_COMMAND];
+    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_UPDATE_REQUEST];
     genericCmd.isMeshCmd = YES;
     return genericCmd;
 }
@@ -215,7 +215,7 @@
                               @"CommandType":@"Rai2DownMobile",
                               @"MobileInternalIndex":@(correlationId).stringValue
                               };
-    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_MESH_COMMAND];
+    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_UPDATE_REQUEST];
     genericCmd.isMeshCmd = YES;
     return genericCmd;
 }

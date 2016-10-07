@@ -722,8 +722,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                 case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
-                case CommandType_RULE_LIST:
-                case CommandType_MESH_COMMAND:{
+                case CommandType_RULE_LIST:{
                     commandPayload = command.command;
                     break;
                 }

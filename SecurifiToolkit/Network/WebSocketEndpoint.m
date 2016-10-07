@@ -25,7 +25,6 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 @property(nonatomic, strong) NetworkConfig *config;
 @property(nonatomic, readonly) NSDictionary *responseHandlers;
-@property BOOL isMesh;
 @end
 
 @implementation WebSocketEndpoint
@@ -46,13 +45,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (void)connect{
     NSLog(@"connect websocket");
-    self.isMesh = NO;
     self.socket = [self connectSocketToPort:self.config.port];
 }
 
 -(void)connectMesh{
     NSLog(@"connect mesh");
-    self.isMesh = YES;
     self.socket_mesh = [self connectSocketToPort:7682];
 }
 
@@ -123,7 +120,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (void)webSocketDidOpen:(PSWebSocket *)webSocket {
     NSLog(@"webSocketDidOpen");
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    if(self.isMesh){
+    if([webSocket isEqual:self.socket_mesh]){
         [toolkit asyncSendToLocal:[GenericCommand requestRai2UpMobile] almondMac:toolkit.currentAlmond.almondplusMAC];
         return;
     }
@@ -174,10 +171,9 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
-    if(self.isMesh){
+    if([webSocket isEqual:self.socket_mesh]){
         //need to work on logic
         NSLog(@"mesh web socket did fail: %@", webSocket);
-        self.isMesh = NO;
         return;
     }
     NSLog(@"The websocket did fail with error: %@, socket: %@", error.description, webSocket);
@@ -185,10 +181,9 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
-    if(self.isMesh){
+    if([webSocket isEqual:self.socket_mesh]){
         //need to work on logic
         NSLog(@"mesh websocket did close");
-        self.isMesh = NO;
         return;
     }
     NSLog(@"The websocket closed with code: %@, reason: %@, wasClean: %@, socket: %@", @(code), reason, (wasClean) ? @"YES" : @"NO", webSocket);
@@ -202,44 +197,44 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
              },
              //meshcommands
              @"Rai2UpMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
             
              @"Rai2DownMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"SlaveDetailsMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"CheckForAddableWiredSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"CheckForAddableWirelessSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"AddWiredSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"AddWirelessSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"DynamicAddWiredSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"DynamicAddWirelessSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"BlinkLedMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"SetSlaveNameMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"RemoveSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              @"ForceRemoveSlaveMobile" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_MESH_COMMAND];
+                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:payload commandType:CommandType_COMMAND_RESPONSE];
              },
              //new device commands
              @"DeviceList" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
