@@ -27,14 +27,16 @@ static NSString *databasePath;
 static BrowsingHistoryDataBase *dbSharedInstance = nil;
 static sqlite3 *database = nil;
 static sqlite3 *DB = nil;
-NSMutableDictionary *inCompleteDB;
+typedef void(^myCompletion)(BOOL);
 #pragma mark initializeMethods
 +(void)initializeDataBase{
     [self createDataBasePath:DATABASE_FILE];
     [self setHistoryTable];
-    inCompleteDB = [[NSMutableDictionary alloc]init];
 }
-
++(void) myMethod:(myCompletion) compblock{
+    //do stuff
+    compblock(YES);
+}
 +(void)createDataBasePath:(NSString*)dbPath{
     ////NSLog(@"createDataBasePath");
     NSArray * dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -151,7 +153,7 @@ NSMutableDictionary *inCompleteDB;
              NSString *pageState = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 9)];
             NSMutableDictionary *uriInfo = [NSMutableDictionary new];
 //            NSLog(@"category List == %@,%@,%@",uriString5,uriString7,uriString8);
-            NSDictionary *categoryObj = @{@"ID":uriString5,
+           NSDictionary *categoryObj = @{@"ID":uriString5,
                                           @"categoty":uriString7,
                                           @"subCategory":uriString8};
             [uriInfo setObject:uriString4 forKey:@"hostName"];
@@ -196,9 +198,10 @@ NSMutableDictionary *inCompleteDB;
 }
 
 #pragma mark insertMethods
-+(NSDictionary *)insertHistoryRecord:(NSDictionary *)hDict{
++(void )insertHistoryRecord:(NSDictionary *)hDict{
+    
     if(hDict == NULL)
-        return nil;
+        return;
     NSString *query = @"INSERT OR REPLACE INTO HistoryTB (DATE,UNIQUEKEY,AMAC,CMAC, URIS,CATEGORYID,TIME,CATEGORY,CATEGORYNAME,PS,DATEINT) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
     [self setHistoryTable];
 //    NSString *mac = amac;
@@ -225,15 +228,254 @@ NSMutableDictionary *inCompleteDB;
 //                          
 //                          ]
 //               };
-    return [self insertHistoryEntries:hDict query:query];
+//    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+//    
+//    [self myMethod:^(BOOL finished) {
+//        if(finished){
+//           [self insertHistoryEntries:hDict query:query];
+//            NSLog(@"success");
+//        }
+//        
+//        dispatch_semaphore_signal(sema);
+//    }];
+//    
+//    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    [self insertHistoryEntries:hDict query:query];
+    return;
 }
+/*
++(void) getOrInert:(NSDictionary *)hDict query:(NSString *)query read:(BOOL)read\\\
 
-+ (NSDictionary *)insertHistoryEntries:(NSDictionary *)hDict query:(NSString *)query{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    [self myMethod:^(BOOL finished) {
+        if(finished){
+            if(read)
+                [self getAllBrowsingHistorywithLimit:<#(int)#> almonsMac:<#(NSString *)#> clientMac:<#(NSString *)#>]
+            else
+            [self insertHistoryEntries:hDict query:query];
+            NSLog(@"success");
+        }
+        
+        dispatch_semaphore_signal(sema);
+    }];
+    
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    return;
+}
+*/
++ (void )insertHistoryEntries:(NSDictionary *)hDict query:(NSString *)query{
     sqlite3_stmt *statement;
     NSString *endtag;
     NSArray *allObj = hDict[@"Data"];
     if([allObj count]<= 0)
-        return nil;
+        return ;
      NSDictionary *catogeryDict = [self parseJson:@"CategoryMap"];
     
     const char *dbpath = [databasePath UTF8String];
@@ -245,12 +487,12 @@ NSMutableDictionary *inCompleteDB;
         
         if (sqlite3_prepare_v2(database, [statement1 UTF8String], -1, &init_statement, NULL) != SQLITE_OK) {
             printf("db error: %s\n", sqlite3_errmsg(database));
-            return NO;
+            return ;
         }
         if (sqlite3_step(init_statement) != SQLITE_DONE) {
             sqlite3_finalize(init_statement);
             printf("db error: %s\n", sqlite3_errmsg(database));
-            return NO;
+            return ;
         }
 //
         const char *insert_stmt = [query UTF8String];
@@ -312,11 +554,11 @@ NSMutableDictionary *inCompleteDB;
         sqlite3_stmt *commitStatement;
         if (sqlite3_prepare_v2(database, [statement1 UTF8String], -1, &commitStatement, NULL) != SQLITE_OK) {
             printf("db error: %s\n", sqlite3_errmsg(database));
-            return NO;
+            return ;
         }
         if (sqlite3_step(commitStatement) != SQLITE_DONE) {
             printf("db error: %s\n", sqlite3_errmsg(database));
-            return NO;
+            return ;
         }
         
         sqlite3_finalize(statement);
@@ -339,9 +581,7 @@ NSMutableDictionary *inCompleteDB;
     NSString *ps = hDict[@"pageState"];
     
     // put last_date and & ps in incomplete DB
-    [inCompleteDB setObject:last_date forKey:@"lastDate"];
-    if(ps != NULL)
-    [inCompleteDB setObject:ps forKey:@"PS"];
+   
     
     NSDateFormatter *f = [[NSDateFormatter alloc] init];
     [f setDateFormat:@"yyyy-MM-dd"];
@@ -369,7 +609,7 @@ NSMutableDictionary *inCompleteDB;
         }
 
     }
-    return  inCompleteDB;
+    return ;
 }
 + (NSString *)GetUTCDateTimeFromLocalTime:(NSString *)IN_strLocalTime
 {
