@@ -196,11 +196,12 @@
     return [self jsonPayloadCommand:payload commandType:CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES];
 }
 
-+ (instancetype)requestRai2UpMobile{
++ (instancetype)requestRai2UpMobile:(NSString *)almondMac{
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     NSDictionary *payload = @{
                               @"CommandMode":@"Request",
                               @"CommandType":@"Rai2UpMobile",
+                              @"AlmondMAC" : almondMac? almondMac: @"",
                               @"MobileInternalIndex":@(correlationId).stringValue
                               };
     GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_UPDATE_REQUEST];
@@ -208,11 +209,12 @@
     return genericCmd;
 }
 
-+ (instancetype)requestRai2DownMobile{
++ (instancetype)requestRai2DownMobile:(NSString *)almondMac{
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     NSDictionary *payload = @{
                               @"CommandMode":@"Request",
                               @"CommandType":@"Rai2DownMobile",
+                              @"AlmondMAC" : almondMac? almondMac: @"",
                               @"MobileInternalIndex":@(correlationId).stringValue
                               };
     GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_UPDATE_REQUEST];

@@ -95,7 +95,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 - (void)shutdownMesh {
     NSLog(@"Mesh websocket shutdown");
     //ismesh NO will be set on delegate response
-    GenericCommand *cmd = [GenericCommand requestRai2DownMobile];
+    GenericCommand *cmd = [GenericCommand requestRai2DownMobile:nil];
     [self.socket_mesh send:cmd.command];
     [self.socket_mesh close];
 }
@@ -121,7 +121,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSLog(@"webSocketDidOpen");
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     if([webSocket isEqual:self.socket_mesh]){
-        [toolkit asyncSendToLocal:[GenericCommand requestRai2UpMobile] almondMac:toolkit.currentAlmond.almondplusMAC];
+        [toolkit asyncSendToLocal:[GenericCommand requestRai2UpMobile:nil] almondMac:toolkit.currentAlmond.almondplusMAC];
         return;
     }
     

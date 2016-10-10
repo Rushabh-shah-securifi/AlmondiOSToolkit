@@ -56,9 +56,9 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)requestSensorDeviceList:(NSString*)mac;
 
-+ (instancetype)requestRai2UpMobile;
++ (instancetype)requestRai2UpMobile:(NSString *)almondMac;
 
-+ (instancetype)requestRai2DownMobile;
++ (instancetype)requestRai2DownMobile:(NSString *)almondMac;
 
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
