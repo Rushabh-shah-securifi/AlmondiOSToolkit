@@ -247,4 +247,40 @@ static sqlite3 *DB = nil;
     }
     return ;
 }
++(BOOL)searchDatePresentOrNot:(NSString *)amac clientMac:(NSString *)cmac andDate:(NSString *)date{
+    const char *dbpath = [databasePath UTF8String];
+    NSString *uriString3;
+    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
+    {
+        NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from CompleteDB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE LIKE  '%%%@%%' ",amac,cmac,date];
+        //        const char* sqlcountStat = "SELECT COUNT(*) FROM HistoryTB WHERE AMAC = ? AND CMAC = ?";
+        sqlite3_stmt *statement;
+        //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
+        if( sqlite3_prepare_v2(database, [sqlStatement UTF8String],-1, &statement, NULL)== SQLITE_OK)
+        {
+            //Loop through all the returned rows (should be just one)
+            while( sqlite3_step(statement) == SQLITE_ROW )
+            {
+                uriString3 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 0)];
+            }
+        }
+        else
+        {
+            NSLog( @"Failed from sqlite3_prepare_v2. Error is:  %s", sqlite3_errmsg(database) );
+        }
+        
+        // Finalize and close database.
+        sqlite3_finalize(statement);
+        sqlite3_close(database);
+    }
+    else{
+        NSLog(@"error whilw opening database file");
+    }
+    if(uriString3 != NULL)
+        return YES;
+    else
+        return NO;
+    
+}
+
 @end
