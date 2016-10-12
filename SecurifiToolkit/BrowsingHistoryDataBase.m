@@ -69,10 +69,6 @@ typedef void(^myCompletion)(BOOL);
     NSLog(@"Hello I am in Close");
     sqlite3_close(database);
 }
-
-+ (BOOL)helloDb{
-    return  NO;
-}
 + (BOOL)openDB{
     const char *dbpath = [databasePath UTF8String];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
@@ -86,7 +82,7 @@ typedef void(^myCompletion)(BOOL);
 +(void)setHistoryTable{
     NSFileManager *filemgr = [NSFileManager defaultManager];
     if ([filemgr fileExistsAtPath: databasePath ] == NO){
-        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,UNIQUEKEY TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,CATEGORYID TEXT,TIME INTEGER,CATEGORY TEXT,CATEGORYNAME TEXT,PS TEXT,DATEINT INTEGER,PRIMARY KEY(DATE,AMAC,CMAC,URIS))"];
+        [self createTable:@"CREATE TABLE IF NOT EXISTS HistoryTB (DATE TEXT,AMAC TEXT,CMAC TEXT, URIS TEXT,CATEGORYID TEXT,TIME INTEGER,CATEGORY TEXT,CATEGORYNAME TEXT,DATEINT INTEGER,PRIMARY KEY(DATE,AMAC,CMAC,URIS))"];
     }
 }
 
@@ -146,49 +142,33 @@ typedef void(^myCompletion)(BOOL);
 
 + (NSDictionary *)prepareMethod:(sqlite3_stmt *)compiledStatement andsqlStatement:(NSString *)sqlStatement{
     
-    //    NSLog(@"prepare method Querie: = %s",[sqlStatement UTF8String]);
     NSMutableDictionary *clientBrowsingHistory = [[NSMutableDictionary alloc]init];
-    if(sqlite3_prepare_v2(database, [sqlStatement UTF8String], -1, &compiledStatement, NULL) == SQLITE_OK){/*
-                                                                                                            if (sqlite3_step(compiledStatement) == SQLITE_ROW)
-                                                                                                            {
-                                                                                                            NSString *uriString3 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 3)];
-                                                                                                            
-                                                                                                            NSString *uriString2 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 2)];
-                                                                                                            [clientBrowsingHistory setValue:uriString2 forKey:@"clientMac"];
-                                                                                                            [clientBrowsingHistory setValue:uriString3 forKey:@"almondMac"];
-                                                                                                            
-                                                                                                            
-                                                                                                            }
-                                                                                                            else
-                                                                                                            NSLog(@"sqlite3_step 1 %s",sqlite3_errmsg(database));
-                                                                                                            */
+    if(sqlite3_prepare_v2(database, [sqlStatement UTF8String], -1, &compiledStatement, NULL) == SQLITE_OK){
         NSMutableDictionary *dayDict = [NSMutableDictionary new];
-        //NSLog(@"success msg %s",sqlite3_errmsg(database));
         while (sqlite3_step(compiledStatement) == SQLITE_ROW)
         {
-            NSString *uriString3 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 3)];
+            NSString *uriString3 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 2)];
             
-            NSString *uriString2 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 2)];
+            NSString *uriString2 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 1)];
             [clientBrowsingHistory setValue:uriString2 forKey:@"clientMac"];
             [clientBrowsingHistory setValue:uriString3 forKey:@"almondMac"];
             
             NSString *uriString0 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 0)];
             
-            NSString *uriString1 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 1)];
             
             
-            NSString *uriString4 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 4)];
-            NSString *uriString5 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 5)];
+            NSString *uriString4 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 3)];
+            NSString *uriString5 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 4)];
             
             
-            int field1 =  sqlite3_column_int(compiledStatement, 6);
+            int field1 =  sqlite3_column_int(compiledStatement, 5);
             NSString *uriString6 = [NSString stringWithFormat:@"%d",field1];
             
-            NSString *uriString7 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 7)];
-            NSString *uriString8 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 8)];
-            NSString *pageState = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 9)];
+            NSString *uriString7 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 6)];
+            NSString *uriString8 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 7)];
+            
             NSMutableDictionary *uriInfo = [NSMutableDictionary new];
-            //            NSLog(@"category List == %@,%@,%@",uriString5,uriString7,uriString8);
+            
             NSDictionary *categoryObj = @{@"ID":uriString5,
                                           @"categoty":uriString7,
                                           @"subCategory":uriString8};
@@ -200,16 +180,6 @@ typedef void(^myCompletion)(BOOL);
             
             [uriInfo setObject:[UIImage imageNamed:@"globe" ] forKey:@"image"];
             
-            //            NSDictionary *uriInfo1 = @{
-            //                                       @"hostName":uriString4,
-            //                                       @"Epoc" : uriString6,
-            //                                       @"count" : uriString5,
-            //                                       @"date" : uriString0,
-            //                                       @"categoryObj" : categoryObj,
-            //                                       @"image" : [UIImage imageNamed:@"globe" ]
-            //                                       };
-            
-            [clientBrowsingHistory setObject:pageState forKey:@"pageState"];
             [self addToDictionary:dayDict uriInfo:uriInfo rowID:uriString0];
             
         }
@@ -224,8 +194,6 @@ typedef void(^myCompletion)(BOOL);
     sqlite3_finalize(compiledStatement);
     
     // sqlite3_close(database);
-    //    NSLog(@"DB DayDict:: %@",clientBrowsingHistory);
-    //    NSLog(@"clientBrowsingHistory :: %@",clientBrowsingHistory);
     return clientBrowsingHistory;
 }
 
@@ -246,7 +214,7 @@ typedef void(^myCompletion)(BOOL);
 +(NSMutableDictionary *)insertAndGetHistoryRecord:(NSDictionary *)hDict readlimit:(int)limit amac:(NSString *)amac cmac:(NSString *)camc{
     NSMutableDictionary *recordDict;
     
-    NSString *query = @"INSERT OR REPLACE INTO HistoryTB (DATE,UNIQUEKEY,AMAC,CMAC, URIS,CATEGORYID,TIME,CATEGORY,CATEGORYNAME,PS,DATEINT) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+    NSString *query = @"INSERT OR REPLACE INTO HistoryTB (DATE,AMAC,CMAC, URIS,CATEGORYID,TIME,CATEGORY,CATEGORYNAME,DATEINT) VALUES(?,?,?,?,?,?,?,?,?)";
     [self setHistoryTable];
     if([self openDB]== NO)
         return nil;
@@ -274,8 +242,6 @@ typedef void(^myCompletion)(BOOL);
         return ;
     NSDictionary *catogeryDict = [self parseJson:@"CategoryMap"];
     
-    
-    
     NSString* statement1;
     static sqlite3_stmt *init_statement = nil;
     statement1 = @"BEGIN EXCLUSIVE TRANSACTION";
@@ -289,21 +255,20 @@ typedef void(^myCompletion)(BOOL);
         printf("db error: %s\n", sqlite3_errmsg(database));
         return ;
     }
-    //
+    
     const char *insert_stmt = [query UTF8String];
     sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
-    // store this nsarr to completeDB table
     
-    ////NSLog(@"allDate %@",allDate);
+    
+
     for(NSDictionary *uriDict in allObj)
     {
-        NSString *str = @"-2";
         if(sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL)== SQLITE_OK){
             sqlite3_bind_text(statement, 1, [uriDict[@"Date"] UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_text(statement, 2, [str UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_text(statement, 3, [hDict[@"AMAC"] UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_text(statement, 4, [hDict[@"CMAC"] UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_text(statement, 5, [uriDict[@"Domain"] UTF8String], -1, SQLITE_TRANSIENT);
+            
+            sqlite3_bind_text(statement, 2, [hDict[@"AMAC"] UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 3, [hDict[@"CMAC"] UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 4, [uriDict[@"Domain"] UTF8String], -1, SQLITE_TRANSIENT);
             
             //categoryID instead of count
             int ID = [uriDict[@"subCategory"] intValue] ;
@@ -314,13 +279,11 @@ typedef void(^myCompletion)(BOOL);
                                  @"categoryName": @"Real Estate"   };
             }
             int mii = arc4random()%81;
-            sqlite3_bind_text(statement, 6, [[NSString stringWithFormat:@"%d",mii] UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_int(statement, 7, [[NSString stringWithFormat:@"%@",uriDict[@"LastVisitedEpoch"]] integerValue]);
-            sqlite3_bind_text(statement, 8, [categoryName[@"category"] UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_text(statement, 9, [categoryName[@"categoryName"] UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 5, [[NSString stringWithFormat:@"%d",mii] UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_int(statement, 6, [[NSString stringWithFormat:@"%@",uriDict[@"LastVisitedEpoch"]] integerValue]);
+            sqlite3_bind_text(statement, 7, [categoryName[@"category"] UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 8, [categoryName[@"categoryName"] UTF8String], -1, SQLITE_TRANSIENT);
             int rc;
-            NSString *ps = hDict[@"pageState"]?hDict[@"pageState"]:@"**";
-            sqlite3_bind_text(statement, 10, [ps UTF8String], -1, SQLITE_TRANSIENT);
             
             NSDateFormatter *objDateformat = [[NSDateFormatter alloc] init];
             [objDateformat setDateFormat:@"yyyy-MM-dd"];
@@ -328,7 +291,7 @@ typedef void(^myCompletion)(BOOL);
             NSDate *objUTCDate  = [objDateformat dateFromString:strUTCTime];
             long long milliseconds = (long long)([objUTCDate timeIntervalSince1970]);
             
-            sqlite3_bind_int(statement, 11, milliseconds);
+            sqlite3_bind_int(statement, 9, milliseconds);
             if (sqlite3_step(statement) == SQLITE_DONE){
                 NSLog(@" successS");
                 
@@ -367,41 +330,38 @@ typedef void(^myCompletion)(BOOL);
     NSDictionary *last_uriDict = [allObj lastObject];
     NSString *last_date = last_uriDict[@"Date"];
     
-    
-    NSString *ps = hDict[@"pageState"];
-    
     // put last_date and & ps in incomplete DB
-    
-    
-    NSDateFormatter *f = [[NSDateFormatter alloc] init];
-    [f setDateFormat:@"yyyy-MM-dd"];
-    NSString *todayDate = [f stringFromDate:[NSDate date]];
-    NSLog(@"first_date %@ last_date %@ today %@",first_date,last_date,todayDate);
     if([first_date isEqualToString:last_date]){
-        
         
     }
     else{
-        if([first_date isEqualToString:todayDate]){
-            // take b/w date
-            NSArray *arr = [CompleteDB betweenDays:todayDate date2:last_date previousDate:NULL];
-            NSLog(@" in between days today arr %@",arr);
-            for(NSString *dateStr in arr){
-                [CompleteDB insertInCompleteDB:dateStr cmac:hDict[@"CMAC"] amac:hDict[@"AMAC"]];
-            }
-        }
-        else{
-            NSArray *arr = [CompleteDB betweenDays:first_date date2:last_date previousDate:NULL];
-            NSLog(@" in between days today not %@",arr);
-            
-            if(arr.count > 1)
-                for(long int i = 0;i < arr.count - 1;i++){// skipping last obj
-                    [CompleteDB insertInCompleteDB:[arr objectAtIndex:i] cmac:hDict[@"CMAC"] amac:hDict[@"AMAC"]];
-                }
-        }
+        [self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
+        
         
     }
     return ;
+}
++(void)addtoCompleteDB:(NSString *)firstDate lastDate:(NSString*)lastDate amac:(NSString*)amac cmac:(NSString *)cmac{
+    NSDateFormatter *f = [[NSDateFormatter alloc] init];
+    [f setDateFormat:@"yyyy-MM-dd"];
+    NSString *todayDate = [f stringFromDate:[NSDate date]];
+    if([firstDate isEqualToString:todayDate]){
+        // take b/w date
+        NSArray *arr = [CompleteDB betweenDays:todayDate date2:lastDate previousDate:NULL];
+        NSLog(@" in between days today arr %@",arr);
+        for(NSString *dateStr in arr){
+            [CompleteDB insertInCompleteDB:dateStr cmac:cmac amac:amac];
+        }
+    }
+    else{
+        NSArray *arr = [CompleteDB betweenDays:firstDate date2:lastDate previousDate:NULL];
+        NSLog(@" in between days today not %@",arr);
+        
+        if(arr.count > 1)
+            for(long int i = 0;i < arr.count - 1;i++){// skipping last obj
+                [CompleteDB insertInCompleteDB:[arr objectAtIndex:i] cmac:cmac amac:amac];
+            }
+    }
 }
 + (NSString *)GetUTCDateTimeFromLocalTime:(NSString *)IN_strLocalTime
 {
@@ -442,18 +402,17 @@ typedef void(^myCompletion)(BOOL);
         return nil;
     
     const char *dbpath = [databasePath UTF8String];
-    //    if (sqlite3_open(dbpath, &database) == SQLITE_OK)
-    //    {
+   
     NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT COUNT(*) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
-    //        const char* sqlcountStat = "SELECT COUNT(*) FROM HistoryTB WHERE AMAC = ? AND CMAC = ?";
+    
     sqlite3_stmt *statement;
-    //NSLog(@"count statment  %s",[sqlcountStat UTF8String]);
+    
     if( sqlite3_prepare_v2(database, [sqlcountStat UTF8String],-1, &statement, NULL)== SQLITE_OK)
     {
         //Loop through all the returned rows (should be just one)
         while( sqlite3_step(statement) == SQLITE_ROW )
         {
-            
+            NSLog(@"Inb loop ");
             count = sqlite3_column_int(statement, 0);
             
         }
@@ -479,7 +438,6 @@ typedef void(^myCompletion)(BOOL);
     {
         NSLog(@"database path %s",dbpath);
         sqlite3_stmt *statement;
-        //NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE TIME IN(SELECT TIME FROM HistoryTB order by TIME ASC limit 50)"];
         
         NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND DATE = \"%@\"",amac,cmac,date];
         if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
@@ -571,7 +529,6 @@ typedef void(^myCompletion)(BOOL);
     
 }
 
-
 +(void)deleteDB:(NSString *)amac clientMac:(NSString *)cmac{
     NSLog(@" I am here Deleting Database");
     const char *dbpath = [databasePath UTF8String];
@@ -629,15 +586,15 @@ typedef void(^myCompletion)(BOOL);
 }
 #pragma mark method for searchPage
 +(NSDictionary *)runQuery:(NSString *)sqlStatement{
-    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
-    {
+//    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
+//    {
         sqlite3_stmt *compiledStatement;
         NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement];
         return dict;
-    }
-    else{
-        NSLog(@"Fail to open ");
-    }
+//    }
+//    else{
+//        NSLog(@"Fail to open ");
+//    }
 }
 
 +(NSDictionary* )todaySearch:(NSString *)amac clientMac:(NSString *)cmac{
