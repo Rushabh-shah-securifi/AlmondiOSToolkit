@@ -104,7 +104,6 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"EEEE"];
     NSString *dayString = [dateFormatter stringFromDate:self];
-    dayString = [dayString substringWithRange:NSMakeRange(0, 3)];
     return dayString;
 }
 
@@ -112,11 +111,10 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"MMMM"];
     NSString *monString = [dateFormatter stringFromDate:self];
-    NSLog(@"monString = %@",monString);
     return monString;
 }
 
--(NSString *)getDayMonthFormat{//Mon 6 June
+-(NSString *)getDayMonthFormat{//Monday 6 June
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth fromDate:self];
     NSInteger day = [components day];
     
@@ -146,7 +144,6 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"HH:mm"];
     NSString *stringDate = [dateFormatter stringFromDate:self];
-    NSLog(@"time +== %@",stringDate);
     return stringDate;
 }
 
