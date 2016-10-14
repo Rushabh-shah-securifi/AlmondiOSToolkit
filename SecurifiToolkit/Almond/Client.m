@@ -140,9 +140,19 @@
     Client *client = [self findClientByID:clientId];
     return client.deviceSchedule;
 }
-
++(BOOL)isSiteMapCompatable{
+    SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *almond = [toolKit currentAlmond];
+    bool isLocal = [toolKit useLocalNetwork:almond.almondplusMAC];
+   BOOL isSiteMapSupport = [ toolKit.currentAlmond siteMapSupportFirmware:toolKit.currentAlmond.firmware];
+    return isSiteMapSupport && !isLocal;
+    
+}
 +(NSArray*) getClientGenericIndexes{
         NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-23,@-22,@-19,@-20,@-3,@-25,nil];
+    if(![self isSiteMapCompatable]){
+         return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,@-25,nil];
+    }
     //for commenting browsing history code
 //    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,nil];
     return genericIndexesArray;
