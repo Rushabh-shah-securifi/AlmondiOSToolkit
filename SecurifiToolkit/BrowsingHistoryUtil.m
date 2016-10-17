@@ -108,7 +108,14 @@
         
     }
     NSLog(@" month and date %@,%d",day,month);
-    return [NSString stringWithFormat:@"%d-%@",month,day];
+    return [NSString stringWithFormat:@"%d-%@-%@",month,day,[self getcurrentYear]];
+}
++ (NSString *)getcurrentYear{
+    NSDateFormatter *dateformate=[[NSDateFormatter alloc]init];
+    [dateformate setDateFormat:@"yyyy"]; // Date formater
+    NSString *date = [dateformate stringFromDate:[NSDate date]]; // Convert date to string
+    return date;
+    
 }
 + (BOOL)isNumeric:(NSString *)code{
     

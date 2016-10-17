@@ -128,6 +128,7 @@ typedef void(^myCompletion)(BOOL);
 #pragma mark getBrowsingHistoryMethods
 + (NSDictionary *)getAllBrowsingHistorywithLimit:(int)limit almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
     
+    
     //    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
     //    {
     NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC  limit %d",amac,cmac,limit];
@@ -167,20 +168,19 @@ typedef void(^myCompletion)(BOOL);
             NSString *uriString7 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 6)];
             NSString *uriString8 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 7)];
             
-            NSMutableDictionary *uriInfo = [NSMutableDictionary new];
             
             NSDictionary *categoryObj = @{@"ID":uriString5,
                                           @"categoty":uriString7,
                                           @"subCategory":uriString8};
-            [uriInfo setObject:uriString4 forKey:@"hostName"];
-            [uriInfo setObject:uriString6 forKey:@"Epoc"];
-            [uriInfo setObject:uriString5 forKey:@"count"];
-            [uriInfo setObject:uriString0 forKey:@"date"];
-            [uriInfo setObject:categoryObj forKey:@"categoryObj"];
             
-            [uriInfo setObject:[UIImage imageNamed:@"globe" ] forKey:@"image"];
-            
-            [self addToDictionary:dayDict uriInfo:uriInfo rowID:uriString0];
+            NSDictionary *uriInfo1 = @{
+                                       @"hostName":uriString4,
+                                       @"Epoc" : uriString6,
+                                       @"count" : uriString5,
+                                       @"date" : uriString0,
+                                       @"categoryObj" : categoryObj
+                                       };
+            [self addToDictionary:dayDict uriInfo:uriInfo1 rowID:uriString0];
             
         }
         //        NSLog(@"while not running errMSg %s",sqlite3_errmsg(database));
@@ -213,6 +213,12 @@ typedef void(^myCompletion)(BOOL);
 #pragma mark insertMethods
 +(NSMutableDictionary *)insertAndGetHistoryRecord:(NSDictionary *)hDict readlimit:(int)limit amac:(NSString *)amac cmac:(NSString *)camc{
     NSMutableDictionary *recordDict;
+//    
+//    [self addtoCompleteDB:@"2016-10-11" lastDate:@"2016-10-04" amac:amac cmac:camc];
+//    [CompleteDB searchDatePresentOrNot:amac clientMac:camc andDate:@""];
+//    NSLog(@" max date %@ and min date %@",[CompleteDB getMaxDate:amac clientMac:camc],[CompleteDB getLastDate:amac clientMac:camc]);
+//    NSLog(@"date present %d",[CompleteDB searchDatePresentOrNot:amac clientMac:camc andDate:@"2016-10-19"]);
+    
     
     NSString *query = @"INSERT OR REPLACE INTO HistoryTB (DATE,AMAC,CMAC, URIS,CATEGORYID,TIME,CATEGORY,CATEGORYNAME,DATEINT) VALUES(?,?,?,?,?,?,?,?,?)";
     [self setHistoryTable];
@@ -264,7 +270,12 @@ typedef void(^myCompletion)(BOOL);
     for(NSDictionary *uriDict in allObj)
     {
         if(sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL)== SQLITE_OK){
-            sqlite3_bind_text(statement, 1, [uriDict[@"Date"] UTF8String], -1, SQLITE_TRANSIENT);
+            NSLog(@"insert date = %@",uriDict[@"Date"]);
+            NSString *todayDate = [self getTodayDate];
+//            if([uriDict[@"Date"] isEqualToString:@""])
+//                sqlite3_bind_text(statement, 1, [todayDate UTF8String], -1, SQLITE_TRANSIENT);
+//            else
+                sqlite3_bind_text(statement, 1, [uriDict[@"Date"] UTF8String], -1, SQLITE_TRANSIENT);
             
             sqlite3_bind_text(statement, 2, [hDict[@"AMAC"] UTF8String], -1, SQLITE_TRANSIENT);
             sqlite3_bind_text(statement, 3, [hDict[@"CMAC"] UTF8String], -1, SQLITE_TRANSIENT);
@@ -332,11 +343,10 @@ typedef void(^myCompletion)(BOOL);
     
     // put last_date and & ps in incomplete DB
     if([first_date isEqualToString:last_date]){
-        
+       
     }
     else{
         [self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
-        
         
     }
     return ;
@@ -345,6 +355,7 @@ typedef void(^myCompletion)(BOOL);
     NSDateFormatter *f = [[NSDateFormatter alloc] init];
     [f setDateFormat:@"yyyy-MM-dd"];
     NSString *todayDate = [f stringFromDate:[NSDate date]];
+    
     if([firstDate isEqualToString:todayDate]){
         // take b/w date
         NSArray *arr = [CompleteDB betweenDays:todayDate date2:lastDate previousDate:NULL];
