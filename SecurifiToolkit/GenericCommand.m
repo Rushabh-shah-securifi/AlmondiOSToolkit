@@ -72,7 +72,7 @@
     return cmd;
 }
 
-+ (instancetype)websocketChangeAlmondMode:(SFIAlmondMode)newMode userId:(NSString *)userId almondMac:(NSString *)almondMac {
++ (instancetype)changeAlmondMode:(SFIAlmondMode)newMode userId:(NSString *)userId almondMac:(NSString *)almondMac {
     AlmondModeChangeRequest *request = [AlmondModeChangeRequest new];
     request.almondMAC = almondMac;
     request.mode = newMode;
@@ -85,18 +85,7 @@
     return cmd;
 }
 
-+ (instancetype)cloudChangeAlmondMode:(SFIAlmondMode)newMode userId:(NSString*)userId almondMac:(NSString *)almondMac {
-    AlmondModeChangeRequest *request = [AlmondModeChangeRequest new];
-    request.almondMAC = almondMac;
-    request.mode = newMode;
-    request.userId = userId;
-    
-    GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
-    cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
-    cmd.command = request;
-    
-    return cmd;
-}
+
 
 
 

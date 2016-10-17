@@ -86,6 +86,27 @@
 #import "Device.h"
 #import "DeviceKnownValues.h"
 #import "Client.h"
+#import "SFIOfflineDataManager.h"
+#import "DatabaseStore.h"
+
+#define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
+#define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
+#define kPREF_USER_DEFAULT_LOGGED_IN_ONCE                   @"kLoggedInOnce"
+#define kPREF_DEFAULT_CONNECTION_MODE                       @"kDefaultConnectionMode"
+
+#define SEC_SERVICE_NAME                                    @"securifiy.login_service"
+#define SEC_EMAIL                                           @"com.securifi.email"
+#define SEC_PWD                                             @"com.securifi.pwd"
+#define SEC_USER_ID                                         @"com.securifi.userid"
+#define SEC_IS_ACCOUNT_ACTIVATED                            @"com.securifi.isActivated"
+#define SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT          @"com.securifi.minsRemaining"
+#define SEC_APN_TOKEN                                       @"com.securifi.apntoken"
+
+#define GET_WIRELESS_SUMMARY_COMMAND @"<root><AlmondRouterSummary action=\"get\">1</AlmondRouterSummary></root>"
+#define GET_WIRELESS_SETTINGS_COMMAND @"<root><AlmondWirelessSettings action=\"get\">1</AlmondWirelessSettings></root>"
+#define GET_CONNECTED_DEVICE_COMMAND @"<root><AlmondConnectedDevices action=\"get\">1</AlmondConnectedDevices></root>"
+#define GET_BLOCKED_DEVICE_COMMAND @"<root><AlmondBlockedMACs action=\"get\">1</AlmondBlockedMACs></root>"
+#define APPLICATION_ID @"1001"
 
 @class SecurifiConfigurator;
 @class AlmondModeChangeRequest;
@@ -166,18 +187,38 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 @interface SecurifiToolkit : NSObject
 
+@property(atomic) BOOL isShutdown;
+@property(nonatomic, readonly) Scoreboard *scoreboard;
+@property(nonatomic, readonly) SecurifiConfigurator *config;
+@property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
+@property(nonatomic, readonly) DatabaseStore *notificationsDb;
+@property(nonatomic, strong) Network *network;
+//@property(nonatomic, readonly) DatabaseStore *notificationsDb;
 // When YES connections will be made to the Securifi Production cloud servers.
 // When NO the development servers will be used.
 // Default is YES
 // Changes take effect on next connection attempt. Use closeConnection to force a connection change.
 @property(nonatomic) BOOL useProductionCloud;
-
+@property(nonatomic) BOOL isAppInForeGround;
 @property(atomic) NSMutableArray *scenesArray;
 @property(atomic) NSMutableArray *clients;
 @property(atomic) NSMutableArray *devices;
 @property(atomic) NSMutableArray *ruleList;
 @property(atomic) NSDictionary *genericDevices;
 @property(atomic) NSDictionary *genericIndexes;
+
+- (void)tearDownLoginSession;
+- (void)resetCurrentAlmond;
+- (void)postNotification:(NSString *)notificationName data:(id)payload;
+- (void)asyncInitializeConnection2:(Network *)network;
+- (void)purgeStoredData;
+- (void)tryShutdownAndStartNetworks:(enum SFIAlmondConnectionMode)mode;
+- (GenericCommand*)tryRequestAlmondMode:(NSString *)almondMac;
+-(void) asyncInitCloud;
+
+-(Network *)setUpNetwork;
+
+-(void) tearDownNetwork;
 
 + (BOOL)isInitialized;
 
@@ -188,7 +229,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Returns a copy of the configuration currently in effect. Changes to the configuration have no effect on the shared instance.
 - (SecurifiConfigurator *)configuration;
 
-- (void)initToolkit;
+- (void) asyncInitNetwork;
 
 - (void)shutdownToolkit;
 
@@ -196,31 +237,20 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)debugUpdateConfiguration:(SecurifiConfigurator *)configurator;
 
-- (void)asyncSendToCloud:(GenericCommand *)command;
+- (sfi_id)asyncSendAlmondAffiliationRequest:(NSString *)linkCode;
 
-// Send a request to affiliate an Almond with the Cloud account. The link code is the code generated on the Almond
-// and inputted by the user.
-- (sfi_id)asyncSendAlmondAffiliationRequest:(NSString*)linkCode;
+- (void)asyncSendToNetwork:(GenericCommand *)command;
 
-// Sends an update to a sensor device property.
-// On completion, kSFIDidCompleteMobileCommandRequest is posted
-- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue;
+//This is the generic class to send request
+- (void) asyncSendRequest:(CommandType*)commandNumber commandString:(NSString*)commandString fieldValues:(NSArray*)array;
 
-- (sfi_id)asyncChangeAlmond:(SFIAlmondPlus *)almond device:(SFIDevice *)device name:(NSString *)deviceName location:(NSString *)deviceLocation;
-
-- (void)asyncSendToLocal:(GenericCommand *)command almondMac:(NSString *)almondMac;
-
-// returns the mode being used by the current almond, or the default mode when a current almond is not specified
-- (enum SFIAlmondConnectionMode)currentConnectionMode;
+//sending request with the payload value of NSmutabledictionary
+- (void) asyncSendRequest:(CommandType*)commandType commandString:(NSString*)commandString payloadData:(NSMutableDictionary*)data;
 
 // returns the desired connection mode; this mode is ignored in some cases when the Almond does not support it
 // caller should use currentConnectionMode for actual one being used
 // default mode indicates  the desired system setting and is useful to the UI in some cases
-- (enum SFIAlmondConnectionMode)defaultConnectionMode;
-
-// returns the current connection interface used for communicating with the almond
-// this mode is a logical AND of the default mode and the per-Almond settings.
-- (enum SFIAlmondConnectionMode)connectionModeForAlmond:(NSString *)almondMac;
+- (enum SFIAlmondConnectionMode)currentConnectionMode;
 
 // configures which connection interface to use for communicating with the almond
 // assumes local network settings are already configured for the almond.
@@ -230,8 +260,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // the connection is torn down and, depending on the current connection mode, restarted.
 - (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
 
-// returns the status of the connection interface
-- (enum SFIAlmondConnectionStatus)connectionStatusForAlmond:(NSString *)almondMac;
+- (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(enum ConnectionStatusType)status;
 
 // returns the Local Connection settings for the almond, or nil if none configured
 - (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
@@ -241,8 +270,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
 
 - (BOOL)isNetworkOnline;
-
-- (BOOL)isCloudOnline;
+//- (BOOL)isCloudLoggedIn;
 
 - (BOOL)isCloudReachable;
 
@@ -252,24 +280,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (int)minsRemainingForUnactivatedAccount;
 
-- (BOOL)hasLoginCredentials;
-
-- (void)asyncSendLoginWithEmail:(NSString *)email password:(NSString *)password;
-
 - (NSString *)loginEmail;
 
 - (void)asyncSendLogout;
-
-- (void)asyncSendLogoutAllWithEmail:(NSString *)email password:(NSString *)password;
-
-//Current Temperature Format for UI
-- (BOOL)isCurrentTemperatureFormatFahrenheit;
-- (void)setCurrentTemperatureFormatFahrenheit:(BOOL)format;
-- (int)convertTemperatureToCurrentFormat:(int)temperature;
-- (NSString*)getTemperatureWithCurrentFormat:(int)temperature;
-
-// Nils out the current Almond selection
-- (void)removeCurrentAlmond;
 
 // Specify the currently "viewed" Almond. May perform updates in the background to check on Hash values.
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
@@ -314,31 +327,16 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard *)scoreboardSnapshot;
 
-- (sfi_id)asyncUpdateAlmondFirmware:(NSString *)almondMAC firmwareVersion:(NSString *)firmwareVersion;
-
-// Issues a command to the specified Almond router to reboot itself
-- (sfi_id)asyncRebootAlmond:(NSString *)almondMAC;
-
-- (sfi_id)asyncSendAlmondLogs:(NSString *)almondMAC problemDescription:(NSString *)description;
-
-// Send a command to the cloud requesting an account be set up with the specified email and password
-- (void)asyncSendCloudSignupWithEmail:(NSString *)email password:(NSString *)password;
-
 - (void)asyncSendValidateCloudAccount:(NSString *)email;
-
-// Send a command to the cloud requesting to change the password for cloud account
-- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
-
-// Send a command to the cloud requesting to change the password for cloud account
-- (void)asyncRequestResetCloudPassword:(NSString *)email;
 
 // Send a command to the cloud requesting to delete cloud account
 - (void)asyncRequestDeleteCloudAccount:(NSString *)password;
 
+- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
+
 // Send a command to the cloud requesting to unlink the current Almond from cloud account
 - (void)asyncRequestUnlinkAlmond:(NSString *)almondMAC password:(NSString *)password;
 
-// Send a command to the cloud requesting to invite secondary user to the current Almond from cloud account
 - (void)asyncRequestInviteForSharingAlmond:(NSString *)almondMAC inviteEmail:(NSString *)inviteEmailID;
 
 // Send a command to the cloud requesting to remove another secondary user from the current Almond from cloud account
@@ -369,12 +367,6 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
-- (void)asyncRequestRegisterForNotification:(NSString *)deviceToken;
-
-- (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC;
-
-- (void)getClientsNotificationPreferences;
-// Send a command to change the notification mode for the specific almond
 - (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode;
 
 - (SFIAlmondMode)modeForAlmond:(NSString *)almondMac;
@@ -384,7 +376,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 // Supported actions are:
 // kSFINotificationPreferenceChangeActionAdd;
 // kSFINotificationPreferenceChangeActionDelete;
-- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action mii:(int)mii;
+//- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action mii:(int)mii;
 
 - (NSInteger)countUnviewedNotifications;
 
@@ -415,8 +407,6 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network;
 
 -(void)cleanUp;
-
-- (void)asyncSendCommand:(GenericCommand *)command;
 
 - (GenericCommand *)makeAlmondListCommand;
 

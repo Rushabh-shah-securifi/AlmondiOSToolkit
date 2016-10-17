@@ -14,6 +14,7 @@
 #import "Client.h"
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
+#import "KeyChainWrapper.h"
 
 @implementation ClientParser
 - (instancetype)init {
@@ -85,7 +86,7 @@
         }
         toolkit.clients = wifiClientsArray;
         if(!local)
-            [toolkit getClientsNotificationPreferences];
+            [self getClientsNotificationPreferences];
     }
     
     else if([commandType isEqualToString:DYNAMIC_CLIENT_ADDED]){
@@ -146,6 +147,21 @@
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil userInfo:resData];
+}
+
+- (void)getClientsNotificationPreferences{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSString *userID = [KeyChainWrapper retrieveEntryForUser:SEC_EMAIL forService:SEC_SERVICE_NAME];
+    NSMutableDictionary *commandInfo = [NSMutableDictionary new];
+    
+    [commandInfo setValue:@"GetClientPreferences" forKey:@"CommandType"];
+    [commandInfo setValue:toolkit.currentAlmond.almondplusMAC forKey:@"AlmondMAC"];
+    [commandInfo setValue:userID forKey:@"UserID"];
+    
+    
+    GenericCommand *cloudCommand = [GenericCommand jsonStringPayloadCommand:commandInfo commandType:CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST];
+    
+    [toolkit asyncSendToNetwork:cloudCommand];
 }
 
 -(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{

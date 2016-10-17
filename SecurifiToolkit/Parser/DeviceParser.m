@@ -21,6 +21,7 @@
 #import "Client.h"
 #import "RouterParser.h"
 #import "NotificationPreferenceListResponse.h"
+#import "NotificationPreferenceListRequest.h"
 
 //#import "SFIRouterSummary.h"
 
@@ -219,12 +220,12 @@
         NSLog(@"addobjects");
         toolkit.devices = deviceList;
         if(!local){
-            [toolkit asyncRequestNotificationPreferenceList:almond.almondplusMAC];
+            [self asyncRequestNotificationPreferenceList:almond.almondplusMAC];
             
             //temp fix - to fetch almond list after firmware update
             if([commandType isEqualToString:@"DynamicDeviceList"]){
                 NSLog(@"sending almond list payload");
-                [toolkit asyncSendCommand:[toolkit makeAlmondListCommand]];
+                [toolkit asyncSendToNetwork:[toolkit makeAlmondListCommand]];
             }
         }
         
@@ -269,7 +270,6 @@
                 break;
             }
         }
-        
     }
 
     else if([commandType isEqualToString:DYNAMIC_DEVICE_REMOVED]){
@@ -304,6 +304,23 @@
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
+}
+
+- (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC {
+    NSLog(@"toolkit - asyncRequestNotificationPreferenceList");
+    if (almondMAC == nil) {
+        SLog(@"asyncRequestRegisterForNotification : almond MAC is nil");
+        return;
+    }
+    
+    NotificationPreferenceListRequest *req = [NotificationPreferenceListRequest new];
+    req.almondplusMAC = almondMAC;
+    
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST;
+    cmd.command = req;
+    
+    [[SecurifiToolkit sharedInstance] asyncSendToNetwork:cmd];
 }
 
 - (void)onNotificationPrefDidChange:(id)sender {

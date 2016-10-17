@@ -11,12 +11,12 @@
 #import "SecurifiTypes.h"
 #import "NetworkConfig.h"
 
-typedef NS_ENUM(NSUInteger, NetworkConnectionStatus) {
-    NetworkConnectionStatusUninitialized = 1,
-    NetworkConnectionStatusInitializing,
-    NetworkConnectionStatusInitialized,
-    NetworkConnectionStatusShutdown,
-};
+//typedef NS_ENUM(NSUInteger, NetworkConnectionStatus) {
+//    NetworkConnectionStatusUninitialized = 1,
+//    NetworkConnectionStatusInitializing,
+//    NetworkConnectionStatusInitialized,
+//    NetworkConnectionStatusShutdown,
+//};
 
 typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
     NetworkLoginStatusNotLoggedIn = 1,
@@ -28,6 +28,7 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 @class GenericCommand;
 @class SecurifiConfigurator;
 @class NetworkState;
+
 
 @protocol NetworkDelegate
 
@@ -43,7 +44,7 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 
 - (void)networkDidReceiveDynamicUpdate:(Network*)network response:(id)payload responseType:(enum CommandType)commandType;
 
--(void)_sendSanity;
+-(void)sendTempPassLoginCommand;
 @end
 
 
@@ -54,7 +55,7 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 // Indicates whether the config is for a Cloud connection or web socket connection
 @property(readonly) enum NetworkEndpointMode mode;
 @property(nonatomic, readonly) NetworkState *networkState;
-@property(nonatomic, readonly) enum NetworkConnectionStatus connectionState;
+//@property(nonatomic, readonly) enum NetworkConnectionStatus connectionState;
 @property(nonatomic, readonly) BOOL isStreamConnected;
 @property(nonatomic) enum NetworkLoginStatus loginStatus;
 
@@ -69,11 +70,10 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 - (void)shutdown;
 
 - (void)shutdownMesh;
+
 // Queues the specified command to the cloud. This is a special command queue that is used for initializing the Network.
 - (BOOL)submitCloudInitializationCommand:(GenericCommand *)command;
 
-// After all initialization has been completed, this method MUST BE CALLED for normal command processing to start
-- (void)markCloudInitialized;
 
 // Queues the specified command to the cloud
 // Returns YES on successful submission

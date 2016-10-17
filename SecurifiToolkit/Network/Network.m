@@ -13,7 +13,8 @@
 #import "NetworkEndpoint.h"
 #import "CloudEndpoint.h"
 #import "WebSocketEndpoint.h"
-
+#import "ConnectionStatus.h"
+#import "KeyChainAccess.h"
 
 @interface Network () <NetworkEndpointDelegate>
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
@@ -21,11 +22,10 @@
 @property(atomic) NSInteger currentUnitCounter;
 @property(nonatomic) SUnit *currentUnit;
 
-@property(nonatomic, readonly) dispatch_queue_t initializationQueue;    // serial queue to which network initialization commands submitted to the system are added
 @property(nonatomic, readonly) dispatch_queue_t commandQueue;           // serial queue to which commands submitted to the system are added
 @property(nonatomic, readonly) dispatch_queue_t callbackQueue;          // queue used for posting notifications
 @property(nonatomic, readonly) dispatch_queue_t dynamicCallbackQueue;          // queue used for posting notifications
-@property(nonatomic, readonly) dispatch_semaphore_t cloud_initialized_latch;
+
 
 @property(nonatomic) BOOL networkUpNoticePosted;
 @property(nonatomic) id <NetworkEndpoint> endpoint;
@@ -46,14 +46,9 @@
         _networkConfig = networkConfig;
         _callbackQueue = callbackQueue;
         _dynamicCallbackQueue = dynamicCallbackQueue;
-        
-        [self markConnectionState:NetworkConnectionStatusUninitialized];
+        NSLog(@" Who is setting status Network - initWithNetworkConfig");
+        [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)NO_NETWORK_CONNECTION];
         self.loginStatus = NetworkLoginStatusNotLoggedIn;
-        
-        
-        
-        _initializationQueue = dispatch_queue_create("cloud_init_command_queue", DISPATCH_QUEUE_SERIAL);
-        _cloud_initialized_latch = dispatch_semaphore_create(0);
         
         _commandQueue = dispatch_queue_create("command_queue", DISPATCH_QUEUE_SERIAL);
         _networkState = [NetworkState new];
@@ -75,17 +70,20 @@
 
 - (void)connect {
     NSLog(@"Initialzing network communication");
-    
-    [self markConnectionState:NetworkConnectionStatusInitializing];
+    NSLog(@" Who is setting status Network - connect");
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
+    NSLog(@"connecting to the network");
     
     if (self.endpoint) {
         return;
     }
     
     NetworkConfig *config = self.networkConfig;
+    
     if (config.mode == NetworkEndpointMode_cloud) {
         self.endpoint = [CloudEndpoint endpointWithConfig:config];
     }
+    
     else {
         self.endpoint = [WebSocketEndpoint endpointWithConfig:config];
     }
@@ -106,85 +104,18 @@
     }
 }
 
-- (void)shutdown {
-    NSLog(@"Shutting down network Network 2");
-    
+- (void)shutdown{
+    NSLog(@"Shutdowing Network");
     if (!self.endpoint) {
         return;
     }
     
-    NSLog(@"[%@] Network is shutting down", self.debugDescription);
-    
-    // Signal shutdown
-    //
-    [self markConnectionState:NetworkConnectionStatusShutdown];
     [self markLoggedInState:NO];
     
-    // Clean up command queue
-    //
     [self tryAbortUnit];
-    dispatch_semaphore_signal(self.cloud_initialized_latch);
-    
     [self.endpoint shutdown];
     self.endpoint = nil;
-    
-    // Tell delegate of shutdown
     [self.delegate networkConnectionDidClose:self];
-}
-
-#pragma mark - Semaphores
-
-// Called by commands submitted to the normal command queue that have to wait for the cloud initialization
-// sequence to complete. Like network establishment procedures, this process can time out in which case the
-// Network is shutdown.
-- (BOOL)waitForCloudInitialization:(int)numSecsToWait {
-    dispatch_semaphore_t latch = self.cloud_initialized_latch;
-    NSString *msg = @"Giving up on endpoint initialization";
-    
-    BOOL timedOut = [self waitOnLatch:latch timeout:numSecsToWait logMsg:msg];
-    if (timedOut) {
-        NSLog(@"%@. Issuing shutdown on timeout", msg);
-        [self shutdown];
-    }
-    return timedOut;
-}
-
-// Waits up to the specified number of seconds for the semaphore to be signalled.
-// Returns YES on timeout waiting on the latch.
-// Returns NO when the signal has been received before the timeout.
-- (BOOL)waitOnLatch:(dispatch_semaphore_t)latch timeout:(int)numSecsToWait logMsg:(NSString *)msg {
-    dispatch_time_t max_time = dispatch_time(DISPATCH_TIME_NOW, numSecsToWait * NSEC_PER_SEC);
-    
-    BOOL timedOut = NO;
-    
-    dispatch_time_t blockingSleepSecondsIfNotDone;
-    do {
-        enum NetworkConnectionStatus status = self.connectionState;
-        
-        if (status == NetworkConnectionStatusShutdown) {
-            NSLog(@"%@. Network was shutdown.", msg);
-            break;
-        }
-        if (status == NetworkConnectionStatusInitialized) {
-            NSLog(@"%@. Cloud is initialized.", msg);
-            break;
-        }
-        
-        const int waitMs = 5;
-        blockingSleepSecondsIfNotDone = dispatch_time(DISPATCH_TIME_NOW, waitMs * NSEC_PER_MSEC);
-        
-        timedOut = blockingSleepSecondsIfNotDone > max_time;
-        if (timedOut) {
-            NSLog(@"%@. Timeout reached.", msg);
-            break;
-        }
-    }
-    while (0 != dispatch_semaphore_wait(latch, blockingSleepSecondsIfNotDone));
-    
-    // make sure...
-    dispatch_semaphore_signal(latch);
-    
-    return timedOut;
 }
 
 #pragma mark - state
@@ -193,14 +124,6 @@
     return _networkConfig.mode;
 }
 
-- (BOOL)isStreamConnected {
-    NetworkConnectionStatus status = self.connectionState;
-    return (status == NetworkConnectionStatusInitialized) || (status == NetworkConnectionStatusInitializing);
-}
-
-- (void)markConnectionState:(enum NetworkConnectionStatus)status {
-    _connectionState = status;
-}
 
 - (void)markLoggedInState:(BOOL)loggedIn {
     self.loginStatus = loggedIn ? NetworkLoginStatusLoggedIn : NetworkLoginStatusNotLoggedIn;
@@ -250,6 +173,7 @@
 
 - (void)delegateData:(id)payload commandType:(CommandType)commandType {
     __weak Network *block_self = self;
+    NSLog(@"delegate data is called");
     dispatch_sync(self.callbackQueue, ^() {
         [block_self.delegate networkDidReceiveResponse:block_self response:payload responseType:commandType];
     });
@@ -265,18 +189,15 @@
 - (void)post:(NSString *)notificationName payload:(id)payload queue:(dispatch_queue_t)queue {
     __weak id block_payload = payload;
     __weak id block_self = self;
+    NSDictionary *data = nil;
+    if (payload) {
+        data = @{
+                 @"data" : block_payload,
+                 @"network" : block_self,
+                 };
+    }
     
-    //dispatch_sync(queue, ^() {
-        NSDictionary *data = nil;
-        if (payload) {
-            data = @{
-                     @"data" : block_payload,
-                     @"network" : block_self,
-                     };
-        }
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
-    //});
+    [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
 }
 
 
@@ -288,140 +209,17 @@
     return next;
 }
 
-- (void)markCloudInitialized {
-    NetworkConnectionStatus cloudStatus = self.connectionState;
-    if (cloudStatus == NetworkConnectionStatusInitialized) {
-        return;
-    }
-    if (cloudStatus == NetworkConnectionStatusShutdown) {
-        return;
-    }
-    
-    // There may be other commands in the initialization queue still waiting for responses.
-    // Let them complete or timeout before opening up the main command queue.
-    // Therefore, queue a command to make the state change and start the main queue's processing.
-    
-    NSLog(@"Queuing cloud initialization completed command");
-    
-    __weak Network *block_self = self;
-    dispatch_async(self.initializationQueue, ^() {
-        NetworkConnectionStatus status = block_self.connectionState;
-        if (status == NetworkConnectionStatusInitialized) {
-            return;
-        }
-        if (status == NetworkConnectionStatusShutdown) {
-            return;
-        }
-        
-        [block_self markConnectionState:NetworkConnectionStatusInitialized];
-        
-        dispatch_semaphore_t latch = block_self.cloud_initialized_latch;
-        if (latch) {
-            NSInteger limit = self.currentUnitCounter;
-            for (NSInteger i = 0; i < limit; i++) {
-                dispatch_semaphore_signal(latch);
-            }
-            NSLog(@"Executed cloud initialization completed command");
-        }
-    });
-}
-
-- (BOOL)submitCloudInitializationCommand:(GenericCommand *)command {
-    if (self.connectionState == NetworkConnectionStatusInitialized) {
-        NSLog(@"Rejected cloud initialization command submission: already marked as initialized");
-//                return NO; //todo fix me.
-    }
-    
-    dispatch_queue_t queue = self.initializationQueue;
-    BOOL waitForInit = NO;
-    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:1];
-}
-
-- (BOOL)submitCommand:(GenericCommand *)command {
-    dispatch_queue_t queue = self.commandQueue;
-    BOOL waitForInit = YES;
-    
-    if (!self.isStreamConnected) {
-        return NO;
-    }
-    
-    switch (self.connectionState) {
-        case NetworkConnectionStatusUninitialized:
-        case NetworkConnectionStatusShutdown:
-            // don't even queue; just get out
-            return NO;
-            
-        case NetworkConnectionStatusInitialized:
-            waitForInit = NO;
-            break;
-            
-        case NetworkConnectionStatusInitializing:
-            break;
-    }
-    
-    // fire precondition handler
-    NetworkPrecondition pFunction = command.networkPrecondition;
-    if (pFunction) {
-        BOOL okToSubmit = pFunction(self, command);
-        if (!okToSubmit) {
-            return NO;
-        }
-    }
-    
-    return [self internalSubmitCommand:command queue:queue waitForNetworkInitializedLatch:waitForInit waitAtMostSecs:0];
-}
 
 // we manage two different queues, one for initializing the network, and one for normal network operation.
 // this mechanism allows the initialization logic to be determined by the toolkit as responses are returned.
 // when initializing, the normal command queue blocks on the network_initialized_latch semaphore
-- (BOOL)internalSubmitCommand:(GenericCommand *)command queue:(dispatch_queue_t)queue waitForNetworkInitializedLatch:(BOOL)waitForNetworkInitializedLatch waitAtMostSecs:(int)waitAtMostSecs {
-    if (!self.isStreamConnected) {
-        DLog(@"SubmitCommand failed: network is shutdown");
-        return NO;
-    }
+- (BOOL)submitCommand:(GenericCommand *)command {
     
-//    NSLog(@"Command Queue: queueing command: %@, wait:%@", command, waitForNetworkInitializedLatch ? @"YES" : @"NO");
-    
-    __weak Network *block_self = self;
-    dispatch_async(queue, ^() {
-        if (!block_self.isStreamConnected) {
-//            NSLog(@"Command Queue: aborting unit: network is shutdown");
-            return;
-        }
-        if (waitForNetworkInitializedLatch) {
-            int const timeOutSecs = 10;
-            [block_self waitForCloudInitialization:timeOutSecs];
-        }
-        if (!block_self.isStreamConnected) {
-//            NSLog(@"Command Queue: aborting unit: network is shutdown");
-            return;
-        }
+    dispatch_async(self.commandQueue, ^() {
         
-        NSInteger tag = [block_self nextUnitCounter];
+        BOOL success = [self.endpoint sendCommand:command error:nil];
+        [self.delegate networkDidSendCommand:self command:command];
         
-        SUnit *unit = [[SUnit alloc] initWithCommand:command];
-        [unit markWorking:tag];
-        block_self.currentUnit = unit;
-        
-//        NSLog(@"Command Queue: sending %ld (%@)", (long) tag, command);
-        
-        NSError *error;
-        
-        BOOL success = [block_self.endpoint sendCommand:command error:&error];
-        if (!success) {
-//            NSLog(@"sending command error %@,Discription %@",command,error.description);
-//            NSLog(@"Command Queue: send error, command:%@, error:%@, tag:%ld", command, error.description, (long) tag);
-            [unit markResponse:NO];
-            return;
-        }
-        [block_self.delegate networkDidSendCommand:block_self command:command];
-        
-//        NSLog(@"Command Queue: waiting for response: %ld (%@)", (long) tag, command);
-        
-        //        int const waitAtMostSecs = 1;
-        [unit waitForResponse:waitAtMostSecs];
-        
-//        NSLog(@"Command Queue: done waiting for response: %ld (%@)", (long) tag, command);
     });
     
     return YES;
@@ -430,26 +228,47 @@
 #pragma mark - NetworkEndpointDelegate methods
 
 - (void)networkEndpointWillStartConnecting:(id <NetworkEndpoint>)endpoint {
-    [self postData:NETWORK_CONNECTING_NOTIFIER data:nil];
+    NSLog(@" Who is setting status Network - networkEndpointWillStartConnecting");
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType*)IS_CONNECTING_TO_NETWORK];
 }
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
-    if (self.networkConfig.mode == NetworkEndpointMode_cloud || self.networkConfig.mode == NetworkEndpointMode_web_socket) {
-        [self markConnectionState:NetworkConnectionStatusInitialized];
-    }
+    NSLog(@" Who is setting status Network - networkEndpointDidConnect");
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)CONNECTED_TO_NETWORK];
+    if([[SecurifiToolkit sharedInstance] currentConnectionMode] == SFIAlmondConnectionMode_local)
+        [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)AUTHENTICATED];
     
-    if (!self.networkUpNoticePosted) {
-        [self.delegate networkConnectionDidEstablish:self];
-        self.networkUpNoticePosted = YES;
-        [self postData:NETWORK_UP_NOTIFIER data:nil];
-        [self.delegate _sendSanity];
+    //if (!self.networkUpNoticePosted) {
+    //        [self.delegate networkConnectionDidEstablish:self];
+    self.networkUpNoticePosted = YES;
+    SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
+    BOOL isCloudConnection = [toolKit currentConnectionMode] == (SFIAlmondConnectionMode)SFIAlmondConnectionMode_cloud ?YES : NO;
+    
+    NSLog(@"%d is the cloudConnection", isCloudConnection);
+    if(isCloudConnection){
+        NSLog(@"i have entered this isCloudConnection");
+        BOOL hasLoginCredentials = [KeyChainAccess hasLoginCredentials];
+        if(hasLoginCredentials){
+            NSLog(@"i have enter hasLoginCredentials");
+            [self.delegate sendTempPassLoginCommand];
+        }else{
+            NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
+            _loginStatus = NetworkLoginStatusNotLoggedIn;
+            
+            // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
+            // We probably should track things down and find a way to remove a dependency on this event in the UI.
+            [toolKit postNotification:kSFIDidLogoutNotification data:nil];
+            return;
+        }
     }
 }
 
 - (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint {
-    [self markConnectionState:NetworkConnectionStatusShutdown];
+    NSLog(@" Who is setting status Network - networkEndpointDidDisconnect");
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)NO_NETWORK_CONNECTION];
     [self.delegate networkConnectionDidClose:self];
 }
+
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
     switch (commandType) {
@@ -595,35 +414,7 @@
             [self postData:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
-
-//        case CommandType_WIFI_CLIENTS_LIST_RESPONSE: {
-//            NSLog(@"nsetwor.m - CommandType_WIFI_CLIENTS_LIST_RESPONSE");
-//            [self tryMarkUnitCompletion:YES responseType:commandType];
-//            [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
-//            break;
-//        };
-//        case CommandType_DYNAMIC_CLIENT_UPDATE_REQUEST: {
-//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-//            break;
-//        };
-//        case CommandType_DYNAMIC_CLIENT_JOIN_REQUEST: {
-//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-//            break;
-//        };
-//        case CommandType_DYNAMIC_CLIENT_LEFT_REQUEST: {
-//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-//            break;
-//        };
-//        case CommandType_DYNAMIC_CLIENT_ADD_REQUEST: {
-//            [self postDataDynamic:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload commandType:commandType];
-//            break;
-//        };
-//        case CommandType_DYNAMIC_CLIENT_REMOVE_REQUEST: {
-//            //md01
-//            [self tryMarkUnitCompletion:YES responseType:commandType];
-//            [self postData:NOTIFICATION_WIFI_CLIENT_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
-//            break;
-//        };
+            
         case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
@@ -643,7 +434,7 @@
             break;
         };
             
-        //rules
+            //rules
         case CommandType_RULE_LIST: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:RULE_LIST_NOTIFIER data:payload];
@@ -667,10 +458,10 @@
         };
         case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
-//            .s
+            //            .s
             NSLog(@"CommandType_DYNAMIC_ALMOND_MODE_CHANGE");
             [self delegateData:payload commandType:commandType];
-//            [self postData:kSFIAlmondModeDidChange data:payload];
+            //            [self postData:kSFIAlmondModeDidChange data:payload];
             break;
         };
         case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE: {
@@ -678,18 +469,11 @@
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
             break;
         };
-//        case CommandType_ALMOND_MODE_CHANGE_RESPONSE:{
-//            NSLog(@"Almond mode change responce");
-//            [self tryMarkUnitCompletion:YES responseType:commandType];
-//            [self delegateData:payload commandType:commandType];
-//            [self postData:kSFIAlmondModeDidChange data:payload];
-//            break;
-//        };
-        //mesh
+            
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
-        
+            
         case CommandType_DYNAMIC_DEVICE_DATA:
         case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
         case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST:
@@ -739,6 +523,4 @@
     }
 }
 
-
 @end
-

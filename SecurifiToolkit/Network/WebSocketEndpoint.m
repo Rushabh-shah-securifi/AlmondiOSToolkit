@@ -16,6 +16,7 @@
 #import "DynamicAlmondNameChangeResponse.h"
 #import "SecurifiToolkit.h"
 #import "GenericCommand.h"
+#import "ConnectionStatus.h"
 
 typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
@@ -88,8 +89,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 
 - (void)shutdown {
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)DISCONNECTING_NETWORK];
     NSLog(@"websocket shutDown");
     [self.socket close];
+    [self.socket_mesh close];
+    [self.delegate networkEndpointDidDisconnect:self];
 }
 
 - (void)shutdownMesh {
@@ -101,6 +105,8 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (BOOL)sendCommand:(GenericCommand *)obj error:(NSError **)outError {
+    if(obj==nil || obj.command==nil)
+        return NO;
     NSData *data = obj.command;
     //logs
     if([data isKindOfClass:[NSData class]])
@@ -121,19 +127,17 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSLog(@"webSocketDidOpen");
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     if([webSocket isEqual:self.socket_mesh]){
-        [toolkit asyncSendToLocal:[GenericCommand requestRai2UpMobile:nil] almondMac:toolkit.currentAlmond.almondplusMAC];
+        [toolkit asyncSendToNetwork:[GenericCommand requestRai2UpMobile:nil]];
         return;
     }
     
-    
     [self.delegate networkEndpointDidConnect:self];
     
-    
     SFIAlmondPlus *plus = [toolkit currentAlmond];
-    [toolkit asyncSendToLocal:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand requestAlmondClients:plus.almondplusMAC] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand requestSceneList:plus.almondplusMAC] almondMac:plus.almondplusMAC];
-    [toolkit asyncSendToLocal:[GenericCommand requestAlmondRules:plus.almondplusMAC] almondMac:plus.almondplusMAC];
+    [toolkit asyncSendToNetwork:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] ];
+    [toolkit asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
+    [toolkit asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
+    [toolkit asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
 }
 
 

@@ -227,6 +227,12 @@
 		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
 		A5C7AE4A1C807BFA007E630D /* RouterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE481C807BFA007E630D /* RouterParser.h */; };
 		A5C7AE4B1C807BFA007E630D /* RouterParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE491C807BFA007E630D /* RouterParser.m */; };
+		A5D9B4F81DB4AE3E00BF1F60 /* ConnectionStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4F71DB4AE3E00BF1F60 /* ConnectionStatus.m */; };
+		A5D9B4FB1DB4CC1A00BF1F60 /* KeyChainAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */; };
+		A5D9B4FE1DB4CF5F00BF1F60 /* AlmondManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */; };
+		A5D9B5011DB4D07100BF1F60 /* AlmondListManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */; };
+		A5D9B5041DB4DBA500BF1F60 /* CreateJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5031DB4DBA500BF1F60 /* CreateJSON.m */; };
+		A5D9B5071DB4FCDB00BF1F60 /* HTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5061DB4FCDB00BF1F60 /* HTTPRequest.m */; };
 		A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804171C75A90E005A8DB3 /* DataBaseManager.h */; };
 		A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804181C75A90E005A8DB3 /* DataBaseManager.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
@@ -607,6 +613,18 @@
 		A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceParser.m; sourceTree = "<group>"; };
 		A5C7AE481C807BFA007E630D /* RouterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterParser.h; sourceTree = "<group>"; };
 		A5C7AE491C807BFA007E630D /* RouterParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RouterParser.m; sourceTree = "<group>"; };
+		A5D9B4F61DB4AE0F00BF1F60 /* ConnectionStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConnectionStatus.h; sourceTree = "<group>"; };
+		A5D9B4F71DB4AE3E00BF1F60 /* ConnectionStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionStatus.m; sourceTree = "<group>"; };
+		A5D9B4F91DB4CBF800BF1F60 /* KeyChainAccess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyChainAccess.h; sourceTree = "<group>"; };
+		A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainAccess.m; sourceTree = "<group>"; };
+		A5D9B4FC1DB4CF1900BF1F60 /* AlmondManagement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlmondManagement.h; sourceTree = "<group>"; };
+		A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondManagement.m; sourceTree = "<group>"; };
+		A5D9B4FF1DB4CFFB00BF1F60 /* AlmondListManagement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlmondListManagement.h; sourceTree = "<group>"; };
+		A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondListManagement.m; sourceTree = "<group>"; };
+		A5D9B5021DB4DB7F00BF1F60 /* CreateJSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CreateJSON.h; sourceTree = "<group>"; };
+		A5D9B5031DB4DBA500BF1F60 /* CreateJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CreateJSON.m; sourceTree = "<group>"; };
+		A5D9B5051DB4FCAD00BF1F60 /* HTTPRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HTTPRequest.h; sourceTree = "<group>"; };
+		A5D9B5061DB4FCDB00BF1F60 /* HTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPRequest.m; sourceTree = "<group>"; };
 		A5E804171C75A90E005A8DB3 /* DataBaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBaseManager.h; sourceTree = "<group>"; };
 		A5E804181C75A90E005A8DB3 /* DataBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBaseManager.m; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
@@ -795,6 +813,8 @@
 			children = (
 				1C2F60591B69D6F3001CCA34 /* MDJSON.h */,
 				1C2F605A1B69D6F3001CCA34 /* MDJSON.m */,
+				A5D9B5021DB4DB7F00BF1F60 /* CreateJSON.h */,
+				A5D9B5031DB4DBA500BF1F60 /* CreateJSON.m */,
 			);
 			path = JSON;
 			sourceTree = "<group>";
@@ -877,6 +897,10 @@
 				1DF03CCE2A1CB575A240FE08 /* NetworkEndpoint.h */,
 				1DF0331795B522861FD989FC /* NetworkConfig.m */,
 				1DF03A6156A59D49A942855B /* NetworkConfig.h */,
+				A5D9B4F61DB4AE0F00BF1F60 /* ConnectionStatus.h */,
+				A5D9B4F71DB4AE3E00BF1F60 /* ConnectionStatus.m */,
+				A5D9B5051DB4FCAD00BF1F60 /* HTTPRequest.h */,
+				A5D9B5061DB4FCDB00BF1F60 /* HTTPRequest.m */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -1159,6 +1183,12 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				A5D9B4F91DB4CBF800BF1F60 /* KeyChainAccess.h */,
+				A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */,
+				A5D9B4FC1DB4CF1900BF1F60 /* AlmondManagement.h */,
+				A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */,
+				A5D9B4FF1DB4CFFB00BF1F60 /* AlmondListManagement.h */,
+				A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */,
 				1C3270DB1A243B28007202C1 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
@@ -1717,7 +1747,9 @@
 				CEEAB7AA1CACF2C8003C5290 /* Client.m in Sources */,
 				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
 				A52164051C983E4E00E7B79D /* GenericIndexClass.m in Sources */,
+				A5D9B4F81DB4AE3E00BF1F60 /* ConnectionStatus.m in Sources */,
 				221185C5178D371200EE23ED /* SecurifiToolkit.m in Sources */,
+				A5D9B5071DB4FCDB00BF1F60 /* HTTPRequest.m in Sources */,
 				CEE19EEB181F9D9500F91AAD /* GenericCommandRequest.m in Sources */,
 				A52164021C983E4E00E7B79D /* GenericDeviceClass.m in Sources */,
 				CE466A5C1823C50700E55DF9 /* ValidateAccountResponse.m in Sources */,
@@ -1730,8 +1762,10 @@
 				1C4382EE1B2FDD5200F6AB7A /* PSWebSocketBuffer.m in Sources */,
 				1CD1D55B1A660B7A00C030E9 /* SFINotificationUser.m in Sources */,
 				1CD1D54F1A660B7A00C030E9 /* NotificationPreferenceListResponse.m in Sources */,
+				A5D9B5011DB4D07100BF1F60 /* AlmondListManagement.m in Sources */,
 				1C4382F71B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m in Sources */,
 				1C4382F91B2FDD5200F6AB7A /* PSWebSocketServer.m in Sources */,
+				A5D9B5041DB4DBA500BF1F60 /* CreateJSON.m in Sources */,
 				1CD1D5531A660B7A00C030E9 /* NotificationPreferences.m in Sources */,
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
 				1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */,
@@ -1792,6 +1826,7 @@
 				22B326D01796D447004B3642 /* SanityResponse.m in Sources */,
 				CE2EA25E19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.m in Sources */,
 				CE2EA26619D04BEA00C6D6A8 /* AlmondNameChangeResponse.m in Sources */,
+				A5D9B4FE1DB4CF5F00BF1F60 /* AlmondManagement.m in Sources */,
 				2253388617A6B7380051BF0F /* AffiliationUserRequest.m in Sources */,
 				CE466A641823D01E00E55DF9 /* ResetPasswordResponse.m in Sources */,
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
@@ -1864,6 +1899,7 @@
 				1DF030BA38ACE415D8B22060 /* SecurifiTypes.m in Sources */,
 				1DF03A369FB69FD247EF53C4 /* NSData+Securifi.m in Sources */,
 				1DF037EFF36E54E1F5BEEFB5 /* RouterCommandParser.m in Sources */,
+				A5D9B4FB1DB4CC1A00BF1F60 /* KeyChainAccess.m in Sources */,
 				1DF0373D47BD27460A45E658 /* SFIBlockedContent.m in Sources */,
 				1DF03DAE30405E38A3ADAB90 /* CommandParser.m in Sources */,
 			);
