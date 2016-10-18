@@ -76,7 +76,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         [self.delegate networkEndpointDidDisconnect:self];
         return nil;
     }
-    
+
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     
     PSWebSocket *almondSocket = [PSWebSocket clientSocketWithRequest:request];
@@ -85,7 +85,6 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     [almondSocket open];
     return almondSocket;
 }
-
 
 
 - (void)shutdown {
@@ -109,10 +108,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         return NO;
     NSData *data = obj.command;
     //logs
-    if([data isKindOfClass:[NSData class]])
+    if([data isKindOfClass:[NSData class]]){
         NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-    else
+    }else{
         NSLog(@"websocket send: %@", data);
+    }
     
     if(obj.isMeshCmd)
         [self.socket_mesh send:data];

@@ -11,6 +11,7 @@
 #import "NotificationClearCountResponse.h"
 #import "Network.h"
 #import "ConnectionStatus.h"
+#import "AlmondModeChangeRequest.h"
 
 typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
     CloudEndpointSocketError_notConnectedState          = 200,
@@ -291,7 +292,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                         responsePayload = [NotificationListResponse parseDeviceLogsJson:buffer];
                                         parsedPayload = YES;
                                         break;
-                                        
                                     case CommandType_GET_ALL_SCENES:
                                     case CommandType_COMMAND_RESPONSE:
                                     case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
@@ -306,6 +306,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
                                     case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
+                                    case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
@@ -588,6 +589,13 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_RESET_PASSWORD_REQUEST:
                 case CommandType_SENSOR_CHANGE_REQUEST:
                 case CommandType_GENERIC_COMMAND_REQUEST:
+                case CommandType_CHANGE_PASSWORD_REQUEST:
+                case CommandType_DELETE_ACCOUNT_REQUEST:
+                case CommandType_UPDATE_USER_PROFILE_REQUEST:
+                case CommandType_UNLINK_ALMOND_REQUEST:
+                case CommandType_USER_INVITE_REQUEST:
+                case CommandType_DELETE_SECONDARY_USER_REQUEST:
+                case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
                 case CommandType_NOTIFICATION_REGISTRATION:
                 case CommandType_NOTIFICATION_DEREGISTRATION:
                 case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
@@ -601,8 +609,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                     break;
                 }
                     // Commands that transfer in Command 61 container
-                    
                 case CommandType_ALMOND_MODE_CHANGE_REQUEST:
+                case CommandType_ALMOND_NAME_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
                     id <SecurifiCommand> cmd = command.command;
                     //Send as Command 61
@@ -621,7 +629,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                     break;
                 }
                     //PY 150914 Accounts
-                case CommandType_ALMOND_LIST: {
+                case CommandType_ALMOND_LIST:
+                case CommandType_USER_PROFILE_REQUEST: //PY 150914 Accounts
+                case CommandType_ME_AS_SECONDARY_USER_REQUEST:
+                case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:{
                     commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
                     break;
                 }

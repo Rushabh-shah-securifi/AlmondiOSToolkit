@@ -89,6 +89,7 @@
 #import "SFIOfflineDataManager.h"
 #import "DatabaseStore.h"
 
+
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
 #define kPREF_USER_DEFAULT_LOGGED_IN_ONCE                   @"kLoggedInOnce"

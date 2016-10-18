@@ -18,6 +18,7 @@
 #import "GenericCommandRequest.h"
 #import "AlmondModeChangeRequest.h"
 #import "MDJSON.h"
+#import "SecurifiToolkit.h"
 
 @implementation GenericCommand
 
@@ -80,13 +81,14 @@
     
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
-    cmd.command = request.toJson;
+    
+    if([[SecurifiToolkit sharedInstance] currentConnectionMode] == SFIAlmondConnectionMode_local)
+        cmd.command = request.toJson;
+    else
+        cmd.command = request;
     
     return cmd;
 }
-
-
-
 
 
 + (instancetype)websocketSetSensorDevice:(SFIDevice *)device value:(SFIDeviceKnownValues *)newValue {

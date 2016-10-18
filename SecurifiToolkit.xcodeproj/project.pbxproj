@@ -233,6 +233,7 @@
 		A5D9B5011DB4D07100BF1F60 /* AlmondListManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */; };
 		A5D9B5041DB4DBA500BF1F60 /* CreateJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5031DB4DBA500BF1F60 /* CreateJSON.m */; };
 		A5D9B5071DB4FCDB00BF1F60 /* HTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5061DB4FCDB00BF1F60 /* HTTPRequest.m */; };
+		A5D9B50D1DB62E7A00BF1F60 /* Log.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B50C1DB62E7A00BF1F60 /* Log.m */; };
 		A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804171C75A90E005A8DB3 /* DataBaseManager.h */; };
 		A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804181C75A90E005A8DB3 /* DataBaseManager.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
@@ -625,6 +626,8 @@
 		A5D9B5031DB4DBA500BF1F60 /* CreateJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CreateJSON.m; sourceTree = "<group>"; };
 		A5D9B5051DB4FCAD00BF1F60 /* HTTPRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HTTPRequest.h; sourceTree = "<group>"; };
 		A5D9B5061DB4FCDB00BF1F60 /* HTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTPRequest.m; sourceTree = "<group>"; };
+		A5D9B50B1DB62E6900BF1F60 /* Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
+		A5D9B50C1DB62E7A00BF1F60 /* Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Log.m; path = Parser/Log.m; sourceTree = "<group>"; };
 		A5E804171C75A90E005A8DB3 /* DataBaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBaseManager.h; sourceTree = "<group>"; };
 		A5E804181C75A90E005A8DB3 /* DataBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBaseManager.m; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
@@ -1148,6 +1151,8 @@
 				1DF03C0E4702BF52858C839B /* SecurifiTypes.m */,
 				CE5EB5BF17E7096800985636 /* AlmondPlusSDKConstants.h */,
 				A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */,
+				A5D9B50B1DB62E6900BF1F60 /* Log.h */,
+				A5D9B50C1DB62E7A00BF1F60 /* Log.m */,
 			);
 			path = SecurifiToolkit;
 			sourceTree = "<group>";
@@ -1876,6 +1881,7 @@
 				1DF03CBA2B45BFB97D3A8E79 /* NotificationCountResponse.m in Sources */,
 				1DF030D5F61AB6CED17F1DB2 /* NotificationClearCountRequest.m in Sources */,
 				1DF033F86547E8B8555F3561 /* NotificationClearCountResponse.m in Sources */,
+				A5D9B50D1DB62E7A00BF1F60 /* Log.m in Sources */,
 				CE3EDAED1D46390600C153A6 /* BrowsingHistoryUtil.m in Sources */,
 				1DF0318029A6D5169BBF1BAA /* AlmondVersionChecker.m in Sources */,
 				1DF034303C37A11B7DC547A6 /* Network.m in Sources */,

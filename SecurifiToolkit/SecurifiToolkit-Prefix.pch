@@ -6,7 +6,8 @@
     #import <Foundation/Foundation.h>
 #endif
 
-#define NSLog //
+#import "Log.h"
+//#define NSLog //
 
 #if( DEBUG )
 // Debug logging
