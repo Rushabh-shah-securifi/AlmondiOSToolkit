@@ -34,6 +34,7 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 @property(nonatomic) NSMutableArray *accessEmailIDs;
 @property(nonatomic) BOOL isExpanded;
 @property(nonatomic, copy) NSString *ownerEmailID;
+@property(nonatomic) NSString *routerMode;
 
 @property(nonatomic) enum SFIAlmondPlusLinkType linkType;
 

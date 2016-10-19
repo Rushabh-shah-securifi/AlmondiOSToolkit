@@ -3740,6 +3740,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self asyncSendToCloud:command];
     }
 }
+-(void)routerModeOnCurrentAlmond:(NSString *)routerMOde{
+    self.currentAlmond.routerMode = routerMOde;
+}
 
 
 @end
