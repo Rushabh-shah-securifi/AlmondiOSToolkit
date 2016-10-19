@@ -346,7 +346,7 @@ typedef void(^myCompletion)(BOOL);
        
     }
     else{
-        [self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
+        //[self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
         
     }
     return ;
@@ -366,6 +366,9 @@ typedef void(^myCompletion)(BOOL);
     }
     else{
         NSArray *arr = [CompleteDB betweenDays:firstDate date2:lastDate previousDate:NULL];
+        if(![firstDate isEqualToString:todayDate]){
+            arr =[CompleteDB betweenDays:todayDate date2:lastDate previousDate:NULL];
+        }
         NSLog(@" in between days today not %@",arr);
         
         if(arr.count > 1)

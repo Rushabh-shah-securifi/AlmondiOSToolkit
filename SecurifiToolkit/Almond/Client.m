@@ -140,17 +140,23 @@
     Client *client = [self findClientByID:clientId];
     return client.deviceSchedule;
 }
-+(BOOL)isSiteMapCompatable{
++(BOOL)isSiteMapCompatableLocal{
     SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *almond = [toolKit currentAlmond];
     bool isLocal = [toolKit useLocalNetwork:almond.almondplusMAC];
-   BOOL isSiteMapSupport = [ toolKit.currentAlmond siteMapSupportFirmware:toolKit.currentAlmond.firmware];
-    return isSiteMapSupport && !isLocal;
+    return isLocal;
+    
+}
++(BOOL)siteMapCompatbleFW{
+    SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *almond = [toolKit currentAlmond];
+    BOOL isSiteMapSupport = [toolKit.currentAlmond siteMapSupportFirmware:toolKit.currentAlmond.firmware];
+    return isSiteMapSupport;
     
 }
 +(NSArray*) getClientGenericIndexes{
-        NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-23,@-22,@-19,@-20,@-3,@-25,nil];
-    if(![self isSiteMapCompatable]){
+        NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,@-25,nil];
+    if([self siteMapCompatbleFW]){
          return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-19,@-20,@-3,@-25,nil];
     }
     //for commenting browsing history code
