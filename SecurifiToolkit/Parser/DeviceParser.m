@@ -150,6 +150,7 @@
     }
     return self;
 }
+
 -(void)initNotification{
     NSLog(@"init device notification");
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -197,7 +198,7 @@
     }
     
 //    payload = [self parseJson:@"DeviceListResponse"];
-    NSLog(@"devices - payload: %@", payload);
+    //NSLog(@"devices - payload: %@", payload);
 
     BOOL isMatchingAlmondOrLocal = ([payload[ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud

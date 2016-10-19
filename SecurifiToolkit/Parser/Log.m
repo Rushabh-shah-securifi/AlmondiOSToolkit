@@ -7,6 +7,7 @@
 //
 
 #import "Log.h"
+
 @implementation Log
 void _Log(NSString *prefix, const char *file, int lineNumber, const char *funcName, NSString *format,...) {
     va_list ap;
@@ -14,6 +15,10 @@ void _Log(NSString *prefix, const char *file, int lineNumber, const char *funcNa
     format = [format stringByAppendingString:@"\n"];
     NSString *msg = [[NSString alloc] initWithFormat:[NSString stringWithFormat:@"%@",format] arguments:ap];
     va_end (ap);
+    NSDateFormatter *DateFormatter=[[NSDateFormatter alloc] init];
+    
+    [DateFormatter setDateFormat:@"yyyy-MM-dd hh:mm:ss"];
+    
     fprintf(stderr,"%s%50s:%3d - %s",[prefix UTF8String], funcName, lineNumber, [msg UTF8String]);
 }
 @end

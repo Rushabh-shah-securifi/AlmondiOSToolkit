@@ -267,6 +267,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 - (enum SFIAlmondConnectionMode)currentConnectionMode {
+    NSLog(@"i am called");
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     enum SFIAlmondConnectionMode mode = (enum SFIAlmondConnectionMode) [defaults integerForKey:kPREF_DEFAULT_CONNECTION_MODE];
     return mode;
@@ -275,6 +276,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:mode forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    NSLog(@"i am called");
     [self tryShutdownAndStartNetworks:mode];
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
@@ -297,7 +299,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac {
-    
+    NSLog(@"i am called");
     if (!almondMac) {
         return;
     }
@@ -380,9 +382,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     __weak SecurifiToolkit *block_self = self;
     NSLog(@" mode == %d",mode);
-    
+    NSLog(@"I am called");
     //FORCED_DISCONNECT state is added here to make sure that toggle between cloud network and local network does not break;
     dispatch_async(self.commandDispatchQueue, ^() {
+        
         [block_self tearDownNetwork];
         [block_self asyncInitNetwork];
     });
@@ -459,6 +462,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 -(void) asyncInitCloud {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSLog(@"i am called");
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
     [self asyncInitNetwork];
 }
@@ -471,7 +475,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"INIT SDK. SDK is already shutdown. Returning.");
         return;
     }
-    
+    NSLog(@"i am called");
     ConnectionStatusType state = [ConnectionStatus getConnectionStatus];
     switch (state) {
         case AUTHENTICATED:
@@ -517,6 +521,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     SecurifiToolkit __weak *block_self = self;
     
     dispatch_async(self.networkCallbackQueue, ^(void) {
+        NSLog(@"I am called");
         [block_self tearDownNetwork];
     });
 }
@@ -616,6 +621,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 //      c. if good response, then process next command
 
 - (void)closeConnection {
+    NSLog(@"I am called");
     [self tearDownNetwork];
 }
 
@@ -647,7 +653,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!linkCode) {
         return 0;
     }
-    
+    NSLog(@"i am called");
     // ensure we are in the correct connection mode
     //[self setConnectionMode:SFIAlmondConnectionMode_cloud forAlmond:self.currentAlmond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -691,11 +697,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)tearDownLoginSession {
+    NSLog(@"i am called");
     [KeyChainAccess clearSecCredentials];
     [self purgeStoredData];
 }
 
 - (void)purgeStoredData {
+    NSLog(@"i am called");
     //[self setConnectionMode:SFIAlmondConnectionMode_cloud];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
@@ -733,6 +741,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // Logon failed:
         // Ensure all credentials are cleared
         [self tearDownLoginSession];
+        NSLog(@"I am called");
         [self tearDownNetwork];
     }
     
@@ -742,6 +751,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onLogoutResponse {
     [self tearDownLoginSession];
+    NSLog(@"I am called");
     [self tearDownNetwork];
     //    [self resetCurrentAlmond];
     [self postNotification:kSFIDidLogoutNotification data:nil];
@@ -751,6 +761,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (res.isSuccessful) {
         DLog(@"SDK received success on Logout All");
         [self tearDownLoginSession];
+        NSLog(@"I am called");
         [self tearDownNetwork];
         //        [self resetCurrentAlmond];
     }
@@ -769,6 +780,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 // pre-populates the current almond setting based with the first local almond it finds.
 // called after login session has been purged
 - (void)resetCurrentAlmond {
+    NSLog(@"i am called");
     NSArray *local = self.localLinkedAlmondList;
     if (local.count == 0) {
         // notification will also be called below when setting current one;
@@ -784,6 +796,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Almond Management
 
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond {
+    NSLog(@"i am called");
     [AlmondManagement setCurrentAlmond:almond];
 }
 
@@ -842,6 +855,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
+    NSLog(@"i am called");
     Network *network = local ? [self setUpNetwork] : self.network;
     
     NetworkState *state = network.networkState;
@@ -966,6 +980,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     cmd.commandType = CommandType_RESET_PASSWORD_REQUEST;
     cmd.command = req;
     
+    NSLog(@"i am called");
     // make sure cloud connection is set up
     [self tearDownLoginSession];
     [KeyChainAccess setSecEmail:email];
@@ -1243,11 +1258,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case SFIAlmondConnectionMode_cloud:{
             NSLog(@"entering the cloud mode");
             [self tearDownNetwork];
+            NSLog(@"I am called");
             networkConfig = [NetworkConfig cloudConfig:self.config useProductionHost:self.useProductionCloud];
         }
             break;
         case SFIAlmondConnectionMode_local:{
             SFIAlmondPlus *plus = self.currentAlmond;
+            NSLog(@"I am called");
             [self tearDownNetwork];
             
             SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:plus.almondplusMAC];
@@ -1298,6 +1315,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return NO;
     }
     
+    NSLog(@"i am called");
     // if in cloud mode, then fail fast
     if (![self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_local]) {
         return NO;

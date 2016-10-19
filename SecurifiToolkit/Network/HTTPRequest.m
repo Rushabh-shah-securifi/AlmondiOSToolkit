@@ -22,7 +22,6 @@
     [dictionary setValue:emailID forKey:@"emailID"];
     
     [self sendHTTPRequestWithData:dictionary withRequestType:@"ResetPassword"];
-    
 }
 
 -(void) sendAsyncHTTPRequestResendActivationLink: (NSString*)emailID{

@@ -114,6 +114,7 @@
 // Returns the current Almond, which might or might not be the same as the old one. May return nil.
 + (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
     // if current is "local only" then no need to inspect the almond list; just return the current one.
+    NSLog(@"i am called");
     SecurifiToolkit * toolKit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *current = [toolKit currentAlmond];
     if (current.linkType == SFIAlmondPlusLinkType_local_only) {
@@ -128,6 +129,7 @@
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
+            
             [toolKit setCurrentAlmond:currentAlmond];
         }
         else {

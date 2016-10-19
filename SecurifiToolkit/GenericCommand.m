@@ -81,7 +81,7 @@
     
     GenericCommand *cmd = [GenericCommand commandWithCorrelationId:request.correlationId];
     cmd.commandType = CommandType_ALMOND_MODE_CHANGE_REQUEST;
-    
+    NSLog(@"i am called");
     if([[SecurifiToolkit sharedInstance] currentConnectionMode] == SFIAlmondConnectionMode_local)
         cmd.command = request.toJson;
     else

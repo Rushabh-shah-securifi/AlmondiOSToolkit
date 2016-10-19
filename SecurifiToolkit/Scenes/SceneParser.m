@@ -57,7 +57,7 @@
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
 
-    NSLog(@"main scene dict %@",mainDict);
+    //NSLog(@"main scene dict %@",mainDict);
     NSDictionary *dict;
     NSString * commandType = mainDict[COMMAND_TYPE];
     

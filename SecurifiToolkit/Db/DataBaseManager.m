@@ -148,10 +148,10 @@ static sqlite3 *DB = nil;
                     sqlite3_bind_text(statement, 6, [uriObj[@"COUNT"] UTF8String], -1, SQLITE_TRANSIENT);
                     sqlite3_bind_text(statement, 7, [uriObj[@"TIME"] UTF8String], -1, SQLITE_TRANSIENT);
                         if (sqlite3_step(statement) == SQLITE_DONE){
-                            NSLog(@" success");
+                            //NSLog(@" success");
                         }
                         else {
-                            NSLog(@" error");
+                            //NSLog(@" error");
                         }
                     
                 }
@@ -181,10 +181,10 @@ static sqlite3 *DB = nil;
             sqlite3_bind_text(statement, 1, [indexID UTF8String], -1, SQLITE_TRANSIENT);
             sqlite3_bind_text(statement, 2, [indexData UTF8String],-1, SQLITE_TRANSIENT);
             if (sqlite3_step(statement) == SQLITE_DONE){
-                NSLog(@" success");
+                //NSLog(@" success");
             }
             else {
-                NSLog(@" error");
+                //NSLog(@" error");
             }
         }
         sqlite3_close(database);

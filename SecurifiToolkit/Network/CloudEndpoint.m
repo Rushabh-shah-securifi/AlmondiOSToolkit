@@ -272,7 +272,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                 }
                                 
                                 NSString *response = [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding];
-                                NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                //NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                 
                                 switch (commandType) {
                                         // these are the only command responses so far that uses a JSON payload; we special case them for now
@@ -336,7 +336,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     //                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     
                                     CommandParser *parser = [CommandParser new];
-                                    NSLog(@"xml Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    //NSLog(@"xml Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
                                     responsePayload = temp.command;
                                     
@@ -671,7 +671,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
             unsigned int header_commandType = (unsigned int) htonl(commandType);
             
-            NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
+            //NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
             
             NSOutputStream *outputStream = cloudEndpoint.outputStream;
             if (outputStream == nil) {

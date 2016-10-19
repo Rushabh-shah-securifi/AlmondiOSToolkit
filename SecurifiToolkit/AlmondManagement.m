@@ -20,7 +20,7 @@
     if (!almond) {
         return;
     }
-    
+    NSLog(@"i am called");
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
     
@@ -31,7 +31,7 @@
     if (!almond) {
         return;
     }
-    
+    NSLog(@"i am called");
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
@@ -48,6 +48,7 @@
     SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
     // reset connections
     if([toolKit currentConnectionMode]==SFIAlmondConnectionMode_local){
+        NSLog(@"i am called");
         [toolKit tryShutdownAndStartNetworks:toolKit.currentConnectionMode];
         return;
     }
@@ -239,6 +240,7 @@
 + (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
     SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
     BOOL local = [toolKit useLocalNetwork:almondMac];
+    NSLog(@"i am called");
     Network *network = local ? [toolKit setUpNetwork] : toolKit.network;
     
     NetworkState *state = network.networkState;

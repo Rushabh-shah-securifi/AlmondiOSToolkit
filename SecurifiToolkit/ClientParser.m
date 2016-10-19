@@ -63,7 +63,7 @@
         }
         mainDict = [[data valueForKey:@"data"] objectFromJSONData];
     }
-     NSLog(@"onWiFiClientsListResAndDynamicCallbacks %@",mainDict);
+     //NSLog(@"onWiFiClientsListResAndDynamicCallbacks %@",mainDict);
     BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
