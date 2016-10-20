@@ -276,9 +276,10 @@
         client.deviceAllowedType = DeviceAllowed_Blocked;
         
     }else{
+        client.deviceSchedule = blockedString;
         client.deviceAllowedType = DeviceAllowed_OnSchedule;
     }
-    client.deviceSchedule = blockedString;
+    
 }
 
 + (int)activeClientCount{
