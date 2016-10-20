@@ -2619,6 +2619,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self asyncSendToNetwork:cmd];
     }
 }
+-(void)routerModeOnCurrentAlmond:(NSString *)routerMOde{
+    self.currentAlmond.routerMode = routerMOde;
+}
 
 
 @end

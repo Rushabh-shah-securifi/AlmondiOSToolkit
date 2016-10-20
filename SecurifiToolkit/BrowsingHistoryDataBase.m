@@ -346,7 +346,7 @@ typedef void(^myCompletion)(BOOL);
        
     }
     else{
-        [self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
+        //[self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
         
     }
     return ;
@@ -366,10 +366,12 @@ typedef void(^myCompletion)(BOOL);
     }
     else{
         NSArray *arr = [CompleteDB betweenDays:firstDate date2:lastDate previousDate:NULL];
+        if(![firstDate isEqualToString:todayDate]){
+            arr =[CompleteDB betweenDays:todayDate date2:lastDate previousDate:NULL];
+        }
         NSLog(@" in between days today not %@",arr);
         
-        if(arr.count > 1)
-            for(long int i = 0;i < arr.count - 1;i++){// skipping last obj
+            for(long int i = 0;i < arr.count ;i++){
                 [CompleteDB insertInCompleteDB:[arr objectAtIndex:i] cmac:cmac amac:amac];
             }
     }
@@ -480,10 +482,10 @@ typedef void(^myCompletion)(BOOL);
     NSString *dateStr;
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
-        
         int count = [self getCount:amac clientMac:cmac];
         if(count > 500)
         {
+            count = [self getCount:amac clientMac:cmac];
             NSString *sqlcountStat =[NSString stringWithFormat: @"SELECT MIN(DATEINT) from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ",amac,cmac];
             
             sqlite3_stmt *statement;
@@ -526,6 +528,7 @@ typedef void(^myCompletion)(BOOL);
             {
                 NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(database));
             }
+            //NSLog(<#NSString * _Nonnull format, ...#>)
             [CompleteDB deleteDateEntries:amac clientMac:cmac date:dateStr];
         }
         sqlite3_close(database);

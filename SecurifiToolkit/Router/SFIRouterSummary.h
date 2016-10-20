@@ -22,6 +22,7 @@
 @property(nonatomic) NSString *login;
 @property(nonatomic) NSString *password;
 @property(nonatomic) NSArray *almondsList;
+@property (nonatomic) NSString *routerMode;
 // passwords sent in summary information are encrypted
 - (NSString *)decryptPassword:(NSString *)almondMac;
 

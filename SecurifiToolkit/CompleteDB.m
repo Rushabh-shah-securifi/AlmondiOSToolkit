@@ -117,7 +117,7 @@ static sqlite3 *database1 = nil;
                                                          options:0];
     
     NSMutableArray *dateArr = [[NSMutableArray alloc]init];
-    for (long int i = [components day]; i>=0; i--) {
+    for (long int i = [components day] - 1; i>0; i--) {// skipping first and last day
         [components setDay:i];
         NSDate *date = [calendar dateByAddingComponents:components toDate:endDate options:0];
         

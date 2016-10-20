@@ -207,6 +207,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(atomic) NSMutableArray *ruleList;
 @property(atomic) NSDictionary *genericDevices;
 @property(atomic) NSDictionary *genericIndexes;
+@property(nonatomic)NSString *routerMode;
 
 - (void)tearDownLoginSession;
 - (void)resetCurrentAlmond;
@@ -420,4 +421,6 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (BOOL)connectMesh;
 
 - (void)shutDownMesh;
+
+-(void)routerModeOnCurrentAlmond:(NSString *)routerMOde;
 @end

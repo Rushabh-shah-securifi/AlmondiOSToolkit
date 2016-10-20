@@ -110,6 +110,12 @@
     routerSummary.firmwareVersion = payload[@"FirmwareVersion"];
     routerSummary.wirelessSummaries = [self parseWirelessSettingsSummary:payload[@"WirelessSetting"]];
     routerSummary.almondsList = [self getAlmondsList:payload];
+    if(payload[@"RouterMode"]!=NULL){
+    routerSummary.routerMode = payload[@"RouterMode"];
+    [SecurifiToolkit sharedInstance].routerMode = payload[@"RouterMode"];
+    NSLog(@"router mode = %@",[SecurifiToolkit sharedInstance].routerMode);
+        
+    }
     return routerSummary;
 }
 
