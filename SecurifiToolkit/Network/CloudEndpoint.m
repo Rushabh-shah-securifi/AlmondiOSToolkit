@@ -373,7 +373,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
                                     case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
-                                    
+                                    case CommandType_MESH_COMMAND:
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
