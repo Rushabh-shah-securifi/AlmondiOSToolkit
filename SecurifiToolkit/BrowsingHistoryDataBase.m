@@ -346,7 +346,7 @@ typedef void(^myCompletion)(BOOL);
        
     }
     else{
-        [self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
+        //[self addtoCompleteDB:first_date lastDate:last_date amac:hDict[@"AMAC"] cmac:hDict[@"CMAC"]];
         
     }
     return ;
@@ -528,6 +528,7 @@ typedef void(^myCompletion)(BOOL);
             {
                 NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(database));
             }
+            //NSLog(<#NSString * _Nonnull format, ...#>)
             [CompleteDB deleteDateEntries:amac clientMac:cmac date:dateStr];
         }
         sqlite3_close(database);
