@@ -37,6 +37,8 @@
         self.enableAlmondVersionRemoteUpdate = NO;
         self.enableSensorTileDebugInfo = NO;
         self.isSimulator = NO;
+        self.siteMapEnable = YES;
+    
     }
 
     return self;
