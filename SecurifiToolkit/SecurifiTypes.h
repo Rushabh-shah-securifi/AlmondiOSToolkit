@@ -198,6 +198,9 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_TONE,
     SFIDevicePropertyType_VOLUME,
     SFIDevicePropertyType_SECONDS,
+    SFIDevicePropertyType_RGB,
+    SFIDevicePropertyType_BLINK_STATE,
+    SFIDevicePropertyType_LED_STATE,
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 
