@@ -60,14 +60,17 @@
         genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
         
     }else if([commandType isEqualToString:@"GetWirelessSettings"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:payload[@"CountryRegion"]]
+                                                    commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
     else if([commandType isEqualToString:@"SetWirelessSettings"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:@"CountryRegion"]
+                                                    commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
     }
 
     else if([commandType isEqualToString:@"FirmwareUpdate"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]] commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE success:(payload[@"Success"] == nil)? true: [payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:[payload[@"Percentage"] intValue] reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:@"CountryRegion"]
+                                                    commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE success:(payload[@"Success"] == nil)? true: [payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:[payload[@"Percentage"] intValue] reason:payload[@"Reason"]];
     }
     else if([commandType isEqualToString:@"RebootRouter"]){
         genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_REBOOT success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue ] completionPercentage:0 reason:payload[@"Reason"]];
@@ -139,7 +142,7 @@
     return wirelessSettingsObjsArray;
 }
 
-+(NSArray*)parseWirelessSettings:(NSArray*)wirelessSettingPayloadArray{
++(NSArray*)parseWirelessSettings:(NSArray*)wirelessSettingPayloadArray regionCode:(NSString *)regionCode{
     NSMutableArray *wirelessSettingsArray = [NSMutableArray new];
     for(NSDictionary *payload in wirelessSettingPayloadArray){
         SFIWirelessSetting *wirelessSettings = [[SFIWirelessSetting alloc]init];
@@ -150,7 +153,7 @@
         wirelessSettings.security = payload[@"Security"];
         wirelessSettings.encryptionType = payload[@"EncryptionType"];
         wirelessSettings.wirelessMode = payload[@"WirelessMode"];
-        wirelessSettings.countryRegion = payload[@"CountryRegion"];
+        wirelessSettings.countryRegion = regionCode?:@"";
         [wirelessSettingsArray addObject:wirelessSettings];
     }
     
