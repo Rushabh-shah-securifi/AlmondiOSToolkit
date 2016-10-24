@@ -70,6 +70,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 #pragma mark - NetworkEndpoint protocol methods
 
 - (void)connect {
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
     NSLog(@"Initialzing CloudEndpoint communication");
     __strong CloudEndpoint *block_self = self;
     
@@ -675,7 +676,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
             unsigned int header_commandType = (unsigned int) htonl(commandType);
             
-            //NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
+            NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
             
             NSOutputStream *outputStream = cloudEndpoint.outputStream;
             if (outputStream == nil) {

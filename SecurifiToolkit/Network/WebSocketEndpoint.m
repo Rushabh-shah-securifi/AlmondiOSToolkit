@@ -5,7 +5,8 @@
 
 #import "WebSocketEndpoint.h"
 #import "GenericCommand.h"
-#import "PSWebSocket.h"
+//#import "PSWebSocket.h"
+#import "SRWebSocket.h"
 #import "NetworkConfig.h"
 #import "DeviceListResponse.h"
 #import "DeviceValueResponse.h"
@@ -20,9 +21,9 @@
 
 typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
-@interface WebSocketEndpoint () <PSWebSocketDelegate>
-@property(nonatomic, strong) PSWebSocket *socket;
-@property(nonatomic, strong) PSWebSocket *socket_mesh;
+@interface WebSocketEndpoint () <SRWebSocketDelegate>
+@property(nonatomic, strong) SRWebSocket *socket;
+@property(nonatomic, strong) SRWebSocket *socket_mesh;
 
 @property(nonatomic, strong) NetworkConfig *config;
 @property(nonatomic, readonly) NSDictionary *responseHandlers;
@@ -45,6 +46,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)connect{
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
     NSLog(@"connect websocket");
     self.socket = [self connectSocketToPort:self.config.port];
 }
@@ -54,7 +56,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     self.socket_mesh = [self connectSocketToPort:7682];
 }
 
--(PSWebSocket *)connectSocketToPort:(NSUInteger)almondPort{
+-(SRWebSocket *)connectSocketToPort:(NSUInteger)almondPort{
     NSLog(@"connect almond socket");
     NetworkConfig *config = self.config;
     NSString *login = config.login;
@@ -79,7 +81,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     
-    PSWebSocket *almondSocket = [PSWebSocket clientSocketWithRequest:request];
+    SRWebSocket *almondSocket = [[SRWebSocket alloc]initWithURLRequest:request];
     almondSocket.delegate = self;
     
     [almondSocket open];
@@ -123,8 +125,8 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     return YES;
 }
 
-#pragma mark - PSWebSocketDelegate methods
-- (void)webSocketDidOpen:(PSWebSocket *)webSocket {
+#pragma mark - SRWebSocketDelegate methods
+- (void)webSocketDidOpen:(SRWebSocket *)webSocket {
     NSLog(@"webSocketDidOpen");
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     if([webSocket isEqual:self.socket_mesh]){
@@ -142,7 +144,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 
-- (void)webSocket:(PSWebSocket *)webSocket didReceiveMessage:(id)message {
+- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message {
     NSLog(@"Websocket receive: %@", message);
     
     NSString *str = message;
@@ -175,7 +177,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     }
 }
 
-- (void)webSocket:(PSWebSocket *)webSocket didFailWithError:(NSError *)error {
+- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error {
     if([webSocket isEqual:self.socket_mesh]){
         //need to work on logic
         NSLog(@"mesh web socket did fail: %@", webSocket);
@@ -185,7 +187,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     [self.delegate networkEndpointDidDisconnect:self];
 }
 
-- (void)webSocket:(PSWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
+- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
     if([webSocket isEqual:self.socket_mesh]){
         //need to work on logic
         NSLog(@"mesh websocket did close");

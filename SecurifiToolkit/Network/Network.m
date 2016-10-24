@@ -71,7 +71,6 @@
 - (void)connect {
     NSLog(@"Initialzing network communication");
     NSLog(@" Who is setting status Network - connect");
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
     NSLog(@"connecting to the network");
     
     if (self.endpoint) {

@@ -9,6 +9,7 @@
 #import "GenericCommand.h"
 #import "SFIAlmondPlus.h"
 #import "KeyChainWrapper.h"
+#import "ConnectionStatus.h"
 
 #define SEC_PASSWORD @"password"
 
@@ -59,7 +60,7 @@
     // clean up
     endpoint.delegate = nil;
     [endpoint shutdown];
-    //
+    
     _test_connection_latch = nil;
     _test_command_latch = nil;
     NSLog(@"local testResult  %d",self.testResult);
@@ -112,10 +113,11 @@
 #pragma mark - NetworkEndpointDelegate methods
 
 - (void)networkEndpointWillStartConnecting:(id <NetworkEndpoint>)endpoint {
-
+    
 }
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)AUTHENTICATED];
     dispatch_semaphore_t latch = self.test_connection_latch;
     if (latch) {
         self.testResult = TestConnectionResult_success;
@@ -124,7 +126,7 @@
 }
 
 - (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint {
-
+    NSLog(@"didisconnect is called");
 }
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {

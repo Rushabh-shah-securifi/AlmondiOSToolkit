@@ -63,6 +63,7 @@
 #import "KeyChainAccess.h"
 #import "AlmondManagement.h"
 #import "CompleteDB.h"
+#import "LocalNetworkManagement.h"
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
 #define kDEVICES_HELP_SHOWN                                 @"kDevicesHelpShown"
@@ -281,96 +282,96 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
 
-- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
-    
-    if (![settings hasCompleteSettings]) {
-        NSLog(@"setLocalNetworkSettings returning...");
-        return;
-    }
-    
-    NSString *almondMac = settings.almondplusMAC;
-    enum SFIAlmondConnectionMode mode = [self currentConnectionMode];
-    [self storeLocalNetworkSettings:settings];
-    //[self tryShutdownAndStartNetworks:mode];
-}
+//- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
+//    
+//    if (![settings hasCompleteSettings]) {
+//        NSLog(@"setLocalNetworkSettings returning...");
+//        return;
+//    }
+//    
+//    NSString *almondMac = settings.almondplusMAC;
+//    enum SFIAlmondConnectionMode mode = [self currentConnectionMode];
+//    [self storeLocalNetworkSettings:settings];
+//    //[self tryShutdownAndStartNetworks:mode];
+//}
 
-- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
-    return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
-}
+//- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
+//    return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
+//}
 
-- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac {
-    NSLog(@"i am called");
-    if (!almondMac) {
-        return;
-    }
-    
-    [self.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
-    
-    SFIAlmondPlus *currentAlmond = self.currentAlmond;
-    if (currentAlmond) {
-        if ([currentAlmond.almondplusMAC isEqualToString:almondMac]) {
-            [AlmondManagement removeCurrentAlmond];
-            
-            NSArray *cloud = self.almondList;
-            if (cloud.count > 0) {
-                [self setCurrentAlmond:cloud.firstObject];
-            }
-            else {
-                NSArray *local = self.localLinkedAlmondList;
-                if (local.count > 0) {
-                    [self setCurrentAlmond:local.firstObject];
-                }
-            }
-        }
-    }
-    
-    [self postNotification:kSFIDidUpdateAlmondList data:nil];
-}
+//- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac {
+//    NSLog(@"i am called");
+//    if (!almondMac) {
+//        return;
+//    }
+//    
+//    [self.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
+//    
+//    SFIAlmondPlus *currentAlmond = self.currentAlmond;
+//    if (currentAlmond) {
+//        if ([currentAlmond.almondplusMAC isEqualToString:almondMac]) {
+//            [AlmondManagement removeCurrentAlmond];
+//            
+//            NSArray *cloud = self.almondList;
+//            if (cloud.count > 0) {
+//                [self setCurrentAlmond:cloud.firstObject];
+//            }
+//            else {
+//                NSArray *local = self.localLinkedAlmondList;
+//                if (local.count > 0) {
+//                    [self setCurrentAlmond:local.firstObject];
+//                }
+//            }
+//        }
+//    }
+//    
+//    [self postNotification:kSFIDidUpdateAlmondList data:nil];
+//}
 
-- (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
-    // guard against bad data
-    if (![settings hasCompleteSettings]) {
-        NSLog(@"storeLocalNetworkSettings");
-        return;
-    }
-    
-    [self.dataManager writeAlmondLocalNetworkSettings:settings];
-}
+//- (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
+//    // guard against bad data
+//    if (![settings hasCompleteSettings]) {
+//        NSLog(@"storeLocalNetworkSettings");
+//        return;
+//    }
+//    
+//    [self.dataManager writeAlmondLocalNetworkSettings:settings];
+//}
 
-- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary {
-    NSLog(@"tryUpdateLocalNetworkSettingsForAlmond - mac: %@", almondMac);
-    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-    NSLog(@"settings: %@", settings);
-    NSLog(@"summary: %@", summary);
-    if (!settings) {
-        settings = [SFIAlmondLocalNetworkSettings new];
-        settings.almondplusMAC = almondMac;
-        
-        // very important: copy name to settings, if possible
-        SFIAlmondPlus *plus = [AlmondManagement cloudAlmond:almondMac];
-        if (plus) {
-            settings.almondplusName = plus.almondplusName;
-        }
-    }
-    
-    if (summary.login) {
-        settings.login = summary.login;
-    }
-    if (summary.password) {
-        NSLog(@"summary.password = %@, uptime: %@",summary.password, summary.uptime);
-        NSString *decrypted = [summary decryptPassword:almondMac];
-        NSLog(@"decrypted: %@", decrypted);
-        if (decrypted) {
-            settings.password = decrypted;
-        }
-        NSLog(@"settings.password: %@", settings.password);
-    }
-    if (summary.url) {
-        settings.host = summary.url;
-    }
-    
-    [self setLocalNetworkSettings:settings];
-}
+//- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary {
+//    NSLog(@"tryUpdateLocalNetworkSettingsForAlmond - mac: %@", almondMac);
+//    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+//    NSLog(@"settings: %@", settings);
+//    NSLog(@"summary: %@", summary);
+//    if (!settings) {
+//        settings = [SFIAlmondLocalNetworkSettings new];
+//        settings.almondplusMAC = almondMac;
+//        
+//        // very important: copy name to settings, if possible
+//        SFIAlmondPlus *plus = [AlmondManagement cloudAlmond:almondMac];
+//        if (plus) {
+//            settings.almondplusName = plus.almondplusName;
+//        }
+//    }
+//    
+//    if (summary.login) {
+//        settings.login = summary.login;
+//    }
+//    if (summary.password) {
+//        NSLog(@"summary.password = %@, uptime: %@",summary.password, summary.uptime);
+//        NSString *decrypted = [summary decryptPassword:almondMac];
+//        NSLog(@"decrypted: %@", decrypted);
+//        if (decrypted) {
+//            settings.password = decrypted;
+//        }
+//        NSLog(@"settings.password: %@", settings.password);
+//    }
+//    if (summary.url) {
+//        settings.host = summary.url;
+//    }
+//    
+//    [LocalNetworkManagement setLocalNetworkSettings:settings];
+//}
 
 // for changing network settings
 // ensures a local connection for the specified almond is shutdown and, if needed, restarted
@@ -385,7 +386,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSLog(@"I am called");
     //FORCED_DISCONNECT state is added here to make sure that toggle between cloud network and local network does not break;
     dispatch_async(self.commandDispatchQueue, ^() {
-        
+    
         [block_self tearDownNetwork];
         [block_self asyncInitNetwork];
     });
@@ -641,7 +642,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if(network ==nil){
         NSLog(@"calling _asyncInitNetwork ");
         [self asyncInitNetwork];
-        return;
     }
     
     BOOL success = [self.network submitCommand:command];
@@ -651,7 +651,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     else {
         NSLog(@"[Generic cmd: %d] send error", command.commandType);
     }
-    
 }
 
 - (sfi_id)asyncSendAlmondAffiliationRequest:(NSString *)linkCode {
@@ -1268,10 +1267,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
             break;
         case SFIAlmondConnectionMode_local:{
             SFIAlmondPlus *plus = self.currentAlmond;
+            
             NSLog(@"I am called");
             [self tearDownNetwork];
             
-            SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:plus.almondplusMAC];
+            SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:plus.almondplusMAC];
             
             networkConfig = [NetworkConfig webSocketConfig:settings almondMac:plus.almondplusMAC];
             
@@ -1335,7 +1335,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // if network not set up then check that settings are complete; the network will be set up on calling
     // asyncSubmitLocal command.
     //todo need a fast cache for this; very expensive to hit the file system constantly
-    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
+    SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almondMac];
     return settings.hasCompleteSettings;
 }
 
@@ -1710,7 +1710,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         SFIRouterSummary *summary = (SFIRouterSummary *) routerCommand.command;
         
         NSLog(@"tryupdatelocalNetwork is getting called");
-        [self tryUpdateLocalNetworkSettingsForAlmond:routerCommand.almondMAC withRouterSummary:summary];
+        [LocalNetworkManagement tryUpdateLocalNetworkSettingsForAlmond:routerCommand.almondMAC withRouterSummary:summary];
     }
     
     [self postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];

@@ -22,6 +22,7 @@
 #import "RouterParser.h"
 #import "NotificationPreferenceListResponse.h"
 #import "NotificationPreferenceListRequest.h"
+#import "LocalNetworkManagement.h"
 
 //#import "SFIRouterSummary.h"
 
@@ -584,7 +585,7 @@
             SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
             NSLog(@"routersummary: %@", routerSummary);
             if([toolkit currentConnectionMode] == SFIAlmondConnectionMode_cloud)
-                [toolkit tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
+                [LocalNetworkManagement tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
             break;
         }
     }

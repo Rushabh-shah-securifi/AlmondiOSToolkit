@@ -19,6 +19,6 @@ void _Log(NSString *prefix, const char *file, int lineNumber, const char *funcNa
     
     [DateFormatter setDateFormat:@"yyyy-MM-dd hh:mm:ss"];
     
-    fprintf(stderr,"%s%50s:%3d - %s",[prefix UTF8String], funcName, lineNumber, [msg UTF8String]);
+    fprintf(stderr,"%100s:%3d - %s",funcName, lineNumber, [msg UTF8String]);
 }
 @end

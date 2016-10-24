@@ -223,6 +223,68 @@
 		A54EAF9C1C44D8D800CF2837 /* ClientParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAF9A1C44D8D800CF2837 /* ClientParser.m */; };
 		A54EAFB01C44DC4A00CF2837 /* SceneParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A54EAFAE1C44DC4A00CF2837 /* SceneParser.h */; };
 		A54EAFB11C44DC4A00CF2837 /* SceneParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A54EAFAF1C44DC4A00CF2837 /* SceneParser.m */; };
+		A569B8711DBE108C00FBD429 /* LocalNetworkManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8701DBE108C00FBD429 /* LocalNetworkManagement.m */; };
+		A569B8A61DBE3E8500FBD429 /* SRDelegateController.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8761DBE3E8500FBD429 /* SRDelegateController.h */; };
+		A569B8A71DBE3E8500FBD429 /* SRDelegateController.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8771DBE3E8500FBD429 /* SRDelegateController.m */; };
+		A569B8A81DBE3E8500FBD429 /* SRDelegateController.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8771DBE3E8500FBD429 /* SRDelegateController.m */; };
+		A569B8A91DBE3E8500FBD429 /* SRIOConsumer.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8791DBE3E8500FBD429 /* SRIOConsumer.h */; };
+		A569B8AA1DBE3E8500FBD429 /* SRIOConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B87A1DBE3E8500FBD429 /* SRIOConsumer.m */; };
+		A569B8AB1DBE3E8500FBD429 /* SRIOConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B87A1DBE3E8500FBD429 /* SRIOConsumer.m */; };
+		A569B8AC1DBE3E8500FBD429 /* SRIOConsumerPool.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B87B1DBE3E8500FBD429 /* SRIOConsumerPool.h */; };
+		A569B8AD1DBE3E8500FBD429 /* SRIOConsumerPool.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B87C1DBE3E8500FBD429 /* SRIOConsumerPool.m */; };
+		A569B8AE1DBE3E8500FBD429 /* SRIOConsumerPool.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B87C1DBE3E8500FBD429 /* SRIOConsumerPool.m */; };
+		A569B8AF1DBE3E8500FBD429 /* NSRunLoop+SRWebSocketPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B87D1DBE3E8500FBD429 /* NSRunLoop+SRWebSocketPrivate.h */; };
+		A569B8B01DBE3E8500FBD429 /* NSURLRequest+SRWebSocketPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B87E1DBE3E8500FBD429 /* NSURLRequest+SRWebSocketPrivate.h */; };
+		A569B8B11DBE3E8500FBD429 /* SRProxyConnect.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8801DBE3E8500FBD429 /* SRProxyConnect.h */; };
+		A569B8B21DBE3E8500FBD429 /* SRProxyConnect.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8811DBE3E8500FBD429 /* SRProxyConnect.m */; };
+		A569B8B31DBE3E8500FBD429 /* SRProxyConnect.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8811DBE3E8500FBD429 /* SRProxyConnect.m */; };
+		A569B8B41DBE3E8500FBD429 /* SRRunLoopThread.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8831DBE3E8500FBD429 /* SRRunLoopThread.h */; };
+		A569B8B51DBE3E8500FBD429 /* SRRunLoopThread.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8841DBE3E8500FBD429 /* SRRunLoopThread.m */; };
+		A569B8B61DBE3E8500FBD429 /* SRRunLoopThread.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8841DBE3E8500FBD429 /* SRRunLoopThread.m */; };
+		A569B8B71DBE3E8500FBD429 /* SRPinningSecurityPolicy.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8861DBE3E8500FBD429 /* SRPinningSecurityPolicy.h */; };
+		A569B8B81DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8871DBE3E8500FBD429 /* SRPinningSecurityPolicy.m */; };
+		A569B8B91DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8871DBE3E8500FBD429 /* SRPinningSecurityPolicy.m */; };
+		A569B8BA1DBE3E8500FBD429 /* SRConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8881DBE3E8500FBD429 /* SRConstants.h */; };
+		A569B8BB1DBE3E8500FBD429 /* SRConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8891DBE3E8500FBD429 /* SRConstants.m */; };
+		A569B8BC1DBE3E8500FBD429 /* SRConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8891DBE3E8500FBD429 /* SRConstants.m */; };
+		A569B8BD1DBE3E8500FBD429 /* SRError.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B88B1DBE3E8500FBD429 /* SRError.h */; };
+		A569B8BE1DBE3E8500FBD429 /* SRError.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B88C1DBE3E8500FBD429 /* SRError.m */; };
+		A569B8BF1DBE3E8500FBD429 /* SRError.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B88C1DBE3E8500FBD429 /* SRError.m */; };
+		A569B8C01DBE3E8500FBD429 /* SRHash.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B88D1DBE3E8500FBD429 /* SRHash.h */; };
+		A569B8C11DBE3E8500FBD429 /* SRHash.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B88E1DBE3E8500FBD429 /* SRHash.m */; };
+		A569B8C21DBE3E8500FBD429 /* SRHash.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B88E1DBE3E8500FBD429 /* SRHash.m */; };
+		A569B8C31DBE3E8500FBD429 /* SRHTTPConnectMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B88F1DBE3E8500FBD429 /* SRHTTPConnectMessage.h */; };
+		A569B8C41DBE3E8500FBD429 /* SRHTTPConnectMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8901DBE3E8500FBD429 /* SRHTTPConnectMessage.m */; };
+		A569B8C51DBE3E8500FBD429 /* SRHTTPConnectMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8901DBE3E8500FBD429 /* SRHTTPConnectMessage.m */; };
+		A569B8C61DBE3E8500FBD429 /* SRLog.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8911DBE3E8500FBD429 /* SRLog.h */; };
+		A569B8C71DBE3E8500FBD429 /* SRLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8921DBE3E8500FBD429 /* SRLog.m */; };
+		A569B8C81DBE3E8500FBD429 /* SRLog.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8921DBE3E8500FBD429 /* SRLog.m */; };
+		A569B8C91DBE3E8500FBD429 /* SRMutex.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8931DBE3E8500FBD429 /* SRMutex.h */; };
+		A569B8CA1DBE3E8500FBD429 /* SRMutex.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8941DBE3E8500FBD429 /* SRMutex.m */; };
+		A569B8CB1DBE3E8500FBD429 /* SRMutex.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8941DBE3E8500FBD429 /* SRMutex.m */; };
+		A569B8CC1DBE3E8500FBD429 /* SRRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8951DBE3E8500FBD429 /* SRRandom.h */; };
+		A569B8CD1DBE3E8500FBD429 /* SRRandom.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8961DBE3E8500FBD429 /* SRRandom.m */; };
+		A569B8CE1DBE3E8500FBD429 /* SRRandom.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8961DBE3E8500FBD429 /* SRRandom.m */; };
+		A569B8CF1DBE3E8500FBD429 /* SRSIMDHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8971DBE3E8500FBD429 /* SRSIMDHelpers.h */; };
+		A569B8D01DBE3E8500FBD429 /* SRSIMDHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8981DBE3E8500FBD429 /* SRSIMDHelpers.m */; };
+		A569B8D11DBE3E8500FBD429 /* SRSIMDHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8981DBE3E8500FBD429 /* SRSIMDHelpers.m */; };
+		A569B8D21DBE3E8500FBD429 /* SRURLUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8991DBE3E8500FBD429 /* SRURLUtilities.h */; };
+		A569B8D31DBE3E8500FBD429 /* SRURLUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B89A1DBE3E8500FBD429 /* SRURLUtilities.m */; };
+		A569B8D41DBE3E8500FBD429 /* SRURLUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B89A1DBE3E8500FBD429 /* SRURLUtilities.m */; };
+		A569B8D51DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B89B1DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.h */; };
+		A569B8D61DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B89C1DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m */; };
+		A569B8D71DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B89C1DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m */; };
+		A569B8D81DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B89D1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.h */; };
+		A569B8D91DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B89E1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m */; };
+		A569B8DA1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B89E1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m */; };
+		A569B8DB1DBE3E8500FBD429 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A569B8A01DBE3E8500FBD429 /* Info.plist */; };
+		A569B8DC1DBE3E8500FBD429 /* SocketRocket.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8A11DBE3E8500FBD429 /* SocketRocket.h */; };
+		A569B8DD1DBE3E8500FBD429 /* SRSecurityPolicy.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8A21DBE3E8500FBD429 /* SRSecurityPolicy.h */; };
+		A569B8DE1DBE3E8500FBD429 /* SRSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A31DBE3E8500FBD429 /* SRSecurityPolicy.m */; };
+		A569B8DF1DBE3E8500FBD429 /* SRSecurityPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A31DBE3E8500FBD429 /* SRSecurityPolicy.m */; };
+		A569B8E01DBE3E8500FBD429 /* SRWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8A41DBE3E8500FBD429 /* SRWebSocket.h */; };
+		A569B8E11DBE3E8500FBD429 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */; };
+		A569B8E21DBE3E8500FBD429 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */; };
 		A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */; };
 		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
 		A5C7AE4A1C807BFA007E630D /* RouterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE481C807BFA007E630D /* RouterParser.h */; };
@@ -610,6 +672,51 @@
 		A54EAF9A1C44D8D800CF2837 /* ClientParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientParser.m; sourceTree = "<group>"; };
 		A54EAFAE1C44DC4A00CF2837 /* SceneParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneParser.h; sourceTree = "<group>"; };
 		A54EAFAF1C44DC4A00CF2837 /* SceneParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneParser.m; sourceTree = "<group>"; };
+		A569B8701DBE108C00FBD429 /* LocalNetworkManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalNetworkManagement.m; sourceTree = "<group>"; };
+		A569B8721DBE10EA00FBD429 /* LocalNetworkManagement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalNetworkManagement.h; sourceTree = "<group>"; };
+		A569B8761DBE3E8500FBD429 /* SRDelegateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRDelegateController.h; sourceTree = "<group>"; };
+		A569B8771DBE3E8500FBD429 /* SRDelegateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRDelegateController.m; sourceTree = "<group>"; };
+		A569B8791DBE3E8500FBD429 /* SRIOConsumer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRIOConsumer.h; sourceTree = "<group>"; };
+		A569B87A1DBE3E8500FBD429 /* SRIOConsumer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRIOConsumer.m; sourceTree = "<group>"; };
+		A569B87B1DBE3E8500FBD429 /* SRIOConsumerPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRIOConsumerPool.h; sourceTree = "<group>"; };
+		A569B87C1DBE3E8500FBD429 /* SRIOConsumerPool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRIOConsumerPool.m; sourceTree = "<group>"; };
+		A569B87D1DBE3E8500FBD429 /* NSRunLoop+SRWebSocketPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSRunLoop+SRWebSocketPrivate.h"; sourceTree = "<group>"; };
+		A569B87E1DBE3E8500FBD429 /* NSURLRequest+SRWebSocketPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+SRWebSocketPrivate.h"; sourceTree = "<group>"; };
+		A569B8801DBE3E8500FBD429 /* SRProxyConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRProxyConnect.h; sourceTree = "<group>"; };
+		A569B8811DBE3E8500FBD429 /* SRProxyConnect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRProxyConnect.m; sourceTree = "<group>"; };
+		A569B8831DBE3E8500FBD429 /* SRRunLoopThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRRunLoopThread.h; sourceTree = "<group>"; };
+		A569B8841DBE3E8500FBD429 /* SRRunLoopThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRRunLoopThread.m; sourceTree = "<group>"; };
+		A569B8861DBE3E8500FBD429 /* SRPinningSecurityPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRPinningSecurityPolicy.h; sourceTree = "<group>"; };
+		A569B8871DBE3E8500FBD429 /* SRPinningSecurityPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRPinningSecurityPolicy.m; sourceTree = "<group>"; };
+		A569B8881DBE3E8500FBD429 /* SRConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRConstants.h; sourceTree = "<group>"; };
+		A569B8891DBE3E8500FBD429 /* SRConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRConstants.m; sourceTree = "<group>"; };
+		A569B88B1DBE3E8500FBD429 /* SRError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRError.h; sourceTree = "<group>"; };
+		A569B88C1DBE3E8500FBD429 /* SRError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRError.m; sourceTree = "<group>"; };
+		A569B88D1DBE3E8500FBD429 /* SRHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRHash.h; sourceTree = "<group>"; };
+		A569B88E1DBE3E8500FBD429 /* SRHash.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRHash.m; sourceTree = "<group>"; };
+		A569B88F1DBE3E8500FBD429 /* SRHTTPConnectMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRHTTPConnectMessage.h; sourceTree = "<group>"; };
+		A569B8901DBE3E8500FBD429 /* SRHTTPConnectMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRHTTPConnectMessage.m; sourceTree = "<group>"; };
+		A569B8911DBE3E8500FBD429 /* SRLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRLog.h; sourceTree = "<group>"; };
+		A569B8921DBE3E8500FBD429 /* SRLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRLog.m; sourceTree = "<group>"; };
+		A569B8931DBE3E8500FBD429 /* SRMutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRMutex.h; sourceTree = "<group>"; };
+		A569B8941DBE3E8500FBD429 /* SRMutex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRMutex.m; sourceTree = "<group>"; };
+		A569B8951DBE3E8500FBD429 /* SRRandom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRRandom.h; sourceTree = "<group>"; };
+		A569B8961DBE3E8500FBD429 /* SRRandom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRRandom.m; sourceTree = "<group>"; };
+		A569B8971DBE3E8500FBD429 /* SRSIMDHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRSIMDHelpers.h; sourceTree = "<group>"; };
+		A569B8981DBE3E8500FBD429 /* SRSIMDHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRSIMDHelpers.m; sourceTree = "<group>"; };
+		A569B8991DBE3E8500FBD429 /* SRURLUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRURLUtilities.h; sourceTree = "<group>"; };
+		A569B89A1DBE3E8500FBD429 /* SRURLUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRURLUtilities.m; sourceTree = "<group>"; };
+		A569B89B1DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSRunLoop+SRWebSocket.h"; sourceTree = "<group>"; };
+		A569B89C1DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSRunLoop+SRWebSocket.m"; sourceTree = "<group>"; };
+		A569B89D1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+SRWebSocket.h"; sourceTree = "<group>"; };
+		A569B89E1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+SRWebSocket.m"; sourceTree = "<group>"; };
+		A569B8A01DBE3E8500FBD429 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A569B8A11DBE3E8500FBD429 /* SocketRocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketRocket.h; sourceTree = "<group>"; };
+		A569B8A21DBE3E8500FBD429 /* SRSecurityPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRSecurityPolicy.h; sourceTree = "<group>"; };
+		A569B8A31DBE3E8500FBD429 /* SRSecurityPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRSecurityPolicy.m; sourceTree = "<group>"; };
+		A569B8A41DBE3E8500FBD429 /* SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRWebSocket.h; sourceTree = "<group>"; };
+		A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRWebSocket.m; sourceTree = "<group>"; };
+		A569B8E31DBE414100FBD429 /* libicucore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libicucore.tbd; path = usr/lib/libicucore.tbd; sourceTree = SDKROOT; };
 		A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceParser.h; sourceTree = "<group>"; };
 		A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceParser.m; sourceTree = "<group>"; };
 		A5C7AE481C807BFA007E630D /* RouterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterParser.h; sourceTree = "<group>"; };
@@ -1101,6 +1208,7 @@
 		221185BC178D371200EE23ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A569B8E31DBE414100FBD429 /* libicucore.tbd */,
 				1CA80E4D1BAFA721002EB836 /* libxml2.dylib */,
 				1CA80E471BAFA482002EB836 /* libsqlite3.dylib */,
 				1CA80E451BAFA46E002EB836 /* libz.dylib */,
@@ -1140,6 +1248,7 @@
 				1C414BCF1A79F2BE00C448A4 /* OfflineStorage */,
 				22A76D2517912B830099CD8F /* parser */,
 				1C4382D61B2FDD5200F6AB7A /* PocketSocket */,
+				A569B8731DBE3E8500FBD429 /* SocketRocket */,
 				22A76D2417912B6E0099CD8F /* public */,
 				1C2F60531B69D5B9001CCA34 /* Scenes */,
 				221185C0178D371200EE23ED /* Supporting Files */,
@@ -1194,6 +1303,8 @@
 				A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */,
 				A5D9B4FF1DB4CFFB00BF1F60 /* AlmondListManagement.h */,
 				A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */,
+				A569B8721DBE10EA00FBD429 /* LocalNetworkManagement.h */,
+				A569B8701DBE108C00FBD429 /* LocalNetworkManagement.m */,
 				1C3270DB1A243B28007202C1 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
@@ -1344,6 +1455,119 @@
 			name = WiFiClients;
 			sourceTree = "<group>";
 		};
+		A569B8731DBE3E8500FBD429 /* SocketRocket */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8741DBE3E8500FBD429 /* Internal */,
+				A569B89B1DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.h */,
+				A569B89C1DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m */,
+				A569B89D1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.h */,
+				A569B89E1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m */,
+				A569B89F1DBE3E8500FBD429 /* Resources */,
+				A569B8A11DBE3E8500FBD429 /* SocketRocket.h */,
+				A569B8A21DBE3E8500FBD429 /* SRSecurityPolicy.h */,
+				A569B8A31DBE3E8500FBD429 /* SRSecurityPolicy.m */,
+				A569B8A41DBE3E8500FBD429 /* SRWebSocket.h */,
+				A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */,
+			);
+			path = SocketRocket;
+			sourceTree = "<group>";
+		};
+		A569B8741DBE3E8500FBD429 /* Internal */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8751DBE3E8500FBD429 /* Delegate */,
+				A569B8781DBE3E8500FBD429 /* IOConsumer */,
+				A569B87D1DBE3E8500FBD429 /* NSRunLoop+SRWebSocketPrivate.h */,
+				A569B87E1DBE3E8500FBD429 /* NSURLRequest+SRWebSocketPrivate.h */,
+				A569B87F1DBE3E8500FBD429 /* Proxy */,
+				A569B8821DBE3E8500FBD429 /* RunLoop */,
+				A569B8851DBE3E8500FBD429 /* Security */,
+				A569B8881DBE3E8500FBD429 /* SRConstants.h */,
+				A569B8891DBE3E8500FBD429 /* SRConstants.m */,
+				A569B88A1DBE3E8500FBD429 /* Utilities */,
+			);
+			path = Internal;
+			sourceTree = "<group>";
+		};
+		A569B8751DBE3E8500FBD429 /* Delegate */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8761DBE3E8500FBD429 /* SRDelegateController.h */,
+				A569B8771DBE3E8500FBD429 /* SRDelegateController.m */,
+			);
+			path = Delegate;
+			sourceTree = "<group>";
+		};
+		A569B8781DBE3E8500FBD429 /* IOConsumer */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8791DBE3E8500FBD429 /* SRIOConsumer.h */,
+				A569B87A1DBE3E8500FBD429 /* SRIOConsumer.m */,
+				A569B87B1DBE3E8500FBD429 /* SRIOConsumerPool.h */,
+				A569B87C1DBE3E8500FBD429 /* SRIOConsumerPool.m */,
+			);
+			path = IOConsumer;
+			sourceTree = "<group>";
+		};
+		A569B87F1DBE3E8500FBD429 /* Proxy */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8801DBE3E8500FBD429 /* SRProxyConnect.h */,
+				A569B8811DBE3E8500FBD429 /* SRProxyConnect.m */,
+			);
+			path = Proxy;
+			sourceTree = "<group>";
+		};
+		A569B8821DBE3E8500FBD429 /* RunLoop */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8831DBE3E8500FBD429 /* SRRunLoopThread.h */,
+				A569B8841DBE3E8500FBD429 /* SRRunLoopThread.m */,
+			);
+			path = RunLoop;
+			sourceTree = "<group>";
+		};
+		A569B8851DBE3E8500FBD429 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8861DBE3E8500FBD429 /* SRPinningSecurityPolicy.h */,
+				A569B8871DBE3E8500FBD429 /* SRPinningSecurityPolicy.m */,
+			);
+			path = Security;
+			sourceTree = "<group>";
+		};
+		A569B88A1DBE3E8500FBD429 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A569B88B1DBE3E8500FBD429 /* SRError.h */,
+				A569B88C1DBE3E8500FBD429 /* SRError.m */,
+				A569B88D1DBE3E8500FBD429 /* SRHash.h */,
+				A569B88E1DBE3E8500FBD429 /* SRHash.m */,
+				A569B88F1DBE3E8500FBD429 /* SRHTTPConnectMessage.h */,
+				A569B8901DBE3E8500FBD429 /* SRHTTPConnectMessage.m */,
+				A569B8911DBE3E8500FBD429 /* SRLog.h */,
+				A569B8921DBE3E8500FBD429 /* SRLog.m */,
+				A569B8931DBE3E8500FBD429 /* SRMutex.h */,
+				A569B8941DBE3E8500FBD429 /* SRMutex.m */,
+				A569B8951DBE3E8500FBD429 /* SRRandom.h */,
+				A569B8961DBE3E8500FBD429 /* SRRandom.m */,
+				A569B8971DBE3E8500FBD429 /* SRSIMDHelpers.h */,
+				A569B8981DBE3E8500FBD429 /* SRSIMDHelpers.m */,
+				A569B8991DBE3E8500FBD429 /* SRURLUtilities.h */,
+				A569B89A1DBE3E8500FBD429 /* SRURLUtilities.m */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		A569B89F1DBE3E8500FBD429 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A569B8A01DBE3E8500FBD429 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		CE458D5919EBBB5000689251 /* util */ = {
 			isa = PBXGroup;
 			children = (
@@ -1442,29 +1666,38 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A569B8C61DBE3E8500FBD429 /* SRLog.h in Headers */,
 				1C4382ED1B2FDD5200F6AB7A /* PSWebSocketBuffer.h in Headers */,
 				1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */,
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
+				A569B8D81DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.h in Headers */,
 				1C3270E81A243B28007202C1 /* SFIWirelessSummary.h in Headers */,
+				A569B8C31DBE3E8500FBD429 /* SRHTTPConnectMessage.h in Headers */,
 				CE5EB65617EAD44E00985636 /* SFIDeviceValue.h in Headers */,
 				22A76D3C17912F980099CD8F /* SignupResponse.h in Headers */,
 				CE6DC94517EC60C2006F48C4 /* MobileCommandRequest.h in Headers */,
 				CE484C9D1D41E1E3006C1388 /* BrowsingHistoryDataBase.h in Headers */,
 				1CD1D5521A660B7A00C030E9 /* NotificationPreferences.h in Headers */,
+				A569B8B71DBE3E8500FBD429 /* SRPinningSecurityPolicy.h in Headers */,
 				1C3EEFC31B37999300DFCF62 /* SFIDevicesList.h in Headers */,
 				A54EAFB01C44DC4A00CF2837 /* SceneParser.h in Headers */,
+				A569B8B41DBE3E8500FBD429 /* SRRunLoopThread.h in Headers */,
+				A569B8A91DBE3E8500FBD429 /* SRIOConsumer.h in Headers */,
 				CE3EDAEC1D46390600C153A6 /* BrowsingHistoryUtil.h in Headers */,
+				A569B8D51DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.h in Headers */,
 				22A76D491791347D0099CD8F /* AffiliationUserComplete.h in Headers */,
 				2204C20E1794349400B05F17 /* GenericCommand.h in Headers */,
 				22011C9B179540AF0019D5A4 /* CommandTypes.h in Headers */,
 				1CD1D5501A660B7A00C030E9 /* NotificationPreferenceResponse.h in Headers */,
 				CE5EB63417E82CB400985636 /* DeviceListRequest.h in Headers */,
+				A569B8CC1DBE3E8500FBD429 /* SRRandom.h in Headers */,
 				CE5EB64917E86D2200985636 /* DeviceListResponse.h in Headers */,
 				1C2F60561B69D5B9001CCA34 /* ScenesListRequest.h in Headers */,
 				1CD1D54A1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.h in Headers */,
 				CE2EA25119D00B3E00C6D6A8 /* UserInviteRequest.h in Headers */,
 				CE5EB64E17EAD41F00985636 /* DeviceValueRequest.h in Headers */,
 				CE5EB63917E852E500985636 /* SFIDevice.h in Headers */,
+				A569B8B11DBE3E8500FBD429 /* SRProxyConnect.h in Headers */,
 				CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */,
 				A52164071C983E4E00E7B79D /* GenericValue.h in Headers */,
 				CEAD85A519CAB7D8006D1048 /* DeleteAccountRequest.h in Headers */,
@@ -1483,6 +1716,7 @@
 				CE6DC94917EC60D1006F48C4 /* MobileCommandResponse.h in Headers */,
 				CE5EB5CA17E722BD00985636 /* AlmondListResponse.h in Headers */,
 				A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */,
+				A569B8D21DBE3E8500FBD429 /* SRURLUtilities.h in Headers */,
 				CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */,
 				CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */,
 				1C4382EF1B2FDD5200F6AB7A /* PSWebSocketDeflater.h in Headers */,
@@ -1496,23 +1730,27 @@
 				CE466A5F1823CFF900E55DF9 /* ResetPasswordRequest.h in Headers */,
 				1DF031BD12F94A49DA1C4E85 /* SecurifiCommand.h in Headers */,
 				CE91315619C6B94500D94876 /* UserProfileResponse.h in Headers */,
+				A569B8C91DBE3E8500FBD429 /* SRMutex.h in Headers */,
 				CE466A571823C2E800E55DF9 /* ValidateAccountRequest.h in Headers */,
 				A52164011C983E4E00E7B79D /* GenericDeviceClass.h in Headers */,
 				CE5EB5C017E7096800985636 /* AlmondPlusSDKConstants.h in Headers */,
 				CEAD85A919CABCBE006D1048 /* DeleteAccountResponse.h in Headers */,
 				CEAD85AD19CACE43006D1048 /* UpdateUserProfileRequest.h in Headers */,
+				A569B8C01DBE3E8500FBD429 /* SRHash.h in Headers */,
 				A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */,
 				CE91317119C9A2F900D94876 /* ChangePasswordResponse.h in Headers */,
 				1C3270E41A243B28007202C1 /* SFIRouterSummary.h in Headers */,
 				CEAD85B119CAEED1006D1048 /* UpdateUserProfileResponse.h in Headers */,
 				A52164041C983E4E00E7B79D /* GenericIndexClass.h in Headers */,
 				A52164171C9927D400E7B79D /* DeviceIndex.h in Headers */,
+				A569B8BD1DBE3E8500FBD429 /* SRError.h in Headers */,
 				1CFE442519F79E100065475C /* UserProfileResponse.m in Headers */,
 				CE5C1DB31D950FFB007BCE50 /* CompleteDB.h in Headers */,
 				CE5EB65217EAD43000985636 /* DeviceValueResponse.h in Headers */,
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
 				1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */,
+				A569B8E01DBE3E8500FBD429 /* SRWebSocket.h in Headers */,
 				1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */,
 				1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */,
 				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
@@ -1520,16 +1758,20 @@
 				CE5EB65A17EAD46500985636 /* SFIDeviceKnownValues.h in Headers */,
 				CE2EA26119D04BDD00C6D6A8 /* AlmondNameChange.h in Headers */,
 				CE2EA24D19CFF69F00C6D6A8 /* UnlinkAlmondResponse.h in Headers */,
+				A569B8DD1DBE3E8500FBD429 /* SRSecurityPolicy.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
 				1CD1D5561A660B7A00C030E9 /* NotificationRegistrationResponse.h in Headers */,
 				1C4382FA1B2FDD5200F6AB7A /* PSWebSocketTypes.h in Headers */,
 				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
+				A569B8DC1DBE3E8500FBD429 /* SocketRocket.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
 				CEEAB7A91CACF2B8003C5290 /* Client.h in Headers */,
 				1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */,
 				A52163FE1C983E4E00E7B79D /* Formatter.h in Headers */,
 				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
 				CE2EA26D19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.h in Headers */,
+				A569B8AF1DBE3E8500FBD429 /* NSRunLoop+SRWebSocketPrivate.h in Headers */,
+				A569B8A61DBE3E8500FBD429 /* SRDelegateController.h in Headers */,
 				1CD1D54E1A660B7A00C030E9 /* NotificationPreferenceListResponse.h in Headers */,
 				22FAE88817A8E528002FFEE8 /* Signup.h in Headers */,
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
@@ -1563,6 +1805,7 @@
 				1DF03C9FE842023F0F9D0202 /* SFINotificationStore.h in Headers */,
 				1C3EEFC71B379B3800DFCF62 /* SFIGenericRouterCommand.h in Headers */,
 				1DF037531EF66D6AA5504BD5 /* NotificationStoreImpl.h in Headers */,
+				A569B8AC1DBE3E8500FBD429 /* SRIOConsumerPool.h in Headers */,
 				1DF03EAA8828BEC034BDCA43 /* AlmondModeChangeResponse.h in Headers */,
 				1DF03C8BC24C649E0B09C2BE /* DynamicAlmondModeChange.h in Headers */,
 				A5C7AE4A1C807BFA007E630D /* RouterParser.h in Headers */,
@@ -1572,9 +1815,11 @@
 				1DF0360F76B7FDD43B761465 /* NotificationListResponse.h in Headers */,
 				1DF037D75654FB77C8A4DFA3 /* NotificationListRequest.h in Headers */,
 				1DF036CF40181B113E42E1D3 /* NotificationCountRequest.h in Headers */,
+				A569B8B01DBE3E8500FBD429 /* NSURLRequest+SRWebSocketPrivate.h in Headers */,
 				1DF035420555D20D2F38BC1A /* NotificationCountResponse.h in Headers */,
 				1C4382F51B2FDD5200F6AB7A /* PSWebSocketInternal.h in Headers */,
 				1DF0358CCF266F1666C24215 /* NotificationClearCountRequest.h in Headers */,
+				A569B8BA1DBE3E8500FBD429 /* SRConstants.h in Headers */,
 				1C4382F11B2FDD5200F6AB7A /* PSWebSocketDriver.h in Headers */,
 				1DF0371747228122D3121E75 /* NotificationClearCountResponse.h in Headers */,
 				CEF6F49E1C92CAAF00C68975 /* Rule.h in Headers */,
@@ -1596,6 +1841,7 @@
 				1DF0398177D6DD566A25FA8B /* LogoutResponse.h in Headers */,
 				1DF030928185AD7897BD4669 /* LogoutAllRequest.h in Headers */,
 				CEF6F4A11C92CAAF00C68975 /* RuleParser.h in Headers */,
+				A569B8CF1DBE3E8500FBD429 /* SRSIMDHelpers.h in Headers */,
 				1DF035F57F29A54222660EEB /* LogoutAllResponse.h in Headers */,
 				1C2F605B1B69D6F3001CCA34 /* MDJSON.h in Headers */,
 				1DF03D24E7252EEB274F79D7 /* CommandTypeScoreboardEvent.h in Headers */,
@@ -1682,6 +1928,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A569B8DB1DBE3E8500FBD429 /* Info.plist in Resources */,
 				221185FD178D453A00EE23ED /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1749,6 +1996,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A569B8CA1DBE3E8500FBD429 /* SRMutex.m in Sources */,
 				CEEAB7AA1CACF2C8003C5290 /* Client.m in Sources */,
 				CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */,
 				A52164051C983E4E00E7B79D /* GenericIndexClass.m in Sources */,
@@ -1773,6 +2021,7 @@
 				A5D9B5041DB4DBA500BF1F60 /* CreateJSON.m in Sources */,
 				1CD1D5531A660B7A00C030E9 /* NotificationPreferences.m in Sources */,
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
+				A569B8D61DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m in Sources */,
 				1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */,
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
@@ -1783,6 +2032,8 @@
 				CEA605B81A113E4E008380D3 /* DynamicNotificationPreferenceList.m in Sources */,
 				1CD1D5591A660B7A00C030E9 /* SFINotificationDevice.m in Sources */,
 				1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */,
+				A569B8A71DBE3E8500FBD429 /* SRDelegateController.m in Sources */,
+				A569B8C11DBE3E8500FBD429 /* SRHash.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
 				1C4382F41B2FDD5200F6AB7A /* PSWebSocketInflater.m in Sources */,
@@ -1792,16 +2043,22 @@
 				1C4382F01B2FDD5200F6AB7A /* PSWebSocketDeflater.m in Sources */,
 				A5C7AE4B1C807BFA007E630D /* RouterParser.m in Sources */,
 				CE5EB5CB17E722BD00985636 /* AlmondListResponse.m in Sources */,
+				A569B8C71DBE3E8500FBD429 /* SRLog.m in Sources */,
 				22A76D4A1791347D0099CD8F /* AffiliationUserComplete.m in Sources */,
 				CE5EB63A17E852E500985636 /* SFIDevice.m in Sources */,
+				A569B8D91DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m in Sources */,
 				CE91317219C9A2F900D94876 /* ChangePasswordResponse.m in Sources */,
 				1C3270E71A243B28007202C1 /* SFIWirelessSetting.m in Sources */,
 				CE7F218519CC012C008AD4FB /* AlmondAffiliationData.m in Sources */,
 				CE5EB5C717E7204000985636 /* AlmondListRequest.m in Sources */,
 				CE466A581823C2E800E55DF9 /* ValidateAccountRequest.m in Sources */,
 				1CD1D5571A660B7A00C030E9 /* NotificationRegistrationResponse.m in Sources */,
+				A569B8D01DBE3E8500FBD429 /* SRSIMDHelpers.m in Sources */,
+				A569B8CD1DBE3E8500FBD429 /* SRRandom.m in Sources */,
+				A569B8B21DBE3E8500FBD429 /* SRProxyConnect.m in Sources */,
 				2204C20F1794349400B05F17 /* GenericCommand.m in Sources */,
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
+				A569B8711DBE108C00FBD429 /* LocalNetworkManagement.m in Sources */,
 				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
 				1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */,
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
@@ -1813,6 +2070,7 @@
 				CE5C1DB41D950FFB007BCE50 /* CompleteDB.m in Sources */,
 				1C3EEFC01B37999300DFCF62 /* SFIBlockedDevice.m in Sources */,
 				CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */,
+				A569B8DE1DBE3E8500FBD429 /* SRSecurityPolicy.m in Sources */,
 				CE2EA25219D00B3E00C6D6A8 /* UserInviteRequest.m in Sources */,
 				CE7F218919CC0166008AD4FB /* AlmondAffiliationDataResponse.m in Sources */,
 				CEAD85AA19CABCBE006D1048 /* DeleteAccountResponse.m in Sources */,
@@ -1822,9 +2080,11 @@
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
 				1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */,
 				1CD1D54D1A660B7A00C030E9 /* NotificationPreferenceListRequest.m in Sources */,
+				A569B8AD1DBE3E8500FBD429 /* SRIOConsumerPool.m in Sources */,
 				CE6DC94A17EC60D1006F48C4 /* MobileCommandResponse.m in Sources */,
 				CE5EB64A17E86D2200985636 /* DeviceListResponse.m in Sources */,
 				CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */,
+				A569B8E11DBE3E8500FBD429 /* SRWebSocket.m in Sources */,
 				1C3EEFC81B379B3800DFCF62 /* SFIGenericRouterCommand.m in Sources */,
 				CE91316E19C9A2DD00D94876 /* ChangePasswordRequest.m in Sources */,
 				A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */,
@@ -1837,6 +2097,7 @@
 				CE98307818C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.m in Sources */,
 				1CD1D54B1A660B7A00C030E9 /* NotificationDeleteRegistrationResponse.m in Sources */,
 				CEF6F4A51C92CAAF00C68975 /* RulesTimeElement.m in Sources */,
+				A569B8BB1DBE3E8500FBD429 /* SRConstants.m in Sources */,
 				1C414BEB1A7B625400C448A4 /* NSDate+Convenience.m in Sources */,
 				CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */,
 				CE5EB65B17EAD46500985636 /* SFIDeviceKnownValues.m in Sources */,
@@ -1858,9 +2119,11 @@
 				1C4382F21B2FDD5200F6AB7A /* PSWebSocketDriver.m in Sources */,
 				CE2EA26A19D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m in Sources */,
 				CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */,
+				A569B8B51DBE3E8500FBD429 /* SRRunLoopThread.m in Sources */,
 				CE2EA25A19D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
 				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
+				A569B8D31DBE3E8500FBD429 /* SRURLUtilities.m in Sources */,
 				1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */,
 				A52164181C9927D400E7B79D /* DeviceIndex.m in Sources */,
 				1DF03F91E7AC7D1B82057F04 /* BaseCommandRequest.m in Sources */,
@@ -1890,6 +2153,8 @@
 				1DF03711937B3B810AAE5178 /* WebSocketEndpoint.m in Sources */,
 				CEED64341C7C370E008A7412 /* DeviceKnownValues.m in Sources */,
 				1DF03ABE2E57CDD4954FB4F2 /* NetworkConfig.m in Sources */,
+				A569B8BE1DBE3E8500FBD429 /* SRError.m in Sources */,
+				A569B8C41DBE3E8500FBD429 /* SRHTTPConnectMessage.m in Sources */,
 				1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */,
 				CEF6F49F1C92CAAF00C68975 /* Rule.m in Sources */,
 				1DF0391E21650F9E90235929 /* Login.m in Sources */,
@@ -1901,6 +2166,8 @@
 				1DF03F559DD7C482A3D38939 /* LogoutAllResponse.m in Sources */,
 				1DF03FE22D7AB1C44290B0BC /* CommandTypeScoreboardEvent.m in Sources */,
 				1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */,
+				A569B8AA1DBE3E8500FBD429 /* SRIOConsumer.m in Sources */,
+				A569B8B81DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */,
 				A52163FF1C983E4E00E7B79D /* Formatter.m in Sources */,
 				1DF030BA38ACE415D8B22060 /* SecurifiTypes.m in Sources */,
 				1DF03A369FB69FD247EF53C4 /* NSData+Securifi.m in Sources */,
@@ -1917,16 +2184,35 @@
 			files = (
 				CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */,
 				CEF6F4A31C92CAAF00C68975 /* RuleParser.m in Sources */,
+				A569B8AB1DBE3E8500FBD429 /* SRIOConsumer.m in Sources */,
 				CEF6F4A01C92CAAF00C68975 /* Rule.m in Sources */,
+				A569B8C81DBE3E8500FBD429 /* SRLog.m in Sources */,
+				A569B8AE1DBE3E8500FBD429 /* SRIOConsumerPool.m in Sources */,
 				A52164001C983E4E00E7B79D /* Formatter.m in Sources */,
 				CEF6F4931C92CA1A00C68975 /* dummyCloudEndpoint.m in Sources */,
+				A569B8BF1DBE3E8500FBD429 /* SRError.m in Sources */,
+				A569B8BC1DBE3E8500FBD429 /* SRConstants.m in Sources */,
+				A569B8CE1DBE3E8500FBD429 /* SRRandom.m in Sources */,
 				CEF6F4921C92CA1A00C68975 /* CommandObject.m in Sources */,
 				CEF6F4911C92CA1A00C68975 /* CommandMapping.m in Sources */,
+				A569B8D71DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m in Sources */,
+				A569B8CB1DBE3E8500FBD429 /* SRMutex.m in Sources */,
+				A569B8C51DBE3E8500FBD429 /* SRHTTPConnectMessage.m in Sources */,
 				A52164061C983E4E00E7B79D /* GenericIndexClass.m in Sources */,
+				A569B8A81DBE3E8500FBD429 /* SRDelegateController.m in Sources */,
+				A569B8C21DBE3E8500FBD429 /* SRHash.m in Sources */,
+				A569B8E21DBE3E8500FBD429 /* SRWebSocket.m in Sources */,
 				CEF6F4941C92CA1A00C68975 /* MockCloud.m in Sources */,
+				A569B8D41DBE3E8500FBD429 /* SRURLUtilities.m in Sources */,
+				A569B8B31DBE3E8500FBD429 /* SRProxyConnect.m in Sources */,
+				A569B8B61DBE3E8500FBD429 /* SRRunLoopThread.m in Sources */,
+				A569B8D11DBE3E8500FBD429 /* SRSIMDHelpers.m in Sources */,
+				A569B8DF1DBE3E8500FBD429 /* SRSecurityPolicy.m in Sources */,
 				A52164031C983E4E00E7B79D /* GenericDeviceClass.m in Sources */,
 				CEF6F4A61C92CAAF00C68975 /* RulesTimeElement.m in Sources */,
+				A569B8B91DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */,
 				A52164091C983E4E00E7B79D /* GenericValue.m in Sources */,
+				A569B8DA1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

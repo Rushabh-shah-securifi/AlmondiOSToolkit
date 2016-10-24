@@ -258,18 +258,18 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // assumes local network settings are already configured for the almond.
 - (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac;
 
-// configure local network settings; if a connection is opened for the almond specified in the settings,
-// the connection is torn down and, depending on the current connection mode, restarted.
-- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
+//// configure local network settings; if a connection is opened for the almond specified in the settings,
+//// the connection is torn down and, depending on the current connection mode, restarted.
+//- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
 
 - (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(enum ConnectionStatusType)status;
 
-// returns the Local Connection settings for the almond, or nil if none configured
-- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
+//// returns the Local Connection settings for the almond, or nil if none configured
+//- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
 
-- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary;
+//- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary;
 
-- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
+//- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
 
 - (BOOL)isNetworkOnline;
 //- (BOOL)isCloudLoggedIn;
