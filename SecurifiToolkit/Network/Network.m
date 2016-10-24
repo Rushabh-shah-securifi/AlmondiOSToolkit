@@ -399,11 +399,6 @@
             [self postData:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
-<<<<<<< HEAD
-            
-=======
-
->>>>>>> octRelease
         case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
