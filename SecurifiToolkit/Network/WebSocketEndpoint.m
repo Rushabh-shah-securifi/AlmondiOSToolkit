@@ -92,6 +92,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     NSLog(@"websocket shutDown");
     [self.socket close];
     [self.socket_mesh close];
+    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
     [self.delegate networkEndpointDidDisconnect:self];
 }
 

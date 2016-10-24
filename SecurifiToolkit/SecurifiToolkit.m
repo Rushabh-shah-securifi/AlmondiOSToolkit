@@ -164,7 +164,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         _commandDispatchQueue = dispatch_queue_create("command_dispatch", DISPATCH_QUEUE_SERIAL);
         
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        //        [center addObserver:self selector:@selector(onReachabilityChanged:) name:kSFIReachabilityChangedNotification object:nil];
+        [center addObserver:self selector:@selector(onReachabilityChanged:) name:kSFIReachabilityChangedNotification object:nil];
     }
     
     return self;
@@ -267,7 +267,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 - (enum SFIAlmondConnectionMode)currentConnectionMode {
-    NSLog(@"i am called");
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     enum SFIAlmondConnectionMode mode = (enum SFIAlmondConnectionMode) [defaults integerForKey:kPREF_DEFAULT_CONNECTION_MODE];
     return mode;
@@ -446,9 +445,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)onReachabilityChanged:(id)notice {
     self.scoreboard.reachabilityChangedCount++;
+    NSLog(@"onReachability is called from toolkit");
     if(self.isAppInForeGround){
         NSLog(@"asyncInitNetwork is called from asyncInitNetwork");
-        if([ConnectionStatus getConnectionStatus] == (ConnectionStatusType*)NO_NETWORK_CONNECTION)
+        if(self.isCloudReachable && [ConnectionStatus getConnectionStatus] == (ConnectionStatusType*)NO_NETWORK_CONNECTION)
             [self asyncInitNetwork];
     }else{
         NSLog(@"application is in the background so does not start the start the network");
@@ -487,6 +487,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"INIT SDK. connection already initializing. Returning.");
             return;
         };
+        case DISCONNECTING_NETWORK: {
+            NSLog(@"disconnecting from network is called");
+        }
         case NO_NETWORK_CONNECTION:
         default: {
             NSLog(@"INIT SDK. connection needs establishment. Passing thru");
@@ -633,10 +636,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     Network *network = self.network;
-    //    if (network == nil || (![ConnectionStatus isStreamConnected] && [ConnectionStatus getConnectionStatus] != IS_CONNECTING_TO_NETWORK)) {
+    
     if(network ==nil){
         NSLog(@"calling _asyncInitNetwork ");
         [self asyncInitNetwork];
+        return;
     }
     
     BOOL success = [self.network submitCommand:command];
@@ -753,7 +757,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self tearDownLoginSession];
     NSLog(@"I am called");
     [self tearDownNetwork];
-    //    [self resetCurrentAlmond];
     [self postNotification:kSFIDidLogoutNotification data:nil];
 }
 
@@ -1359,7 +1362,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)networkConnectionDidClose:(Network *)network {
     network.delegate = nil;
-    
+    NSLog(@"networkDidCloseIsCalled");
     if (network == self.network) {
         self.network = nil;
         DLog(@"%s: posting NETWORK_DOWN_NOTIFIER on closing cloud connection", __PRETTY_FUNCTION__);

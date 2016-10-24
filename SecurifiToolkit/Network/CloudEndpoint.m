@@ -146,7 +146,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 - (void)shutdown {
     NSLog(@" Who is setting status CloudEndpoint - shutdown");
     // Take weak reference to prevent retain cycles
-    __weak CloudEndpoint *block_self = self;
+    __strong CloudEndpoint *block_self = self;
     [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)DISCONNECTING_NETWORK];
     dispatch_async(self.backgroundQueue, ^(void) {
         NSLog(@"[%@] CloudEndpoint is shutting down", block_self.debugDescription);
@@ -176,7 +176,9 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 block_self.inputStream = nil;
             }
         }
-        NSLog(@"disconnected from cloud network");
+        NSLog(@"disconnected from cloud network this %@",self.delegate);
+        
+        [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
         [self.delegate networkEndpointDidDisconnect:self];
     });
     
