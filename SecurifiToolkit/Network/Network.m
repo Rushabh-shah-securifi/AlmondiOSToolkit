@@ -369,10 +369,17 @@
         };
         case CommandType_COMMAND_RESPONSE: {
             //md01
+            NSLog(@"network normal command response");
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_COMMAND_RESPONSE_NOTIFIER data:payload];
             break;
         };
+        case CommandType_MESH_COMMAND: {
+            NSLog(@"network mesh command response");
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_COMMAND_TYPE_MESH_RESPONSE data:payload];
+            break;
+        }
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
             [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
             break;
@@ -392,7 +399,11 @@
             [self postData:NOTIFICATION_RULE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> octRelease
         case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];

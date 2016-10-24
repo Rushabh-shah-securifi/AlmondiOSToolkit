@@ -70,6 +70,8 @@
 @property(nonatomic) BOOL enableSensorTileDebugInfo;
 
 @property(nonatomic) BOOL isSimulator;
+
+@property(nonatomic) BOOL siteMapEnable;
 - (id)copyWithZone:(NSZone *)zone;
 
 @end

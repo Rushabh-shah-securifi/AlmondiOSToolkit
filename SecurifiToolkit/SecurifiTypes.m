@@ -186,7 +186,10 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"BUZZ_STATE" : @(SFIDevicePropertyType_BUZZ_STATE),
                         @"TONE" : @(SFIDevicePropertyType_TONE),
                         @"VOLUME" : @(SFIDevicePropertyType_VOLUME),
-                        @"SECONDS" : @(SFIDevicePropertyType_SECONDS)
+                        @"SECONDS" : @(SFIDevicePropertyType_SECONDS),
+                        @"RGB" : @(SFIDevicePropertyType_RGB),
+                        @"BLINK_STATE" : @(SFIDevicePropertyType_BLINK_STATE),
+                        @"LED_STATE" : @(SFIDevicePropertyType_LED_STATE)
                         };
     }
     return

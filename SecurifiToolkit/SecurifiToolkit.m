@@ -186,9 +186,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.deviceParser = [[DeviceParser alloc]init];
     self.routerParser = [[RouterParser alloc]init];
     [DataBaseManager initializeDataBase];
-    [BrowsingHistoryDataBase initializeDataBase];
-    [CompleteDB initializeCompleteDataBase];
-    
+    if(self.configuration.siteMapEnable){
+        [BrowsingHistoryDataBase initializeDataBase];
+        [CompleteDB initializeCompleteDataBase];
+    }
     self.genericDevices = [DeviceParser parseGenericDevicesDict:[self.deviceParser parseJson:@"deviceListJson"]];
     self.genericIndexes = [DeviceParser parseGenericIndexesDict:[self.deviceParser parseJson:@"GenericIndexesData"]];
 }

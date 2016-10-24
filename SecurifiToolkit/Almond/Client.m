@@ -156,7 +156,7 @@
 }
 +(NSArray*) getClientGenericIndexes{
         NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,@-25,nil];
-    if([self siteMapCompatbleFW]){
+    if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable){
          return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-19,@-20,@-3,@-25,nil];
     }
     //for commenting browsing history code
@@ -276,9 +276,10 @@
         client.deviceAllowedType = DeviceAllowed_Blocked;
         
     }else{
+        client.deviceSchedule = blockedString;
         client.deviceAllowedType = DeviceAllowed_OnSchedule;
     }
-    client.deviceSchedule = blockedString;
+    
 }
 
 + (int)activeClientCount{
