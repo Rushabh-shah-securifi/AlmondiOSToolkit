@@ -49,7 +49,7 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 // password for login
 @property(nonatomic, copy) NSString *password;
 
-- (enum TestConnectionResult)testConnection;
+- (enum TestConnectionResult)testConnection: (BOOL)fromLoginPage;
 
 // makes an SFIAlmondPlus representation marked with SFIAlmondPlusLinkType_local_only
 - (SFIAlmondPlus *)asLocalLinkAlmondPlus;

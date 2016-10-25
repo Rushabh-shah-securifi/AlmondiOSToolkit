@@ -208,6 +208,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(atomic) NSDictionary *genericDevices;
 @property(atomic) NSDictionary *genericIndexes;
 @property(nonatomic)NSString *routerMode;
+@property(nonatomic)BOOL *isTesting
 
 - (void)tearDownLoginSession;
 - (void)resetCurrentAlmond;
@@ -256,7 +257,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // configures which connection interface to use for communicating with the almond
 // assumes local network settings are already configured for the almond.
-- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac;
+- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode;
 
 //// configure local network settings; if a connection is opened for the almond specified in the settings,
 //// the connection is torn down and, depending on the current connection mode, restarted.

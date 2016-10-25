@@ -31,7 +31,7 @@
     return self;
 }
 
-- (enum TestConnectionResult)testConnection {
+- (enum TestConnectionResult)testConnection: (BOOL)fromLoginPage{
     NSString *mac = @"test_almond";
 
     NetworkConfig *config = [NetworkConfig webSocketConfig:self almondMac:mac];
@@ -42,7 +42,7 @@
     WebSocketEndpoint *endpoint = [WebSocketEndpoint endpointWithConfig:config];
     endpoint.delegate = self;
 
-    [endpoint connect];
+    [endpoint connectAddAlmondLocally];
     [self waitOnLatch:self.test_connection_latch timeout:3 logMsg:@"Failed to connect to web socket"];
 
     BOOL success = (self.testResult == TestConnectionResult_success);
@@ -56,10 +56,10 @@
             [self waitOnLatch:self.test_command_latch timeout:3 logMsg:@"Failed to send GetAlmondNameandMAC to web socket"];
         }
     }
-
     // clean up
-    endpoint.delegate = nil;
-    [endpoint shutdown];
+    
+//    endpoint.delegate = nil;
+//    [endpoint shutdown];
     
     _test_connection_latch = nil;
     _test_command_latch = nil;
@@ -117,7 +117,6 @@
 }
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)AUTHENTICATED];
     dispatch_semaphore_t latch = self.test_connection_latch;
     if (latch) {
         self.testResult = TestConnectionResult_success;

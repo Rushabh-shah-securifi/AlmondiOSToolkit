@@ -274,7 +274,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return mode;
 }
 
-- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode forAlmond:(NSString *)almondMac{
+- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:mode forKey:kPREF_DEFAULT_CONNECTION_MODE];
     NSLog(@"i am called");
@@ -282,100 +282,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
 
-//- (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
-//    
-//    if (![settings hasCompleteSettings]) {
-//        NSLog(@"setLocalNetworkSettings returning...");
-//        return;
-//    }
-//    
-//    NSString *almondMac = settings.almondplusMAC;
-//    enum SFIAlmondConnectionMode mode = [self currentConnectionMode];
-//    [self storeLocalNetworkSettings:settings];
-//    //[self tryShutdownAndStartNetworks:mode];
-//}
-
-//- (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
-//    return [self.dataManager readAlmondLocalNetworkSettings:almondMac];
-//}
-
-//- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac {
-//    NSLog(@"i am called");
-//    if (!almondMac) {
-//        return;
-//    }
-//    
-//    [self.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
-//    
-//    SFIAlmondPlus *currentAlmond = self.currentAlmond;
-//    if (currentAlmond) {
-//        if ([currentAlmond.almondplusMAC isEqualToString:almondMac]) {
-//            [AlmondManagement removeCurrentAlmond];
-//            
-//            NSArray *cloud = self.almondList;
-//            if (cloud.count > 0) {
-//                [self setCurrentAlmond:cloud.firstObject];
-//            }
-//            else {
-//                NSArray *local = self.localLinkedAlmondList;
-//                if (local.count > 0) {
-//                    [self setCurrentAlmond:local.firstObject];
-//                }
-//            }
-//        }
-//    }
-//    
-//    [self postNotification:kSFIDidUpdateAlmondList data:nil];
-//}
-
-//- (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
-//    // guard against bad data
-//    if (![settings hasCompleteSettings]) {
-//        NSLog(@"storeLocalNetworkSettings");
-//        return;
-//    }
-//    
-//    [self.dataManager writeAlmondLocalNetworkSettings:settings];
-//}
-
-//- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary {
-//    NSLog(@"tryUpdateLocalNetworkSettingsForAlmond - mac: %@", almondMac);
-//    SFIAlmondLocalNetworkSettings *settings = [self localNetworkSettingsForAlmond:almondMac];
-//    NSLog(@"settings: %@", settings);
-//    NSLog(@"summary: %@", summary);
-//    if (!settings) {
-//        settings = [SFIAlmondLocalNetworkSettings new];
-//        settings.almondplusMAC = almondMac;
-//        
-//        // very important: copy name to settings, if possible
-//        SFIAlmondPlus *plus = [AlmondManagement cloudAlmond:almondMac];
-//        if (plus) {
-//            settings.almondplusName = plus.almondplusName;
-//        }
-//    }
-//    
-//    if (summary.login) {
-//        settings.login = summary.login;
-//    }
-//    if (summary.password) {
-//        NSLog(@"summary.password = %@, uptime: %@",summary.password, summary.uptime);
-//        NSString *decrypted = [summary decryptPassword:almondMac];
-//        NSLog(@"decrypted: %@", decrypted);
-//        if (decrypted) {
-//            settings.password = decrypted;
-//        }
-//        NSLog(@"settings.password: %@", settings.password);
-//    }
-//    if (summary.url) {
-//        settings.host = summary.url;
-//    }
-//    
-//    [LocalNetworkManagement setLocalNetworkSettings:settings];
-//}
-
 // for changing network settings
 // ensures a local connection for the specified almond is shutdown and, if needed, restarted
-- (void)tryShutdownAndStartNetworks:(enum SFIAlmondConnectionMode)mode {
+- (void)tryShutdownAndStartNetworks:(enum SFIAlmondConnectionMode)mode{
     
     if (!self.config.enableLocalNetworking) {
         return;
@@ -383,14 +292,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     __weak SecurifiToolkit *block_self = self;
     NSLog(@" mode == %d",mode);
-    NSLog(@"I am called");
     //FORCED_DISCONNECT state is added here to make sure that toggle between cloud network and local network does not break;
     dispatch_async(self.commandDispatchQueue, ^() {
-    
         [block_self tearDownNetwork];
         [block_self asyncInitNetwork];
     });
 }
+
 
 #pragma mark - Connection and Network state reporting
 
@@ -417,7 +325,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return (int) [KeyChainAccess secMinsRemainingForUnactivatedAccount];
 }
 
-- (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(enum ConnectionStatusType)status{
+- (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(enum ConnectionStatusType)status {
+    
     switch (status) {
         case (ConnectionStatusType)NO_NETWORK_CONNECTION:
             return SFIAlmondConnectionStatus_disconnected;
@@ -449,7 +358,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.scoreboard.reachabilityChangedCount++;
     NSLog(@"onReachability is called from toolkit");
     if(self.isAppInForeGround){
-        NSLog(@"asyncInitNetwork is called from asyncInitNetwork");
         if(self.isCloudReachable && [ConnectionStatus getConnectionStatus] == (ConnectionStatusType*)NO_NETWORK_CONNECTION)
             [self asyncInitNetwork];
     }else{
@@ -468,6 +376,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
     [self asyncInitNetwork];
 }
+
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void) asyncInitNetwork {
@@ -859,7 +768,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
     BOOL local = [self useLocalNetwork:almondMac];
     NSLog(@"i am called");
-    Network *network = local ? [self setUpNetwork] : self.network;
+    Network *network = local ? [self setUpNetwork] : self.network;;
     
     NetworkState *state = network.networkState;
     if ([state wasDeviceValuesFetchedForAlmond:almondMac]) {
@@ -1251,9 +1160,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 
-
 #pragma mark - Network management
--(Network *)setUpNetwork {
+-(Network *)setUpNetwork{
     enum SFIAlmondConnectionMode mode = [self currentConnectionMode];
     Network *network = nil;
     NetworkConfig *networkConfig = nil;
@@ -1261,19 +1169,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case SFIAlmondConnectionMode_cloud:{
             NSLog(@"entering the cloud mode");
             [self tearDownNetwork];
-            NSLog(@"I am called");
             networkConfig = [NetworkConfig cloudConfig:self.config useProductionHost:self.useProductionCloud];
         }
-            break;
+        break;
         case SFIAlmondConnectionMode_local:{
-            SFIAlmondPlus *plus = self.currentAlmond;
-            
-            NSLog(@"I am called");
+            SFIAlmondPlus* almond = self.currentAlmond;
+            NSLog(@"Entering the local mode");
             [self tearDownNetwork];
             
-            SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:plus.almondplusMAC];
+            SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
             
-            networkConfig = [NetworkConfig webSocketConfig:settings almondMac:plus.almondplusMAC];
+            networkConfig = [NetworkConfig webSocketConfig:settings almondMac:almond.almondplusMAC];
             
         }
             break;

@@ -36,8 +36,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 @property(nonatomic) NSInputStream *inputStream;
 @property(nonatomic) NSOutputStream *outputStream;
 
-//@property(nonatomic, readonly) enum CloudEndpointConnectionStatus connectionState;
-
 @end
 
 
@@ -70,7 +68,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 #pragma mark - NetworkEndpoint protocol methods
 
 - (void)connect {
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
     NSLog(@"Initialzing CloudEndpoint communication");
     __strong CloudEndpoint *block_self = self;
     
@@ -128,7 +125,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             
             [block_self.delegate networkEndpointDidConnect:block_self];
             
-            //            while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]] && [ConnectionStatus isStreamConnected]) {
             while ([runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]) {
             }
             
@@ -148,7 +144,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
     NSLog(@" Who is setting status CloudEndpoint - shutdown");
     // Take weak reference to prevent retain cycles
     __strong CloudEndpoint *block_self = self;
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)DISCONNECTING_NETWORK];
     dispatch_async(self.backgroundQueue, ^(void) {
         NSLog(@"[%@] CloudEndpoint is shutting down", block_self.debugDescription);
         NSLog(@"before time interval");
@@ -179,7 +174,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         }
         NSLog(@"disconnected from cloud network this %@",self.delegate);
         
-        [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
         [self.delegate networkEndpointDidDisconnect:self];
     });
     
@@ -275,7 +269,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                 }
                                 
                                 NSString *response = [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding];
-                                //NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                 
                                 switch (commandType) {
                                         // these are the only command responses so far that uses a JSON payload; we special case them for now
@@ -341,7 +335,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     //                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     
                                     CommandParser *parser = [CommandParser new];
-                                    //NSLog(@"xml Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    NSLog(@"xml Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
                                     responsePayload = temp.command;
                                     

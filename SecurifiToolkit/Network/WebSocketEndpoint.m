@@ -17,7 +17,6 @@
 #import "DynamicAlmondNameChangeResponse.h"
 #import "SecurifiToolkit.h"
 #import "GenericCommand.h"
-#import "ConnectionStatus.h"
 
 typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
@@ -46,7 +45,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)connect{
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
+    NSLog(@"connect websocket");
+    self.socket = [self connectSocketToPort:self.config.port];
+}
+
+-(void)connectAddAlmondLocally {
     NSLog(@"connect websocket");
     self.socket = [self connectSocketToPort:self.config.port];
 }
@@ -90,11 +93,9 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 
 - (void)shutdown {
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)DISCONNECTING_NETWORK];
     NSLog(@"websocket shutDown");
     [self.socket close];
     [self.socket_mesh close];
-    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
     [self.delegate networkEndpointDidDisconnect:self];
 }
 
@@ -115,6 +116,9 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         NSLog(@"Websocket send: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     }else{
         NSLog(@"websocket send: %@", data);
+    }
+    if(![data isKindOfClass:[NSData class]] && ![data isKindOfClass:[NSString class]]){
+        return NO;
     }
     
     if(obj.isMeshCmd)
@@ -184,6 +188,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         return;
     }
     NSLog(@"The websocket did fail with error: %@, socket: %@", error.description, webSocket);
+        
     [self.delegate networkEndpointDidDisconnect:self];
 }
 

@@ -22,7 +22,6 @@
     NSString *almondMac = settings.almondplusMAC;
     enum SFIAlmondConnectionMode mode = [[SecurifiToolkit sharedInstance] currentConnectionMode];
     [self storeLocalNetworkSettings:settings];
-    //[self tryShutdownAndStartNetworks:mode];
 }
 
 + (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {

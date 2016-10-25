@@ -15,4 +15,6 @@
 
 + (instancetype)endpointWithConfig:(NetworkConfig *)config;
 
+-(void)connectAddAlmondLocally;
+
 @end
