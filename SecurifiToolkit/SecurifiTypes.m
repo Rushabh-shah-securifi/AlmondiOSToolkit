@@ -189,7 +189,8 @@ NSDictionary *securifi_property_name_to_type_dictionary() {
                         @"SECONDS" : @(SFIDevicePropertyType_SECONDS),
                         @"RGB" : @(SFIDevicePropertyType_RGB),
                         @"BLINK_STATE" : @(SFIDevicePropertyType_BLINK_STATE),
-                        @"LED_STATE" : @(SFIDevicePropertyType_LED_STATE)
+                        @"LED_STATE" : @(SFIDevicePropertyType_LED_STATE),
+                        @"PRESS" : @(SFIDevicePropertyType_PRESS)
                         };
     }
     return
