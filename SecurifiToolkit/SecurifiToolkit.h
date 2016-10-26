@@ -88,6 +88,8 @@
 #import "Client.h"
 #import "SFIOfflineDataManager.h"
 #import "DatabaseStore.h"
+#import "NetworkConfig.h"
+#import "WebSocketEndpoint.h"
 
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
@@ -208,8 +210,9 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(atomic) NSDictionary *genericDevices;
 @property(atomic) NSDictionary *genericIndexes;
 @property(nonatomic)NSString *routerMode;
-@property(nonatomic)BOOL *isTesting
 
+-(Network*) createNetworkWithConfig:(NetworkConfig *)config;
+-(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint;
 - (void)tearDownLoginSession;
 - (void)resetCurrentAlmond;
 - (void)postNotification:(NSString *)notificationName data:(id)payload;
@@ -289,6 +292,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // Specify the currently "viewed" Almond. May perform updates in the background to check on Hash values.
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
+
+- (void)writeCurrentAlmond:(SFIAlmondPlus *)almond;
 
 // Returns the designated "current" Almond, or nil.
 - (SFIAlmondPlus *)currentAlmond;

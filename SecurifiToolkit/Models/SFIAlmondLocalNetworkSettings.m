@@ -10,6 +10,9 @@
 #import "SFIAlmondPlus.h"
 #import "KeyChainWrapper.h"
 #import "ConnectionStatus.h"
+#import "LocalNetworkManagement.h"
+#import "Securifitoolkit.h"
+#import "Network.h"
 
 #define SEC_PASSWORD @"password"
 
@@ -17,6 +20,7 @@
 @property(nonatomic, readonly) dispatch_semaphore_t test_connection_latch;
 @property(nonatomic, readonly) dispatch_semaphore_t test_command_latch;
 @property(nonatomic) enum TestConnectionResult testResult;
+@property(nonatomic) WebSocketEndpoint *endpoint;
 @end
 
 @implementation SFIAlmondLocalNetworkSettings
@@ -27,7 +31,7 @@
         self.almondplusName = @"Unknown"; // name is not provided in the summary (why not!!!) so we make sure it is not null, but expect it to be properly set
         self.port = 7681; // default web socket port
     }
-
+    
     return self;
 }
 
@@ -40,9 +44,10 @@
     _test_connection_latch = dispatch_semaphore_create(0);
 
     WebSocketEndpoint *endpoint = [WebSocketEndpoint endpointWithConfig:config];
+    self.endpoint = endpoint;
     endpoint.delegate = self;
 
-    [endpoint connectAddAlmondLocally];
+    [endpoint connect];
     [self waitOnLatch:self.test_connection_latch timeout:3 logMsg:@"Failed to connect to web socket"];
 
     BOOL success = (self.testResult == TestConnectionResult_success);
@@ -111,12 +116,8 @@
 
 
 #pragma mark - NetworkEndpointDelegate methods
-
-- (void)networkEndpointWillStartConnecting:(id <NetworkEndpoint>)endpoint {
-    
-}
-
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
+    
     dispatch_semaphore_t latch = self.test_connection_latch;
     if (latch) {
         self.testResult = TestConnectionResult_success;
@@ -130,10 +131,15 @@
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
     if (commandType == CommandType_ALMOND_NAME_AND_MAC_RESPONSE) {
-        dispatch_semaphore_t latch = self.test_command_latch;
+        //dispatch_semaphore_t latch = self.test_command_latch;
         NSLog(@"processTestConnectionResponsePayload almond name and mac %@",payload);
         [self processTestConnectionResponsePayload:payload];
-        dispatch_semaphore_signal(latch);
+       // dispatch_semaphore_signal(latch);
+        
+        SFIAlmondPlus* plus = self.asLocalLinkAlmondPlus;
+        [[SecurifiToolkit sharedInstance] writeCurrentAlmond: plus];
+        
+        [[SecurifiToolkit sharedInstance] createNetworkInstanceAndChangeDelegate:plus webSocketEndPoint:self.endpoint];
     }
 }
 

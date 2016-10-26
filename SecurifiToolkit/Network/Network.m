@@ -16,7 +16,7 @@
 #import "ConnectionStatus.h"
 #import "KeyChainAccess.h"
 
-@interface Network () <NetworkEndpointDelegate>
+@interface Network ()
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
 
 @property(atomic) NSInteger currentUnitCounter;
@@ -28,8 +28,6 @@
 
 
 @property(nonatomic) BOOL networkUpNoticePosted;
-@property(nonatomic) id <NetworkEndpoint> endpoint;
-
 
 @end
 
@@ -69,6 +67,7 @@
 }
 
 - (void)connect {
+    __strong Network *blockSelf = self;
     [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
     NSLog(@"Initialzing network communication");
     NSLog(@" Who is setting status Network - connect");
@@ -88,7 +87,7 @@
         self.endpoint = [WebSocketEndpoint endpointWithConfig:config];
     }
     
-    self.endpoint.delegate = self;
+    self.endpoint.delegate = blockSelf;
     [self.endpoint connect];
 }
 
@@ -114,8 +113,9 @@
     
     [self tryAbortUnit];
     [self.endpoint shutdown];
+    [self networkEndpointDidDisconnect:self.endpoint];
     self.endpoint = nil;
-    [self.delegate networkConnectionDidClose:self];
+    //[self.delegate networkConnectionDidClose:self];
 }
 
 #pragma mark - state
@@ -136,7 +136,6 @@
     if (unit) {
         [unit markResponse:success];
         [self.delegate networkDidReceiveCommandResponse:self command:unit.command timeToCompletion:unit.timeToCompletionSuccess responseType:responseType];
-        
     }
     else {
         [self.delegate networkDidReceiveCommandResponse:self command:nil timeToCompletion:0 responseType:responseType];
@@ -145,7 +144,6 @@
 
 - (void)tryAbortUnit {
     SUnit *unit = self.currentUnit;
-    
     if (unit) {
         DLog(@"Marking unit as aborted: %@", unit.description);
         [unit abort];
@@ -216,12 +214,13 @@
 - (BOOL)submitCommand:(GenericCommand *)command {
     
     dispatch_async(self.commandQueue, ^() {
-        
+        NSLog(@"am i called1");
         BOOL success = [self.endpoint sendCommand:command error:nil];
+        NSLog(@"am i called2");
         [self.delegate networkDidSendCommand:self command:command];
-        
+        NSLog(@"am i called3");
     });
-    
+    NSLog(@"am i called4");
     return YES;
 }
 
@@ -235,6 +234,7 @@
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
     NSLog(@" Who is setting status Network - networkEndpointDidConnect");
     [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)CONNECTED_TO_NETWORK];
+    SecurifiToolkit *toolkit =[SecurifiToolkit sharedInstance];
     if([[SecurifiToolkit sharedInstance] currentConnectionMode] == SFIAlmondConnectionMode_local)
         [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)AUTHENTICATED];
     
@@ -258,6 +258,12 @@
             [toolKit postNotification:kSFIDidLogoutNotification data:nil];
             return;
         }
+    }else{
+        SFIAlmondPlus* plus = toolkit.currentAlmond;
+        [toolkit asyncSendToNetwork:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] ];
+        [toolkit asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
+        [toolkit asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
+        [toolkit asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
     }
 }
 
@@ -516,6 +522,7 @@
         case CommandType_ALMOND_COMMAND_RESPONSE:
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: // posted from web socket only; payload is dictionary
         {
+            NSLog(@"delegate is working properly");
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self delegateData:payload commandType:commandType];
             break;

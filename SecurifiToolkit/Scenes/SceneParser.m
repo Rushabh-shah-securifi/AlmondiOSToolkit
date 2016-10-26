@@ -65,7 +65,7 @@
         if([mainDict[@"Scenes"] isKindOfClass:[NSArray class]])
             return;
         NSDictionary *scenesPayload = mainDict[@"Scenes"];
-        NSLog(@"scenesPayload sceneList %@",scenesPayload);
+//        NSLog(@"scenesPayload sceneList %@",scenesPayload);
         NSArray *scenePosKeys = scenesPayload.allKeys;
         NSArray *sortedPostKeys = [scenePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];

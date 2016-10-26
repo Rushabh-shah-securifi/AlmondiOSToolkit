@@ -142,6 +142,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 
 - (void)shutdown {
     NSLog(@" Who is setting status CloudEndpoint - shutdown");
+//    [self.delegate networkEndpointDidDisconnect:self];
     // Take weak reference to prevent retain cycles
     __strong CloudEndpoint *block_self = self;
     dispatch_async(self.backgroundQueue, ^(void) {
@@ -174,7 +175,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         }
         NSLog(@"disconnected from cloud network this %@",self.delegate);
         
-        [self.delegate networkEndpointDidDisconnect:self];
+        
     });
     
 }

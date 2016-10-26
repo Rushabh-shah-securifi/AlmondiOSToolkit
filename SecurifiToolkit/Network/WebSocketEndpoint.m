@@ -49,11 +49,6 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     self.socket = [self connectSocketToPort:self.config.port];
 }
 
--(void)connectAddAlmondLocally {
-    NSLog(@"connect websocket");
-    self.socket = [self connectSocketToPort:self.config.port];
-}
-
 -(void)connectMesh{
     NSLog(@"connect mesh");
     self.socket_mesh = [self connectSocketToPort:7682];
@@ -140,11 +135,11 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     
     [self.delegate networkEndpointDidConnect:self];
     
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
-    [toolkit asyncSendToNetwork:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] ];
-    [toolkit asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
-    [toolkit asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
-    [toolkit asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
+//    SFIAlmondPlus *plus = [toolkit currentAlmond];
+//    [toolkit asyncSendToNetwork:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] ];
+//    [toolkit asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
+//    [toolkit asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
+//    [toolkit asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
 }
 
 

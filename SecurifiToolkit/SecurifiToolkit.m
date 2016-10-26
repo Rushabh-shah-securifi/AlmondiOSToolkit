@@ -64,6 +64,7 @@
 #import "AlmondManagement.h"
 #import "CompleteDB.h"
 #import "LocalNetworkManagement.h"
+#import "WebSocketEndpoint.h"
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
 #define kDEVICES_HELP_SHOWN                                 @"kDevicesHelpShown"
@@ -245,6 +246,27 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return YES;
 }
 
+
+-(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint{
+    SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:plus.almondplusMAC];
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
+
+    NetworkConfig *networkConfig = [NetworkConfig webSocketConfig:settings almondMac:plus.almondplusMAC];
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    toolkit.network = [self createNetworkWithConfig:networkConfig];
+    
+    toolkit.network.endpoint = endpoint;
+    
+    toolkit.network.endpoint.delegate = toolkit.network;
+    
+    [toolkit.network networkEndpointDidConnect:endpoint];
+    
+}
+
 #pragma mark - Connection management
 
 // tests that the system configuration and current almond's link type are compatible with the specified mode
@@ -358,7 +380,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.scoreboard.reachabilityChangedCount++;
     NSLog(@"onReachability is called from toolkit");
     if(self.isAppInForeGround){
-        if(self.isCloudReachable && [ConnectionStatus getConnectionStatus] == (ConnectionStatusType*)NO_NETWORK_CONNECTION)
+        if(self.isCloudReachable && [ConnectionStatus getConnectionStatus] == (ConnectionStatusType*)NO_NETWORK_CONNECTION && self.currentConnectionMode == SFIAlmondConnectionMode_cloud)
             [self asyncInitNetwork];
     }else{
         NSLog(@"application is in the background so does not start the start the network");
@@ -374,7 +396,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSLog(@"i am called");
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
-    [self asyncInitNetwork];
+    [self tryShutdownAndStartNetworks:SFIAlmondConnectionMode_cloud];
+    
 }
 
 
@@ -549,15 +572,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
     Network *network = self.network;
     
     if(network ==nil){
-        NSLog(@"calling _asyncInitNetwork ");
-        [self asyncInitNetwork];
+        NSLog(@"calling _asyncInitNetwork %d ",command.command);
+        //[self asyncInitNetwork];
     }
     
     BOOL success = [self.network submitCommand:command];
+    NSLog(@"boolean value is %d",success);
     if (success) {
         NSLog(@"[Generic cmd: %d] send success", command.commandType);
-    }
-    else {
+    }else {
         NSLog(@"[Generic cmd: %d] send error", command.commandType);
     }
 }
@@ -710,6 +733,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void)setCurrentAlmond:(SFIAlmondPlus *)almond {
     NSLog(@"i am called");
     [AlmondManagement setCurrentAlmond:almond];
+}
+
+- (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
+    NSLog(@"i am called");
+    [AlmondManagement writeCurrentAlmond:almond];
 }
 
 - (SFIAlmondPlus *)currentAlmond {
@@ -1197,6 +1225,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return network;
 }
 
+-(Network*) createNetworkWithConfig:(NetworkConfig *)config{
+    Network* network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
+    return network;
+}
+
 - (void)connectMesh{
     if([self currentConnectionMode] == SFIAlmondConnectionMode_local && self.network!=nil)
         [self.network connectMesh];
@@ -1235,6 +1268,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     Network *local = self.network;
     if (local) {
         NSString *mac = local.config.almondMac;
+        NSLog(@"Is mac present in the network %d" ,mac && [mac isEqualToString:almondMac]);
         return mac && [mac isEqualToString:almondMac];
     }
     

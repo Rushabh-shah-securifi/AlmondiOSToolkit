@@ -28,7 +28,7 @@
 }
 
 + (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
-    if (!almond) {
+   if (!almond) {
         return;
     }
     NSLog(@"i am called");

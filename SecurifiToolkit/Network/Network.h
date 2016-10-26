@@ -10,6 +10,7 @@
 #import "CommandTypes.h"
 #import "SecurifiTypes.h"
 #import "NetworkConfig.h"
+#import "NetworkEndpoint.h"
 
 //typedef NS_ENUM(NSUInteger, NetworkConnectionStatus) {
 //    NetworkConnectionStatusUninitialized = 1,
@@ -48,7 +49,7 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 @end
 
 
-@interface Network : NSObject
+@interface Network : NSObject<NetworkEndpointDelegate>
 
 @property(nonatomic, weak) id <NetworkDelegate> delegate;
 
@@ -58,6 +59,7 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 //@property(nonatomic, readonly) enum NetworkConnectionStatus connectionState;
 @property(nonatomic, readonly) BOOL isStreamConnected;
 @property(nonatomic) enum NetworkLoginStatus loginStatus;
+@property(nonatomic) id <NetworkEndpoint> endpoint;
 
 // queue on which notifications will be posted
 + (instancetype)networkWithNetworkConfig:(NetworkConfig *)networkConfig callbackQueue:(dispatch_queue_t)callbackQueue dynamicCallbackQueue:(dispatch_queue_t)dynamicCallbackQueue;
