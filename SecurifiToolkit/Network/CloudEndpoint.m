@@ -670,8 +670,14 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             NSData *write_payload = [commandPayload isKindOfClass:NSData.class] ? commandPayload : [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
             unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
             unsigned int header_commandType = (unsigned int) htonl(commandType);
-            
+
             NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
+            
+            if([commandPayload isKindOfClass:[NSData class]]){
+                NSLog(@"Sending payload: %@, \nType: %d", [[NSString alloc] initWithData:commandPayload encoding:NSUTF8StringEncoding], commandType);
+            }else{
+                NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
+            }
             
             NSOutputStream *outputStream = cloudEndpoint.outputStream;
             if (outputStream == nil) {
