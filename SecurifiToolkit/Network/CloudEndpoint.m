@@ -139,7 +139,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         [block_self.delegate networkEndpointDidDisconnect:block_self];
     });
 }
-
+-(void) shutdownAndCallDelegate {
+    [self.delegate networkEndpointDidDisconnect:self];
+    [self shutdown];
+}
 - (void)shutdown {
     NSLog(@" Who is setting status CloudEndpoint - shutdown");
 //    [self.delegate networkEndpointDidDisconnect:self];
@@ -371,7 +374,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             NSLog(@"NSStreamEventHasSpaceAvailable");
             if (theStream == self.outputStream) {
                 NSLog(@"Output stream error: %@", theStream.streamError.localizedDescription);
-                [self shutdown];
+                [self shutdownAndCallDelegate];
             }
             break;
         }
@@ -383,7 +386,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 BOOL trusted = [self isTrustedCertificate:theStream];
                 if (!trusted) {
                     NSLog(@"%s: SSL Cert is not trusted. Issuing shutdown.", __PRETTY_FUNCTION__);
-                    [self shutdown];
+                    [self shutdownAndCallDelegate];
                 }
                 self.certificateTrusted = trusted;
             }
@@ -395,7 +398,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             NSLog(@"NSStreamEventHasSpaceAvailable");
             if (theStream == self.inputStream) {
                 NSLog(@"%s: SESSION ENDED CONNECTION BROKEN TIME => %f", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-                [self shutdown];
+                [self shutdownAndCallDelegate];
             }
             
             break;
