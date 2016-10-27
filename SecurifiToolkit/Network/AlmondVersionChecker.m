@@ -69,12 +69,17 @@ https://firmware.securifi.com/AP2/version [ap2]
     else if ([almondVersion hasPrefix:@"A1A"]) {
         return [NSURL URLWithString:@"https://firmware.securifi.com/A1A/version"];
     }
+    
     else if ([almondVersion hasPrefix:@"AL3"]) {
-        if ([almondVersion rangeOfString:@"beta" options:NSCaseInsensitiveSearch].location != NSNotFound){ // to support ios7
+        if([almondVersion rangeOfString:@"64" options:NSCaseInsensitiveSearch].location != NSNotFound){
+            if([almondVersion rangeOfString:@"beta" options:NSCaseInsensitiveSearch].location != NSNotFound)
+                return [NSURL URLWithString:@"https://firmware.securifi.com/AL3_64MB_BETA/version"];
+            else
+                return [NSURL URLWithString:@"https://firmware.securifi.com/AL3_64MB/version"];
+        }
+        else{
             return [NSURL URLWithString:@"https://firmware.securifi.com/AL3_BETA/version"];
         }
-        else
-            return [NSURL URLWithString:@"https://firmware.securifi.com/AL3/version"];
     }
     
     else {
