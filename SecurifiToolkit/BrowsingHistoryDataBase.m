@@ -126,7 +126,7 @@ typedef void(^myCompletion)(BOOL);
     return data;
 }
 #pragma mark getBrowsingHistoryMethods
-+ (NSDictionary *)getAllBrowsingHistorywithLimit:(int)limit almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
++ (NSArray *)getAllBrowsingHistorywithLimit:(int)limit almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
     
     
     //    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
@@ -134,16 +134,16 @@ typedef void(^myCompletion)(BOOL);
     NSString *sqlStatement =[NSString stringWithFormat: @"SELECT * from HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" ORDER BY TIME DESC  limit %d",amac,cmac,limit];
     sqlite3_stmt *compiledStatement;
     
-    NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement];
+    NSArray *arr = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement];
     //NSLog(@"search ddict %@",dict);
-    return dict;
+    return arr;
     //}
     
 }
 
-+ (NSDictionary *)prepareMethod:(sqlite3_stmt *)compiledStatement andsqlStatement:(NSString *)sqlStatement{
++ (NSArray *)prepareMethod:(sqlite3_stmt *)compiledStatement andsqlStatement:(NSString *)sqlStatement{
     
-    NSMutableDictionary *clientBrowsingHistory = [[NSMutableDictionary alloc]init];
+    NSMutableArray *clientBrowsingHistory = [[NSMutableArray alloc]init];
     if(sqlite3_prepare_v2(database, [sqlStatement UTF8String], -1, &compiledStatement, NULL) == SQLITE_OK){
         NSMutableDictionary *dayDict = [NSMutableDictionary new];
         while (sqlite3_step(compiledStatement) == SQLITE_ROW)
@@ -184,7 +184,13 @@ typedef void(^myCompletion)(BOOL);
             
         }
         //        NSLog(@"while not running errMSg %s",sqlite3_errmsg(database));
-        [clientBrowsingHistory setObject:dayDict forKey:@"Data"];
+       // [clientBrowsingHistory setObject:dayDict forKey:@"Data"];
+        NSLog(@"sorted arr %@",[self sortedDateArr:[dayDict allKeys]]);
+        NSArray *sortedArr = [self sortedDateArr:[dayDict allKeys]];
+        for(NSString *date in sortedArr){
+            [clientBrowsingHistory addObject:dayDict[date]];
+        }
+        
         
     }
     else{
@@ -196,7 +202,24 @@ typedef void(^myCompletion)(BOOL);
     // sqlite3_close(database);
     return clientBrowsingHistory;
 }
-
++(NSArray *)sortedDateArr:(NSArray *)dayDicArr{
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd"];
+    NSMutableArray *dateArr = [NSMutableArray new];
+    for (NSString *dates in dayDicArr){
+        NSDate *date = [dateFormat dateFromString:dates];
+        [dateArr addObject:date];
+    }
+    NSArray *sortedArray = [dateArr sortedArrayUsingComparator: ^(NSDate *d1, NSDate *d2) {
+        return [d2 compare:d1];
+    }];
+    [dateArr removeAllObjects];
+    for(NSDate *date in sortedArray){
+        NSString *string = [dateFormat stringFromDate:date];
+        [dateArr addObject:string];
+    }
+    return dateArr;
+}
 + (void)addToDictionary:(NSMutableDictionary *)rowIndexValDict uriInfo:(NSMutableDictionary *)uriInfo rowID:(NSString *)day{
     
     NSMutableArray *augArray = [rowIndexValDict valueForKey:[NSString stringWithFormat:@"%@",day]];
@@ -211,8 +234,8 @@ typedef void(^myCompletion)(BOOL);
 }
 
 #pragma mark insertMethods
-+(NSMutableDictionary *)insertAndGetHistoryRecord:(NSDictionary *)hDict readlimit:(int)limit amac:(NSString *)amac cmac:(NSString *)camc{
-    NSMutableDictionary *recordDict;
++(NSArray *)insertAndGetHistoryRecord:(NSDictionary *)hDict readlimit:(int)limit amac:(NSString *)amac cmac:(NSString *)camc{
+    NSArray *recordDict;
 //    
 //    [self addtoCompleteDB:@"2016-10-11" lastDate:@"2016-10-04" amac:amac cmac:camc];
 //    [CompleteDB searchDatePresentOrNot:amac clientMac:camc andDate:@""];
@@ -599,12 +622,12 @@ typedef void(^myCompletion)(BOOL);
     return ;
 }
 #pragma mark method for searchPage
-+(NSDictionary *)runQuery:(NSString *)sqlStatement{
++(NSArray *)runQuery:(NSString *)sqlStatement{
 //    if(sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK)
 //    {
         sqlite3_stmt *compiledStatement;
-        NSDictionary *dict = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement];
-        return dict;
+        NSArray *arr = [self prepareMethod:compiledStatement andsqlStatement:sqlStatement];
+        return arr;
 //    }
 //    else{
 //        NSLog(@"Fail to open ");
