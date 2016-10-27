@@ -176,6 +176,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     }
 }
 
+
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error {
     if([webSocket isEqual:self.socket_mesh]){
         //need to work on logic
@@ -448,6 +449,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_ALMOND_NAME_CHANGE];
              },
              };
+}
+
+-(void)setAlmondNameAndMAC:(NSString *)mac{
+    self.config.almondMac=mac;
 }
 
 @end

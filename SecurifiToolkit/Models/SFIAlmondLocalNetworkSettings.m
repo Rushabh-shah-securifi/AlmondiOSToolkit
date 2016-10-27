@@ -13,6 +13,7 @@
 #import "LocalNetworkManagement.h"
 #import "Securifitoolkit.h"
 #import "Network.h"
+#import "DynamicAlmondModeChange.h"
 
 #define SEC_PASSWORD @"password"
 
@@ -21,6 +22,7 @@
 @property(nonatomic, readonly) dispatch_semaphore_t test_command_latch;
 @property(nonatomic) enum TestConnectionResult testResult;
 @property(nonatomic) WebSocketEndpoint *endpoint;
+@property(nonatomic) DynamicAlmondModeChange *res;
 @end
 
 @implementation SFIAlmondLocalNetworkSettings
@@ -139,7 +141,9 @@
         SFIAlmondPlus* plus = self.asLocalLinkAlmondPlus;
         [[SecurifiToolkit sharedInstance] writeCurrentAlmond: plus];
         
-        [[SecurifiToolkit sharedInstance] createNetworkInstanceAndChangeDelegate:plus webSocketEndPoint:self.endpoint];
+        [[SecurifiToolkit sharedInstance] createNetworkInstanceAndChangeDelegate:plus webSocketEndPoint:self.endpoint res:_res];
+    }else if (commandType == CommandType_DYNAMIC_ALMOND_MODE_CHANGE) {
+        _res =payload;
     }
 }
 

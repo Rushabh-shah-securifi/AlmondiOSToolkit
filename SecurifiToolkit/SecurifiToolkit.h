@@ -90,6 +90,7 @@
 #import "DatabaseStore.h"
 #import "NetworkConfig.h"
 #import "WebSocketEndpoint.h"
+#import "DynamicAlmondModeChange.h"
 
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
@@ -212,7 +213,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(nonatomic)NSString *routerMode;
 
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config;
--(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint;
+-(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res;
 - (void)tearDownLoginSession;
 - (void)resetCurrentAlmond;
 - (void)postNotification:(NSString *)notificationName data:(id)payload;

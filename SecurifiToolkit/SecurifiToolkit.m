@@ -247,23 +247,26 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 
--(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint{
+-(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res{
     SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:plus.almondplusMAC];
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
-
+    
     NetworkConfig *networkConfig = [NetworkConfig webSocketConfig:settings almondMac:plus.almondplusMAC];
     
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    Network *network = [Network networkWithNetworkConfig:networkConfig callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
+    network.delegate = self;
+    [endpoint setAlmondNameAndMAC:plus.almondplusMAC];
     
-    toolkit.network = [self createNetworkWithConfig:networkConfig];
+    endpoint.delegate=network;
+    network.endpoint = endpoint;
     
-    toolkit.network.endpoint = endpoint;
+    self.network = network;
     
-    toolkit.network.endpoint.delegate = toolkit.network;
-    
-    [toolkit.network networkEndpointDidConnect:endpoint];
+    [network networkEndpointDidConnect:endpoint];
+    if(res!=nil)
+        [self onDynamicAlmondModeChange:res network:endpoint];
     
 }
 
@@ -737,6 +740,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
     NSLog(@"i am called");
+    self.currentAlmond =almond;
     [AlmondManagement writeCurrentAlmond:almond];
 }
 
@@ -2424,9 +2428,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return;
     }
     NSLog(@"res dict %@",res);
-    NSLog(@"res.mode: %d", res.mode);
+    NSLog(@"res.mode: %d %@", res.mode ,self.currentAlmond.almondplusMAC  );
     //    NSString *modeString = res[@"Mode"];
     if([res.almondMAC isEqualToString:self.currentAlmond.almondplusMAC]){
+        NSLog(@"Am I inside onDynamicAlmondModeChange");
         [network.networkState markModeForAlmond:self.currentAlmond.almondplusMAC mode:res.mode];
         
         NSDictionary *modeNotifyDict =  @{

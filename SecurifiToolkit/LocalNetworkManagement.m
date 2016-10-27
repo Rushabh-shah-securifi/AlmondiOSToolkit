@@ -37,7 +37,15 @@
     [toolkit.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
     
     SFIAlmondPlus *currentAlmond = toolkit.currentAlmond;
-    if (currentAlmond) {
+    if(currentAlmond!=nil)
+        NSLog(@"Current Almond is %@ %@" , currentAlmond.almondplusMAC, almondMac);
+    
+    if(currentAlmond!=nil && [currentAlmond.almondplusMAC isEqualToString:almondMac] && [toolkit currentConnectionMode]==SFIAlmondConnectionMode_local){
+        NSLog(@"Current Almond equals is ");
+        [toolkit tearDownNetwork];
+    }
+    
+    if (currentAlmond!=nil) {
         if ([currentAlmond.almondplusMAC isEqualToString:almondMac]) {
             [AlmondManagement removeCurrentAlmond];
             
@@ -53,6 +61,7 @@
             }
         }
     }
+    
     
     [toolkit postNotification:kSFIDidUpdateAlmondList data:nil];
 }
