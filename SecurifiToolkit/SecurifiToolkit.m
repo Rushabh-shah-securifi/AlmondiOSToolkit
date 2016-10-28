@@ -1253,7 +1253,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [old shutdown];
         
         self.network = nil;
-    }
+    } 
+    [self cleanUp];
 }
 
 // internal function used by high-level command dispatch methods for branching on local or cloud command queue
