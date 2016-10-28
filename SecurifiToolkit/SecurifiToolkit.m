@@ -350,7 +350,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return (int) [KeyChainAccess secMinsRemainingForUnactivatedAccount];
 }
 
-- (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(enum ConnectionStatusType)status {
+- (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(ConnectionStatusType)status {
     
     switch (status) {
         case (ConnectionStatusType)NO_NETWORK_CONNECTION:
