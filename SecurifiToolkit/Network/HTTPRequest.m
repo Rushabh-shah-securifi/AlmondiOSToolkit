@@ -1,6 +1,8 @@
 #import "HTTPRequest.h"
 #import "CreateJSON.h"
-
+@interface HTTPRequest()
+@property (nonatomic) NSMutableData *responseData;
+@end
 @implementation HTTPRequest
 
 
@@ -36,13 +38,14 @@
     
     NSString *post = [CreateJSON getJSONStringfromDictionary:dictionary];
     
+    NSLog(@"post req %@",post);
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%lu",(unsigned long)[postData length]];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     
     NSString* url = [@"https://utils.securifi.com/" stringByAppendingString:requestType];
-    
+    NSLog(@"post req %@ reqType %@",post,url);
     [request setURL:[NSURL URLWithString:url]];
     
     [request setHTTPMethod:@"POST"];
@@ -53,13 +56,13 @@
     
     [request setHTTPBody:postData];
     
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    
-    if(conn) {
-        NSLog(@"Connection Successful");
-    } else {
-        NSLog(@"Connection could not be made");
-    }
+//    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+//    
+//    if(conn) {
+//        NSLog(@"Connection Successful");
+//    } else {
+//        NSLog(@"Connection could not be made");
+//    }
     
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
@@ -68,6 +71,8 @@
         }
         else{
             NSDictionary *response = [NSJSONSerialization JSONObjectWithData:data options:nil error:nil];
+            if(response == NULL)
+                return ;
             NSLog(@"%@ is the response for signup",response);
             if([requestType isEqualToString:@"SignUp"])
                 [[NSNotificationCenter defaultCenter] postNotificationName:SIGN_UP_NOTIFIER object:nil userInfo:response];
