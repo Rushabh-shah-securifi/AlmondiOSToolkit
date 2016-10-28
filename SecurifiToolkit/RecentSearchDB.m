@@ -63,24 +63,21 @@ static sqlite3 *DB = nil;
     [self setRecentSearchTable];
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
+         int rc=0;
+        long int currentTime = [NSDate date].timeIntervalSince1970;
         sqlite3_stmt *statement;
         
-        NSString *query = @"INSERT OR REPLACE INTO recentDB (URIS,AMAC,CMAC,TIME) VALUES(?,?,?,?)";
-        NSLog(@"completeDB query %s",[query UTF8String]);
-        
-        if(sqlite3_prepare_v2(database, [query UTF8String],-1, &statement, NULL)== SQLITE_OK){
-            sqlite3_bind_text(statement, 1, [uri UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_text(statement, 2, [amac UTF8String], -1, SQLITE_TRANSIENT);
-            sqlite3_bind_text(statement, 3, [cmac UTF8String], -1, SQLITE_TRANSIENT);
-            long int currentTime = [NSDate date].timeIntervalSince1970;
-          
-            sqlite3_bind_int(statement, 4, currentTime);
-            NSLog(@" preparev2 CompleteDB success recent search  %ld",currentTime);
+        NSString * query  = [NSString
+                             stringWithFormat:@"INSERT OR REPLACE INTO recentDB (URIS,AMAC,CMAC,TIME) VALUES (\"%@\",\"%@\",\"%@\",%ld)",uri,amac,cmac,currentTime];
+        char * errMsg;
+        rc = sqlite3_exec(database, [query UTF8String] ,&statement,NULL,&errMsg);
+        if(SQLITE_OK != rc)
+        {
+            NSLog(@"Failed to insert record  rc:%d, msg=%s",rc,errMsg);
         }
         else{
-            NSLog(@" preparev2 CompleteDB error recent search %s",sqlite3_errmsg(database));
+            NSLog(@"success added uri %@",uri);
         }
-        sqlite3_finalize(statement);
         
     }else{
         NSLog(@"fail to open %s",sqlite3_errmsg(database));
@@ -108,16 +105,9 @@ static sqlite3 *DB = nil;
     NSLog(@"prepare method Querie: = %s",[sqlStatement UTF8String]);
     NSMutableArray *recentsearchHistory = [[NSMutableArray alloc]init];
     if(sqlite3_prepare_v2(database, [sqlStatement UTF8String], -1, &compiledStatement, NULL) == SQLITE_OK){
-        if (sqlite3_step(compiledStatement) == SQLITE_ROW)
-        {
-            NSString *uriString2 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 2)];
-        }
-        else
-            NSLog(@"sqlite3_step 1 %s",sqlite3_errmsg(database));
-        
-        NSLog(@"success msg %s",sqlite3_errmsg(database));
         while (sqlite3_step(compiledStatement) == SQLITE_ROW)
         {
+            NSString *uriString2 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 2)];
             NSString *uriString0 = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(compiledStatement, 0)];
             NSMutableDictionary *uriInfo = [NSMutableDictionary new];
             [uriInfo setObject:uriString0 forKey:@"hostName"];
@@ -125,7 +115,6 @@ static sqlite3 *DB = nil;
             [uriInfo setObject:[UIImage imageNamed:@"search_icon"] forKey:@"image" ];
             [recentsearchHistory addObject:uriInfo];
            
-            
         }
         NSLog(@"while not running errMSg %s",sqlite3_errmsg(database));
         
