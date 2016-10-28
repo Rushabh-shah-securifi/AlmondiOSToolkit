@@ -89,13 +89,16 @@
     if (almondName.length == 0) {
         return;
     }
-    
+    NSLog(@"Came here onDynamicAlmondNameChange %@",almondName);
     SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
         SFIAlmondPlus *current = [toolKit currentAlmond];
+        NSLog(@"Came here onDynamicAlmondNameChange inside changed %@",almondName);
         if ([current isEqualAlmondPlus:changed]) {
             changed.colorCodeIndex = current.colorCodeIndex;
-            [toolKit currentAlmond].almondplusName=almondName;
+            //[toolKit currentAlmond].almondplusName=almondName;
+            NSLog(@"Came here after settings %@",[toolKit currentAlmond].almondplusName);
+            [toolKit writeCurrentAlmond:changed];
             //[self setCurrentAlmond:changed];
         }
         
