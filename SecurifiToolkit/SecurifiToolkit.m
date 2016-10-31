@@ -67,6 +67,7 @@
 #import "WebSocketEndpoint.h"
 #import "NotificationAccessAndRefreshCommands.h"
 
+
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
 #define kDEVICES_HELP_SHOWN                                 @"kDevicesHelpShown"
 #define kRULES_HELP_SHOWN                                   @"kRulesHelpShown"
@@ -102,9 +103,8 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 
 // ===============================================================================================
 
-@interface SecurifiToolkit () <SFIDeviceLogStoreDelegate, NetworkDelegate>
+@interface SecurifiToolkit () <NetworkDelegate>
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
-@property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
 @property(nonatomic, readonly) dispatch_queue_t networkCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t networkDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
@@ -1480,7 +1480,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_DEVICELOG_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationListResponse *res = payload;
-                [self onDeviceLogSyncResponse:res];
+                [DeviceLogsProcessing onDeviceLogSyncResponse:res];
             }
             break;
         };
@@ -1763,8 +1763,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network {
-    
-    
+
     if (!res) {
         return;
     }
@@ -1989,10 +1988,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Notification Preference List callbacks
 
 - (void)onDeviceNotificationPreferenceChangeResponseCallback:(NotificationPreferenceResponse*)res network:(Network *)network {
-    
-    //    if (!res.isSuccessful) {
-    //        return;
-    //    }
     
     GenericCommand *cmd = [network.networkState expirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
     NotificationPreferences *req = cmd.command;
@@ -2314,121 +2309,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
                                           };
         self.mode_src = res.mode;
         [self postNotification:kSFIAlmondModeDidChange data:modeNotifyDict];
-    }
-}
-
-#pragma mark - Device Log processing and SFIDeviceLogStoreDelegate methods
-
-- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId forWifiClients:(BOOL)isForWifiClients {
-    DatabaseStore *db = self.deviceLogsDb;
-    [db purgeAll];
-    
-    id <SFIDeviceLogStore> store = [db newDeviceLogStore:almondMac deviceId:deviceId delegate:self];
-    [store ensureFetchNotifications:isForWifiClients]; // will callback to self (registered as delegate) to load notifications
-    
-    [self.network.networkState clearExpirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac];
-    
-    return store;
-}
-
-- (void)tryRefreshDeviceLog:(NSString *)almondMac deviceId:(sfi_id)deviceId forWiFiClient:(BOOL)isForWifiClients {
-    /*
-     Mobile +++++++++>>>>  Cloud 804
-     [For the first time send for first logs]
-     <root>
-     {mac:201243434454, device_id:19, requestId:”dajdasj”’}
-     </root>
-     [subsequent command]
-     <root>
-     {mac:201243434454, device_id:19, requestId:”dajdasj”, pageState:”12aaa12eee2eeffb1024”}
-     </root>
-     */
-    
-    // track timeouts/guard against multiple requests being sent for device logs
-    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
-        GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac];
-        if (!storedCmd) {
-            [aNetwork.networkState markExpirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac genericCommand:aCmd];
-            return YES;
-        }
-        // give the request 5 seconds to complete
-        return storedCmd.isExpired;
-    };
-    
-    DatabaseStore *store = self.deviceLogsDb;
-    NSString *pageState = [store nextTrackedSyncPoint];
-    
-    NSDictionary *payload;
-    if (isForWifiClients) {
-        payload = pageState ? @{
-                                @"mac" : almondMac,
-                                @"client_id" : @(deviceId),
-                                @"requestId" : pageState,
-                                @"pageState" : pageState,
-                                @"type" : @"wifi_client",
-                                } : @{
-                                      @"mac" : almondMac,
-                                      @"client_id" : @(deviceId),
-                                      @"requestId" : almondMac,
-                                      @"type" : @"wifi_client",
-                                      };
-    }else{
-        payload = pageState ? @{
-                                @"mac" : almondMac,
-                                @"device_id" : @(deviceId),
-                                @"requestId" : pageState,
-                                @"pageState" : pageState,
-                                } : @{
-                                      @"mac" : almondMac,
-                                      @"device_id" : @(deviceId),
-                                      @"requestId" : almondMac,
-                                      };
-    }
-    [self internalSendJsonCommandToCloud:payload commandType:CommandType_DEVICELOG_REQUEST precondition:precondition];
-}
-
-- (void)deviceLogStoreTryFetchRecords:(id <SFIDeviceLogStore>)deviceLogStore forWiFiClient:(BOOL)isForWifiClients {
-    [self tryRefreshDeviceLog:deviceLogStore.almondMac deviceId:deviceLogStore.deviceID forWiFiClient:isForWifiClients];
-}
-
-- (void)onDeviceLogSyncResponse:(NotificationListResponse *)res {
-    if (!res) {
-        return;
-    }
-    
-    NSString *requestId = res.requestId;
-    
-    // Store the notifications and stop tracking the pageState that they were associated with
-    DatabaseStore *store = self.deviceLogsDb;
-    
-    NSArray *notificationsToStore = res.notifications;
-    for (SFINotification *n in notificationsToStore) {
-        n.viewed = YES;
-    }
-    
-    [store storeNotifications:notificationsToStore syncPoint:requestId];
-    
-    // Let the world know there are new notifications
-    [self postNotification:kSFINotificationDidStore data:nil];
-    
-    // Keep syncing until page state is no longer provided
-    if (res.isPageStateDefined) {
-        // There are more pages to fetch
-        NSString *nextPageState = res.pageState;
-        
-        // Guard against bug in Cloud sending back same page state, causing us to go into infinite loop
-        // requesting the same page over and over.
-        BOOL alreadyTracked = [store isTrackedSyncPoint:nextPageState];
-        if (alreadyTracked) {
-            // remove the state and halt further processing
-            [store removeSyncPoint:nextPageState];
-            
-            DLog(@"Already tracking sync point; halting further processing: %@", nextPageState);
-        }
-        else {
-            // Keep track of this page state until the response has been processed
-            [store trackSyncPoint:nextPageState];
-        }
     }
 }
 

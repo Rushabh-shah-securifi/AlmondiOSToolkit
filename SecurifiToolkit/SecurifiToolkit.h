@@ -91,6 +91,7 @@
 #import "NetworkConfig.h"
 #import "WebSocketEndpoint.h"
 #import "DynamicAlmondModeChange.h"
+#import "DeviceLogsProcessing.h"
 
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
@@ -212,6 +213,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(atomic) NSDictionary *genericDevices;
 @property(atomic) NSDictionary *genericIndexes;
 @property(nonatomic)NSString *routerMode;
+@property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
 
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config;
 -(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res;
@@ -410,7 +412,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 //- (void)setNotificationsBadgeCount:(NSInteger)count;
 
-- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId  forWifiClients:(BOOL)isForWifiClients;
+//- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId  forWifiClients:(BOOL)isForWifiClients;
 
 - (BOOL)useLocalNetwork:(NSString *)almondMac;
 
