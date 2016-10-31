@@ -289,6 +289,7 @@
 		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
 		A5C7AE4A1C807BFA007E630D /* RouterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE481C807BFA007E630D /* RouterParser.h */; };
 		A5C7AE4B1C807BFA007E630D /* RouterParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE491C807BFA007E630D /* RouterParser.m */; };
+		A5D401151DC35A8A00D2EF6C /* NotificationAccessAndRefreshCommands.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D401141DC35A8A00D2EF6C /* NotificationAccessAndRefreshCommands.m */; };
 		A5D9B4F81DB4AE3E00BF1F60 /* ConnectionStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4F71DB4AE3E00BF1F60 /* ConnectionStatus.m */; };
 		A5D9B4FB1DB4CC1A00BF1F60 /* KeyChainAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */; };
 		A5D9B4FE1DB4CF5F00BF1F60 /* AlmondManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */; };
@@ -721,6 +722,8 @@
 		A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceParser.m; sourceTree = "<group>"; };
 		A5C7AE481C807BFA007E630D /* RouterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterParser.h; sourceTree = "<group>"; };
 		A5C7AE491C807BFA007E630D /* RouterParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RouterParser.m; sourceTree = "<group>"; };
+		A5D401131DC35A0A00D2EF6C /* NotificationAccessAndRefreshCommands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationAccessAndRefreshCommands.h; sourceTree = "<group>"; };
+		A5D401141DC35A8A00D2EF6C /* NotificationAccessAndRefreshCommands.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationAccessAndRefreshCommands.m; sourceTree = "<group>"; };
 		A5D9B4F61DB4AE0F00BF1F60 /* ConnectionStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConnectionStatus.h; sourceTree = "<group>"; };
 		A5D9B4F71DB4AE3E00BF1F60 /* ConnectionStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionStatus.m; sourceTree = "<group>"; };
 		A5D9B4F91DB4CBF800BF1F60 /* KeyChainAccess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyChainAccess.h; sourceTree = "<group>"; };
@@ -1297,6 +1300,8 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				A5D401131DC35A0A00D2EF6C /* NotificationAccessAndRefreshCommands.h */,
+				A5D401141DC35A8A00D2EF6C /* NotificationAccessAndRefreshCommands.m */,
 				A5D9B4F91DB4CBF800BF1F60 /* KeyChainAccess.h */,
 				A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */,
 				A5D9B4FC1DB4CF1900BF1F60 /* AlmondManagement.h */,
@@ -2078,6 +2083,7 @@
 				A54EAFB11C44DC4A00CF2837 /* SceneParser.m in Sources */,
 				CEAD85B219CAEED1006D1048 /* UpdateUserProfileResponse.m in Sources */,
 				1C23FBD219480D6C00E353D1 /* Reachability.m in Sources */,
+				A5D401151DC35A8A00D2EF6C /* NotificationAccessAndRefreshCommands.m in Sources */,
 				1C414BD31A79F2BE00C448A4 /* SFIOfflineDataManager.m in Sources */,
 				1CD1D54D1A660B7A00C030E9 /* NotificationPreferenceListRequest.m in Sources */,
 				A569B8AD1DBE3E8500FBD429 /* SRIOConsumerPool.m in Sources */,

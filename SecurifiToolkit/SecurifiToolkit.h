@@ -196,6 +196,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(nonatomic, readonly) SecurifiConfigurator *config;
 @property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
 @property(nonatomic, readonly) DatabaseStore *notificationsDb;
+@property(nonatomic, readonly) id <SFINotificationStore> notificationsStore;
 @property(nonatomic, strong) Network *network;
 //@property(nonatomic, readonly) DatabaseStore *notificationsDb;
 // When YES connections will be made to the Securifi Production cloud servers.
@@ -387,27 +388,27 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 // kSFINotificationPreferenceChangeActionDelete;
 //- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action mii:(int)mii;
 
-- (NSInteger)countUnviewedNotifications;
+//- (NSInteger)countUnviewedNotifications;
 
-- (id <SFINotificationStore>)newNotificationStore;
+//- (id <SFINotificationStore>)newNotificationStore;
 
 // makes a copy of the notifications database; used for debugging
-- (BOOL)copyNotificationStoreTo:(NSString *)filePath;
+//- (BOOL)copyNotificationStoreTo:(NSString *)filePath;
 
 // Initiates a process to synchronize the on-board Notifications database with the cloud.
 // If a request is already in flight, this call fails fast and silently.
 // Posts kSFINotificationDidStore when new notifications have been fetched.
-- (void)tryRefreshNotifications;
+//- (void)tryRefreshNotifications;
 
 // Called after all Notifications/Activity have been viewed. The Clear command is sent to the cloud to reset the
 // global state shared across all logged-in devices.
-- (void)tryClearNotificationCount;
+//- (void)tryClearNotificationCount;
 
 // Called to synchronize the badge count as specified in a Push Notification payload. The badge count reflects then
 // latest known global "new notification" count.
-- (NSInteger)notificationsBadgeCount;
+//- (NSInteger)notificationsBadgeCount;
 
-- (void)setNotificationsBadgeCount:(NSInteger)count;
+//- (void)setNotificationsBadgeCount:(NSInteger)count;
 
 - (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId  forWifiClients:(BOOL)isForWifiClients;
 

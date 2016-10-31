@@ -65,6 +65,7 @@
 #import "CompleteDB.h"
 #import "LocalNetworkManagement.h"
 #import "WebSocketEndpoint.h"
+#import "NotificationAccessAndRefreshCommands.h"
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
 #define kDEVICES_HELP_SHOWN                                 @"kDevicesHelpShown"
@@ -104,7 +105,6 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @interface SecurifiToolkit () <SFIDeviceLogStoreDelegate, NetworkDelegate>
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
-@property(nonatomic, readonly) id <SFINotificationStore> notificationsStore;
 @property(nonatomic, readonly) dispatch_queue_t networkCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t networkDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
@@ -541,7 +541,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         if(cmd!=nil)
             [block_self asyncSendToNetwork:cmd];
         
-        [block_self tryRefreshNotifications];
+        [NotificationAccessAndRefreshCommands tryRefreshNotifications];
         //        }
         
     }
@@ -1254,6 +1254,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         self.network = nil;
     }
+    //[self cleanUp];
 }
 
 // internal function used by high-level command dispatch methods for branching on local or cloud command queue
@@ -2154,7 +2155,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     NSLog(@"storedCount isZero");
     if (storedCount == 0) {
-        [self setNotificationsBadgeCount:newCount];
+        [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:newCount];
         
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
@@ -2166,7 +2167,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!allStored) {
         // stopped early
         // nothing more to do
-        [self setNotificationsBadgeCount:newCount];
+        [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:newCount];
         
         // Let the world know there are new notifications
         [self postNotification:kSFINotificationDidStore data:nil];
@@ -2184,25 +2185,23 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (res.isPageStateDefined) {
         // There are more pages to fetch
         NSString *nextPageState = res.pageState;
-        
         // Guard against bug in Cloud sending back same page state, causing us to go into infinite loop
         // requesting the same page over and over.
         BOOL alreadyTracked = [store isTrackedSyncPoint:nextPageState];
         if (alreadyTracked) {
             // remove the state and halt further processing
             [store removeSyncPoint:nextPageState];
-            
         }
         else {
             // Keep track of this page state until the response has been processed
             [store trackSyncPoint:nextPageState];
             
             // and try to download it now
-            [self internalAsyncFetchNotifications:nextPageState];
+            [NotificationAccessAndRefreshCommands internalAsyncFetchNotifications:nextPageState];
         }
     }
     else {
-        [self setNotificationsBadgeCount:newCount];
+        [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:newCount];
         
         // check whether there is queued work to be done
         [self internalTryProcessNotificationSyncPoints];
@@ -2226,7 +2225,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSString *nextPageState = [store nextTrackedSyncPoint];
     if (nextPageState.length > 0) {
         DLog(@"internalTryProcessNotificationSyncPoints: fetching sync point: %@", nextPageState);
-        [self internalAsyncFetchNotifications:nextPageState];
+        [NotificationAccessAndRefreshCommands internalAsyncFetchNotifications:nextPageState];
     }
 }
 
@@ -2241,10 +2240,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     // Store the notifications and stop tracking the pageState that they were associated with
-    [self setNotificationsBadgeCount:res.badgeCount];
+    [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:res.badgeCount];
     
     if (res.badgeCount > 0) {
-        [self tryRefreshNotifications];
+        [NotificationAccessAndRefreshCommands tryRefreshNotifications];
     }
     
 }
@@ -2261,135 +2260,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
-#pragma mark - Notification access and refresh commands
-
-- (NSInteger)countUnviewedNotifications {
-    if (!self.config.enableNotifications) {
-        return 0;
-    }
-    return [self.notificationsStore countUnviewedNotifications];
-}
-
-- (id <SFINotificationStore>)newNotificationStore {
-    return [self.notificationsDb newNotificationStore];
-}
-
-- (BOOL)copyNotificationStoreTo:(NSString *)filePath {
-    if (!self.config.enableNotifications) {
-        return NO;
-    }
-    return [self.notificationsDb copyDatabaseTo:filePath];
-}
-
-// this method sends a request to fetch the latest notifications;
-// it does not handle the case of fetching older ones
-- (void)tryRefreshNotifications {
-    if (!self.config.enableNotifications || self.currentConnectionMode== SFIAlmondConnectionMode_local) {
-        return;
-    }
-    
-    if (![ConnectionStatus isCloudLoggedIn]) {
-        return;
-    }
-    NSLog(@"internalAsyncFetchNotifications");
-    [self internalAsyncFetchNotifications:nil];
-}
-
-// sends a command to clear the notification count
-- (void)tryClearNotificationCount {
-    if (!self.config.enableNotifications) {
-        return;
-    }
-    
-    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
-        enum ExpirableCommandType type = ExpirableCommandType_notificationClearCountRequest;
-        NSString *aNamespace = @"notification";
-        
-        GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:type namespace:aNamespace];
-        if (storedCmd) {
-            // clear the lock after execution; next command invocation will be allowed
-            [aNetwork.networkState clearExpirableRequest:type namespace:aNamespace];
-            // give the request 5 seconds to complete
-            return storedCmd.isExpired;
-        }
-        else {
-            [aNetwork.networkState markExpirableRequest:type namespace:aNamespace genericCommand:aCmd];
-            return YES;
-        }
-    };
-    
-    // reset count internally
-    [self setNotificationsBadgeCount:0];
-    
-    // send the command to the cloud
-    NotificationClearCountRequest *req = [NotificationClearCountRequest new];
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = req.commandType;
-    cmd.command = req;
-    cmd.networkPrecondition = precondition;
-    
-    [self asyncSendToNetwork:cmd];
-}
-
-- (NSInteger)notificationsBadgeCount {
-    if (!self.config.enableNotifications) {
-        return 0;
-    }
-    return self.notificationsDb.badgeCount;
-}
-
-- (void)setNotificationsBadgeCount:(NSInteger)count {
-    if (!self.config.enableNotifications) {
-        return;
-    }
-    
-    if (![ConnectionStatus isCloudLoggedIn]) {
-        return;
-    }
-    
-    [self.notificationsDb storeBadgeCount:count];
-    [self postNotification:kSFINotificationBadgeCountDidChange data:nil];
-}
-
-// Sends a request for notifications
-// pagestate can be nil or a defined page state. The page state also becomes an correlation ID that is parroted back in the
-// response. This allows the system to track responses and ensure page states are always serviced, even across app sessions.
-- (void)internalAsyncFetchNotifications:(NSString *)pageState {
-    if (!self.config.enableNotifications) {
-        return;
-    }
-    
-    NotificationListRequest *req = [NotificationListRequest new];
-    req.pageState = pageState;
-    req.requestId = pageState;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_NOTIFICATIONS_SYNC_REQUEST;
-    cmd.command = req;
-    
-    // nil indicates request is for "refresh; get latest" request
-    if (pageState == nil) {
-        cmd.networkPrecondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
-            GenericCommand *storedCmd = [aNetwork.networkState expirableRequest:ExpirableCommandType_notificationListRequest namespace:@"notification"];
-            if (!storedCmd) {
-                [aNetwork.networkState markExpirableRequest:ExpirableCommandType_notificationListRequest namespace:@"notification" genericCommand:aCmd];
-                return YES;
-            }
-            // give the request 5 seconds to complete
-            return storedCmd.isExpired;
-        };
-    }
-    
-    [self asyncSendToNetwork:cmd];
-}
-
 #pragma mark - Almond Mode change callbacks
 
 - (void)onAlmondModeChangeCompletion:(NSDictionary*)res network:(Network *)network {
-    //    if (!res.success) {
-    //        return;
-    //    }
     
     [network.networkState confirmPendingModeForAlmond];
     

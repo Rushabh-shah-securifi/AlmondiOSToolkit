@@ -411,16 +411,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
     }
 }
 
-//- (void)tryPostNetworkUpNotification {
-//    if (self.connectionState != CloudEndpointConnectionStatus_established) {
-//        return;
-//    }
-//    if (!self.networkUpNoticePosted) {
-//        self.networkUpNoticePosted = YES;
-//        [self.delegate networkEndpointDidConnect:self];
-//    }
-//}
-
 #pragma mark - SSL certificates
 
 - (void)loadCertificate {
