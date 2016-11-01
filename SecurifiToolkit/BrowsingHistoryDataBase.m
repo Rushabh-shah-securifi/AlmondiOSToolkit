@@ -591,9 +591,8 @@ typedef void(^myCompletion)(BOOL);
     
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
     {
-        int record = [self getCount:amac clientMac:cmac] - 500;
-        if(record > 0)
-        {
+        int record = [self getCount:amac clientMac:cmac];
+        
             NSLog(@"database path %s",dbpath);
             sqlite3_stmt *statement;
             NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB order by TIME ASC limit %d)",amac,cmac,record];
@@ -613,7 +612,6 @@ typedef void(^myCompletion)(BOOL);
             {
                 NSLog(@"%s: prepare failure: %s", __FUNCTION__, sqlite3_errmsg(database));
             }
-        }
     }
     else
     {
