@@ -1451,7 +1451,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"toolkit - CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE");
             if (self.config.enableNotifications) {
                 NotificationPreferenceResponse *res = payload;
-                [self onDeviceNotificationPreferenceChangeResponseCallback:res network:network];
+//                [self onDeviceNotificationPreferenceChangeResponseCallback:res network:network];
             }
             break;
         }
@@ -1995,10 +1995,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 #pragma mark - Notification Preference List callbacks
 
 - (void)onDeviceNotificationPreferenceChangeResponseCallback:(NotificationPreferenceResponse*)res network:(Network *)network {
-    
-    //    if (!res.isSuccessful) {
-    //        return;
-    //    }
+    //now offline preference is not needed, since we are clearing device list on offline, the control will not come here now.
     
     GenericCommand *cmd = [network.networkState expirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
     NotificationPreferences *req = cmd.command;

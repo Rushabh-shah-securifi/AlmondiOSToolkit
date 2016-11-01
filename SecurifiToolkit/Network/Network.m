@@ -462,11 +462,17 @@
             [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
+        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:kSFINotificationPreferencesListDidChange data:payload];
+            break;
+        };
         case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE data:payload];
             break;
         };
+        
         case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             //            .s
@@ -514,7 +520,6 @@
         case CommandType_ALMOND_MODE_RESPONSE:
         case CommandType_NOTIFICATION_DEREGISTRATION_RESPONSE:
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE:
-        case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:
         case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
         case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
