@@ -22,7 +22,7 @@
     [store ensureFetchNotifications:isForWifiClients]; // will callback to self (registered as delegate) to load notifications
     
     [toolkit.network.networkState clearExpirableRequest:ExpirableCommandType_deviceLogRequest namespace:almondMac];
-    
+    NSLog(@"newDeviceLogStore is called from DeviceLogsProcessing");
     return store;
 }
 

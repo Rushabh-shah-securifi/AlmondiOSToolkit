@@ -320,6 +320,7 @@
             [self postData:SENSOR_CHANGE_NOTIFIER data:payload];
             break;
         }
+
         case CommandType_USER_PROFILE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:USER_PROFILE_NOTIFIER data:payload];

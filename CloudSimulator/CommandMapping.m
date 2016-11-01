@@ -169,7 +169,6 @@
         }
         case CommandType_DEVICE_VALUE:{
             NSLog(@"CommandType_DEVICE_VALUE");
-    
             NSMutableArray *deviceValueArray = [commandObj addDeviceValues];
             //device response
             DeviceValueResponse *devicevalueresponse;

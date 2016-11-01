@@ -285,6 +285,8 @@
 		A569B8E01DBE3E8500FBD429 /* SRWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = A569B8A41DBE3E8500FBD429 /* SRWebSocket.h */; };
 		A569B8E11DBE3E8500FBD429 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */; };
 		A569B8E21DBE3E8500FBD429 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */; };
+		A5960DD21DC85522000B380C /* DeviceLogsProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */; };
+		A5960DD51DC86F0F000B380C /* NotificationPreferenceListCallbacks.m in Sources */ = {isa = PBXBuildFile; fileRef = A5960DD41DC86F0F000B380C /* NotificationPreferenceListCallbacks.m */; };
 		A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */; };
 		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
 		A5C7AE4A1C807BFA007E630D /* RouterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE481C807BFA007E630D /* RouterParser.h */; };
@@ -718,6 +720,10 @@
 		A569B8A41DBE3E8500FBD429 /* SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRWebSocket.h; sourceTree = "<group>"; };
 		A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRWebSocket.m; sourceTree = "<group>"; };
 		A569B8E31DBE414100FBD429 /* libicucore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libicucore.tbd; path = usr/lib/libicucore.tbd; sourceTree = SDKROOT; };
+		A5960DD01DC854EC000B380C /* DeviceLogsProcessing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLogsProcessing.h; sourceTree = "<group>"; };
+		A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceLogsProcessing.m; sourceTree = "<group>"; };
+		A5960DD31DC86EE3000B380C /* NotificationPreferenceListCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationPreferenceListCallbacks.h; sourceTree = "<group>"; };
+		A5960DD41DC86F0F000B380C /* NotificationPreferenceListCallbacks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationPreferenceListCallbacks.m; sourceTree = "<group>"; };
 		A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceParser.h; sourceTree = "<group>"; };
 		A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceParser.m; sourceTree = "<group>"; };
 		A5C7AE481C807BFA007E630D /* RouterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterParser.h; sourceTree = "<group>"; };
@@ -1300,6 +1306,10 @@
 		22A76D2417912B6E0099CD8F /* public */ = {
 			isa = PBXGroup;
 			children = (
+				A5960DD31DC86EE3000B380C /* NotificationPreferenceListCallbacks.h */,
+				A5960DD41DC86F0F000B380C /* NotificationPreferenceListCallbacks.m */,
+				A5960DD01DC854EC000B380C /* DeviceLogsProcessing.h */,
+				A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */,
 				A5D401131DC35A0A00D2EF6C /* NotificationAccessAndRefreshCommands.h */,
 				A5D401141DC35A8A00D2EF6C /* NotificationAccessAndRefreshCommands.m */,
 				A5D9B4F91DB4CBF800BF1F60 /* KeyChainAccess.h */,
@@ -2127,6 +2137,7 @@
 				CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */,
 				A569B8B51DBE3E8500FBD429 /* SRRunLoopThread.m in Sources */,
 				CE2EA25A19D03FB800C6D6A8 /* DeleteSecondaryUserRequest.m in Sources */,
+				A5960DD51DC86F0F000B380C /* NotificationPreferenceListCallbacks.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
 				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
 				A569B8D31DBE3E8500FBD429 /* SRURLUtilities.m in Sources */,
@@ -2139,6 +2150,7 @@
 				1DF038D75AEE3E0335A71E1F /* NotificationStoreImpl.m in Sources */,
 				CEED64301C7C351E008A7412 /* Device.m in Sources */,
 				1DF037CAB07B19208BC80642 /* AlmondModeChangeResponse.m in Sources */,
+				A5960DD21DC85522000B380C /* DeviceLogsProcessing.m in Sources */,
 				1DF03066782B488103FE1232 /* DynamicAlmondModeChange.m in Sources */,
 				1DF0329C5A1F03EC60478DC4 /* AlmondModeRequest.m in Sources */,
 				1DF03C118A1C313783C2A754 /* AlmondModeResponse.m in Sources */,

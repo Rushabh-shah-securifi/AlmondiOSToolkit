@@ -66,6 +66,7 @@
 #import "LocalNetworkManagement.h"
 #import "WebSocketEndpoint.h"
 #import "NotificationAccessAndRefreshCommands.h"
+#import "NotificationPreferenceListCallbacks.h"
 
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
@@ -403,7 +404,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
 }
 
-
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void) asyncInitNetwork {
     __weak SecurifiToolkit *block_self = self;
@@ -493,8 +493,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 -(void)removeObjectFromArray:(NSMutableArray *)array{
-    if(array!=nil && array.count>0)
-        [array removeAllObjects];
+        if(array!=nil && array.count>0){
+            NSLog(@"%@",array);
+            [array removeAllObjects];
+        }
 }
 
 // Invokes post-connection set-up and login to request updates that had been made while the connection was down
@@ -1169,7 +1171,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     GenericCommand *command = [GenericCommand new];
     command.commandType = CommandType_LOGIN_COMMAND; // use Login command type
     command.command = req;
-    
     return command;
 }
 
@@ -1254,7 +1255,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         self.network = nil;
     }
-    //[self cleanUp];
+    [self cleanUp];
 }
 
 // internal function used by high-level command dispatch methods for branching on local or cloud command queue
@@ -1429,7 +1430,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationRegistrationResponse *res = payload;
-                [self onNotificationRegistrationResponseCallback:res];
+                [NotificationPreferenceListCallbacks onNotificationRegistrationResponseCallback:res];
             }
             break;
         }
@@ -1438,7 +1439,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"toolkit - CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE");
             if (self.config.enableNotifications) {
                 NotificationPreferenceListResponse *res = payload;
-                [self onNotificationPrefListChange:res];
+                [NotificationPreferenceListCallbacks onNotificationPrefListChange:res];
             }
             break;
         }
@@ -1447,7 +1448,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"toolkit - CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE");
             if (self.config.enableNotifications) {
                 NotificationPreferenceResponse *res = payload;
-                [self onDeviceNotificationPreferenceChangeResponseCallback:res network:network];
+                [NotificationPreferenceListCallbacks onDeviceNotificationPreferenceChangeResponseCallback:res network:network];
             }
             break;
         }
@@ -1456,7 +1457,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             if (self.config.enableNotifications) {
                 NotificationListResponse *res = payload;
                 NSLog(@"CommandType_NOTIFICATIONS_SYNC_RESPONSE");
-                [self onNotificationListSyncResponse:res network:network];
+                [NotificationPreferenceListCallbacks onNotificationListSyncResponse:res network:network];
             }
             break;
         };
@@ -1464,7 +1465,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_NOTIFICATIONS_COUNT_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationCountResponse *res = payload;
-                [self onNotificationCountResponse:res];
+                [NotificationPreferenceListCallbacks onNotificationCountResponse:res];
             }
             break;
         };
@@ -1472,7 +1473,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationClearCountResponse *res = payload;
-                [self onNotificationClearCountResponse:res];
+                [NotificationPreferenceListCallbacks onNotificationClearCountResponse:res];
             }
             break;
         };
@@ -1561,7 +1562,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
             if (self.config.enableNotifications) {
                 DynamicNotificationPreferenceList *obj = payload;
-                [self onDynamicNotificationPrefListChange:obj];
+                [NotificationPreferenceListCallbacks onDynamicNotificationPrefListChange:obj];
             }
             break;
         }
@@ -1984,276 +1985,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
 }
 
-
-#pragma mark - Notification Preference List callbacks
-
-- (void)onDeviceNotificationPreferenceChangeResponseCallback:(NotificationPreferenceResponse*)res network:(Network *)network {
-    
-    GenericCommand *cmd = [network.networkState expirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
-    NotificationPreferences *req = cmd.command;
-    NSLog(@"onDeviceNotificationPreferenceChangeResponseCallback req :%@", req);
-    if (!req) {
-        return;
-    }
-    
-    NSString *almondMac = req.almondMAC;
-    NSArray *currentPrefs = [self notificationPrefList:almondMac];
-    
-    NSArray *newPrefs;
-    if ([req.action isEqualToString:kSFINotificationPreferenceChangeActionAdd]) {
-        newPrefs = [SFINotificationDevice addNotificationDevices:req.notificationDeviceList to:currentPrefs];
-    }
-    else if ([req.action isEqualToString:kSFINotificationPreferenceChangeActionDelete]) {
-        newPrefs = [SFINotificationDevice removeNotificationDevices:req.notificationDeviceList from:currentPrefs];
-    }
-    else {
-        [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
-        return;
-    }
-    [self.dataManager writeNotificationPreferenceList:newPrefs almondMac:almondMac];
-    
-    [network.networkState clearExpirableRequest:ExpirableCommandType_notificationPreferencesChangesRequest namespace:@"notification"];
-    
-    [self postNotification:kSFINotificationPreferencesListDidChange data:res];
-}
-
-- (void)onNotificationRegistrationResponseCallback:(NotificationRegistrationResponse *)obj {
-    NSString *notification;
-    switch (obj.responseType) {
-        case NotificationRegistrationResponseType_success:
-            notification = kSFIDidRegisterForNotifications;
-            break;
-        case NotificationRegistrationResponseType_alreadyRegistered:
-            notification = kSFIDidRegisterForNotifications;
-            break;
-        case NotificationRegistrationResponseType_failedToRegister:
-        default:
-            notification = kSFIDidFailToRegisterForNotifications;
-            break;
-    }
-    
-    [self postNotification:notification data:nil];
-}
-
-- (void)onNotificationDeregistrationResponseCallback:(id)sender {
-    NSNotification *notifier = (NSNotification *) sender;
-    NSDictionary *data = [notifier userInfo];
-    if (data == nil) {
-        return;
-    }
-    
-    NotificationDeleteRegistrationResponse *obj = (NotificationDeleteRegistrationResponse *) [data valueForKey:@"data"];
-    NSString *notification = obj.isSuccessful ? kSFIDidDeregisterForNotifications : kSFIDidFailToDeregisterForNotifications;
-    [self postNotification:notification data:nil];
-}
-
-- (void)onNotificationPrefListChange:(NotificationPreferenceListResponse *)res {
-    if (!res) {
-        return;
-    }
-    
-    NSString *currentMAC = res.almondMAC;
-    if (currentMAC.length == 0) {
-        return;
-    }
-    
-    if ([res.notificationDeviceList count] != 0) {
-        // Update offline storage
-        [self.dataManager writeNotificationPreferenceList:res.notificationDeviceList almondMac:currentMAC];
-        [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
-    }
-}
-
-- (void)onDynamicNotificationPrefListChange:(DynamicNotificationPreferenceList *)obj {
-    if (obj == nil) {
-        return;
-    }
-    
-    NSString *currentMAC = obj.almondMAC;
-    if (currentMAC.length == 0) {
-        return;
-    }
-    
-    // Get the email id of current user
-    NSString *loggedInUser = [self loginEmail];
-    
-    // Get the notification list of that current user from offline storage
-    NSMutableArray *notificationPrefUserList = obj.notificationUserList;
-    
-    NSArray *notificationList = obj.notificationUserList;
-    for (SFINotificationUser *currentUser in notificationPrefUserList) {
-        if ([currentUser.userID isEqualToString:loggedInUser]) {
-            notificationList = currentUser.notificationDeviceList;
-            break;
-        }
-    }
-    
-    // Update offline storage
-    [self.dataManager writeNotificationPreferenceList:notificationList almondMac:currentMAC];
-    [self postNotification:kSFINotificationPreferencesDidChange data:currentMAC];
-}
-
-- (void)onNotificationListSyncResponse:(NotificationListResponse *)res network:(Network *)network {
-    
-    if (!res) {
-        return;
-    }
-    
-    NSString *requestId = res.requestId;
-    
-    DLog(@"asyncRefreshNotifications: recevied request id:'%@'", requestId);
-    
-    // Remove the guard preventing more refresh notifications
-    if (requestId.length == 0) {
-        // note: we are only tracking "refresh" requests to prevent more than one of them to be processed at a time.
-        // these requests are not the same as "catch up" requests for older sync points that were queued for fetching
-        // but not downloaded; see internalTryProcessNotificationSyncPoints.
-        
-        [network.networkState clearExpirableRequest:ExpirableCommandType_notificationListRequest namespace:@"notification"];
-    }
-    
-    // Store the notifications and stop tracking the pageState that they were associated with
-    //
-    // As implemented, iteration will continue until a duplicate notification is detected. This procedure
-    // ensures that if the system is missing some notifications, it will catch up eventually.
-    // Notifications are delivered newest to oldest, making it likely all new ones are fetched in the first call.
-    DatabaseStore *store = self.notificationsDb;
-    
-    NSUInteger newCount = res.newCount;
-    NSLog(@"toolkit 801 new count: %d", newCount);
-    NSArray *notificationsToStore = res.notifications;
-    NSUInteger totalCount = notificationsToStore.count;
-    
-    // Set viewed state:
-    // for new notifications...
-    NSUInteger rangeEnd = newCount > totalCount ? totalCount : newCount;
-    NSRange newNotificationRange = NSMakeRange(0, rangeEnd);
-    for (SFINotification *notification in [notificationsToStore subarrayWithRange:newNotificationRange]) {
-        notification.viewed = NO;
-    }
-    // for old notifications...
-    NSUInteger rangeEnd_final = totalCount - rangeEnd;
-    NSRange oldNotificationRange = NSMakeRange(rangeEnd, rangeEnd_final);
-    for (SFINotification *notification in [notificationsToStore subarrayWithRange:oldNotificationRange]) {
-        notification.viewed = YES;
-    }
-    
-    NSInteger storedCount = [store storeNotifications:notificationsToStore syncPoint:requestId];
-    NSLog(@"storedCount == totalCount %ld == %ld ",storedCount,totalCount);
-    BOOL allStored = (storedCount == totalCount);
-    
-    if (allStored) {
-        NSLog(@"asyncRefreshNotifications: stored:%li", (long) totalCount);
-    }
-    else {
-        NSLog(@"asyncRefreshNotifications: stored partial notifications:%li of %li", (long) storedCount, (long) totalCount);
-    }
-    NSLog(@"storedCount isZero");
-    if (storedCount == 0) {
-        [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:newCount];
-        
-        // check whether there is queued work to be done
-        [self internalTryProcessNotificationSyncPoints];
-        [self postNotification:kSFINotificationDidStore data:nil];
-        // if nothing stored, then no need to tell the world
-        return;
-    }
-    NSLog(@"AllStore is zero");
-    if (!allStored) {
-        // stopped early
-        // nothing more to do
-        [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:newCount];
-        
-        // Let the world know there are new notifications
-        [self postNotification:kSFINotificationDidStore data:nil];
-        
-        // check whether there is queued work to be done
-        [self internalTryProcessNotificationSyncPoints];
-        
-        return;
-    }
-    
-    // Let the world know there are new notifications
-    [self postNotification:kSFINotificationDidStore data:nil];
-    
-    // Keep syncing until page state is no longer provided
-    if (res.isPageStateDefined) {
-        // There are more pages to fetch
-        NSString *nextPageState = res.pageState;
-        // Guard against bug in Cloud sending back same page state, causing us to go into infinite loop
-        // requesting the same page over and over.
-        BOOL alreadyTracked = [store isTrackedSyncPoint:nextPageState];
-        if (alreadyTracked) {
-            // remove the state and halt further processing
-            [store removeSyncPoint:nextPageState];
-        }
-        else {
-            // Keep track of this page state until the response has been processed
-            [store trackSyncPoint:nextPageState];
-            
-            // and try to download it now
-            [NotificationAccessAndRefreshCommands internalAsyncFetchNotifications:nextPageState];
-        }
-    }
-    else {
-        [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:newCount];
-        
-        // check whether there is queued work to be done
-        [self internalTryProcessNotificationSyncPoints];
-    }
-}
-
-// Check whether there are page states in the data store that need to be fetched.
-// This could happen when the app is halted or connections break before a previous
-// run completed fetching all pages.
-- (void)internalTryProcessNotificationSyncPoints {
-    DatabaseStore *store = self.notificationsDb;
-    
-    NSInteger count = store.countTrackedSyncPoints;
-    
-    if (count == 0) {
-        return;
-    }
-    
-    DLog(@"internalTryProcessNotificationSyncPoints: queued sync points: %li", (long) count);
-    
-    NSString *nextPageState = [store nextTrackedSyncPoint];
-    if (nextPageState.length > 0) {
-        DLog(@"internalTryProcessNotificationSyncPoints: fetching sync point: %@", nextPageState);
-        [NotificationAccessAndRefreshCommands internalAsyncFetchNotifications:nextPageState];
-    }
-}
-
-- (void)onNotificationCountResponse:(NotificationCountResponse *)res {
-    
-    if (!res) {
-        return;
-    }
-    
-    if (res.error) {
-        return;
-    }
-    
-    // Store the notifications and stop tracking the pageState that they were associated with
-    [NotificationAccessAndRefreshCommands setNotificationsBadgeCount:res.badgeCount];
-    
-    if (res.badgeCount > 0) {
-        [NotificationAccessAndRefreshCommands tryRefreshNotifications];
-    }
-    
-}
-
-- (void)onNotificationClearCountResponse:(NotificationClearCountResponse*)res {
-    if (!res) {
-        return;
-    }
-    if (res.error) {
-        
-    }
-    else {
-        DLog(@"onNotificationClearCountResponse: success");
-    }
-}
 
 #pragma mark - Almond Mode change callbacks
 
