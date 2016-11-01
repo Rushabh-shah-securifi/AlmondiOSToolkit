@@ -486,10 +486,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
 //}
 
 -(void)cleanUp{
-    [self removeObjectFromArray:self.devices];
-    [self removeObjectFromArray:self.scenesArray];
-    [self removeObjectFromArray:self.clients];
-    [self removeObjectFromArray:self.ruleList];
+    if(self.devices!=nil && self.devices.count>0)
+        [self.devices removeAllObjects];
+     if(self.scenesArray!=nil && self.scenesArray.count>0)
+        [self.scenesArray removeAllObjects];
+     if(self.clients!=nil && self.clients.count>0)
+        [self.clients removeAllObjects];
+     if(self.ruleList!=nil && self.ruleList.count>0)
+        [self.ruleList removeAllObjects];
 }
 
 -(void)removeObjectFromArray:(NSMutableArray *)array{
