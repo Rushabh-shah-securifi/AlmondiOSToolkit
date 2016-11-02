@@ -12,7 +12,7 @@
 
 //+(DBManager*)getSharedInstance;
 + (void)initializeDataBase;
-+(NSMutableDictionary *)insertAndGetHistoryRecord:(NSDictionary *)hDict readlimit:(int)limit amac:(NSString *)amac cmac:(NSString *)camc;
++(NSArray *)insertAndGetHistoryRecord:(NSDictionary *)hDict readlimit:(int)limit amac:(NSString *)amac cmac:(NSString *)camc;
 
 + (NSDictionary *)getAllBrowsingHistorywithLimit:(int)limit almonsMac:(NSString *)amac clientMac:(NSString *)cmac;
 

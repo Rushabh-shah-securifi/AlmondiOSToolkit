@@ -8,11 +8,11 @@
 
 
 typedef NS_ENUM(NSInteger, ConnectionStatusType){
-    NO_NETWORK_CONNECTION,
+    NO_NETWORK_CONNECTION = 0,
     IS_CONNECTING_TO_NETWORK,
     CONNECTED_TO_NETWORK,
     AUTHENTICATED,
-    DISCONNECTING_NETWORK,
+    DISCONNECTING_NETWORK
 };
 
 @interface ConnectionStatus : NSObject

@@ -21,7 +21,7 @@
 + (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network;
 + (void)onDynamicAlmondListAdd:(AlmondListResponse *)obj;
 + (void)onDynamicAlmondListDelete:(AlmondListResponse *)obj network:(Network *)network;
-+ (void)onDynamicAlmondNameChange:(NSData *)data;
++ (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)data;
 + (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage;
 
 @end

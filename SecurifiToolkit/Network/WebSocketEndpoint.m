@@ -134,7 +134,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
     }
     
     [self.delegate networkEndpointDidConnect:self];
-    
+    [toolkit asyncSendToNetwork:[GenericCommand websocketAlmondNameAndMac]];
 //    SFIAlmondPlus *plus = [toolkit currentAlmond];
 //    [toolkit asyncSendToNetwork:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] ];
 //    [toolkit asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];

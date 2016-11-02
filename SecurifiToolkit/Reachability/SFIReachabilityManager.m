@@ -25,6 +25,7 @@ NSString *const kSFIReachabilityChangedNotification = @"kReachabilityChangedNoti
 - (instancetype)initWithHost:(NSString*)host {
     self = [super init];
     if (self) {
+        host = @"www.google.com";
         _reachability = [Reachability reachabilityWithHostname:host];
 
         // Start Monitoring
@@ -49,6 +50,7 @@ NSString *const kSFIReachabilityChangedNotification = @"kReachabilityChangedNoti
 }
 
 - (BOOL)isReachable {
+   
     return self.reachability.isReachable;
 }
 

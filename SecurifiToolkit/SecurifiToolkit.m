@@ -349,7 +349,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return (int) [KeyChainAccess secMinsRemainingForUnactivatedAccount];
 }
 
-- (enum SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(enum ConnectionStatusType)status {
+- (SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(ConnectionStatusType)status {
     
     switch (status) {
         case (ConnectionStatusType)NO_NETWORK_CONNECTION:
@@ -469,10 +469,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 -(void)cleanUp{
-    [self removeObjectFromArray:self.devices];
-    [self removeObjectFromArray:self.scenesArray];
-    [self removeObjectFromArray:self.clients];
-    [self removeObjectFromArray:self.ruleList];
+    if(self.devices!=nil && self.devices.count>0)
+        [self.devices removeAllObjects];
+     if(self.scenesArray!=nil && self.scenesArray.count>0)
+        [self.scenesArray removeAllObjects];
+     if(self.clients!=nil && self.clients.count>0)
+        [self.clients removeAllObjects];
+     if(self.ruleList!=nil && self.ruleList.count>0)
+        [self.ruleList removeAllObjects];
 }
 
 -(void)removeObjectFromArray:(NSMutableArray *)array{
@@ -1138,7 +1142,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         break;
         case SFIAlmondConnectionMode_local:{
             SFIAlmondPlus* almond = self.currentAlmond;
-            NSLog(@"Entering the local mode");
+            NSLog(@"Entering the local mode %@",almond.almondplusMAC);
             [self tearDownNetwork];
             
             SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
@@ -1356,6 +1360,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             if (self.config.enableNotifications) {
                 NotificationPreferenceResponse *res = payload;
                 [NotificationPreferenceListCallbacks onDeviceNotificationPreferenceChangeResponseCallback:res network:network];
+
             }
             break;
         }
@@ -1412,18 +1417,20 @@ static SecurifiToolkit *toolkit_singleton = nil;
             
             NSString *mac_hex = dict[@"MAC"];
             NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
-            
+            NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE %@ mac is %@",[self currentAlmond].almondplusMAC, mac);
             SFIAlmondPlus *current = [self currentAlmond];
-            if ([current.almondplusMAC isEqualToString:mac]) {
+            //if ([current.almondplusMAC isEqualToString:mac]) {
+                NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Inside CurrentAlmond equals %@",current.almondplusName);
                 if ([current.almondplusName isEqualToString:name]) {
+                    NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Returning %@",current.almondplusName);
                     return; // name is the same
                 }
                 DynamicAlmondNameChangeResponse *res = DynamicAlmondNameChangeResponse.new;
-                res.almondplusMAC = mac;
+                res.almondplusMAC = current.almondplusMAC;
                 res.almondplusName = name;
                 
                 [AlmondListManagement onDynamicAlmondNameChange:res];
-            }
+            //}
             
             break;
         }

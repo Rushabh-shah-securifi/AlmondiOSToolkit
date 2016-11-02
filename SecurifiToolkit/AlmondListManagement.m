@@ -75,37 +75,35 @@
     
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
-    [toolKit.devices removeAllObjects];
-    [toolKit.clients removeAllObjects];
-    [toolKit.scenesArray removeAllObjects];
-    [toolKit.ruleList removeAllObjects];
+//    [toolKit.devices removeAllObjects];
+//    [toolKit.clients removeAllObjects];
+//    [toolKit.scenesArray removeAllObjects];
+//    [toolKit.ruleList removeAllObjects];
     [toolKit postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
-+ (void)onDynamicAlmondNameChange:(NSData *)data {
-    if (data == nil) {
-        return;
-    }
++ (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)obj {
+   
     SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
-    NSError * error = nil;
-    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    NSString *almondName = [dictionary valueForKey:@"AlmondPlusName"];
-    
+    NSString *almondName = obj.almondplusName;
     if (almondName.length == 0) {
         return;
     }
-    
-    SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:[dictionary valueForKey:@"AlmondPlusMAC"]];
+    NSLog(@"Came here onDynamicAlmondNameChange %@",almondName);
+    SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
-        NSLog(@"the name of the almond is changed");
         SFIAlmondPlus *current = [toolKit currentAlmond];
+        NSLog(@"Came here onDynamicAlmondNameChange inside changed %@",almondName);
         if ([current isEqualAlmondPlus:changed]) {
             changed.colorCodeIndex = current.colorCodeIndex;
-            [[SecurifiToolkit sharedInstance] setCurrentAlmond:changed];
+            //[toolKit currentAlmond].almondplusName=almondName;
+            NSLog(@"Came here after settings %@",[toolKit currentAlmond].almondplusName);
+            [toolKit writeCurrentAlmond:changed];
+            //[self setCurrentAlmond:changed];
         }
         
         // Tell the world so they can update their view
-        [toolKit postNotification:kSFIDidChangeAlmondName data:data];
+        [toolKit postNotification:kSFIDidChangeAlmondName data:obj];
     }
 }
 
@@ -126,6 +124,9 @@
         [toolKit purgeStoredData];
         return nil;
     }
+    
+    
+    
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {

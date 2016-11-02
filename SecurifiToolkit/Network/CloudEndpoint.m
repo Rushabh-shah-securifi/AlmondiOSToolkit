@@ -254,7 +254,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             CommandType commandType = (CommandType) commandType_raw;
                             id responsePayload = nil;
                             BOOL parsedPayload = NO;
-                            NSLog(@"cloudendpoint response: %d", commandType);
                             if (!securifi_valid_command_type(commandType)) {
                                 NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@",
                                       commandType, [[NSString alloc] initWithData:dataBuffer encoding:NSUTF8StringEncoding]);
@@ -273,7 +272,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                 }
                                 
                                 NSString *response = [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding];
-                                NSLog(@"Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                NSLog(@"CommandType: %d \nCloud receive:  %@", commandType, [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                 
                                 switch (commandType) {
                                         // these are the only command responses so far that uses a JSON payload; we special case them for now
@@ -339,7 +338,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     //                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     
                                     CommandParser *parser = [CommandParser new];
-                                    NSLog(@"xml Cloud receive:  %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
+                                    NSLog(@"CommandType: %d \nCloud receive:  %@", commandType, [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
                                     responsePayload = temp.command;
                                     

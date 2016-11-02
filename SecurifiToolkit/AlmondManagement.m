@@ -52,7 +52,7 @@
         [toolKit tryShutdownAndStartNetworks:toolKit.currentConnectionMode];
         return;
     }
-    
+    [toolKit cleanUp];
     NSArray *devices = [self deviceList:mac];
     if (devices.count == 0) {
         DLog(@"%s: devices empty: requesting device list for current almond: %@", __PRETTY_FUNCTION__, mac);

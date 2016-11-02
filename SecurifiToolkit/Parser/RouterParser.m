@@ -57,26 +57,26 @@
     SFIGenericRouterCommand *genericRouterCommand;
     NSString *commandType = payload[@"CommandType"];
     if([commandType isEqualToString:@"RouterSummary"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY payload:payload];
         
     }else if([commandType isEqualToString:@"GetWirelessSettings"]){
         genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:payload[@"CountryRegion"]]
-                                                    commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+                                                    commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS payload:payload];
     }
     else if([commandType isEqualToString:@"SetWirelessSettings"]){
         genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:@"CountryRegion"]
-                                                    commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+                                                    commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS payload:payload];
     }
 
     else if([commandType isEqualToString:@"FirmwareUpdate"]){
         genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:@"CountryRegion"]
-                                                    commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE success:(payload[@"Success"] == nil)? true: [payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:[payload[@"Percentage"] intValue] reason:payload[@"Reason"]];
+                                                    commandType:SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE payload:payload];
     }
     else if([commandType isEqualToString:@"RebootRouter"]){
-        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_REBOOT success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue ] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_REBOOT payload:payload];
     }
     else if([commandType isEqualToString:@"SendLogs"]){
-        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_SEND_LOGS_RESPONSE success:[payload[@"Success"] boolValue] Mac:payload[@"AlmondMAC"] mii:[payload[@"MobileInternalIndex"] intValue] completionPercentage:0 reason:payload[@"Reason"]];
+        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_SEND_LOGS_RESPONSE payload:payload];
     }
     
     NSDictionary *data = nil;
@@ -89,15 +89,17 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER object:nil userInfo:data];
 }
 
-+(SFIGenericRouterCommand*)createGenericRouterCommand:(id)command commandType:(SFIGenericRouterCommandType)type success:(BOOL)success Mac:(NSString*)Mac mii:(int)mii completionPercentage:(unsigned int)completionPercentage reason:(NSString*)reason{
++(SFIGenericRouterCommand*)createGenericRouterCommand:(id)command commandType:(SFIGenericRouterCommandType)type payload:(NSDictionary *)payload{
     SFIGenericRouterCommand *genericRouterCommand = [SFIGenericRouterCommand new];
     genericRouterCommand.command = command;
     genericRouterCommand.commandType = type;
-    genericRouterCommand.commandSuccess = success;
-    genericRouterCommand.almondMAC = Mac;
-    genericRouterCommand.mii = mii;
-    genericRouterCommand.completionPercentage = completionPercentage;
-    genericRouterCommand.responseMessage = reason;
+    genericRouterCommand.commandSuccess = payload[@"Success"]? [payload[@"Success"] boolValue]:YES;
+    genericRouterCommand.mii = [payload[@"MobileInternalIndex"] intValue];
+    genericRouterCommand.responseMessage = payload[@"Reason"];
+    
+    genericRouterCommand.almondMAC = payload[@"AlmondMAC"];
+    genericRouterCommand.completionPercentage = payload[@"Percentage"]? [payload[@"Percentage"] intValue]: 0;
+    genericRouterCommand.uptime = payload[@"Uptime"]?: 0;
     NSLog(@"generic command response msg: %@", genericRouterCommand.responseMessage);
     return  genericRouterCommand;
 }
@@ -114,10 +116,9 @@
     routerSummary.wirelessSummaries = [self parseWirelessSettingsSummary:payload[@"WirelessSetting"]];
     routerSummary.almondsList = [self getAlmondsList:payload];
     if(payload[@"RouterMode"]!=NULL){
-    routerSummary.routerMode = payload[@"RouterMode"];
-    [SecurifiToolkit sharedInstance].routerMode = payload[@"RouterMode"];
-    NSLog(@"router mode = %@",[SecurifiToolkit sharedInstance].routerMode);
-        
+        routerSummary.routerMode = payload[@"RouterMode"];
+        [SecurifiToolkit sharedInstance].routerMode = payload[@"RouterMode"];
+        NSLog(@"router mode = %@",[SecurifiToolkit sharedInstance].routerMode);
     }
     return routerSummary;
 }
@@ -149,6 +150,7 @@
         wirelessSettings.type = payload[@"Type"];
         wirelessSettings.enabled = [payload[@"Enabled"] boolValue];
         wirelessSettings.ssid = payload[@"SSID"];
+        wirelessSettings.password = payload[@"Password"];
         wirelessSettings.channel = [payload[@"Channel"] intValue];
         wirelessSettings.security = payload[@"Security"];
         wirelessSettings.encryptionType = payload[@"EncryptionType"];
