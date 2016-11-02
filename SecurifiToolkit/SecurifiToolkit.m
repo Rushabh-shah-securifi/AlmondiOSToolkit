@@ -87,8 +87,6 @@ NSString *const kSFIDidChangeAlmondName = @"kSFIDidChangeAlmondName";
 NSString *const kSFIDidCompleteAlmondModeChangeRequest = @"kSFIDidCompleteAlmondChangeRequest";
 NSString *const kSFIAlmondModeDidChange = @"kSFIAlmondModeDidChange";
 NSString *const kSFIDidReceiveGenericAlmondRouterResponse = @"kSFIDidReceiveGenericAlmondRouterResponse";
-NSString *const kSFIDidChangeDeviceList = @"kSFIDidChangeDeviceData";
-NSString *const kSFIDidChangeDeviceValueList = @"kSFIDidChangeDeviceValueList";
 NSString *const kSFIDidCompleteMobileCommandRequest = @"kSFIDidCompleteMobileCommandRequest";
 NSString *const kSFIDidRegisterForNotifications = @"kSFIDidRegisterForNotifications";
 NSString *const kSFIDidFailToRegisterForNotifications = @"kSFIDidFailToRegisterForNotifications";
@@ -470,21 +468,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     _config = configurator.copy;
 }
 
-// Invokes post-connection set-up and login to request updates that had been made while the connection was down
-//- (void)asyncInitializeConnection1:(Network *)network {
-//    // After successful login, refresh the Almond list and hash values.
-//    // This routine is important because the UI will listen for outcomes to these requests.
-//    // Specifically, the event kSFIDidUpdateAlmondList.
-//
-//    __weak SecurifiToolkit *block_self = self;
-////    dispatch_async(self.commandDispatchQueue, ^() {
-//        DLog(@"%s: requesting almond list", __PRETTY_FUNCTION__);
-//        GenericCommand *cmd = [block_self makeAlmondListCommand];
-//        NSLog(@"almond list command send1");
-//        [network submitCommand:cmd];
-////    });
-//}
-
 -(void)cleanUp{
     [self removeObjectFromArray:self.devices];
     [self removeObjectFromArray:self.scenesArray];
@@ -493,8 +476,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 -(void)removeObjectFromArray:(NSMutableArray *)array{
-        if(array!=nil && array.count>0){
-            NSLog(@"%@",array);
+        array = nil;
+        if(array==nil ){
+            NSLog(@"i am not crashing");
             [array removeAllObjects];
         }
 }
@@ -773,48 +757,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (NSArray *)notificationPrefList:(NSString *)almondMac {
     return [self.dataManager readNotificationPreferenceList:almondMac];
 }
-
-#pragma mark - Device and Device Value Management
-
-- (void)asyncRequestDeviceList:(NSString *)almondMac {
-    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
-        NetworkState *state = aNetwork.networkState;
-        if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
-            return NO;
-        }
-        
-        [state markWillFetchDeviceListForAlmond:almondMac];
-        return YES;
-    };
-    
-    BOOL local = [self useLocalNetwork:almondMac];
-}
-
-- (void)asyncRequestDeviceValueList:(NSString *)almondMac {
-    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
-        [aNetwork.networkState markDeviceValuesFetchedForAlmond:almondMac];
-        return YES;
-    };
-    
-    BOOL local = [self useLocalNetwork:almondMac];
-}
-
-- (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
-    BOOL local = [self useLocalNetwork:almondMac];
-    NSLog(@"i am called");
-    Network *network = local ? [self setUpNetwork] : self.network;;
-    
-    NetworkState *state = network.networkState;
-    if ([state wasDeviceValuesFetchedForAlmond:almondMac]) {
-        return NO;
-    }
-    [state markDeviceValuesFetchedForAlmond:almondMac];
-    
-    [self asyncRequestDeviceValueList:almondMac];
-    
-    return YES;
-}
-
 
 #pragma mark - Sending Commands to Network
 - (void)asyncSendLogout {
@@ -1181,17 +1123,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return command;
 }
 
-- (GenericCommand *)makeDeviceHashCommand:(NSString *)almondMac {
-    DeviceDataHashRequest *req = [DeviceDataHashRequest new];
-    req.almondMAC = almondMac;
-    
-    GenericCommand *command = [GenericCommand new];
-    command.commandType = CommandType_DEVICE_DATA_HASH;
-    command.command = req;
-    
-    return command;
-}
-
 
 #pragma mark - Network management
 -(Network *)setUpNetwork{
@@ -1377,31 +1308,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [AlmondListManagement onAlmondListResponse:res network:network];
             break;
         }
-            
-        case CommandType_DEVICE_DATA_HASH_RESPONSE: {
-            DeviceDataHashResponse *res = payload;
-            [self onDeviceHashResponse:res];
-            break;
-        }
-            
-        case CommandType_DEVICE_DATA_RESPONSE: {
-            DeviceListResponse *res = payload;
-            [self onDeviceListResponse:res network:network];
-            break;
-        }
-            
-        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE: {
-            DeviceListResponse *res = payload;
-            [self onDeviceListAndValuesResponse:res network:network];
-            break;
-        }
-            
-        case CommandType_DEVICE_VALUE_LIST_RESPONSE: {
-            DeviceValueResponse *res = payload;
-            [self onDeviceValueListChange:res];
-            break;
-        }
-            
+        
         case CommandType_GENERIC_COMMAND_RESPONSE: {
             GenericCommandResponse *res = payload;
             [self onAlmondRouterGenericCommandResponse:res network:network];
@@ -1534,16 +1441,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     switch (commandType) {
-        case CommandType_DYNAMIC_DEVICE_DATA: {
-            DeviceListResponse *obj = payload;
-            [self onDynamicDeviceListChange:obj network:network];
-            break;
-        }
-        case CommandType_DYNAMIC_DEVICE_VALUE_LIST: {
-            DeviceValueResponse *obj = payload;
-            [self onDynamicDeviceValueListChange:obj];
-            break;
-        }
         case CommandType_DYNAMIC_ALMOND_ADD: {
             AlmondListResponse *obj = payload;
             [AlmondListManagement onDynamicAlmondListAdd:obj];
@@ -1661,330 +1558,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     [self postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
 }
-
-#pragma mark - Device List Update callbacks
-
-- (void)onDeviceHashResponse:(DeviceDataHashResponse*)res {
-    
-    
-    if (!res) {
-        return;
-    }
-    
-    NSString *reportedHash = res.almondHash;
-    if (!res.isSuccessful) {
-        // We assume, on failure, the Almond is no longer associated with this account and
-        // our list of Almonds is out of date. Therefore, issue a request for the Almond list.
-        
-        
-        SFIAlmondPlus *currentAlmond = [self currentAlmond];
-        if (currentAlmond.linkType == SFIAlmondPlusLinkType_cloud_local) {
-            [AlmondManagement removeCurrentAlmond];
-            
-            GenericCommand *cmd = [self makeAlmondListCommand];
-            [self asyncSendToNetwork:cmd];
-        }
-        
-        return;
-    }
-    
-    SFIAlmondPlus *currentAlmond = [self currentAlmond];
-    if (currentAlmond == nil) {
-        return;
-    }
-    
-    NSString *currentMac = currentAlmond.almondplusMAC;
-    NSString *storedHash = [self.dataManager readHashList:currentMac];
-    
-    if (reportedHash.length == 0 || [reportedHash isEqualToString:@"null"]) {
-        //Hash sent by cloud as null - No Device
-        
-        [self asyncRequestDeviceList:currentMac];
-    }
-    else if (storedHash.length > 0 && currentMac.length > 0 && [storedHash isEqualToString:reportedHash]) {
-        // Devices list is fresh. Update the device values.
-        
-        [self tryRequestDeviceValueList:currentMac];
-    }
-    else {
-        //Save hash in file for each almond
-        [self.dataManager writeHashList:reportedHash almondMac:currentMac];
-        // and update the device list -- on receipt of the device list, then the values will be updated
-        [self asyncRequestDeviceList:currentMac];
-    }
-}
-
-- (void)onDynamicDeviceListChange:(DeviceListResponse *)obj network:(Network *)network {
-    
-    if (!obj) {
-        return;
-    }
-    
-    [network.networkState clearWillFetchDeviceListForAlmond:obj.almondMAC];
-    
-    if (!obj.isSuccessful) {
-        return;
-    }
-    
-    NSString *almondMAC = obj.almondMAC;
-    NSMutableArray *newDeviceList = obj.deviceList;
-    
-    [self processDeviceListChange:newDeviceList mac:almondMAC requestValues:YES partialList:NO];
-    [self postNotification:kSFIDidChangeDeviceList data:almondMAC];
-}
-
-- (void)onDeviceListResponse:(DeviceListResponse*)res network:(Network*)network {
-    
-    if (!res) {
-        return;
-    }
-    
-    NSString *mac = res.almondMAC;
-    [network.networkState clearWillFetchDeviceListForAlmond:mac];
-    
-    if (!res.isSuccessful) {
-        
-        return;
-    }
-    
-    NSArray *newDevices = res.deviceList;
-    
-    // values not included in response, so request them
-    BOOL requestValues = (res.deviceValueList == nil);
-    [self processDeviceListChange:newDevices mac:mac requestValues:requestValues partialList:NO];
-    [self postNotification:kSFIDidChangeDeviceList data:mac];
-}
-
-
-- (void)storeDeviceAndDeviceValueList:(NSArray*)deviceList deviceValueList:(NSArray*)deviceValueList mac:mac{
-    
-    [self.dataManager writeDeviceList:deviceList almondMac:mac];
-    [self.dataManager writeDeviceValueList:deviceValueList almondMac:mac];
-    
-}
-
-- (void)onDeviceListAndValuesResponse:(DeviceListResponse *)res network:(Network *)network {
-
-    if (!res) {
-        return;
-    }
-    
-    NSString *mac = res.almondMAC;
-    [network.networkState clearWillFetchDeviceListForAlmond:mac];
-    
-    if (!res.isSuccessful) {
-        return;
-    }
-    
-    const BOOL partialList = res.updatedDevicesOnly;
-    
-    switch (res.type) {
-        case DeviceListResponseType_deviceList: {
-            [self storeDeviceAndDeviceValueList:res.deviceList deviceValueList:res.deviceValueList mac:mac];
-            [self postNotification:kSFIDidChangeDeviceValueList data:mac];
-            break;
-        }
-        case DeviceListResponseType_updated: {
-            NSArray *deviceList = res.deviceList;
-            NSArray *valueList = res.deviceValueList;
-            
-            if (valueList) {
-                [self processDeviceListChange:deviceList mac:mac requestValues:NO partialList:partialList];
-                [self processDeviceValueList:valueList mac:mac];
-                [self postNotification:kSFIDidChangeDeviceList data:mac];
-            }
-            else {
-                // values not included in response, so request them
-                [self processDeviceListChange:deviceList mac:mac requestValues:YES partialList:partialList];
-                [self postNotification:kSFIDidChangeDeviceList data:mac];
-            }
-            
-            break;
-        };
-            
-        case DeviceListResponseType_added: {
-            NSArray *current = [self.dataManager readDeviceList:mac];
-            for (SFIDevice *device in res.deviceList) {
-                current = [SFIDevice addDevice:device list:current];
-            }
-            
-            [self processDeviceListChange:current mac:mac requestValues:YES partialList:NO];
-            [self postNotification:kSFIDidChangeDeviceList data:mac];
-            
-            break;
-        };
-        case DeviceListResponseType_websocket_added: {
-            NSArray *currentDeviceList = [self.dataManager readDeviceList:mac];
-            NSArray *currentValueList = [self.dataManager readDeviceValueList:mac];
-            
-            for (SFIDevice *device in res.deviceList) {
-                currentDeviceList = [SFIDevice addDevice:device list:currentDeviceList];
-            }
-            NSMutableArray *newDeviceValueList = [NSMutableArray arrayWithArray:currentValueList];
-            for (SFIDeviceValue *currentCloudValue in res.deviceValueList) {
-                [newDeviceValueList addObject:currentCloudValue];
-            }
-            [self processDeviceListChange:currentDeviceList mac:mac requestValues:YES partialList:NO];
-            [self.dataManager writeDeviceValueList:newDeviceValueList almondMac:mac];
-            [self postNotification:kSFIDidChangeDeviceList data:mac];
-            
-            break;
-        };
-        case DeviceListResponseType_removed: {
-            
-            NSArray *currentDeviceList = [self.dataManager readDeviceList:mac];
-            NSArray *currentValueList = [self.dataManager readDeviceValueList:mac];
-            
-            SFIDevice *deviceToBeRemoved=[res.deviceList objectAtIndex:0];
-            
-            currentDeviceList = [SFIDevice removeDevice:deviceToBeRemoved list:currentDeviceList];
-            currentValueList = [SFIDeviceValue removeDeviceValue:deviceToBeRemoved.deviceID list:currentValueList];
-            
-            [self.dataManager writeDeviceList:currentDeviceList almondMac:mac];
-            [self.dataManager writeDeviceValueList:currentValueList almondMac:mac];
-            [self postNotification:kSFIDidChangeDeviceList data:mac];
-            
-            break;
-        };
-        case DeviceListResponseType_removed_all: {
-            [self.dataManager removeAllDevices:mac];
-            [self postNotification:kSFIDidChangeDeviceList data:mac];
-            break;
-        }
-    }
-}
-
-// Processes device lists received in dynamic and on-demand updates.
-// After storing the new list, a notification is posted and an updated values list is requested
-- (void)processDeviceListChange:(NSArray *)changedDevices mac:(NSString *)mac requestValues:(BOOL)requestValues partialList:(BOOL)partialList {
-    if (partialList) {
-        // mix in the devices with the new ones
-        NSArray *devices = [self.dataManager readDeviceList:mac];
-        
-        if (devices) {
-            NSMutableArray *new_list = [NSMutableArray array];
-            for (SFIDevice *device in devices) {
-                BOOL foundDevice = NO;
-                
-                for (SFIDevice *newDevice in changedDevices) {
-                    if (device.deviceID == newDevice.deviceID) {
-                        // then update
-                        foundDevice = YES;
-                        [new_list addObject:newDevice];
-                        break;
-                    }
-                }
-                
-                if (!foundDevice) {
-                    [new_list addObject:device];
-                }
-            }
-            
-            changedDevices = new_list;
-        }
-    }
-    
-    [self.dataManager writeDeviceList:changedDevices almondMac:mac];
-    
-    if (requestValues) {
-        // Request values for devices
-        [self asyncRequestDeviceValueList:mac];
-    }
-}
-
-#pragma mark - Device Value Update callbacks
-
-- (void)onDynamicDeviceValueListChange:(DeviceValueResponse *)obj {
-    if (obj == nil) {
-        return;
-    }
-    
-    NSString *almondMac = obj.almondMAC;
-    
-    [self processDeviceValueList:obj.deviceValueList mac:almondMac];
-}
-
-- (void)onDeviceValueListChange:(DeviceValueResponse *)obj {
-    if (!obj) {
-        return;
-    }
-    
-    NSString *almondMac = obj.almondMAC;
-    if (almondMac.length == 0) {
-        return;
-    }
-    
-    // Update offline storage
-    [self.dataManager writeDeviceValueList:obj.deviceValueList almondMac:almondMac];
-    
-    [self postNotification:kSFIDidChangeDeviceValueList data:almondMac];
-}
-
-// Processes a dynamic change to a device value
-- (void)processDeviceValueList:(NSArray *)newDeviceValues mac:(NSString *)currentMAC {
-    
-    if (currentMAC.length == 0) {
-        return;
-    }
-    
-    NSArray *currentDeviceValueList = [self.dataManager readDeviceValueList:currentMAC];
-    
-    NSMutableArray *newDeviceValueList;
-    if (currentDeviceValueList != nil) {
-        for (SFIDeviceValue *currentValue in currentDeviceValueList) {
-            for (SFIDeviceValue *cloudValue in newDeviceValues) {
-                if (currentValue.deviceID == cloudValue.deviceID) {
-                    cloudValue.isPresent = YES;
-                    
-                    NSArray *currentValues = [currentValue knownDevicesValues];
-                    NSArray *cloudValues = [cloudValue knownDevicesValues];
-                    
-                    for (SFIDeviceKnownValues *currentMobileKnownValue in currentValues) {
-                        for (SFIDeviceKnownValues *currentCloudKnownValue in cloudValues) {
-                            if (currentMobileKnownValue.index == currentCloudKnownValue.index) {
-                                currentMobileKnownValue.value = currentCloudKnownValue.value;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    [currentValue replaceKnownDeviceValues:currentValues];
-                }
-            }
-        }
-        
-        newDeviceValueList = [NSMutableArray arrayWithArray:currentDeviceValueList];
-        
-        // Traverse the list and add the new value to offline list
-        // If there are new values without corresponding devices, we know to request the device list.
-        BOOL isDeviceMissing = NO;
-        if (newDeviceValues.count > 0 && currentDeviceValueList.count == 0) {
-            isDeviceMissing = YES;
-        }
-        else {
-            for (SFIDeviceValue *currentCloudValue in newDeviceValues) {
-                if (!currentCloudValue.isPresent) {
-                    [newDeviceValueList addObject:currentCloudValue];
-                    isDeviceMissing = YES;
-                }
-            }
-        }
-        
-        if (isDeviceMissing) {
-            GenericCommand *command = [self makeDeviceHashCommand:currentMAC];
-            [self asyncSendToNetwork:command];
-        }
-        
-        // replace the list given to us with the combined new list
-        newDeviceValues = newDeviceValueList;
-    }
-    
-    // Update offline storage
-    [self.dataManager writeDeviceValueList:newDeviceValues almondMac:currentMAC];
-    
-    [self postNotification:kSFIDidChangeDeviceValueList data:currentMAC];
-}
-
 
 #pragma mark - Almond Mode change callbacks
 

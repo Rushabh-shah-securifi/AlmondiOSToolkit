@@ -43,18 +43,6 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"ALMOND_LIST_%d", type];
         case CommandType_ALMOND_LIST_RESPONSE:
             return [NSString stringWithFormat:@"ALMOND_LIST_RESPONSE_%d", type];
-        case CommandType_DEVICE_DATA_HASH:
-            return [NSString stringWithFormat:@"DEVICE_DATA_HASH_%d", type];
-        case CommandType_DEVICE_DATA_HASH_RESPONSE:
-            return [NSString stringWithFormat:@"DEVICE_DATA_HASH_RESPONSE_%d", type];
-        case CommandType_DEVICE_DATA:
-            return [NSString stringWithFormat:@"DEVICE_DATA_%d", type];
-        case CommandType_DEVICE_DATA_RESPONSE:
-            return [NSString stringWithFormat:@"DEVICE_DATA_RESPONSE_%d", type];
-        case CommandType_DEVICE_VALUE:
-            return [NSString stringWithFormat:@"DEVICE_VALUE_%d", type];
-        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
-            return [NSString stringWithFormat:@"DEVICE_VALUE_LIST_RESPONSE_%d", type];
         case CommandType_MOBILE_COMMAND:
             return [NSString stringWithFormat:@"MOBILE_COMMAND_%d", type];
         case CommandType_MOBILE_COMMAND_RESPONSE:
@@ -177,9 +165,6 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"NOTIFICATIONS_CLEAR_COUNT_REQUEST_%d", type];
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
             return [NSString stringWithFormat:@"NOTIFICATIONS_CLEAR_COUNT_RESPONSE_%d", type];
-            
-        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE:
-            return [NSString stringWithFormat:@"DEVICE_LIST_AND_VALUES_RESPONSE_%d", type];
         case CommandType_ALMOND_COMMAND_RESPONSE:
             return [NSString stringWithFormat:@"ALMOND_COMMAND_RESPONSE_%d", type];
         case CommandType_ALMOND_NAME_AND_MAC_REQUEST:
@@ -224,7 +209,6 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE_%d", type];
         case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
             return [NSString stringWithFormat:@"DYNAMIC_WIFI_CLIENT_REMOVED_ALL_%d", type];
-
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
             return [NSString stringWithFormat:@"DEVICE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
         case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
@@ -263,13 +247,6 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_AFFILIATION_USER_COMPLETE:
         case CommandType_ALMOND_LIST:
         case CommandType_ALMOND_LIST_RESPONSE:
-        case CommandType_DEVICE_DATA_HASH:
-        case CommandType_DEVICE_DATA_HASH_RESPONSE:
-        case CommandType_DEVICE_DATA:
-        case CommandType_DEVICE_DATA_RESPONSE:
-        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE:
-        case CommandType_DEVICE_VALUE:
-        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
         case CommandType_MOBILE_COMMAND:
         case CommandType_MOBILE_COMMAND_RESPONSE:
         case CommandType_DYNAMIC_DEVICE_DATA:

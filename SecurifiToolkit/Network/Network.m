@@ -505,10 +505,6 @@
         case CommandType_LOGOUT_RESPONSE:
         case CommandType_LOGOUT_ALL_RESPONSE:
         case CommandType_ALMOND_LIST_RESPONSE:
-        case CommandType_DEVICE_DATA_HASH_RESPONSE:
-        case CommandType_DEVICE_DATA_RESPONSE:
-        case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE:
-        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
         case CommandType_GENERIC_COMMAND_RESPONSE:
         case CommandType_GENERIC_COMMAND_NOTIFICATION:
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE:

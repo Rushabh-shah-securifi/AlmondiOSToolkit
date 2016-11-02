@@ -574,9 +574,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_LOGOUT_ALL_COMMAND:
                 case CommandType_SIGNUP_COMMAND:
                 case CommandType_AFFILIATION_CODE_REQUEST:
-                case CommandType_DEVICE_DATA_HASH:
-                case CommandType_DEVICE_DATA:
-                case CommandType_DEVICE_VALUE:
                 case CommandType_MOBILE_COMMAND:
                 case CommandType_VALIDATE_REQUEST:
                 case CommandType_RESET_PASSWORD_REQUEST:

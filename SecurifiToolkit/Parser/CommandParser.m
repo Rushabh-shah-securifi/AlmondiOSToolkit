@@ -300,10 +300,10 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_AFFILIATION_USER_COMPLETE:
         case CommandType_SIGNUP_RESPONSE:
         case CommandType_ALMOND_LIST_RESPONSE:
-        case CommandType_DEVICE_DATA_HASH_RESPONSE:
-        case CommandType_DEVICE_DATA_RESPONSE:
-        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
-        case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
+//        case CommandType_DEVICE_DATA_HASH_RESPONSE:
+//        case CommandType_DEVICE_DATA_RESPONSE:
+//        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
+//        case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
         case CommandType_LOGOUT_ALL_RESPONSE:
         case CommandType_LOGOUT_RESPONSE:
         case CommandType_RESET_PASSWORD_RESPONSE:
@@ -578,164 +578,164 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.parsingCommand = YES;
         parser.storingCommandType = CommandType_ALMOND_LIST_RESPONSE;
     }
-        //PY170913 - Device Hash Response
-    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceDataHashResponse, kLength_MaxTag)){
-        DeviceDataHashResponse *deviceDataHashResponse = [[DeviceDataHashResponse alloc]init];
-        parser.command = deviceDataHashResponse;
-        // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
-
-        const char *begin = (const char *)attributes[0 + 3];
-        const char *end = (const char *)attributes[0 + 4];
-        long vlen = end - begin;
-        char val[vlen + 1];
-        strncpy(val, begin, vlen);
-        val[vlen] = '\0';
-
-        BOOL success = !strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5);
-        [parser.command setIsSuccessful:success];
-
-        parser.parsingCommand = YES;
-        parser.storingCommandType = CommandType_DEVICE_DATA_HASH_RESPONSE;
-    }
-        //PY170913 - Device Data Response
-    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceDataResponse, kLength_MaxTag)){
-        DeviceListResponse *deviceDataResponse = [[DeviceListResponse alloc]init];
-        parser.command = deviceDataResponse;
-        // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
-
-        //To get Success attribute
-        NSString *successKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* successVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,successKey,successVal];
-
-
-        //To get Count attribute
-        attributes += 5;
-
-//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        //PY170913 - Device Hash Response
+//    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceDataHashResponse, kLength_MaxTag)){
+//        DeviceDataHashResponse *deviceDataHashResponse = [[DeviceDataHashResponse alloc]init];
+//        parser.command = deviceDataHashResponse;
+//        // [SNLog Log:@"Method Name: %s localName: %s",__PRETTY_FUNCTION__, localname];
+//
+//        const char *begin = (const char *)attributes[0 + 3];
+//        const char *end = (const char *)attributes[0 + 4];
+//        long vlen = end - begin;
+//        char val[vlen + 1];
+//        strncpy(val, begin, vlen);
+//        val[vlen] = '\0';
+//
+//        BOOL success = !strncmp((const char *)attributes[0], k_Success, 8) && !strncmp(val, k_True, 5);
+//        [parser.command setIsSuccessful:success];
+//
+//        parser.parsingCommand = YES;
+//        parser.storingCommandType = CommandType_DEVICE_DATA_HASH_RESPONSE;
+//    }
+//        //PY170913 - Device Data Response
+//    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceDataResponse, kLength_MaxTag)){
+//        DeviceListResponse *deviceDataResponse = [[DeviceListResponse alloc]init];
+//        parser.command = deviceDataResponse;
+//        // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
+//
+//        //To get Success attribute
+//        NSString *successKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* successVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,successKey,successVal];
+//
+//
+//        //To get Count attribute
+//        attributes += 5;
+//
+////        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+////        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
+//        
+//        if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
+//            [parser.command setIsSuccessful:YES];
+//            //Set count
+////            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
+//            parser.tmpDeviceList = [[NSMutableArray alloc]init]; //Create Device List
+//        }else{
+//            [parser.command setIsSuccessful:NO];
+//            [parser.command setDeviceCount:0];
+//        }
+//        
+//        parser.parsingCommand = YES;
+//        parser.storingCommandType = CommandType_DEVICE_DATA_RESPONSE;
+//    }else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
+//              && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//    {
+//        //Get ID from attribute
+//        NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,deviceIDKey,deviceIDVal];
+//        
+//        parser.tmpDevice = [[SFIDevice alloc]init];
+//        if([deviceIDKey isEqualToString:@"ID"]){
+//            [parser.tmpDevice setDeviceID:(unsigned int) [deviceIDVal intValue]];
+//        }else{
+//            //Not possible: (no device id comes from cloud)
+//            [parser.tmpDevice setDeviceID:0];
+//        }
+//        
+//    }
+//    //PY190913 - Device Value Response
+//    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)){
+//        DeviceValueResponse *deviceValueResponse = [[DeviceValueResponse alloc]init];
+//        parser.command = deviceValueResponse;
+//        // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
+//        
+//        
+//        //To get Count attribute
+////        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
 //        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
-        
-        if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
-            [parser.command setIsSuccessful:YES];
-            //Set count
-//            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
-            parser.tmpDeviceList = [[NSMutableArray alloc]init]; //Create Device List
-        }else{
-            [parser.command setIsSuccessful:NO];
-            [parser.command setDeviceCount:0];
-        }
-        
-        parser.parsingCommand = YES;
-        parser.storingCommandType = CommandType_DEVICE_DATA_RESPONSE;
-    }else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
-              && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-    {
-        //Get ID from attribute
-        NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,deviceIDKey,deviceIDVal];
-        
-        parser.tmpDevice = [[SFIDevice alloc]init];
-        if([deviceIDKey isEqualToString:@"ID"]){
-            [parser.tmpDevice setDeviceID:(unsigned int) [deviceIDVal intValue]];
-        }else{
-            //Not possible: (no device id comes from cloud)
-            [parser.tmpDevice setDeviceID:0];
-        }
-        
-    }
-    //PY190913 - Device Value Response
-    else if(prefix == NULL && !strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)){
-        DeviceValueResponse *deviceValueResponse = [[DeviceValueResponse alloc]init];
-        parser.command = deviceValueResponse;
-        // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
-        
-        
-        //To get Count attribute
-//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
-        //Set count
-        [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
-        parser.deviceValues = [[NSMutableArray alloc]init]; //Create Device Value List
-        parser.parsingCommand = YES;
-        parser.storingCommandType = CommandType_DEVICE_VALUE_LIST_RESPONSE;
-    }else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
-              && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-    {
-        //Get ID from attribute
-        NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,deviceIDKey,deviceIDVal];
-        
-        parser.tmpDeviceValue = [[SFIDeviceValue alloc]init];
-        if([deviceIDKey isEqualToString:@"ID"]){
-            [parser.tmpDeviceValue setDeviceID:(unsigned int) [deviceIDVal intValue]];
-        }else{
-            //Not possible: (no device id comes from cloud)
-            [parser.tmpDeviceValue setDeviceID:0];
-        }
-        
-    }else if (!strncmp((const char *)localname, kName_ValueVariables, kLength_MaxTag)
-              && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-    {
-        //Get Value Variable Count
-//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
-
-        [parser.tmpDeviceValue setValueCount:(unsigned int) [countVal intValue]];
-        //Create Device Known Value List
-        parser.knownDeviceValues = [[NSMutableArray alloc]init];
-        
-    }else if(!strncmp((const char *)localname, kName_LastKnownValue, kLength_MaxTag)
-             && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE)){
-        //Get Attributes -Index,  Name,  Type
-        // NSLog(@"localName: %s No of Attributes: %d", localname, nb_attributes);
-        
-        //To get Index attribute
-        NSString *indexKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* indexVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,indexKey,indexVal];
-        
-        
-        //To get Name attribute
-        attributes += 5;
-        
-        NSString *nameKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* nameVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,nameKey,nameVal];
-        
-        NSString *typeKey = nil;
-        NSString* typeVal = nil;
-        if(nb_attributes == 3){
-            //To get Type attribute
-            attributes += 5;
-            typeKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-            typeVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-            // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,typeKey,typeVal];
-        }
-        
-        // Create a new instance of DeviceKnownValue
-        parser.tmpDeviceKnownValue = [[SFIDeviceKnownValues alloc]init];
-        //Save Index
-        if([indexKey isEqualToString:@"Index"]){
-            [parser.tmpDeviceKnownValue setIndex:(unsigned int) [indexVal intValue]];
-        }
-        //Save Name
-        if([nameKey isEqualToString:@"Name"]){
-            SFIDevicePropertyType propertyType = [SFIDeviceKnownValues nameToPropertyType:nameVal];
-            [parser.tmpDeviceKnownValue setValueName:nameVal];
-            [parser.tmpDeviceKnownValue setPropertyType:propertyType];
-        }
-        //Save Type
-        if([typeKey isEqualToString:@"Type"]){
-            [parser.tmpDeviceKnownValue setValueType:typeVal];
-        }
-        parser.storingCharacters = YES;
-        
-    }
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
+//        //Set count
+//        [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
+//        parser.deviceValues = [[NSMutableArray alloc]init]; //Create Device Value List
+//        parser.parsingCommand = YES;
+//        parser.storingCommandType = CommandType_DEVICE_VALUE_LIST_RESPONSE;
+//    }else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
+//              && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
+//    {
+//        //Get ID from attribute
+//        NSString *deviceIDKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* deviceIDVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,deviceIDKey,deviceIDVal];
+//        
+//        parser.tmpDeviceValue = [[SFIDeviceValue alloc]init];
+//        if([deviceIDKey isEqualToString:@"ID"]){
+//            [parser.tmpDeviceValue setDeviceID:(unsigned int) [deviceIDVal intValue]];
+//        }else{
+//            //Not possible: (no device id comes from cloud)
+//            [parser.tmpDeviceValue setDeviceID:0];
+//        }
+//        
+//    }else if (!strncmp((const char *)localname, kName_ValueVariables, kLength_MaxTag)
+//              && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
+//    {
+//        //Get Value Variable Count
+////        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
+//
+//        [parser.tmpDeviceValue setValueCount:(unsigned int) [countVal intValue]];
+//        //Create Device Known Value List
+//        parser.knownDeviceValues = [[NSMutableArray alloc]init];
+//        
+//    }else if(!strncmp((const char *)localname, kName_LastKnownValue, kLength_MaxTag)
+//             && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE)){
+//        //Get Attributes -Index,  Name,  Type
+//        // NSLog(@"localName: %s No of Attributes: %d", localname, nb_attributes);
+//        
+//        //To get Index attribute
+//        NSString *indexKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* indexVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,indexKey,indexVal];
+//        
+//        
+//        //To get Name attribute
+//        attributes += 5;
+//        
+//        NSString *nameKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* nameVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,nameKey,nameVal];
+//        
+//        NSString *typeKey = nil;
+//        NSString* typeVal = nil;
+//        if(nb_attributes == 3){
+//            //To get Type attribute
+//            attributes += 5;
+//            typeKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//            typeVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//            // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,typeKey,typeVal];
+//        }
+//        
+//        // Create a new instance of DeviceKnownValue
+//        parser.tmpDeviceKnownValue = [[SFIDeviceKnownValues alloc]init];
+//        //Save Index
+//        if([indexKey isEqualToString:@"Index"]){
+//            [parser.tmpDeviceKnownValue setIndex:(unsigned int) [indexVal intValue]];
+//        }
+//        //Save Name
+//        if([nameKey isEqualToString:@"Name"]){
+//            SFIDevicePropertyType propertyType = [SFIDeviceKnownValues nameToPropertyType:nameVal];
+//            [parser.tmpDeviceKnownValue setValueName:nameVal];
+//            [parser.tmpDeviceKnownValue setPropertyType:propertyType];
+//        }
+//        //Save Type
+//        if([typeKey isEqualToString:@"Type"]){
+//            [parser.tmpDeviceKnownValue setValueType:typeVal];
+//        }
+//        parser.storingCharacters = YES;
+//        
+//    }
     //PY200913 - Mobile Command Response
     else if(prefix == NULL && !strncmp((const char *)localname, kName_MobileCommandResponse, kLength_MaxTag)){
         MobileCommandResponse *mobileCommandResponse = [[MobileCommandResponse alloc]init];
@@ -984,40 +984,40 @@ static void startElementSAX(void *ctx, const xmlChar *localname, const xmlChar *
         parser.storingCommandType = CommandType_RESET_PASSWORD_RESPONSE;
     }
     
-    //PY 221113 - 81 Command - Tag Changed to DynamicDeviceData from DeviceDataResponse
-    else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicDeviceData, kLength_MaxTag)){
-        DeviceListResponse *deviceDataResponse = [[DeviceListResponse alloc]init];
-        parser.command = deviceDataResponse;
-        // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
-        
-        //To get Success attribute
-        NSString *successKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* successVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,successKey,successVal];
-        
-        
-        //To get Count attribute
-        attributes += 5;
-        
-//        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
-        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
-        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
-        
-        if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
-            [parser.command setIsSuccessful:1];
-            //Set count
-            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
-            parser.tmpDeviceList = [[NSMutableArray alloc]init]; //Create Device List
-        }else{
-            [parser.command setIsSuccessful:0];
-            [parser.command setDeviceCount:0];
-        }
-        
-        parser.parsingCommand = YES;
-        //Set is as DeviceDataResponse so that the structure can be repeated.
-        //Again set it to Dynamic Device Data when end tag is encountered
-        parser.storingCommandType = CommandType_DEVICE_DATA_RESPONSE;
-    }
+//    //PY 221113 - 81 Command - Tag Changed to DynamicDeviceData from DeviceDataResponse
+//    else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicDeviceData, kLength_MaxTag)){
+//        DeviceListResponse *deviceDataResponse = [[DeviceListResponse alloc]init];
+//        parser.command = deviceDataResponse;
+//        // [SNLog Log:@"Method Name: %s localName: %s No of Attributes: %d",__PRETTY_FUNCTION__, localname, nb_attributes];
+//        
+//        //To get Success attribute
+//        NSString *successKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* successVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,successKey,successVal];
+//        
+//        
+//        //To get Count attribute
+//        attributes += 5;
+//        
+////        NSString *countKey = [NSString stringWithCString:(const char*)attributes[0] encoding:NSUTF8StringEncoding];
+//        NSString* countVal = [[NSString alloc] initWithBytes:(const void*)attributes[3] length:(attributes[4] - attributes[3]) encoding:NSUTF8StringEncoding];
+//        // [SNLog Log:@"Method Name: %s Attributes %@ Value %@",__PRETTY_FUNCTION__,countKey,countVal];
+//        
+//        if([successKey isEqualToString:@"success"] && [successVal isEqualToString:@"true"]){
+//            [parser.command setIsSuccessful:1];
+//            //Set count
+//            [parser.command setDeviceCount:(unsigned int) [countVal intValue]];
+//            parser.tmpDeviceList = [[NSMutableArray alloc]init]; //Create Device List
+//        }else{
+//            [parser.command setIsSuccessful:0];
+//            [parser.command setDeviceCount:0];
+//        }
+//        
+//        parser.parsingCommand = YES;
+//        //Set is as DeviceDataResponse so that the structure can be repeated.
+//        //Again set it to Dynamic Device Data when end tag is encountered
+//        parser.storingCommandType = CommandType_DEVICE_DATA_RESPONSE;
+//    }
     //PY 201213 - Almond List ADD - 83
     else if(prefix == NULL && !strncmp((const char *)localname, kName_DynamicAlmondAdd, kLength_MaxTag)){
         AlmondListResponse *almondListResponse = [[AlmondListResponse alloc]init];
@@ -2016,172 +2016,173 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.commandType = CommandType_SIGNUP_RESPONSE;
             parser.parsingCommand = NO;
         }
-        //Device Data Hash Response
-        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
-                 && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
-        {
-            [parser.command setReason:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_Hash, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
-        {
-            [parser.command setAlmondHash:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_DeviceDataHashResponse, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
-        {
-            // [SNLog Log:@"Method Name: %s Device Hash Command Parsing done", __PRETTY_FUNCTION__];
-            parser.commandType = CommandType_DEVICE_DATA_HASH_RESPONSE;
-            parser.parsingCommand = NO;
-            
-        }
-        //Device Data Response - START
-        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
-                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.command setReason:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDeviceList addObject:parser.tmpDevice];
-            
-        }else if (!strncmp((const char *)localname, kName_DeviceName, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setDeviceName:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_OZWNode, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setOZWNode:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_ZigBeeShortID, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setZigBeeShortID:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_ZigBeeEUI64, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setZigBeeEUI64:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_DeviceTechnology, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setDeviceTechnology:(unsigned int) [[parser currentString] intValue]];
-            
-        }else if (!strncmp((const char *)localname, kName_AssociationTimestamp, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setAssociationTimestamp:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_DeviceType, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setDeviceType:(SFIDeviceType) [[parser currentString] intValue]];
-            
-        }else if (!strncmp((const char *)localname, kName_DeviceTypeName, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setDeviceTypeName:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_FriendlyDeviceType, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setFriendlyDeviceType:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_DeviceFunction, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setDeviceFunction:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_AllowNotification, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setAllowNotification:[parser currentString]];
-            
-        }else if (!strncmp((const char *)localname, kName_ValueCount, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setValueCount:(unsigned int) [[parser currentString] intValue]];
-        }
-        //PY 121113
-        else if (!strncmp((const char *)localname, kName_Location, kLength_MaxTag)
-                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.tmpDevice setLocation:[parser currentString]];
-            
-        }
-        else if (!strncmp((const char *)localname, kName_DeviceDataResponse, kLength_MaxTag)
-                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.command setDeviceList:parser.tmpDeviceList];
-            // [SNLog Log:@"Method Name: %s Device Data Command Parsing done Size: %d ", __PRETTY_FUNCTION__ , [parser.tmpDeviceList count]];
-            //PY 230913
-            if(parser.currentTmpMACValue!=nil){
-                 [parser.command setAlmondMAC:parser.currentTmpMACValue];
-                //parser.commandType = DEVICEDATA_CLOUD_RESPONSE;
-                parser.currentTmpMACValue = nil;
-            }
-            
-            parser.commandType = CommandType_DEVICE_DATA_RESPONSE;
-            parser.parsingCommand = NO;
-            
-        }
-        //Device Data Response - END
-        //PY 221113 - Command 81
-        else if (!strncmp((const char *)localname, kName_DynamicDeviceData, kLength_MaxTag)
-                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-        {
-            [parser.command setDeviceList:parser.tmpDeviceList];
-            // [SNLog Log:@"Method Name: %s Device Data Command Parsing done Size: %d ", __PRETTY_FUNCTION__ , [parser.tmpDeviceList count]];
-            //PY 230913 - Device Data Command 81
-            if(parser.currentTmpMACValue!=nil){
-                // [SNLog Log:@"Method Name: %s Cloud Initiated", __PRETTY_FUNCTION__];
-                [parser.command setAlmondMAC:parser.currentTmpMACValue];
-                parser.currentTmpMACValue = nil;
-            }
-            parser.parsingCommand = NO;
-            parser.commandType = CommandType_DYNAMIC_DEVICE_DATA;
-        }
-        
-        //Device Value Response - START
-        //PY 190913 - Device Value List
-        else if (!strncmp((const char *)localname, kName_LastKnownValue, kLength_MaxTag)
-                 && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-        {
-            // // NSLog(@"Last known value: %@ " , [parser currentString]);
-            NSString *currentValue = [parser currentString];
-            
-            // [SNLog Log:@"Method Name: %s Last known value: %@ " , __PRETTY_FUNCTION__, currentValue];
-            [parser.tmpDeviceKnownValue setValue:currentValue];
-            [parser.knownDeviceValues addObject:parser.tmpDeviceKnownValue];
-            
-        }else if (!strncmp((const char *)localname, kName_ValueVariables, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-        {
-            [parser.tmpDeviceValue replaceKnownDeviceValues:parser.knownDeviceValues];
-            
-        }
-        else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
-                 && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-        {
-            [parser.deviceValues addObject:parser.tmpDeviceValue];
-            
-        }
-        else if (!strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)
-                  && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-        {
-            [parser.command setDeviceValueList:parser.deviceValues];
-            parser.commandType = CommandType_DEVICE_VALUE_LIST_RESPONSE;
-            parser.parsingCommand = NO;
-
-            if (parser.currentTmpMACValue != nil) {
-                [parser.command setAlmondMAC:parser.currentTmpMACValue];
-                parser.currentTmpMACValue = nil;
-            }
-        }
+//        //Device Data Hash Response
+//        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
+//        {
+//            [parser.command setReason:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_Hash, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
+//        {
+//            [parser.command setAlmondHash:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_DeviceDataHashResponse, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
+//        {
+//            // [SNLog Log:@"Method Name: %s Device Hash Command Parsing done", __PRETTY_FUNCTION__];
+//            parser.commandType = CommandType_DEVICE_DATA_HASH_RESPONSE;
+//            parser.parsingCommand = NO;
+//            
+//        }
+//        //Device Data Response - START
+//        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.command setReason:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDeviceList addObject:parser.tmpDevice];
+//            
+//        }else if (!strncmp((const char *)localname, kName_DeviceName, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setDeviceName:[parser currentString]];
+//            
+//        }
+//        else if (!strncmp((const char *)localname, kName_OZWNode, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setOZWNode:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_ZigBeeShortID, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setZigBeeShortID:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_ZigBeeEUI64, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setZigBeeEUI64:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_DeviceTechnology, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setDeviceTechnology:(unsigned int) [[parser currentString] intValue]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_AssociationTimestamp, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setAssociationTimestamp:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_DeviceType, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setDeviceType:(SFIDeviceType) [[parser currentString] intValue]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_DeviceTypeName, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setDeviceTypeName:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_FriendlyDeviceType, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setFriendlyDeviceType:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_DeviceFunction, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setDeviceFunction:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_AllowNotification, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setAllowNotification:[parser currentString]];
+//            
+//        }else if (!strncmp((const char *)localname, kName_ValueCount, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setValueCount:(unsigned int) [[parser currentString] intValue]];
+//        }
+//        //PY 121113
+//        else if (!strncmp((const char *)localname, kName_Location, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.tmpDevice setLocation:[parser currentString]];
+//            
+//        }
+//        else if (!strncmp((const char *)localname, kName_DeviceDataResponse, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.command setDeviceList:parser.tmpDeviceList];
+//            // [SNLog Log:@"Method Name: %s Device Data Command Parsing done Size: %d ", __PRETTY_FUNCTION__ , [parser.tmpDeviceList count]];
+//            //PY 230913
+//            if(parser.currentTmpMACValue!=nil){
+//                 [parser.command setAlmondMAC:parser.currentTmpMACValue];
+//                //parser.commandType = DEVICEDATA_CLOUD_RESPONSE;
+//                parser.currentTmpMACValue = nil;
+//            }
+//            
+//            parser.commandType = CommandType_DEVICE_DATA_RESPONSE;
+//            parser.parsingCommand = NO;
+//            
+//        }
+//        //Device Data Response - END
+//        //PY 221113 - Command 81
+//        else if (!strncmp((const char *)localname, kName_DynamicDeviceData, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
+//        {
+//            [parser.command setDeviceList:parser.tmpDeviceList];
+//            // [SNLog Log:@"Method Name: %s Device Data Command Parsing done Size: %d ", __PRETTY_FUNCTION__ , [parser.tmpDeviceList count]];
+//            //PY 230913 - Device Data Command 81
+//            if(parser.currentTmpMACValue!=nil){
+//                // [SNLog Log:@"Method Name: %s Cloud Initiated", __PRETTY_FUNCTION__];
+//                [parser.command setAlmondMAC:parser.currentTmpMACValue];
+//                parser.currentTmpMACValue = nil;
+//            }
+//            parser.parsingCommand = NO;
+//            parser.commandType = CommandType_DYNAMIC_DEVICE_DATA;
+//        }
+//        
+//        //Device Value Response - START
+//        //PY 190913 - Device Value List
+//        else if (!strncmp((const char *)localname, kName_LastKnownValue, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
+//        {
+//            // // NSLog(@"Last known value: %@ " , [parser currentString]);
+//            NSString *currentValue = [parser currentString];
+//            
+//            // [SNLog Log:@"Method Name: %s Last known value: %@ " , __PRETTY_FUNCTION__, currentValue];
+//            [parser.tmpDeviceKnownValue setValue:currentValue];
+//            [parser.knownDeviceValues addObject:parser.tmpDeviceKnownValue];
+//            
+//        }else if (!strncmp((const char *)localname, kName_ValueVariables, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
+//        {
+//            [parser.tmpDeviceValue replaceKnownDeviceValues:parser.knownDeviceValues];
+//            
+//        }
+//        else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
+//                 && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
+//        {
+//            [parser.deviceValues addObject:parser.tmpDeviceValue];
+//            
+//        }
+//        else if (!strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)
+//                  && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
+//        {
+//            [parser.command setDeviceValueList:parser.deviceValues];
+//            parser.commandType = CommandType_DEVICE_VALUE_LIST_RESPONSE;
+//            parser.parsingCommand = NO;
+//
+//            if (parser.currentTmpMACValue != nil) {
+//                [parser.command setAlmondMAC:parser.currentTmpMACValue];
+//                parser.currentTmpMACValue = nil;
+//            }
+//        }
         
         //Device Value Response - END
         //Mobile Command Response - START

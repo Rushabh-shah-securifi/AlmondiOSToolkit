@@ -372,43 +372,43 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
                  
                  [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DYNAMIC_DEVICE_VALUE_LIST];
              },
-             @"DeviceUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-                 res.type = DeviceListResponseType_updated;
-                 res.updatedDevicesOnly = YES;
-                 res.almondMAC = endpoint.config.almondMac;
-                 
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-             },
-             @"DeviceAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-                 res.updatedDevicesOnly = YES;
-                 res.type = DeviceListResponseType_websocket_added;
-                 res.almondMAC = endpoint.config.almondMac;
-                 
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-             },
-             @"DeviceRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-                 res.updatedDevicesOnly = YES;
-                 res.type = DeviceListResponseType_removed;
-                 res.almondMAC = endpoint.config.almondMac;
-                 
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-             },
-             @"DeviceRemoveAll" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 DeviceListResponse *res = [DeviceListResponse new];
-                 res.type = DeviceListResponseType_removed_all;
-                 res.almondMAC = endpoint.config.almondMac;
-                 
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-             },
-             @"devicelist" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
-                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
-                 res.almondMAC = self.config.almondMac;
-                 res.type = DeviceListResponseType_deviceList;
-                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
-             },
+//             @"DeviceUpdated" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+//                 res.type = DeviceListResponseType_updated;
+//                 res.updatedDevicesOnly = YES;
+//                 res.almondMAC = endpoint.config.almondMac;
+//                 
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+//             },
+//             @"DeviceAdded" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+//                 res.updatedDevicesOnly = YES;
+//                 res.type = DeviceListResponseType_websocket_added;
+//                 res.almondMAC = endpoint.config.almondMac;
+//                 
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+//             },
+//             @"DeviceRemoved" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+//                 res.updatedDevicesOnly = YES;
+//                 res.type = DeviceListResponseType_removed;
+//                 res.almondMAC = endpoint.config.almondMac;
+//                 
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+//             },
+//             @"DeviceRemoveAll" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 DeviceListResponse *res = [DeviceListResponse new];
+//                 res.type = DeviceListResponseType_removed_all;
+//                 res.almondMAC = endpoint.config.almondMac;
+//                 
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+//             },
+//             @"devicelist" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
+//                 DeviceListResponse *res = [DeviceListResponse parseJson:payload];
+//                 res.almondMAC = self.config.almondMac;
+//                 res.type = DeviceListResponseType_deviceList;
+//                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_DEVICE_LIST_AND_VALUES_RESPONSE];
+//             },
              //             @"updatealmondmode" : ^void(WebSocketEndpoint *endpoint, NSDictionary *payload) {
              //                 AlmondModeChangeResponse *res = [AlmondModeChangeResponse parseJson:payload];
              //                 [endpoint.delegate networkEndpoint:endpoint dispatchResponse:res commandType:CommandType_ALMOND_MODE_CHANGE_RESPONSE];

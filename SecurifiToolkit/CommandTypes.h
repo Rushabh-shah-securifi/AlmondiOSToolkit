@@ -24,13 +24,6 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_AFFILIATION_USER_COMPLETE               = 26,
     CommandType_ALMOND_LIST                             = 71,
     CommandType_ALMOND_LIST_RESPONSE                    = 72,
-    CommandType_DEVICE_DATA_HASH                        = 73,
-    CommandType_DEVICE_DATA_HASH_RESPONSE               = 74,
-    CommandType_DEVICE_DATA                             = 75,
-    CommandType_DEVICE_DATA_RESPONSE                    = 76,
-    CommandType_DEVICE_LIST_AND_VALUES_RESPONSE         = 2000, // internally defined command type;
-    CommandType_DEVICE_VALUE					        = 77,
-    CommandType_DEVICE_VALUE_LIST_RESPONSE              = 78,
     CommandType_MOBILE_COMMAND                          = 61,
     CommandType_MOBILE_COMMAND_RESPONSE                 = 64,
     CommandType_DYNAMIC_DEVICE_DATA                     = 81,

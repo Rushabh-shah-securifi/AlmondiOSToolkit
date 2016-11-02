@@ -151,11 +151,6 @@ extern NSString *const kSFIAlmondModeDidChange;
 // Notification posted when a response to a generic Almond Router command is received
 extern NSString *const kSFIDidReceiveGenericAlmondRouterResponse;
 
-// Notification posted when a device has been added or removed. Does not post on changes to attributes like device names.
-extern NSString *const kSFIDidChangeDeviceList;
-
-extern NSString *const kSFIDidChangeDeviceValueList;
-
 // Notification posted when a MobileCommand request has completed. Payload contains the command itself, and
 // a boxed NSTimeInterval indicating how long the request-response cycle took.
 extern NSString *const kSFIDidCompleteMobileCommandRequest;
@@ -325,12 +320,6 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 // Fetch the locally stored values for the Almond's notification preferences
 - (NSArray *)notificationPrefList:(NSString *)almondMac;
-
-// Send a command to the cloud requesting a device list for the specified Almond
-- (void)asyncRequestDeviceList:(NSString *)almondMac;
-
-// Send a command to the cloud requesting current values for the Almond's devices
-- (void)asyncRequestDeviceValueList:(NSString *)almondMac;
 
 // Send a command to the cloud requesting current values for the Almond's devices if device values have not been
 // already requested once already on the same network connection
