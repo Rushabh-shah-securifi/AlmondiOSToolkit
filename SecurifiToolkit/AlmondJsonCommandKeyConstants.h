@@ -169,6 +169,8 @@
 #define ALMOND_MODE @"AlmondMode"
 #define ONLINE @"Online"
 #define SIGNAL_STRENGTH @"SignalStrength"
+#define HOP_COUNT @"HopCount"
+
 #define SM_ENABLE @"SMEnable"
 #define BW_ENABLE @"BWEnable"
 #endif /* AlmondJsonCommandKeyConstants_h */
