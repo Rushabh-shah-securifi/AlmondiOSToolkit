@@ -9,6 +9,10 @@
 #ifndef AlmondJsonCommandKeyConstants_h
 #define AlmondJsonCommandKeyConstants_h
 
+#define SLAVE_OFFLINE @"1"
+
+
+
 //common
 #define COMMAND_TYPE @"CommandType"
 #define MOBILE_INTERNAL_INDEX @"MobileInternalIndex"
