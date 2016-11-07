@@ -304,8 +304,18 @@
             }
         }
     }
-
+    toolkit.devices = [self getSortedDevices];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_CONTROLLER_NOTIFIER object:nil];
+}
+
+-(NSMutableArray*)getSortedDevices{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSSortDescriptor *firstDescriptor = [[NSSortDescriptor alloc] initWithKey:@"location" ascending:YES];
+    NSSortDescriptor *secondDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES selector:@selector(caseInsensitiveCompare:)];
+    
+    NSArray *sortDescriptors = [NSArray arrayWithObjects:firstDescriptor, secondDescriptor, nil];
+    return [[toolkit.devices sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];
 }
 
 - (void)asyncRequestNotificationPreferenceList:(NSString *)almondMAC {
