@@ -47,57 +47,6 @@
 
 #pragma mark - Hash value management
 
-- (void)markHashFetchedForAlmond:(NSString *)aAlmondMac {
-    @synchronized (self.almondTableSyncLocker) {
-        [self.hashCheckedForAlmondTable addObject:aAlmondMac];
-    }
-}
-
-- (BOOL)wasHashFetchedForAlmond:(NSString *)aAlmondMac {
-    @synchronized (self.almondTableSyncLocker) {
-        return [self.hashCheckedForAlmondTable containsObject:aAlmondMac];
-    }
-}
-
-- (void)markWillFetchDeviceListForAlmond:(NSString *)aAlmondMac {
-    if (aAlmondMac.length == 0) {
-        return;
-    }
-    @synchronized (self.willFetchDeviceListFlagSyncLocker) {
-        [self.willFetchDeviceListFlag addObject:aAlmondMac];
-    }
-}
-
-- (BOOL)willFetchDeviceListFetchedForAlmond:(NSString *)aAlmondMac {
-    if (aAlmondMac.length == 0) {
-        return NO;
-    }
-    @synchronized (self.willFetchDeviceListFlagSyncLocker) {
-        return [self.willFetchDeviceListFlag containsObject:aAlmondMac];
-    }
-}
-
-- (void)clearWillFetchDeviceListForAlmond:(NSString *)aAlmondMac {
-    if (aAlmondMac.length == 0) {
-        return;
-    }
-    @synchronized (self.willFetchDeviceListFlagSyncLocker) {
-        [self.willFetchDeviceListFlag removeObject:aAlmondMac];
-    }
-}
-
-- (void)markDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac {
-    @synchronized (self.almondTableSyncLocker) {
-        [self.deviceValuesCheckedForAlmondTable addObject:aAlmondMac];
-    }
-}
-
-- (BOOL)wasDeviceValuesFetchedForAlmond:(NSString *)aAlmondMac {
-    @synchronized (self.almondTableSyncLocker) {
-        return [self.deviceValuesCheckedForAlmondTable containsObject:aAlmondMac];
-    }
-}
-
 - (void)markModeForAlmond:(NSString *)aAlmondMac mode:(SFIAlmondMode)mode {
     if (aAlmondMac == nil) {
         return;

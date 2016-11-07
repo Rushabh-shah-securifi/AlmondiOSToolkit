@@ -26,5 +26,12 @@
 + (NSArray *)localLinkedAlmondList;
 + (BOOL)almondExists:(NSString *)almondMac;
 
+//Almond List Management
++ (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network;
++ (void)onDynamicAlmondListAdd:(AlmondListResponse *)obj;
++ (void)onDynamicAlmondListDelete:(AlmondListResponse *)obj network:(Network *)network;
++ (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)data;
++ (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage;
+
 @end
 #endif /* AlmondManagement_h */

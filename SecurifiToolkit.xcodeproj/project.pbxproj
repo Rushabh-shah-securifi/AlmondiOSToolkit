@@ -295,7 +295,6 @@
 		A5D9B4F81DB4AE3E00BF1F60 /* ConnectionStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4F71DB4AE3E00BF1F60 /* ConnectionStatus.m */; };
 		A5D9B4FB1DB4CC1A00BF1F60 /* KeyChainAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */; };
 		A5D9B4FE1DB4CF5F00BF1F60 /* AlmondManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */; };
-		A5D9B5011DB4D07100BF1F60 /* AlmondListManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */; };
 		A5D9B5041DB4DBA500BF1F60 /* CreateJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5031DB4DBA500BF1F60 /* CreateJSON.m */; };
 		A5D9B5071DB4FCDB00BF1F60 /* HTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B5061DB4FCDB00BF1F60 /* HTTPRequest.m */; };
 		A5D9B50D1DB62E7A00BF1F60 /* Log.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B50C1DB62E7A00BF1F60 /* Log.m */; };
@@ -736,8 +735,6 @@
 		A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainAccess.m; sourceTree = "<group>"; };
 		A5D9B4FC1DB4CF1900BF1F60 /* AlmondManagement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlmondManagement.h; sourceTree = "<group>"; };
 		A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondManagement.m; sourceTree = "<group>"; };
-		A5D9B4FF1DB4CFFB00BF1F60 /* AlmondListManagement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlmondListManagement.h; sourceTree = "<group>"; };
-		A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondListManagement.m; sourceTree = "<group>"; };
 		A5D9B5021DB4DB7F00BF1F60 /* CreateJSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CreateJSON.h; sourceTree = "<group>"; };
 		A5D9B5031DB4DBA500BF1F60 /* CreateJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CreateJSON.m; sourceTree = "<group>"; };
 		A5D9B5051DB4FCAD00BF1F60 /* HTTPRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HTTPRequest.h; sourceTree = "<group>"; };
@@ -1316,8 +1313,6 @@
 				A5D9B4FA1DB4CC1A00BF1F60 /* KeyChainAccess.m */,
 				A5D9B4FC1DB4CF1900BF1F60 /* AlmondManagement.h */,
 				A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */,
-				A5D9B4FF1DB4CFFB00BF1F60 /* AlmondListManagement.h */,
-				A5D9B5001DB4D07100BF1F60 /* AlmondListManagement.m */,
 				A569B8721DBE10EA00FBD429 /* LocalNetworkManagement.h */,
 				A569B8701DBE108C00FBD429 /* LocalNetworkManagement.m */,
 				1C3270DB1A243B28007202C1 /* Router */,
@@ -2030,7 +2025,6 @@
 				1C4382EE1B2FDD5200F6AB7A /* PSWebSocketBuffer.m in Sources */,
 				1CD1D55B1A660B7A00C030E9 /* SFINotificationUser.m in Sources */,
 				1CD1D54F1A660B7A00C030E9 /* NotificationPreferenceListResponse.m in Sources */,
-				A5D9B5011DB4D07100BF1F60 /* AlmondListManagement.m in Sources */,
 				1C4382F71B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m in Sources */,
 				1C4382F91B2FDD5200F6AB7A /* PSWebSocketServer.m in Sources */,
 				A5D9B5041DB4DBA500BF1F60 /* CreateJSON.m in Sources */,

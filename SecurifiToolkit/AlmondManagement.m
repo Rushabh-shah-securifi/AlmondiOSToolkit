@@ -20,10 +20,8 @@
     if (!almond) {
         return;
     }
-    NSLog(@"i am called");
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
-    
     [[SecurifiToolkit sharedInstance] postNotification:kSFIDidChangeCurrentAlmond data:almond];
 }
 
@@ -48,16 +46,10 @@
     SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
     // reset connections
     if([toolKit currentConnectionMode]==SFIAlmondConnectionMode_local){
-        NSLog(@"i am called");
         [toolKit tryShutdownAndStartNetworks:toolKit.currentConnectionMode];
         return;
     }
     [toolKit cleanUp];
-    NSArray *devices = [self deviceList:mac];
-    if (devices.count == 0) {
-        DLog(@"%s: devices empty: requesting device list for current almond: %@", __PRETTY_FUNCTION__, mac);
-        [self asyncRequestDeviceList:mac];
-    }
     
     NSLog(@"almond.linktype: %d", almond.linkType);
     
@@ -88,34 +80,6 @@
     //    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser
 }
 
-+ (BOOL)isCurrentTemperatureFormatFahrenheit {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    BOOL value = [defaults boolForKey:kCURRENT_TEMPERATURE_FORMAT];
-    return value;
-}
-
-+ (void)setCurrentTemperatureFormatFahrenheit:(BOOL)format {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:format forKey:kCURRENT_TEMPERATURE_FORMAT];
-    [defaults synchronize];
-}
-
-+ (int)convertTemperatureToCurrentFormat:(int)temperature {
-    if ([self isCurrentTemperatureFormatFahrenheit]) {
-        return temperature;
-    } else {
-        return (int) lround((temperature - 32) / 1.8);
-    }
-}
-
-+ (NSString *)getTemperatureWithCurrentFormat:(int)temperature {
-    if ([self isCurrentTemperatureFormatFahrenheit]) {
-        return [NSString stringWithFormat:@"%d °F", temperature];
-    } else {
-        return [NSString stringWithFormat:@"%d °C", (int) lround((temperature - 32) / 1.8)];
-    }
-}
-
 + (SFIAlmondPlus *)currentAlmond {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *data = [defaults objectForKey:kPREF_CURRENT_ALMOND];
@@ -143,7 +107,6 @@
             return YES;
         }
     }
-    
     return NO;
 }
 
@@ -158,7 +121,7 @@
     // the almond supports both local and cloud network connections. This will ensure the
     // UI can do the right thing and show the right message to the user when connection modes
     // are switched.
-    //
+
     // Note for large lists of almonds, the way the data manger internally manages cloud almond lists
     // is inefficient for these sorts of operations, and a dictionary data structure would allow for
     // fast look up, instead of iteration.
@@ -199,58 +162,162 @@
     return local_almonds;
 }
 
-+ (NSArray *)deviceList:(NSString *)almondMac {
-    return [[SecurifiToolkit sharedInstance].dataManager readDeviceList:almondMac];
-}
-
-+ (NSArray *)deviceValuesList:(NSString *)almondMac {
-    return [[SecurifiToolkit sharedInstance].dataManager readDeviceValueList:almondMac];
-}
 
 + (NSArray *)notificationPrefList:(NSString *)almondMac {
     return [[SecurifiToolkit sharedInstance].dataManager readNotificationPreferenceList:almondMac];
 }
 
-#pragma mark - Device and Device Value Management
+#pragma mark - Almond List Management
 
-+ (void)asyncRequestDeviceList:(NSString *)almondMac {
-    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
-        NetworkState *state = aNetwork.networkState;
-        if ([state willFetchDeviceListFetchedForAlmond:almondMac]) {
-            return NO;
++ (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network {
+    
+    SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
+    
+    if (!obj.isSuccessful) {
+        return;
+    }
+    
+    NSArray *almondList = obj.almondPlusMACList;
+    
+    // Store the new list
+    [toolKit.dataManager writeAlmondList:almondList];
+    
+    // Ensure Current Almond is consistent with new list
+    SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
+    if(plus!=nil)
+        // After requesting the Almond list, we then want to get additional info
+        [toolKit asyncInitializeConnection2:network];
+    
+    // Tell the world
+    [toolKit postNotification:kSFIDidUpdateAlmondList data:plus];
+}
+
++ (void)onDynamicAlmondListAdd:(AlmondListResponse *)obj {
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    if (obj == nil) {
+        return;
+    }
+    if (!obj.isSuccessful) {
+        return;
+    }
+    
+    NSArray *almondList = obj.almondPlusMACList;
+    
+    // Store the new list
+    [toolkit.dataManager writeAlmondList:almondList];
+    
+    // Ensure Current Almond is consistent with new list
+    SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:YES];
+    
+    // Tell the world that this happened
+    [toolkit postNotification:kSFIDidUpdateAlmondList data:plus];
+}
+
++ (void)onDynamicAlmondListDelete:(AlmondListResponse *)obj network:(Network *)network {
+    if (!obj.isSuccessful) {
+        return;
+    }
+    
+    SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
+    NSArray *newAlmondList = @[];
+    for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
+        // remove cached data about the Almond and sensors
+        newAlmondList = [toolKit.dataManager deleteAlmond:deleted];
+        
+        if (toolKit.config.enableNotifications) {
+            // clear out Notification settings
+            [network.networkState clearAlmondMode:deleted.almondplusMAC];
+            [toolKit.notificationsDb deleteNotificationsForAlmond:deleted.almondplusMAC];
+        }
+    }
+    
+    // Ensure Current Almond is consistent with new list
+    SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
+    //    [toolKit.devices removeAllObjects];
+    //    [toolKit.clients removeAllObjects];
+    //    [toolKit.scenesArray removeAllObjects];
+    //    [toolKit.ruleList removeAllObjects];
+    [toolKit postNotification:kSFIDidUpdateAlmondList data:plus];
+}
+
++ (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)obj {
+    
+    SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
+    NSString *almondName = obj.almondplusName;
+    if (almondName.length == 0) {
+        return;
+    }
+    NSLog(@"Came here onDynamicAlmondNameChange %@",almondName);
+    SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
+    if (changed) {
+        SFIAlmondPlus *current = [toolKit currentAlmond];
+        NSLog(@"Came here onDynamicAlmondNameChange inside changed %@",almondName);
+        if ([current isEqualAlmondPlus:changed]) {
+            changed.colorCodeIndex = current.colorCodeIndex;
+            //[toolKit currentAlmond].almondplusName=almondName;
+            NSLog(@"Came here after settings %@",[toolKit currentAlmond].almondplusName);
+            [toolKit writeCurrentAlmond:changed];
+            //[self setCurrentAlmond:changed];
         }
         
-        [state markWillFetchDeviceListForAlmond:almondMac];
-        return YES;
-    };
-    
-    BOOL local = [[SecurifiToolkit sharedInstance] useLocalNetwork:almondMac];
-}
-
-+ (void)asyncRequestDeviceValueList:(NSString *)almondMac {
-    NetworkPrecondition precondition = ^BOOL(Network *aNetwork, GenericCommand *aCmd) {
-        [aNetwork.networkState markDeviceValuesFetchedForAlmond:almondMac];
-        return YES;
-    };
-    
-    BOOL local = [[SecurifiToolkit sharedInstance] useLocalNetwork:almondMac];
-}
-
-+ (BOOL)tryRequestDeviceValueList:(NSString *)almondMac {
-    SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
-    BOOL local = [toolKit useLocalNetwork:almondMac];
-    NSLog(@"i am called");
-    Network *network = local ? [toolKit setUpNetwork] : toolKit.network;
-    
-    NetworkState *state = network.networkState;
-    if ([state wasDeviceValuesFetchedForAlmond:almondMac]) {
-        return NO;
+        // Tell the world so they can update their view
+        [toolKit postNotification:kSFIDidChangeAlmondName data:obj];
     }
-    [state markDeviceValuesFetchedForAlmond:almondMac];
+}
+
+// When the cloud almond list is changed, ensure the Current Almond setting is consistent with the list.
+// This method has side-effects and can change settings.
+// Returns the current Almond, which might or might not be the same as the old one. May return nil.
++ (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
+    // if current is "local only" then no need to inspect the almond list; just return the current one.
+    NSLog(@"i am called");
+    SecurifiToolkit * toolKit = [SecurifiToolkit sharedInstance];
+    SFIAlmondPlus *current = [toolKit currentAlmond];
+    if (current.linkType == SFIAlmondPlusLinkType_local_only) {
+        return current;
+    }
     
-    [self asyncRequestDeviceValueList:almondMac];
+    // Manage the "Current selected Almond" value
+    if (almondList.count == 0) {
+        [toolKit purgeStoredData];
+        return nil;
+    }
     
-    return YES;
+    
+    
+    else if (almondList.count == 1) {
+        SFIAlmondPlus *currentAlmond = almondList[0];
+        if (doManage) {
+            
+            [toolKit setCurrentAlmond:currentAlmond];
+        }
+        else {
+            [AlmondManagement writeCurrentAlmond:currentAlmond];
+        }
+        return currentAlmond;
+    }
+    else {
+        if (current) {
+            for (SFIAlmondPlus *almond in almondList) {
+                if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
+                    // Current one is still in list, so leave it as current.
+                    return almond;
+                }
+            }
+        }
+        
+        // Current one is not in new list.
+        // Just pick the first one in this case
+        SFIAlmondPlus *currentAlmond = almondList[0];
+        if (doManage) {
+            [toolKit setCurrentAlmond:currentAlmond];
+        }
+        else {
+            [AlmondManagement writeCurrentAlmond:currentAlmond];
+        }
+        return currentAlmond;
+    }
 }
 
 @end

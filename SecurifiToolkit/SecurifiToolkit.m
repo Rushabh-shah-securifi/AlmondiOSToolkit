@@ -60,7 +60,6 @@
 #import "ConnectionStatus.h"
 #import "CreateJSON.h"
 #import "HTTPRequest.h"
-#import "AlmondListManagement.h"
 #import "KeyChainAccess.h"
 #import "AlmondManagement.h"
 #import "CompleteDB.h"
@@ -1310,7 +1309,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             
         case CommandType_ALMOND_LIST_RESPONSE: {
             AlmondListResponse *res = payload;
-            [AlmondListManagement onAlmondListResponse:res network:network];
+            [AlmondManagement onAlmondListResponse:res network:network];
             break;
         }
         
@@ -1430,7 +1429,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 res.almondplusMAC = current.almondplusMAC;
                 res.almondplusName = name;
                 
-                [AlmondListManagement onDynamicAlmondNameChange:res];
+                [AlmondManagement onDynamicAlmondNameChange:res];
             //}
             
             break;
@@ -1451,17 +1450,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     switch (commandType) {
         case CommandType_DYNAMIC_ALMOND_ADD: {
             AlmondListResponse *obj = payload;
-            [AlmondListManagement onDynamicAlmondListAdd:obj];
+            [AlmondManagement onDynamicAlmondListAdd:obj];
             break;
         }
         case CommandType_DYNAMIC_ALMOND_DELETE: {
             AlmondListResponse *obj = payload;
-            [AlmondListManagement onDynamicAlmondListDelete:obj network:network];
+            [AlmondManagement onDynamicAlmondListDelete:obj network:network];
             break;
         }
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE: {
             DynamicAlmondNameChangeResponse *obj = payload;
-            [AlmondListManagement onDynamicAlmondNameChange:obj];
+            [AlmondManagement onDynamicAlmondNameChange:obj];
             break;
         }
         case CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST: {
