@@ -9,7 +9,7 @@
 #import "GenericValue.h"
 
 @implementation GenericValue
--(id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString *)eventType{
+-(id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString *)eventType notificationText:(NSString *)notificationText{
     self = [super init];
     if(self){
         self.icon = icon;
@@ -18,11 +18,12 @@
         self.toggleValue = toggleValue;
         self.excludeFrom = excludeFrom;
         self.eventType = eventType;
+        self.notificationText = notificationText;
     }
     return self;
 }
 
-- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue{
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix{
     self = [super init];
     if(self){
         self.iconText = iconText;
@@ -32,11 +33,12 @@
         self.value = value;
         self.excludeFrom = excludeFrom;
         self.transformedValue = transformedValue;
+        self.notificationPrefix = notificationPrefix;
     }
     return self;
 }
 
-- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue{
+- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix{
     self = [super init];
     if(self){
         self.icon = icon;
@@ -46,6 +48,7 @@
         self.excludeFrom = excludeFrom;
         self.eventType = eventType;
         self.transformedValue = transformedValue;
+        self.notificationPrefix = notificationPrefix;
     }
     return self;
 }

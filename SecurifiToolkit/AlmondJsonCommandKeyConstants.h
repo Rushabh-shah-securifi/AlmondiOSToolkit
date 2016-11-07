@@ -38,6 +38,7 @@
 #define INDEX_DEFAULT_ICON @"DefaultIcon"
 #define VALUES @"Values"
 #define TOGGLE_VALUE @"ToggleValue"
+#define NOTIFICATION @"Notification"
 #define ICON @"Icon"
 #define LABEL @"Label"
 #define DEVICE_COMMAND_TYPE @"CommandType"
@@ -50,6 +51,7 @@
 #define RANGE @"Range"
 #define UNIT @"Unit"
 #define FACTOR @"Factor"
+#define PREFIX @"prefix"
 
 //value constants
 #define TRUE_ @"true"
