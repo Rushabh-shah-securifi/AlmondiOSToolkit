@@ -26,6 +26,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 @property(nonatomic, strong) NetworkConfig *config;
 @property(nonatomic, readonly) NSDictionary *responseHandlers;
+@property NSTimer* timer;
 @end
 
 @implementation WebSocketEndpoint
@@ -45,8 +46,19 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)connect{
-    NSLog(@"connect websocket");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSTimer scheduledTimerWithTimeInterval:4.0
+                                         target:self
+                                       selector:@selector(closeSocket)
+                                       userInfo:nil
+                                        repeats:NO] ;
+    });
     self.socket = [self connectSocketToPort:self.config.port];
+}
+
+- (void)closeSocket{
+    [self.socket close];
+    [self.delegate networkEndpointDidDisconnect:self];
 }
 
 -(void)connectMesh{
