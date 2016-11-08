@@ -17,6 +17,7 @@
 #import "DynamicAlmondNameChangeResponse.h"
 #import "SecurifiToolkit.h"
 #import "GenericCommand.h"
+#import "ConnectionStatus.h"
 
 typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
@@ -46,7 +47,21 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
 - (void)connect{
     NSLog(@"connect websocket");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSTimer scheduledTimerWithTimeInterval:4.0
+                                         target:self
+                                       selector:@selector(closeSocket)
+                                       userInfo:nil
+                                        repeats:NO] ;
+    });
     self.socket = [self connectSocketToPort:self.config.port];
+}
+
+- (void)closeSocket{
+    if([[SecurifiToolkit sharedInstance] currentConnectionMode] == SFIAlmondConnectionMode_local && [ConnectionStatus getConnectionStatus] == IS_CONNECTING_TO_NETWORK){
+        [self.socket close];
+        [self.delegate networkEndpointDidDisconnect:self];
+    }
 }
 
 -(void)connectMesh{
@@ -76,7 +91,7 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
         [self.delegate networkEndpointDidDisconnect:self];
         return nil;
     }
-
+    
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     
     SRWebSocket *almondSocket = [[SRWebSocket alloc]initWithURLRequest:request];
