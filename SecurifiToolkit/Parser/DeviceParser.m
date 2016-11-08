@@ -199,7 +199,7 @@
     }
     
 //    payload = [self parseJson:@"DeviceListResponse"];
-    //NSLog(@"devices - payload: %@", payload);
+    NSLog(@"devices - payload: %@", payload);
 
     BOOL isMatchingAlmondOrLocal = ([payload[ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
@@ -523,14 +523,14 @@
                                              commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
                                              readOnly:readOnly
                                              excludeFrom:genericIndexDict[EXCLUDE_FROM]
-                                             showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]];
+                                             showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue] indexName:genericIndexDict[INDEX_NAME]];
     return genericIndexObject;
 }
 
 +(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
     if(formatterDict){
         float factor = formatterDict[FACTOR]? [formatterDict[FACTOR] floatValue]: 1;
-        Formatter *formatter = [[Formatter alloc]initWithFactor:factor min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT]];
+        Formatter *formatter = [[Formatter alloc]initWithFactor:factor min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT] prefix:formatterDict[PREFIX]];
         return formatter;
     }
     return nil;
@@ -547,7 +547,7 @@
                                                                       toggleValue:valueDict[TOGGLE_VALUE]
                                                                             value:value
                                                                       excludeFrom:valueDict[EXCLUDE_FROM]
-                                                                        eventType:valueDict[EVENT_TYPE]];
+                                                                        eventType:valueDict[EVENT_TYPE] notificationText:valueDict[NOTIFICATION]];
             [genericValues setObject:genericValue forKey:value];
         }
         return genericValues;
