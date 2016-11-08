@@ -730,7 +730,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
     NSLog(@"i am called");
-    self.currentAlmond =almond;
+  //  self.currentAlmond = almond;
     [AlmondManagement writeCurrentAlmond:almond];
 }
 
