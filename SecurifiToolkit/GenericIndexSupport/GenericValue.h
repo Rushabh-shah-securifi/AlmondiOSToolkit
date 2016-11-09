@@ -26,9 +26,11 @@
 
 - (id)initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix;
 
--(id)initUnknownDevice;
+- (id)initUnknownDevice;
 
 - (id)initWithGenericValue:(GenericValue*)genericValue text:(NSString*)text;
+
+- (id)initWithDisplayTextNotification:(NSString*)icon value:(NSString*)value prefix:(NSString *)notificationPrefix;
 
 +(GenericValue*)getCopy:(GenericValue*)genVal;
 @end

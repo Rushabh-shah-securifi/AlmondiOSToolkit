@@ -23,7 +23,7 @@
     return self;
 }
 
-- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix{
+- (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix {
     self = [super init];
     if(self){
         self.iconText = iconText;
@@ -37,6 +37,16 @@
     }
     return self;
 }
+- (id)initWithDisplayTextNotification:(NSString*)icon value:(NSString*)value prefix:(NSString *)notificationPrefix {
+    self = [super init];
+    if(self){
+        self.icon = icon;
+        self.value = value;
+        self.notificationPrefix = notificationPrefix;
+    }
+    return self;
+}
+
 
 - (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix{
     self = [super init];
