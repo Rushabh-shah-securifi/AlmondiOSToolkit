@@ -5,7 +5,6 @@
 
 #import "WebSocketEndpoint.h"
 #import "GenericCommand.h"
-//#import "PSWebSocket.h"
 #import "SRWebSocket.h"
 #import "NetworkConfig.h"
 #import "DeviceListResponse.h"
@@ -17,6 +16,7 @@
 #import "DynamicAlmondNameChangeResponse.h"
 #import "SecurifiToolkit.h"
 #import "GenericCommand.h"
+#import "ConnectionStatus.h"
 
 typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 
@@ -57,8 +57,10 @@ typedef void (^WebSocketResponseHandler)(WebSocketEndpoint *, NSDictionary *);
 }
 
 - (void)closeSocket{
-    [self.socket close];
-    [self.delegate networkEndpointDidDisconnect:self];
+    if([[SecurifiToolkit sharedInstance] currentConnectionMode] == SFIAlmondConnectionMode_local && [ConnectionStatus getConnectionStatus] == IS_CONNECTING_TO_NETWORK){
+        [self.socket close];
+        [self.delegate networkEndpointDidDisconnect:self];
+    }
 }
 
 -(void)connectMesh{

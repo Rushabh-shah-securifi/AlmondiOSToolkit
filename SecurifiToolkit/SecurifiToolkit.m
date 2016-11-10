@@ -67,6 +67,7 @@
 #import "WebSocketEndpoint.h"
 #import "NotificationAccessAndRefreshCommands.h"
 #import "NotificationPreferenceListCallbacks.h"
+#import <SecurifiToolkit/ClientParser.h>
 
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
@@ -291,7 +292,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return YES;
 }
 
-
 - (enum SFIAlmondConnectionMode)currentConnectionMode {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     enum SFIAlmondConnectionMode mode = (enum SFIAlmondConnectionMode) [defaults integerForKey:kPREF_DEFAULT_CONNECTION_MODE];
@@ -309,11 +309,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 // for changing network settings
 // ensures a local connection for the specified almond is shutdown and, if needed, restarted
 - (void)tryShutdownAndStartNetworks:(enum SFIAlmondConnectionMode)mode{
-    
     if (!self.config.enableLocalNetworking) {
         return;
     }
-    
     __weak SecurifiToolkit *block_self = self;
     NSLog(@" mode == %d",mode);
     //FORCED_DISCONNECT state is added here to make sure that toggle between cloud network and local network does not break;
@@ -399,7 +397,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSLog(@"i am called");
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
     [self tryShutdownAndStartNetworks:SFIAlmondConnectionMode_cloud];
-    
 }
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
@@ -410,11 +407,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"INIT SDK. SDK is already shutdown. Returning.");
         return;
     }
+    
     NSLog(@"i am called");
     ConnectionStatusType state = [ConnectionStatus getConnectionStatus];
     switch (state) {
         case AUTHENTICATED:
-        case CONNECTED_TO_NETWORK: {
+        case CONNECTED_TO_NETWORK:{
             NSLog(@"INIT SDK. connection established already. Returning.");
             return;
         };
@@ -533,7 +531,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         
         [NotificationAccessAndRefreshCommands tryRefreshNotifications];
         //        }
-        
     }
     
 }

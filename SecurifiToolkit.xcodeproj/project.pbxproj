@@ -56,24 +56,6 @@
 		1C414BE61A79F39600C448A4 /* KeyChainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */; };
 		1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1C414BEB1A7B625400C448A4 /* NSDate+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */; };
-		1C4382EB1B2FDD5200F6AB7A /* PSWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382D81B2FDD5200F6AB7A /* PSWebSocket.h */; };
-		1C4382EC1B2FDD5200F6AB7A /* PSWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382D91B2FDD5200F6AB7A /* PSWebSocket.m */; };
-		1C4382ED1B2FDD5200F6AB7A /* PSWebSocketBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382DA1B2FDD5200F6AB7A /* PSWebSocketBuffer.h */; };
-		1C4382EE1B2FDD5200F6AB7A /* PSWebSocketBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382DB1B2FDD5200F6AB7A /* PSWebSocketBuffer.m */; };
-		1C4382EF1B2FDD5200F6AB7A /* PSWebSocketDeflater.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382DC1B2FDD5200F6AB7A /* PSWebSocketDeflater.h */; };
-		1C4382F01B2FDD5200F6AB7A /* PSWebSocketDeflater.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382DD1B2FDD5200F6AB7A /* PSWebSocketDeflater.m */; };
-		1C4382F11B2FDD5200F6AB7A /* PSWebSocketDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382DE1B2FDD5200F6AB7A /* PSWebSocketDriver.h */; };
-		1C4382F21B2FDD5200F6AB7A /* PSWebSocketDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382DF1B2FDD5200F6AB7A /* PSWebSocketDriver.m */; };
-		1C4382F31B2FDD5200F6AB7A /* PSWebSocketInflater.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E01B2FDD5200F6AB7A /* PSWebSocketInflater.h */; };
-		1C4382F41B2FDD5200F6AB7A /* PSWebSocketInflater.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E11B2FDD5200F6AB7A /* PSWebSocketInflater.m */; };
-		1C4382F51B2FDD5200F6AB7A /* PSWebSocketInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E21B2FDD5200F6AB7A /* PSWebSocketInternal.h */; };
-		1C4382F61B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E31B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h */; };
-		1C4382F71B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E41B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m */; };
-		1C4382F81B2FDD5200F6AB7A /* PSWebSocketServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E51B2FDD5200F6AB7A /* PSWebSocketServer.h */; };
-		1C4382F91B2FDD5200F6AB7A /* PSWebSocketServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E61B2FDD5200F6AB7A /* PSWebSocketServer.m */; };
-		1C4382FA1B2FDD5200F6AB7A /* PSWebSocketTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E71B2FDD5200F6AB7A /* PSWebSocketTypes.h */; };
-		1C4382FB1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4382E81B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h */; };
-		1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C4382E91B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m */; };
 		1C4382FE1B2FFA8800F6AB7A /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C4382FD1B2FFA8800F6AB7A /* CFNetwork.framework */; };
 		1C4382FF1B2FFA9400F6AB7A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE15FFAE186844AA00371183 /* Security.framework */; };
 		1C75820C19B028F70074C601 /* Scoreboard.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C75820A19B028F70074C601 /* Scoreboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -287,6 +269,7 @@
 		A569B8E21DBE3E8500FBD429 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */; };
 		A5960DD21DC85522000B380C /* DeviceLogsProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */; };
 		A5960DD51DC86F0F000B380C /* NotificationPreferenceListCallbacks.m in Sources */ = {isa = PBXBuildFile; fileRef = A5960DD41DC86F0F000B380C /* NotificationPreferenceListCallbacks.m */; };
+		A5C41EB51DD4761E0005FD12 /* SecurifiToolkitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C41EB41DD4761E0005FD12 /* SecurifiToolkitTests.m */; };
 		A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */; };
 		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
 		A5C7AE4A1C807BFA007E630D /* RouterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE481C807BFA007E630D /* RouterParser.h */; };
@@ -502,24 +485,6 @@
 		1C414BE41A79F39600C448A4 /* KeyChainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyChainWrapper.m; sourceTree = "<group>"; };
 		1C414BE81A7B625400C448A4 /* NSDate+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Convenience.h"; sourceTree = "<group>"; };
 		1C414BE91A7B625400C448A4 /* NSDate+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Convenience.m"; sourceTree = "<group>"; };
-		1C4382D81B2FDD5200F6AB7A /* PSWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocket.h; sourceTree = "<group>"; };
-		1C4382D91B2FDD5200F6AB7A /* PSWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocket.m; sourceTree = "<group>"; };
-		1C4382DA1B2FDD5200F6AB7A /* PSWebSocketBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketBuffer.h; sourceTree = "<group>"; };
-		1C4382DB1B2FDD5200F6AB7A /* PSWebSocketBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketBuffer.m; sourceTree = "<group>"; };
-		1C4382DC1B2FDD5200F6AB7A /* PSWebSocketDeflater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketDeflater.h; sourceTree = "<group>"; };
-		1C4382DD1B2FDD5200F6AB7A /* PSWebSocketDeflater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketDeflater.m; sourceTree = "<group>"; };
-		1C4382DE1B2FDD5200F6AB7A /* PSWebSocketDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketDriver.h; sourceTree = "<group>"; };
-		1C4382DF1B2FDD5200F6AB7A /* PSWebSocketDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketDriver.m; sourceTree = "<group>"; };
-		1C4382E01B2FDD5200F6AB7A /* PSWebSocketInflater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketInflater.h; sourceTree = "<group>"; };
-		1C4382E11B2FDD5200F6AB7A /* PSWebSocketInflater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketInflater.m; sourceTree = "<group>"; };
-		1C4382E21B2FDD5200F6AB7A /* PSWebSocketInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketInternal.h; sourceTree = "<group>"; };
-		1C4382E31B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketNetworkThread.h; sourceTree = "<group>"; };
-		1C4382E41B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketNetworkThread.m; sourceTree = "<group>"; };
-		1C4382E51B2FDD5200F6AB7A /* PSWebSocketServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketServer.h; sourceTree = "<group>"; };
-		1C4382E61B2FDD5200F6AB7A /* PSWebSocketServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketServer.m; sourceTree = "<group>"; };
-		1C4382E71B2FDD5200F6AB7A /* PSWebSocketTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketTypes.h; sourceTree = "<group>"; };
-		1C4382E81B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSWebSocketUTF8Decoder.h; sourceTree = "<group>"; };
-		1C4382E91B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSWebSocketUTF8Decoder.m; sourceTree = "<group>"; };
 		1C4382FD1B2FFA8800F6AB7A /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		1C4383001B2FFAA100F6AB7A /* libSystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSystem.dylib; path = usr/lib/libSystem.dylib; sourceTree = SDKROOT; };
 		1C4383021B2FFAAB00F6AB7A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -723,6 +688,9 @@
 		A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceLogsProcessing.m; sourceTree = "<group>"; };
 		A5960DD31DC86EE3000B380C /* NotificationPreferenceListCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationPreferenceListCallbacks.h; sourceTree = "<group>"; };
 		A5960DD41DC86F0F000B380C /* NotificationPreferenceListCallbacks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationPreferenceListCallbacks.m; sourceTree = "<group>"; };
+		A5C41EB21DD4761E0005FD12 /* SecurifiToolkitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SecurifiToolkitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5C41EB41DD4761E0005FD12 /* SecurifiToolkitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecurifiToolkitTests.m; sourceTree = "<group>"; };
+		A5C41EB61DD4761E0005FD12 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceParser.h; sourceTree = "<group>"; };
 		A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceParser.m; sourceTree = "<group>"; };
 		A5C7AE481C807BFA007E630D /* RouterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterParser.h; sourceTree = "<group>"; };
@@ -899,6 +867,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A5C41EAF1DD4761E0005FD12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1042,31 +1017,6 @@
 			path = ../AppKit;
 			sourceTree = "<group>";
 		};
-		1C4382D61B2FDD5200F6AB7A /* PocketSocket */ = {
-			isa = PBXGroup;
-			children = (
-				1C4382D81B2FDD5200F6AB7A /* PSWebSocket.h */,
-				1C4382D91B2FDD5200F6AB7A /* PSWebSocket.m */,
-				1C4382DA1B2FDD5200F6AB7A /* PSWebSocketBuffer.h */,
-				1C4382DB1B2FDD5200F6AB7A /* PSWebSocketBuffer.m */,
-				1C4382DC1B2FDD5200F6AB7A /* PSWebSocketDeflater.h */,
-				1C4382DD1B2FDD5200F6AB7A /* PSWebSocketDeflater.m */,
-				1C4382DE1B2FDD5200F6AB7A /* PSWebSocketDriver.h */,
-				1C4382DF1B2FDD5200F6AB7A /* PSWebSocketDriver.m */,
-				1C4382E01B2FDD5200F6AB7A /* PSWebSocketInflater.h */,
-				1C4382E11B2FDD5200F6AB7A /* PSWebSocketInflater.m */,
-				1C4382E21B2FDD5200F6AB7A /* PSWebSocketInternal.h */,
-				1C4382E31B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h */,
-				1C4382E41B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m */,
-				1C4382E51B2FDD5200F6AB7A /* PSWebSocketServer.h */,
-				1C4382E61B2FDD5200F6AB7A /* PSWebSocketServer.m */,
-				1C4382E71B2FDD5200F6AB7A /* PSWebSocketTypes.h */,
-				1C4382E81B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h */,
-				1C4382E91B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m */,
-			);
-			path = PocketSocket;
-			sourceTree = "<group>";
-		};
 		1C75820919B028F70074C601 /* Stats */ = {
 			isa = PBXGroup;
 			children = (
@@ -1197,6 +1147,7 @@
 				CEF6F4881C92CA1A00C68975 /* CloudSimulator */,
 				221185BF178D371200EE23ED /* SecurifiToolkit */,
 				221185F8178D453A00EE23ED /* SecurifiCloudResources */,
+				A5C41EB31DD4761E0005FD12 /* SecurifiToolkitTests */,
 				221185BC178D371200EE23ED /* Frameworks */,
 				221185BB178D371200EE23ED /* Products */,
 			);
@@ -1207,6 +1158,7 @@
 			children = (
 				221185BA178D371200EE23ED /* libSecurifiToolkit.a */,
 				221185F5178D453A00EE23ED /* SecurifiToolkit.bundle */,
+				A5C41EB21DD4761E0005FD12 /* SecurifiToolkitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1253,7 +1205,6 @@
 				1CD1D5331A660B7A00C030E9 /* Notifications */,
 				1C414BCF1A79F2BE00C448A4 /* OfflineStorage */,
 				22A76D2517912B830099CD8F /* parser */,
-				1C4382D61B2FDD5200F6AB7A /* PocketSocket */,
 				A569B8731DBE3E8500FBD429 /* SocketRocket */,
 				22A76D2417912B6E0099CD8F /* public */,
 				1C2F60531B69D5B9001CCA34 /* Scenes */,
@@ -1578,6 +1529,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		A5C41EB31DD4761E0005FD12 /* SecurifiToolkitTests */ = {
+			isa = PBXGroup;
+			children = (
+				A5C41EB41DD4761E0005FD12 /* SecurifiToolkitTests.m */,
+				A5C41EB61DD4761E0005FD12 /* Info.plist */,
+			);
+			path = SecurifiToolkitTests;
+			sourceTree = "<group>";
+		};
 		CE458D5919EBBB5000689251 /* util */ = {
 			isa = PBXGroup;
 			children = (
@@ -1677,7 +1637,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A569B8C61DBE3E8500FBD429 /* SRLog.h in Headers */,
-				1C4382ED1B2FDD5200F6AB7A /* PSWebSocketBuffer.h in Headers */,
 				1C414BE51A79F39600C448A4 /* KeyChainWrapper.h in Headers */,
 				221185E8178D392500EE23ED /* SecurifiToolkit.h in Headers */,
 				A569B8D81DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.h in Headers */,
@@ -1714,7 +1673,6 @@
 				1CFBB54F1A257D1900438B5F /* SecurifiConfigurator.h in Headers */,
 				1CD1D5541A660B7A00C030E9 /* NotificationRegistration.h in Headers */,
 				22B326CF1796D447004B3642 /* SanityResponse.h in Headers */,
-				1C4382F61B2FDD5200F6AB7A /* PSWebSocketNetworkThread.h in Headers */,
 				CE2EA26919D15DD300C6D6A8 /* MeAsSecondaryUserRequest.h in Headers */,
 				22B326D21796D65E004B3642 /* PrivateCommandTypes.h in Headers */,
 				CE5EB5C617E7204000985636 /* AlmondListRequest.h in Headers */,
@@ -1729,7 +1687,6 @@
 				A569B8D21DBE3E8500FBD429 /* SRURLUtilities.h in Headers */,
 				CE5D0C1B180811EE00224009 /* SFIAlmondPlus.h in Headers */,
 				CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */,
-				1C4382EF1B2FDD5200F6AB7A /* PSWebSocketDeflater.h in Headers */,
 				CE2EA27119D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.h in Headers */,
 				1C414BC81A79F02600C448A4 /* ZHDatabaseStatement.h in Headers */,
 				1CD1D5581A660B7A00C030E9 /* SFINotificationDevice.h in Headers */,
@@ -1771,7 +1728,6 @@
 				A569B8DD1DBE3E8500FBD429 /* SRSecurityPolicy.h in Headers */,
 				2253388517A6B7380051BF0F /* AffiliationUserRequest.h in Headers */,
 				1CD1D5561A660B7A00C030E9 /* NotificationRegistrationResponse.h in Headers */,
-				1C4382FA1B2FDD5200F6AB7A /* PSWebSocketTypes.h in Headers */,
 				CE2EA25519D00B5200C6D6A8 /* UserInviteResponse.h in Headers */,
 				A569B8DC1DBE3E8500FBD429 /* SocketRocket.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
@@ -1798,18 +1754,15 @@
 				CE9A2912188D2B240063D562 /* SensorChangeRequest.h in Headers */,
 				CE9C5B4A188669B6006F2306 /* SensorForcedUpdateRequest.h in Headers */,
 				CE91315219C6B83B00D94876 /* UserProfileRequest.h in Headers */,
-				1C4382F31B2FDD5200F6AB7A /* PSWebSocketInflater.h in Headers */,
 				CE98307718C06D7E00E25AD0 /* DynamicAlmondNameChangeResponse.h in Headers */,
 				1C23FBD319480D6C00E353D1 /* SFIReachabilityManager.h in Headers */,
 				CEA605B71A113E4E008380D3 /* DynamicNotificationPreferenceList.h in Headers */,
 				1C3270E61A243B28007202C1 /* SFIWirelessSetting.h in Headers */,
 				1C414BC61A79F02600C448A4 /* ZHDatabase.h in Headers */,
 				1DF03BA6792245B49830BBD8 /* XMLWriter.h in Headers */,
-				1C4382EB1B2FDD5200F6AB7A /* PSWebSocket.h in Headers */,
 				1DF03F84710D245D6001AFA1 /* BaseCommandRequest.h in Headers */,
 				1DF03ED7951D970D55780A5B /* SFIXmlWriter.h in Headers */,
 				1DF033CE96CE4D0710FD1890 /* SFINotification.h in Headers */,
-				1C4382F81B2FDD5200F6AB7A /* PSWebSocketServer.h in Headers */,
 				1DF03D00FBF41D0DD68FBEFC /* SecurifiTypes.h in Headers */,
 				1DF036EA38E51CE3BBE1E23A /* DatabaseStore.h in Headers */,
 				1DF03C9FE842023F0F9D0202 /* SFINotificationStore.h in Headers */,
@@ -1827,15 +1780,12 @@
 				1DF036CF40181B113E42E1D3 /* NotificationCountRequest.h in Headers */,
 				A569B8B01DBE3E8500FBD429 /* NSURLRequest+SRWebSocketPrivate.h in Headers */,
 				1DF035420555D20D2F38BC1A /* NotificationCountResponse.h in Headers */,
-				1C4382F51B2FDD5200F6AB7A /* PSWebSocketInternal.h in Headers */,
 				1DF0358CCF266F1666C24215 /* NotificationClearCountRequest.h in Headers */,
 				A569B8BA1DBE3E8500FBD429 /* SRConstants.h in Headers */,
-				1C4382F11B2FDD5200F6AB7A /* PSWebSocketDriver.h in Headers */,
 				1DF0371747228122D3121E75 /* NotificationClearCountResponse.h in Headers */,
 				CEF6F49E1C92CAAF00C68975 /* Rule.h in Headers */,
 				1C3EEFBF1B37999300DFCF62 /* SFIBlockedDevice.h in Headers */,
 				1DF038EAE9E89CD9BFFC13C7 /* AlmondVersionChecker.h in Headers */,
-				1C4382FB1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.h in Headers */,
 				1DF03E9C2661E5E178DFE76F /* Network.h in Headers */,
 				1DF035141737DE9D6C0BC6FC /* NetworkState.h in Headers */,
 				CEF6F4A41C92CAAF00C68975 /* RulesTimeElement.h in Headers */,
@@ -1903,6 +1853,23 @@
 			productReference = 221185F5178D453A00EE23ED /* SecurifiToolkit.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
+		A5C41EB11DD4761E0005FD12 /* SecurifiToolkitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A5C41EB71DD4761E0005FD12 /* Build configuration list for PBXNativeTarget "SecurifiToolkitTests" */;
+			buildPhases = (
+				A5C41EAE1DD4761E0005FD12 /* Sources */,
+				A5C41EAF1DD4761E0005FD12 /* Frameworks */,
+				A5C41EB01DD4761E0005FD12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SecurifiToolkitTests;
+			productName = SecurifiToolkitTests;
+			productReference = A5C41EB21DD4761E0005FD12 /* SecurifiToolkitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1913,6 +1880,12 @@
 				LastTestingUpgradeCheck = 0610;
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Securifi Ltd";
+				TargetAttributes = {
+					A5C41EB11DD4761E0005FD12 = {
+						CreatedOnToolsVersion = 8.0;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = 221185B5178D371100EE23ED /* Build configuration list for PBXProject "SecurifiToolkit" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1929,6 +1902,7 @@
 				221185B9178D371200EE23ED /* SecurifiToolkit */,
 				221185EA178D3F4A00EE23ED /* Framework */,
 				221185F4178D453A00EE23ED /* SecurifiCloudResources */,
+				A5C41EB11DD4761E0005FD12 /* SecurifiToolkitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1940,6 +1914,13 @@
 			files = (
 				A569B8DB1DBE3E8500FBD429 /* Info.plist in Resources */,
 				221185FD178D453A00EE23ED /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5C41EB01DD4761E0005FD12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2022,11 +2003,8 @@
 				CE5EB65717EAD44E00985636 /* SFIDeviceValue.m in Sources */,
 				CE9A2917188D30270063D562 /* SensorChangeResponse.m in Sources */,
 				CE466A601823CFF900E55DF9 /* ResetPasswordRequest.m in Sources */,
-				1C4382EE1B2FDD5200F6AB7A /* PSWebSocketBuffer.m in Sources */,
 				1CD1D55B1A660B7A00C030E9 /* SFINotificationUser.m in Sources */,
 				1CD1D54F1A660B7A00C030E9 /* NotificationPreferenceListResponse.m in Sources */,
-				1C4382F71B2FDD5200F6AB7A /* PSWebSocketNetworkThread.m in Sources */,
-				1C4382F91B2FDD5200F6AB7A /* PSWebSocketServer.m in Sources */,
 				A5D9B5041DB4DBA500BF1F60 /* CreateJSON.m in Sources */,
 				1CD1D5531A660B7A00C030E9 /* NotificationPreferences.m in Sources */,
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
@@ -2045,11 +2023,9 @@
 				A569B8C11DBE3E8500FBD429 /* SRHash.m in Sources */,
 				CE5EB65317EAD43000985636 /* DeviceValueResponse.m in Sources */,
 				CE7EA7DF18978910005DCBA3 /* Base64.m in Sources */,
-				1C4382F41B2FDD5200F6AB7A /* PSWebSocketInflater.m in Sources */,
 				CE5D0C1C180811EE00224009 /* SFIAlmondPlus.m in Sources */,
 				1CFBB5501A257D1900438B5F /* SecurifiConfigurator.m in Sources */,
 				CE5EB63E17E8548500985636 /* DeviceDataHashRequest.m in Sources */,
-				1C4382F01B2FDD5200F6AB7A /* PSWebSocketDeflater.m in Sources */,
 				A5C7AE4B1C807BFA007E630D /* RouterParser.m in Sources */,
 				CE5EB5CB17E722BD00985636 /* AlmondListResponse.m in Sources */,
 				A569B8C71DBE3E8500FBD429 /* SRLog.m in Sources */,
@@ -2069,13 +2045,11 @@
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
 				A569B8711DBE108C00FBD429 /* LocalNetworkManagement.m in Sources */,
 				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
-				1C4382FC1B2FDD5200F6AB7A /* PSWebSocketUTF8Decoder.m in Sources */,
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
 				A54EAF9C1C44D8D800CF2837 /* ClientParser.m in Sources */,
 				A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */,
 				1CD1D5491A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.m in Sources */,
-				1C4382EC1B2FDD5200F6AB7A /* PSWebSocket.m in Sources */,
 				CE5C1DB41D950FFB007BCE50 /* CompleteDB.m in Sources */,
 				1C3EEFC01B37999300DFCF62 /* SFIBlockedDevice.m in Sources */,
 				CEAD85A619CAB7D8006D1048 /* DeleteAccountRequest.m in Sources */,
@@ -2126,7 +2100,6 @@
 				22FAE88917A8E528002FFEE8 /* Signup.m in Sources */,
 				1CD1D5511A660B7A00C030E9 /* NotificationPreferenceResponse.m in Sources */,
 				CE5EB64F17EAD41F00985636 /* DeviceValueRequest.m in Sources */,
-				1C4382F21B2FDD5200F6AB7A /* PSWebSocketDriver.m in Sources */,
 				CE2EA26A19D15DD300C6D6A8 /* MeAsSecondaryUserRequest.m in Sources */,
 				CE2EA26219D04BDD00C6D6A8 /* AlmondNameChange.m in Sources */,
 				A569B8B51DBE3E8500FBD429 /* SRRunLoopThread.m in Sources */,
@@ -2225,6 +2198,14 @@
 				A569B8B91DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */,
 				A52164091C983E4E00E7B79D /* GenericValue.m in Sources */,
 				A569B8DA1DBE3E8500FBD429 /* NSURLRequest+SRWebSocket.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5C41EAE1DD4761E0005FD12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A5C41EB51DD4761E0005FD12 /* SecurifiToolkitTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2410,6 +2391,76 @@
 			};
 			name = Release;
 		};
+		A5C41EB81DD4761E0005FD12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"BUNDLE_LOADER[arch=*]" = "$(BUILT_PRODUCTS_DIR)/Almond.app/Almond";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = SecurifiToolkitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masood.securifi.SecurifiToolkitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				"TEST_HOST[sdk=*]" = "$(BUNDLE_LOADER)";
+			};
+			name = Debug;
+		};
+		A5C41EB91DD4761E0005FD12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = SecurifiToolkitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masood.securifi.SecurifiToolkitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2448,6 +2499,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		A5C41EB71DD4761E0005FD12 /* Build configuration list for PBXNativeTarget "SecurifiToolkitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A5C41EB81DD4761E0005FD12 /* Debug */,
+				A5C41EB91DD4761E0005FD12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

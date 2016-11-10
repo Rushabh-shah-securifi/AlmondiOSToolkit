@@ -10,10 +10,11 @@
 #define AlmondManagement_h
 #import <Foundation/Foundation.h>
 #import "SFIAlmondPlus.h"
-#import "SecurifiToolKit.h"
 #import "Network.h"
 #import "NetworkState.h"
 #import "SFIAlmondLocalNetworkSettings.h"
+#import "AlmondListResponse.h"
+#import "DynamicAlmondNameChangeResponse.h"
 
 @interface AlmondManagement : NSObject
 

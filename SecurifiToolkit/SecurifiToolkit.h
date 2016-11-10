@@ -82,7 +82,7 @@
 #import <SecurifiToolkit/SFIDevicesList.h>
 
 #import <SecurifiToolkit/MDJSON.h>
-#import <SecurifiToolkit/ClientParser.h>
+
 #import "Device.h"
 #import "DeviceKnownValues.h"
 #import "Client.h"

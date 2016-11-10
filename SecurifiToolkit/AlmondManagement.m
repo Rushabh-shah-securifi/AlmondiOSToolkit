@@ -7,6 +7,7 @@
 //
 
 #import "AlmondManagement.h"
+#import "SecurifiToolKit.h"
 
 @implementation AlmondManagement
 
@@ -162,11 +163,6 @@
     return local_almonds;
 }
 
-
-+ (NSArray *)notificationPrefList:(NSString *)almondMac {
-    return [[SecurifiToolkit sharedInstance].dataManager readNotificationPreferenceList:almondMac];
-}
-
 #pragma mark - Almond List Management
 
 + (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network {
@@ -234,10 +230,6 @@
     
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:newAlmondList manageCurrentAlmondChange:YES];
-    //    [toolKit.devices removeAllObjects];
-    //    [toolKit.clients removeAllObjects];
-    //    [toolKit.scenesArray removeAllObjects];
-    //    [toolKit.ruleList removeAllObjects];
     [toolKit postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 

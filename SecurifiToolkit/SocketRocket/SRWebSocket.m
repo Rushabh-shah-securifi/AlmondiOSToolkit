@@ -179,7 +179,7 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
     _consumerPool = [[SRIOConsumerPool alloc] init];
 
     _scheduledRunloops = [[NSMutableSet alloc] init];
-
+    
     return self;
 }
 
