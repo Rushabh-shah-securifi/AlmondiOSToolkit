@@ -217,7 +217,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)postNotification:(NSString *)notificationName data:(id)payload;
 - (void)asyncInitializeConnection2:(Network *)network;
 - (void)purgeStoredData;
-- (void)tryShutdownAndStartNetworks:(enum SFIAlmondConnectionMode)mode;
+- (void)tryShutdownAndStartNetworks;
 - (GenericCommand*)tryRequestAlmondMode:(NSString *)almondMac;
 -(void) asyncInitCloud;
 

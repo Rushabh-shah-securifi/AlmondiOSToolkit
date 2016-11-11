@@ -27,7 +27,7 @@
 }
 
 + (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
-   if (!almond) {
+   if(!almond) {
         return;
     }
     NSLog(@"i am called");
@@ -39,17 +39,23 @@
 
 + (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
     NSLog(@"toolkit - manageCurrentAlmondChange");
+    
+    NSLog(@"%@ is the almond name", almond.almondplusName);
     if (!almond) {
+        NSLog(@"almond is nil in manageCurrentAlmondChange");
         return;
     }
     
+    NSLog(@"manageCurrent Almond is passing the return");
     NSString *mac = almond.almondplusMAC;
     SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
     // reset connections
     if([toolKit currentConnectionMode]==SFIAlmondConnectionMode_local){
-        [toolKit tryShutdownAndStartNetworks:toolKit.currentConnectionMode];
-        return;
+        [toolKit tryShutdownAndStartNetworks];
+        return; 
     }
+    
+    NSLog(@"cleanup is called in manageCurrentAlmondchange");
     [toolKit cleanUp];
     
     NSLog(@"almond.linktype: %d", almond.linkType);
@@ -240,6 +246,7 @@
     if (almondName.length == 0) {
         return;
     }
+    
     NSLog(@"Came here onDynamicAlmondNameChange %@",almondName);
     SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
@@ -275,13 +282,10 @@
         [toolKit purgeStoredData];
         return nil;
     }
-    
-    
-    
+
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
-            
             [toolKit setCurrentAlmond:currentAlmond];
         }
         else {

@@ -684,6 +684,8 @@
 		A569B8A41DBE3E8500FBD429 /* SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRWebSocket.h; sourceTree = "<group>"; };
 		A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRWebSocket.m; sourceTree = "<group>"; };
 		A569B8E31DBE414100FBD429 /* libicucore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libicucore.tbd; path = usr/lib/libicucore.tbd; sourceTree = SDKROOT; };
+		A57016DB1DD5A2ED00F83624 /* UITesting.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UITesting.m; sourceTree = "<group>"; };
+		A57016DD1DD5A2ED00F83624 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A5960DD01DC854EC000B380C /* DeviceLogsProcessing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLogsProcessing.h; sourceTree = "<group>"; };
 		A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceLogsProcessing.m; sourceTree = "<group>"; };
 		A5960DD31DC86EE3000B380C /* NotificationPreferenceListCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationPreferenceListCallbacks.h; sourceTree = "<group>"; };
@@ -1148,6 +1150,7 @@
 				221185BF178D371200EE23ED /* SecurifiToolkit */,
 				221185F8178D453A00EE23ED /* SecurifiCloudResources */,
 				A5C41EB31DD4761E0005FD12 /* SecurifiToolkitTests */,
+				A57016DA1DD5A2ED00F83624 /* UITesting */,
 				221185BC178D371200EE23ED /* Frameworks */,
 				221185BB178D371200EE23ED /* Products */,
 			);
@@ -1527,6 +1530,15 @@
 				A569B8A01DBE3E8500FBD429 /* Info.plist */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		A57016DA1DD5A2ED00F83624 /* UITesting */ = {
+			isa = PBXGroup;
+			children = (
+				A57016DB1DD5A2ED00F83624 /* UITesting.m */,
+				A57016DD1DD5A2ED00F83624 /* Info.plist */,
+			);
+			path = UITesting;
 			sourceTree = "<group>";
 		};
 		A5C41EB31DD4761E0005FD12 /* SecurifiToolkitTests */ = {
@@ -2507,6 +2519,7 @@
 				A5C41EB91DD4761E0005FD12 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

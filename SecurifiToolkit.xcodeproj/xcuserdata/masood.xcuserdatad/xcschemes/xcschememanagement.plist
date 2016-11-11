@@ -27,12 +27,17 @@
 		<key>SecurifiToolkitTests.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>21</integer>
+			<integer>19</integer>
 		</dict>
 		<key>Tests.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>19</integer>
+		</dict>
+		<key>UITesting.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>20</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
@@ -48,6 +53,11 @@
 			<true/>
 		</dict>
 		<key>221185F4178D453A00EE23ED</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A57016D81DD5A2ED00F83624</key>
 		<dict>
 			<key>primary</key>
 			<true/>

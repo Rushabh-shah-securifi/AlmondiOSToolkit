@@ -302,18 +302,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:mode forKey:kPREF_DEFAULT_CONNECTION_MODE];
     NSLog(@"i am called");
-    [self tryShutdownAndStartNetworks:mode];
+    [self tryShutdownAndStartNetworks];
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
 
 // for changing network settings
 // ensures a local connection for the specified almond is shutdown and, if needed, restarted
-- (void)tryShutdownAndStartNetworks:(enum SFIAlmondConnectionMode)mode{
+- (void)tryShutdownAndStartNetworks{
     if (!self.config.enableLocalNetworking) {
         return;
     }
     __weak SecurifiToolkit *block_self = self;
-    NSLog(@" mode == %d",mode);
     //FORCED_DISCONNECT state is added here to make sure that toggle between cloud network and local network does not break;
     dispatch_async(self.commandDispatchQueue, ^() {
         [block_self tearDownNetwork];
@@ -396,7 +395,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSLog(@"i am called");
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
-    [self tryShutdownAndStartNetworks:SFIAlmondConnectionMode_cloud];
+    [self tryShutdownAndStartNetworks];
 }
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
@@ -467,6 +466,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 -(void)cleanUp{
+    NSLog(@"%@ is the scenes list after cleanup", self.devices);
     if(self.devices!=nil && self.devices.count>0)
         [self.devices removeAllObjects];
      if(self.scenesArray!=nil && self.scenesArray.count>0)
@@ -475,6 +475,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self.clients removeAllObjects];
      if(self.ruleList!=nil && self.ruleList.count>0)
         [self.ruleList removeAllObjects];
+    
 }
 
 -(void)removeObjectFromArray:(NSMutableArray *)array{
@@ -530,7 +531,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [block_self asyncSendToNetwork:cmd];
         
         [NotificationAccessAndRefreshCommands tryRefreshNotifications];
-        //        }
     }
     
 }
