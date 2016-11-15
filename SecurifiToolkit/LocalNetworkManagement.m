@@ -12,18 +12,6 @@
 
 @implementation LocalNetworkManagement
 
-+ (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings {
-    
-    if (![settings hasCompleteSettings]) {
-        NSLog(@"setLocalNetworkSettings returning...");
-        return;
-    }
-    
-    NSString *almondMac = settings.almondplusMAC;
-    enum SFIAlmondConnectionMode mode = [[SecurifiToolkit sharedInstance] currentConnectionMode];
-    [self storeLocalNetworkSettings:settings];
-}
-
 + (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac {
     return [[SecurifiToolkit sharedInstance].dataManager readAlmondLocalNetworkSettings:almondMac];
 }
@@ -33,35 +21,32 @@
     if (!almondMac) {
         return;
     }
+    
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     [toolkit.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
     
     SFIAlmondPlus *currentAlmond = toolkit.currentAlmond;
-    if(currentAlmond!=nil)
-        NSLog(@"Current Almond is %@ %@" , currentAlmond.almondplusMAC, almondMac);
     
-    if(currentAlmond!=nil && [currentAlmond.almondplusMAC isEqualToString:almondMac] && [toolkit currentConnectionMode]==SFIAlmondConnectionMode_local){
-        NSLog(@"Current Almond equals is ");
-        [toolkit tearDownNetwork];
-    }
-    
-    if (currentAlmond!=nil) {
-        if ([currentAlmond.almondplusMAC isEqualToString:almondMac]) {
-            [AlmondManagement removeCurrentAlmond];
-            
-            NSArray *cloud = toolkit.almondList;
-            if (cloud.count > 0) {
-                [toolkit setCurrentAlmond:cloud.firstObject];
-            }
-            else {
-                NSArray *local = toolkit.localLinkedAlmondList;
-                if (local.count > 0) {
-                    [toolkit setCurrentAlmond:local.firstObject];
-                }
+    if (currentAlmond!=nil && [currentAlmond.almondplusMAC isEqualToString:almondMac]) {
+        
+        if([toolkit currentConnectionMode]==SFIAlmondConnectionMode_local){
+            NSLog(@"Current Almond equals is ");
+            [toolkit tearDownNetwork];
+        }
+        
+        [AlmondManagement removeCurrentAlmond];
+        
+        NSArray *cloud = toolkit.almondList;
+        if (cloud.count > 0) {
+            [toolkit setCurrentAlmond:cloud.firstObject];
+        }
+        else {
+            NSArray *local = toolkit.localLinkedAlmondList;
+            if (local.count > 0) {
+                [toolkit setCurrentAlmond:local.firstObject];
             }
         }
     }
-    
     
     [toolkit postNotification:kSFIDidUpdateAlmondList data:nil];
 }
@@ -108,7 +93,7 @@
         settings.host = summary.url;
     }
     
-    [self setLocalNetworkSettings:settings];
+    [self storeLocalNetworkSettings:settings];
 }
 
 

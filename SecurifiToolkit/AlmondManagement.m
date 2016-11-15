@@ -1,4 +1,4 @@
-    //
+//
 //  AlmondManagement.m
 //  SecurifiToolkit
 //
@@ -38,15 +38,12 @@
 }
 
 + (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
-    NSLog(@"toolkit - manageCurrentAlmondChange");
     
     NSLog(@"%@ is the almond name", almond.almondplusName);
     if (!almond) {
-        NSLog(@"almond is nil in manageCurrentAlmondChange");
         return;
     }
     
-    NSLog(@"manageCurrent Almond is passing the return");
     NSString *mac = almond.almondplusMAC;
     SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
     // reset connections
@@ -116,6 +113,7 @@
     }
     return NO;
 }
+
 
 + (NSArray *)localLinkedAlmondList {
     if (![SecurifiToolkit sharedInstance].config.enableLocalNetworking) {
@@ -282,11 +280,11 @@
         [toolKit purgeStoredData];
         return nil;
     }
-
+    
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
-            [toolKit setCurrentAlmond:currentAlmond];
+            [AlmondManagement setCurrentAlmond:currentAlmond];
         }
         else {
             [AlmondManagement writeCurrentAlmond:currentAlmond];
@@ -307,7 +305,7 @@
         // Just pick the first one in this case
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
-            [toolKit setCurrentAlmond:currentAlmond];
+            [AlmondManagement setCurrentAlmond:currentAlmond];
         }
         else {
             [AlmondManagement writeCurrentAlmond:currentAlmond];

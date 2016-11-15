@@ -130,6 +130,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     });
 }
 
+
 + (BOOL)isInitialized {
     return toolkit_singleton != nil;
 }
@@ -630,7 +631,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 - (void)purgeStoredData {
     NSLog(@"i am called");
-    //[self setConnectionMode:SFIAlmondConnectionMode_cloud];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
     [AlmondManagement removeCurrentAlmond];

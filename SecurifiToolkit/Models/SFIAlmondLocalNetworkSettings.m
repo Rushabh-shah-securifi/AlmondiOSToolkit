@@ -175,6 +175,10 @@
 }
 
 - (BOOL)hasBasicCompleteSettings {
+    NSLog(@"%d value of hasBasicComplete",self.host.length > 0 &&
+          self.port > 0 &&
+          self.login.length > 0 &&
+          self.password.length > 0);
     return self.host.length > 0 &&
             self.port > 0 &&
             self.login.length > 0 &&
@@ -188,6 +192,7 @@
 }
 
 - (BOOL)validMac:(NSString *)mac {
+    NSLog(@"%d value of validMac",mac.length > 0 && ![mac isEqualToString:@"<no_mac>"]);
     return mac.length > 0 && ![mac isEqualToString:@"<no_mac>"];
 }
 

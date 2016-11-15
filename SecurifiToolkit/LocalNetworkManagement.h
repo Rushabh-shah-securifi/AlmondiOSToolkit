@@ -12,7 +12,6 @@
 @class SFIRouterSummary;
 
 @interface LocalNetworkManagement : NSObject
-+ (void)setLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
 + (SFIAlmondLocalNetworkSettings *)localNetworkSettingsForAlmond:(NSString *)almondMac;
 + (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
 + (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
