@@ -568,6 +568,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     BOOL success = [self.network submitCommand:command];
+    
     NSLog(@"boolean value is %d",success);
     if (success) {
         NSLog(@"[Generic cmd: %d] send success", command.commandType);
@@ -599,7 +600,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 #pragma mark - Cloud Logon
-
 - (NSString *)loginEmail {
     return [KeyChainAccess secEmail];
 }
@@ -1143,15 +1143,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [self tearDownNetwork];
             
             SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
-            
             networkConfig = [NetworkConfig webSocketConfig:settings almondMac:almond.almondplusMAC];
-            
         }
             break;
         default:
             break;
     }
-    
+
     network = [Network networkWithNetworkConfig:networkConfig callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
     network.delegate = self;
     

@@ -25,6 +25,7 @@ typedef NS_ENUM(NSUInteger, NetworkEndpointMode) {
 
 - (id)copyWithZone:(NSZone *)zone;
 
+@property(nonatomic) BOOL isTesting;
 // Indicates whether the config is for a Cloud connection or web socket connection
 @property(readonly) enum NetworkEndpointMode mode;
 

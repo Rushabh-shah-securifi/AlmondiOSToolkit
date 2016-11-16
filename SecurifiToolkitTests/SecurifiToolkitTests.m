@@ -14,6 +14,8 @@
 #import "AlmondManagement.h"
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "LocalNetworkManagement.h"
+#import "Login.h"
+
 
 @interface SecurifiToolkitTests : XCTestCase
 
@@ -23,8 +25,19 @@
 
 - (void)setUp {
     [super setUp];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(onReachabilityChanged) name:kSFIReachabilityChangedNotification object:nil];
     NSLog(@"SetUp method is called");
     // Put setup code here. This method is called before the invocation of each test method in the class.
+}
+
+-(void)onReachabilityChanged {
+    NSLog(@"onReachabilityChanged is called from test cases");
+    if(![SecurifiToolkit sharedInstance].isCloudReachable){
+        XCTAssertTrue(false);
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(onReachabilityChanged) name:kSFIReachabilityChangedNotification object:nil];
+    }
 }
 
 - (void)tearDown {
@@ -33,42 +46,75 @@
     [super tearDown];
 }
 
-- (void)testAsyncInitNetwork {
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+- (void)testAsyncInitNetwork_withOutLoginCredential_withOutNetwork {
     
     [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
     
-    XCTAssertEqual([ConnectionStatus getConnectionStatus], NO_NETWORK_CONNECTION);
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    [toolkit tearDownLoginSession];
     
     [toolkit asyncInitNetwork];
-
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(9.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         //do assertions here
-        BOOL isCloudReachable = [toolkit isCloudReachable];
-        ConnectionStatusType currentStatus = [ConnectionStatus getConnectionStatus];
-        NSLog(@"end of the time block and the status value is %ld",(long)currentStatus);
-        
-        BOOL hasLoginCredentials = [KeyChainAccess hasLoginCredentials];
-        if(isCloudReachable){
-            if(!hasLoginCredentials){
-                XCTAssertEqual(currentStatus, CONNECTED_TO_NETWORK);
-            }else{
-                XCTAssertEqual(currentStatus, AUTHENTICATED);
-            }
-        }else{
-            XCTAssertEqual(currentStatus, NO_NETWORK_CONNECTION);
-        }
-        
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
         [expectation fulfill];
     });
     
-    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *error) {
+    [self waitForExpectationsWithTimeout:11.0 handler:^(NSError *error) {
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }
     }];
+}
+
+- (void)testAsyncInitNetwork_withLoginCredentials_withOutNetwork {
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    [self testUserAuthentication];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
+        [toolkit asyncInitNetwork];
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //do assertions here
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
+        [expectation fulfill];
+    });
+    
+    [self waitForExpectationsWithTimeout:22.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timeout Error: %@", error);
+        }
+    }];
+}
+
+//if the network is already in connecting or connected or Authenticated it should not retry the connection
+-(void) testAsyncInitNetwork_ForConnectionsStates_OtherThan_NO_NETWORK_CONNECTION{
+    [ConnectionStatus setConnectionStatusTo:IS_CONNECTING_TO_NETWORK];
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    [toolkit asyncInitNetwork];
+    
+    XCTAssertEqual([ConnectionStatus getConnectionStatus], IS_CONNECTING_TO_NETWORK);
+    
+    [ConnectionStatus setConnectionStatusTo:CONNECTED_TO_NETWORK];
+   
+    [toolkit asyncInitNetwork];
+    
+    XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
+    
+    [ConnectionStatus setConnectionStatusTo:AUTHENTICATED];
+    
+    XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
 }
 
 -(void) testTearDownNetwork {
@@ -141,38 +187,88 @@
     XCTAssertEqualObjects(@"TestCasesAlmond", currentAlmondName);
 }
 
+-(void)testUserAuthentication {
+    
+    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    [toolkit tearDownLoginSession];
+    
+    [toolkit asyncInitNetwork];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //do assertions here
+        NSString* email = @"masood.pathan@securifi.com";
+        NSString* password = @"000000";
+        //set the username and password so that it have credentials
+        [KeyChainAccess setSecEmail:email];
+        
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setBool:YES forKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
+        
+        Login *loginCommand = [Login new];
+        loginCommand.UserID = email;
+        loginCommand.Password = password;
+        
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.commandType = CommandType_LOGIN_COMMAND;
+        cmd.command = loginCommand;
+        NSLog(@"before sending the login command");
+        [toolkit asyncSendToNetwork:cmd];
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //do assertions here
+        NSString* email = @"masood.pathan@securifi.com";
+        NSString* password = @"000000";
+        //set the username and password so that it have credentials
+        [KeyChainAccess setSecEmail:email];
+        
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setBool:YES forKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
+        
+        Login *loginCommand = [Login new];
+        loginCommand.UserID = email;
+        loginCommand.Password = password;
+        
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.commandType = CommandType_LOGIN_COMMAND;
+        cmd.command = loginCommand;
+        NSLog(@"before sending the login command");
+        [toolkit asyncSendToNetwork:cmd];
+    });
+}
 
 -(void) testManageCurrentAlmondChange {
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    [self testUserAuthentication];
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
     almond.almondplusName = @"UnKnownAlmondName";
     almond.almondplusMAC = @"UnknownAlmondMac";
     [toolkit setConnectionMode:SFIAlmondConnectionMode_cloud];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [AlmondManagement manageCurrentAlmondChange:almond];
     });
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSLog(@"%@ is the sceneslist in testmangeCurrentAlmondChange",toolkit.scenesArray);
         
         XCTAssertEqual(toolkit.scenesArray.count,0);
         XCTAssertEqual(toolkit.devices.count,0);
         XCTAssertEqual(toolkit.ruleList.count,0);
         XCTAssertEqual(toolkit.clients.count,0);
-        
-        if(toolkit.isCloudReachable){
-            XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        }
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
         
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
         [AlmondManagement manageCurrentAlmondChange:almond];
     });
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(21.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(25.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         XCTAssertEqual(toolkit.scenesArray.count,0);
         XCTAssertEqual(toolkit.devices.count,0);
         XCTAssertEqual(toolkit.ruleList.count,0);
@@ -181,7 +277,7 @@
         [expectation fulfill];
     });
     
-    [self waitForExpectationsWithTimeout:22.0 handler:^(NSError *error) {
+    [self waitForExpectationsWithTimeout:26.0 handler:^(NSError *error) {
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }
@@ -267,7 +363,6 @@
 -(void) testRemoveLocalNetworkSettingsForAlmond {
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     SFIAlmondLocalNetworkSettings* settings = [SFIAlmondLocalNetworkSettings new];
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
     almond.almondplusName = @"TestingAlmondName";
