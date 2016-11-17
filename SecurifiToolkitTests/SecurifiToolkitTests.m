@@ -406,7 +406,6 @@
         [expectation fulfill];
     });
     
-    
     [self waitForExpectationsWithTimeout:22.0 handler:^(NSError *error) {
         if (error) {
             NSLog(@"Timeout Error: %@", error);
@@ -414,4 +413,73 @@
     }];
 }
 
+
+-(void)testTryUpdateLocalNetworkSettingsForAlmond_withNoPreviousSettings{
+    
+    SFIRouterSummary* summary = [SFIRouterSummary new];
+    summary.login = @"TestingLoginValue";
+    summary.password = @"TestingPassword";
+    summary.url = @"TestingUrl";
+    
+    SFIAlmondPlus* almond = [SFIAlmondPlus new];
+    almond.almondplusMAC = @"TestingAlmondMac";
+    [LocalNetworkManagement removeLocalNetworkSettingsForAlmond:almond.almondplusMAC];
+    
+    [LocalNetworkManagement tryUpdateLocalNetworkSettingsForAlmond:almond.almondplusMAC withRouterSummary:summary];
+    
+    SFIAlmondLocalNetworkSettings* settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
+    
+    XCTAssertNil(settings.login);
+    XCTAssertNil(settings.password);
+    XCTAssertNil(settings.host);
+}
+
+//when the have some previous settings for the mac then it will override that settings with values from router summary
+-(void)testTryUpdateLocalNetworkSettingsForAlmond_withPreviousSettings{
+
+    SFIAlmondPlus* almond = [SFIAlmondPlus new];
+    almond.almondplusMAC = @"TestingAlmondMac";
+    
+    SFIAlmondLocalNetworkSettings* oldSettings = [SFIAlmondLocalNetworkSettings new];
+    oldSettings.host = @"OldTestingUrl";
+    oldSettings.login = @"OldTestingLoginValue";
+    oldSettings.password = @"OldTestingPassword";
+    oldSettings.almondplusMAC = @"TestingAlmondMac";
+    
+    [LocalNetworkManagement removeLocalNetworkSettingsForAlmond:almond.almondplusMAC];
+    [LocalNetworkManagement storeLocalNetworkSettings:oldSettings];
+    
+    SFIRouterSummary* summary = [SFIRouterSummary new];
+    summary.login = @"TestingLoginValue";
+    summary.password = @"G8TNM78pxDqUYZ9K3tzfccmkL16LycEgk7dvD9ZHSlkmbGhBfPS6XDs2uSF7TjqunZF9TdXtWEcqrCujAJIgog==";
+    summary.url = @"TestingUrl";
+    summary.uptime = @"654321";
+    
+    [LocalNetworkManagement tryUpdateLocalNetworkSettingsForAlmond:almond.almondplusMAC withRouterSummary:summary];
+    
+    SFIAlmondLocalNetworkSettings* newSettings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
+    
+    XCTAssertEqualObjects(newSettings.login, @"TestingLoginValue");
+    char arrayChar[16];
+    arrayChar[0] = 23;
+    arrayChar[1] = 30;
+    arrayChar[2] = 45;
+    arrayChar[3] = 53;
+    arrayChar[4] = 110;
+    arrayChar[5] = 79;
+    arrayChar[6] = 3;
+    arrayChar[7] = 48;
+    arrayChar[8] = 121;
+    arrayChar[9] = 106;
+    arrayChar[10] = 99;
+    arrayChar[11] = 100;
+    arrayChar[12] = 113;
+    arrayChar[13] = 61;
+    arrayChar[14] = 113;
+    arrayChar[15] = 7;
+    NSString *str = [NSString stringWithFormat:@"%s", arrayChar];
+    XCTAssertEqualObjects(newSettings.password, str);
+    XCTAssertEqualObjects(newSettings.host, @"TestingUrl");
+    
+}
 @end
