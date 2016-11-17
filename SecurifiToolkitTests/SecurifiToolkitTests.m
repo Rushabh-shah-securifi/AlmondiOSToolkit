@@ -16,7 +16,6 @@
 #import "LocalNetworkManagement.h"
 #import "Login.h"
 
-
 @interface SecurifiToolkitTests : XCTestCase
 
 @end
@@ -40,11 +39,75 @@
     }
 }
 
+-(void) testingInternetDown {
+    while(true){
+        [NSThread sleepForTimeInterval:100];
+    }
+}
+
 - (void)tearDown {
     NSLog(@"tearDown method is called");
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
 }
+
+#pragma mark - toolkit methods
+
+-(void) authenticate{
+    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    XCTAssertEqual([toolkit isCloudReachable], YES);
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    [toolkit tearDownLoginSession];
+    
+    [toolkit asyncInitNetwork];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //do assertions here
+        NSString* email = @"murali.kurapati@securifi.com";
+        NSString* password = @"000000";
+        //set the username and password so that it have credentials
+        [KeyChainAccess setSecEmail:email];
+        
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setBool:YES forKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
+        
+        Login *loginCommand = [Login new];
+        loginCommand.UserID = email;
+        loginCommand.Password = password;
+        
+        GenericCommand *cmd = [GenericCommand new];
+        cmd.commandType = CommandType_LOGIN_COMMAND;
+        cmd.command = loginCommand;
+        NSLog(@"before sending the login command");
+        [toolkit asyncSendToNetwork:cmd];
+    });
+}
+
+
+-(void)testUserAuthentication_Cloud {
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
+    
+    [self authenticate];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
+        [expectation fulfill];
+    });
+    
+    [self waitForExpectationsWithTimeout:16.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timeout Error: %@", error);
+        }
+    }];
+}
+
 
 - (void)testAsyncInitNetwork_withOutLoginCredential_withOutNetwork {
     
@@ -69,6 +132,7 @@
             NSLog(@"Timeout Error: %@", error);
         }
     }];
+    
 }
 
 - (void)testAsyncInitNetwork_withLoginCredentials_withOutNetwork {
@@ -77,14 +141,18 @@
     
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     
-    [self testUserAuthentication];
+    [self authenticate];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(16.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
         [toolkit asyncInitNetwork];
     });
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(21.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         //do assertions here
         XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
         [expectation fulfill];
@@ -113,6 +181,8 @@
     XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
     
     [ConnectionStatus setConnectionStatusTo:AUTHENTICATED];
+    
+    [toolkit asyncInitNetwork];
     
     XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
 }
@@ -149,28 +219,23 @@
 }
 
 
--(void) testTryShutDownAndRestartNetwork{
+-(void) testTryShutDownAndRestartNetwork_forCloudConnection{
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    [toolkit asyncInitNetwork];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [self authenticate];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [toolkit tryShutdownAndStartNetworks];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if(toolkit.isCloudReachable){
-            if([KeyChainAccess hasLoginCredentials])
-                XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-            else
-                XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
-            }else{
-                XCTAssertEqual([ConnectionStatus getConnectionStatus], NO_NETWORK_CONNECTION);
-            }
-            [expectation fulfill];
-        });
     });
     
-    [self waitForExpectationsWithTimeout:12.0 handler:^(NSError *error) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
+        [expectation fulfill];
+    });
+    
+    [self waitForExpectationsWithTimeout:21.0 handler:^(NSError *error) {
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }
@@ -178,7 +243,6 @@
 }
 
 #pragma mark - Almond Management Test cases
-
 -(void) testWriteCurrentAlmond {
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
     almond.almondplusName = @"TestCasesAlmond";
@@ -187,68 +251,22 @@
     XCTAssertEqualObjects(@"TestCasesAlmond", currentAlmondName);
 }
 
--(void)testUserAuthentication {
-    
-    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
-    
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    
-    [toolkit tearDownLoginSession];
-    
-    [toolkit asyncInitNetwork];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        //do assertions here
-        NSString* email = @"masood.pathan@securifi.com";
-        NSString* password = @"000000";
-        //set the username and password so that it have credentials
-        [KeyChainAccess setSecEmail:email];
-        
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setBool:YES forKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
-        
-        Login *loginCommand = [Login new];
-        loginCommand.UserID = email;
-        loginCommand.Password = password;
-        
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.commandType = CommandType_LOGIN_COMMAND;
-        cmd.command = loginCommand;
-        NSLog(@"before sending the login command");
-        [toolkit asyncSendToNetwork:cmd];
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        //do assertions here
-        NSString* email = @"masood.pathan@securifi.com";
-        NSString* password = @"000000";
-        //set the username and password so that it have credentials
-        [KeyChainAccess setSecEmail:email];
-        
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setBool:YES forKey:kPREF_USER_DEFAULT_LOGGED_IN_ONCE];
-        
-        Login *loginCommand = [Login new];
-        loginCommand.UserID = email;
-        loginCommand.Password = password;
-        
-        GenericCommand *cmd = [GenericCommand new];
-        cmd.commandType = CommandType_LOGIN_COMMAND;
-        cmd.command = loginCommand;
-        NSLog(@"before sending the login command");
-        [toolkit asyncSendToNetwork:cmd];
-    });
-}
-
--(void) testManageCurrentAlmondChange {
+-(void) testManageCurrentAlmondChange_CloudConnection {
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
+    
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    [self testUserAuthentication];
+    
+    [self authenticate];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(14.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
+        [expectation fulfill];
+    });
+    
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
     almond.almondplusName = @"UnKnownAlmondName";
     almond.almondplusMAC = @"UnknownAlmondMac";
-    [toolkit setConnectionMode:SFIAlmondConnectionMode_cloud];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [AlmondManagement manageCurrentAlmondChange:almond];
@@ -256,28 +274,14 @@
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSLog(@"%@ is the sceneslist in testmangeCurrentAlmondChange",toolkit.scenesArray);
-        
         XCTAssertEqual(toolkit.scenesArray.count,0);
         XCTAssertEqual(toolkit.devices.count,0);
         XCTAssertEqual(toolkit.ruleList.count,0);
         XCTAssertEqual(toolkit.clients.count,0);
         XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
-        [AlmondManagement manageCurrentAlmondChange:almond];
     });
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(25.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual(toolkit.scenesArray.count,0);
-        XCTAssertEqual(toolkit.devices.count,0);
-        XCTAssertEqual(toolkit.ruleList.count,0);
-        XCTAssertEqual(toolkit.clients.count,0);
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], NO_NETWORK_CONNECTION);
-        [expectation fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:26.0 handler:^(NSError *error) {
+    [self waitForExpectationsWithTimeout:28.0 handler:^(NSError *error) {
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }
@@ -286,20 +290,25 @@
 
 
 #pragma mark - Almond List management
--(void) testManageCurrentAlmondOnAlmondListUpdate{
+
+-(void) testManageCurrentAlmondOnAlmondListUpdate_CloudConnection{
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    NSMutableArray* almondList = [NSMutableArray new];
-    SFIAlmondPlus* singleAlmond = [SFIAlmondPlus new];
-    singleAlmond.almondplusMAC = @"SingleAlmond";
-    [almondList addObject:singleAlmond];
-    SFIAlmondPlus* currentAlmond = [SFIAlmondPlus new];
-    currentAlmond.almondplusMAC = @"CurrentAlmond";
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    NSMutableArray* almondList = [NSMutableArray new];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(16.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        SFIAlmondPlus* singleAlmond = [SFIAlmondPlus new];
+        singleAlmond.almondplusMAC = @"SingleAlmond";
+        [almondList addObject:singleAlmond];
         [AlmondManagement manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
-        NSLog(@"current almond name in testing %@:",[toolkit currentAlmond].almondplusName);
         XCTAssertEqualObjects([toolkit currentAlmond].almondplusMAC, @"SingleAlmond");
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(17.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [almondList removeAllObjects];
         SFIAlmondPlus *firstAlmond = [SFIAlmondPlus new];
         firstAlmond.almondplusMAC = @"firstAlmond";
@@ -310,12 +319,11 @@
         [almondList addObject:firstAlmond];
         [almondList addObject:secondAlmond];
         [almondList addObject:thirdAlmond];
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(11.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [AlmondManagement manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
         XCTAssertEqualObjects([toolkit currentAlmond].almondplusMAC, @"firstAlmond");
-        
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(18.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [almondList removeAllObjects];
         SFIAlmondPlus *firstAlmond = [SFIAlmondPlus new];
         firstAlmond.almondplusMAC = @"firstAlmond";
@@ -323,15 +331,13 @@
         secondAlmond.almondplusMAC = @"secondAlmond";
         SFIAlmondPlus* thirdAlmond = [SFIAlmondPlus new];
         thirdAlmond.almondplusMAC = @"thirdAlmond";
+        SFIAlmondPlus* currentAlmond = [SFIAlmondPlus new];
+        currentAlmond.almondplusMAC = @"CurrentAlmond";
         [almondList addObject:firstAlmond];
         [almondList addObject:secondAlmond];
         [almondList addObject:thirdAlmond];
         [almondList addObject:currentAlmond];
-        
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(12.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [toolkit writeCurrentAlmond:currentAlmond];
+        [AlmondManagement writeCurrentAlmond:currentAlmond];
         NSLog(@"current almond name in testing %@:",[toolkit currentAlmond].almondplusName);
         [AlmondManagement manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
         NSLog(@"current almond name in testing %@:",[toolkit currentAlmond].almondplusName);
@@ -339,7 +345,7 @@
         [expectation fulfill];
     });
     
-    [self waitForExpectationsWithTimeout:22.0 handler:^(NSError *error) {
+    [self waitForExpectationsWithTimeout:19.0 handler:^(NSError *error) {
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }
@@ -347,6 +353,7 @@
 }
 
 #pragma mark - Local Network Mangement 
+
 -(void) testStoreLocalNetworkSettings {
     SFIAlmondLocalNetworkSettings* settings = [SFIAlmondLocalNetworkSettings new];
     settings.almondplusName = @"TestingAlmondName";
@@ -361,7 +368,6 @@
 }
 
 -(void) testRemoveLocalNetworkSettingsForAlmond {
-    
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
     SFIAlmondLocalNetworkSettings* settings = [SFIAlmondLocalNetworkSettings new];
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
@@ -374,7 +380,7 @@
     settings.login = @"TestingLogin";
     settings.password = @"TestingPassword";
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         
         [LocalNetworkManagement storeLocalNetworkSettings:settings];
         
@@ -393,11 +399,9 @@
         
         [LocalNetworkManagement removeLocalNetworkSettingsForAlmond:settings.almondplusMAC];
         
-        //almond = [AlmondManagement currentAlmond];
     });
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         XCTAssertEqual([ConnectionStatus getConnectionStatus], NO_NETWORK_CONNECTION);
         [expectation fulfill];
     });
