@@ -10,8 +10,9 @@
 
 @interface SFIWirelessSummary : NSObject
 
-@property(nonatomic) int wirelessIndex;
+@property(nonatomic) int wirelessIndex; //toberemoved perhaps
 @property(nonatomic) BOOL enabled;
 @property(nonatomic) NSString *ssid;
+@property(nonatomic) NSString *type;
 
 @end

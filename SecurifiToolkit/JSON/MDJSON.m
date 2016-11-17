@@ -75,7 +75,7 @@
 
 - (NSData *)JSONData
 {
-    return [NSJSONSerialization dataWithJSONObject:self options:NSJSONWritingPrettyPrinted error:nil];
+    return [NSJSONSerialization dataWithJSONObject:self options:0 error:nil];
 }
 
 - (NSString *)JSONString

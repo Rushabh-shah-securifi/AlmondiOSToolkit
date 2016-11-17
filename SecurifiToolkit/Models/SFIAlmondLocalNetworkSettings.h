@@ -11,6 +11,7 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
     TestConnectionResult_unknown,           // result is not obtained
     TestConnectionResult_success,           // all is good
     TestConnectionResult_macMismatch,       // the mac specified in the settings do not match the mac on the remote host
+    TestConnectionResult_macMissing,        // the mac was missing or not properly formed
     TestConnectionResult_unknownError,      // some error here or there prevented the test from completing
 };
 
@@ -30,12 +31,6 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 // used as a master switch for toggling between Cloud and Local mode; that is, when disabled, the Cloud mode is indicated.
 @property(nonatomic) BOOL enabled;
 
-// name for SSID 2.5ghz
-@property(nonatomic, copy) NSString *ssid2;
-
-// name for SSID 5ghz
-@property(nonatomic, copy) NSString *ssid5;
-
 // almond MAC id
 @property(nonatomic, copy) NSString *almondplusName; // null unless testConnection succeeds;
 
@@ -54,10 +49,19 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 // password for login
 @property(nonatomic, copy) NSString *password;
 
-- (enum TestConnectionResult)testConnection;
+- (enum TestConnectionResult)testConnection: (BOOL)fromLoginPage;
 
 // makes an SFIAlmondPlus representation marked with SFIAlmondPlusLinkType_local_only
 - (SFIAlmondPlus *)asLocalLinkAlmondPlus;
+
+// indicates whether the settings are basically complete needed for doing an initial connection to test credentials
+// and retrieve the remote Almond's MAC address.
+- (BOOL)hasBasicCompleteSettings;
+
+// indicates whether the settings are complete, though it does not indicate whether the login/pwd are valid.
+- (BOOL)hasCompleteSettings;
+
+- (void)purgePassword;
 
 - (id)initWithCoder:(NSCoder *)coder;
 

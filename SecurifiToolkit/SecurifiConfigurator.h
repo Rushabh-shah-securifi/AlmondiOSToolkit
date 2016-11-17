@@ -44,6 +44,9 @@
 // Controls whether the app allows the user to set Home or Away mode
 @property(nonatomic) BOOL enableNotificationsHomeAwayMode;
 
+// Controls the notification text is adorned with debug information in the UI
+@property(nonatomic) BOOL enableNotificationsDebugMode;
+
 @property(nonatomic) BOOL enableNotificationsDebugLogging;
 
 // Controls whether the app allows the user to enable/disable a SSID on the router tab
@@ -54,8 +57,21 @@
 // Defaults to NO
 @property(nonatomic) BOOL enableLocalNetworking;
 
+// Controls whether the app shows the Scenes tab and functions
 @property(nonatomic) BOOL enableScenes;
 
+// Controls whether the app uses the new WifiClients UI; when NO, then the legacy UI is used.
+@property(nonatomic) BOOL enableWifiClients;
+
+// Controls whether the app will perform an Almond firmware version check and alert the user.
+@property(nonatomic) BOOL enableAlmondVersionRemoteUpdate;
+
+// Controls whether hidden controls will be enabled on the Sensor Tile
+@property(nonatomic) BOOL enableSensorTileDebugInfo;
+
+@property(nonatomic) BOOL isSimulator;
+
+@property(nonatomic) BOOL siteMapEnable;
 - (id)copyWithZone:(NSZone *)zone;
 
 @end

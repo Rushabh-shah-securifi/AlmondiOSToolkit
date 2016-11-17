@@ -13,9 +13,13 @@
 
 @interface SFIOfflineDataManager : NSObject
 
-- (void)writeAlmondList:(NSArray *)almondList;
+- (void)writeAlmondList:(NSArray *)cloudAlmonds;
 
 - (NSArray *)readAlmondList;
+
+- (SFIAlmondPlus *)readAlmond:(NSString *)almondMac;
+
+- (SFIAlmondPlus *)changeAlmondName:(NSString *)name almondMac:(NSString *)almondMac;
 
 - (void)writeHashList:(NSString *)almondHashValue almondMac:(NSString *)almondMac;
 
@@ -42,7 +46,7 @@
 // keyed by mac address
 - (NSDictionary *)readAllAlmondLocalNetworkSettings;
 
-- (void)deleteLocalNetworkSettingsForAlmond:(NSString *)strAlmondMac;
+- (void)deleteLocalNetworkSettingsForAlmond:(NSString *)almondMac;
 
 - (void)purgeAll;
 

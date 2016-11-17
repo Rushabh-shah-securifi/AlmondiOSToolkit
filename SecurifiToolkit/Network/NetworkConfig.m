@@ -5,8 +5,7 @@
 
 #import "NetworkConfig.h"
 #import "SecurifiConfigurator.h"
-#import "SFIAlmondPlus.h"
-
+#import "SFIAlmondLocalNetworkSettings.h"
 
 @implementation NetworkConfig
 
@@ -20,9 +19,13 @@
     return config;
 }
 
-+ (instancetype)webSocketConfigAlmond:(NSString *)almond {
++ (instancetype)webSocketConfig:(SFIAlmondLocalNetworkSettings *)settings almondMac:(NSString *)almondMac {
     NetworkConfig *config = [NetworkConfig configWithMode:NetworkEndpointMode_web_socket];
-    config.almondMac = almond;
+    config.almondMac = almondMac;
+    config.host = settings.host;
+    config.port = settings.port;
+    config.login = settings.login;
+    config.password = settings.password;
     return config;
 }
 
@@ -40,13 +43,14 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    NetworkConfig *copy = [[[self class] allocWithZone:zone] init];
+    NetworkConfig *copy = (NetworkConfig *) [[[self class] allocWithZone:zone] init];
 
     if (copy != nil) {
         copy->_mode = _mode;
         copy.almondMac = self.almondMac;
         copy.host = self.host;
         copy.port = self.port;
+        copy.login = self.login;
         copy.password = self.password;
         copy.enableCertificateValidation = self.enableCertificateValidation;
         copy.enableCertificateChainValidation = self.enableCertificateChainValidation;

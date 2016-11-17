@@ -40,6 +40,8 @@
 
 - (BOOL)isActuator;
 
+- (BOOL)isRuleActuator;
+
 // Indicates whether the device has been tampered
 - (BOOL)isTampered:(SFIDeviceValue *)deviceValue;
 

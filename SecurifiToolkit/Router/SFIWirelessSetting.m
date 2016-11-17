@@ -57,6 +57,7 @@
         copy.wirelessMode = self.wirelessMode;
         copy.wirelessModeCode = self.wirelessModeCode;
         copy.countryRegion = self.countryRegion;
+        copy.type = self.type;
     }
 
     return copy;
