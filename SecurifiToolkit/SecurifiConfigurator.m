@@ -8,9 +8,9 @@
 
 #import "SecurifiConfigurator.h"
 
-#define CLOUD_PROD_SERVER   @"cloud.securifi.com"
-#define CLOUD_DEV_SERVER    @"ec2-23-20-197-230.compute-1.amazonaws.com"
-//#define CLOUD_DEV_SERVER    @"clouddev.securifi.com"
+#define CLOUD_PROD_SERVER   @"cloud.securifi.com" //
+//#define CLOUD_DEV_SERVER    @"ec2-54-226-113-110.compute-1.amazonaws.com"
+#define CLOUD_DEV_SERVER    @"clouddev.securifi.com" //can you connect to the 54.226.113.110
 #define CLOUD_SERVER_PORT   1028
 #define CLOUD_CERT_FILENAME @"cert"
 
@@ -28,10 +28,17 @@
         self.certificateFileName = CLOUD_CERT_FILENAME; // file must be named "cert.der". But leave off the file extension in the config.
         self.enableNotifications = NO;
         self.enableNotificationsHomeAwayMode = NO;
+        self.enableNotificationsDebugMode = NO;
         self.enableNotificationsDebugLogging = NO;
         self.enableRouterWirelessControl = YES;
         self.enableLocalNetworking = NO;
         self.enableScenes = NO;
+        self.enableWifiClients = NO;
+        self.enableAlmondVersionRemoteUpdate = NO;
+        self.enableSensorTileDebugInfo = NO;
+        self.isSimulator = NO;
+        self.siteMapEnable = NO;
+    
     }
 
     return self;
@@ -50,10 +57,15 @@
         copy.certificateFileName = self.certificateFileName;
         copy.enableNotifications = self.enableNotifications;
         copy.enableNotificationsHomeAwayMode = self.enableNotificationsHomeAwayMode;
+        copy.enableNotificationsDebugMode = self.enableNotificationsDebugMode;
         copy.enableNotificationsDebugLogging = self.enableNotificationsDebugLogging;
         copy.enableRouterWirelessControl = self.enableRouterWirelessControl;
         copy.enableLocalNetworking = self.enableLocalNetworking;
         copy.enableScenes = self.enableScenes;
+        copy.enableWifiClients = self.enableWifiClients;
+        copy.enableAlmondVersionRemoteUpdate = self.enableAlmondVersionRemoteUpdate;
+        copy.enableSensorTileDebugInfo = self.enableSensorTileDebugInfo;
+        copy.isSimulator = self.isSimulator;
     }
 
     return copy;

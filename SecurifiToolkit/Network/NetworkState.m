@@ -4,6 +4,7 @@
 //
 
 #import "NetworkState.h"
+#import "GenericCommand.h"
 
 
 @interface NetworkState ()
@@ -16,6 +17,10 @@
 
 @property(nonatomic, readonly) NSObject *almondModeSynLocker;
 @property(nonatomic, readonly) NSMutableDictionary *almondModeTable;
+@property(nonatomic) NSDictionary *pendingModeTable;
+
+@property(nonatomic, readonly) NSObject *expirableCommandsLocker;
+@property(nonatomic, readonly) NSMutableDictionary *expirableCommands;
 @end
 
 @implementation NetworkState
@@ -32,6 +37,9 @@
 
         _almondModeSynLocker = [NSObject new];
         _almondModeTable = [NSMutableDictionary new];
+
+        _expirableCommandsLocker = [NSObject new];
+        _expirableCommands = [NSMutableDictionary new];
     }
 
     return self;
@@ -101,6 +109,30 @@
     }
 }
 
+- (void)markPendingModeForAlmond:(NSString *)aAlmondMac mode:(SFIAlmondMode)mode {
+    @synchronized (self.almondModeSynLocker) {
+        self.pendingModeTable = @{
+                @"mac" : aAlmondMac,
+                @"mode" : @(mode),
+        };
+    }
+}
+
+- (void)confirmPendingModeForAlmond {
+    @synchronized (self.almondModeSynLocker) {
+        NSDictionary *table = self.pendingModeTable;
+        if (table) {
+            self.pendingModeTable = nil;
+
+            NSString *almondMac = table[@"mac"];
+            NSNumber *modeNum = table[@"mode"];
+            SFIAlmondMode mode = (SFIAlmondMode) modeNum.intValue;
+
+            [self markModeForAlmond:almondMac mode:mode];
+        }
+    }
+}
+
 - (SFIAlmondMode)almondMode:(NSString *)aAlmondMac {
     if (aAlmondMac == nil) {
         return SFIAlmondMode_unknown;
@@ -124,6 +156,50 @@
 
     @synchronized (self.almondModeSynLocker) {
         [self.almondModeTable removeObjectForKey:aAlmondMac];
+    }
+}
+
+- (void)markExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace genericCommand:(GenericCommand *)cmd {
+    if (!namespace) {
+        return;
+    }
+    @synchronized (self.expirableCommandsLocker) {
+        NSNumber *key = @(type);
+        NSMutableDictionary *dict = self.expirableCommands[key];
+        if (!dict) {
+            dict = [NSMutableDictionary dictionary];
+            self.expirableCommands[key] = dict;
+        }
+        dict[namespace] = cmd;
+    }
+}
+
+- (GenericCommand *)expirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace {
+    if (!namespace) {
+        return nil;
+    }
+    @synchronized (self.expirableCommandsLocker) {
+        NSNumber *key = @(type);
+
+        NSMutableDictionary *dict = self.expirableCommands[key];
+        if (!dict) {
+            return nil;
+        }
+
+        return dict[namespace];
+    }
+}
+
+- (void)clearExpirableRequest:(enum ExpirableCommandType)type namespace:(NSString *)namespace {
+    if (!namespace) {
+        return;
+    }
+    @synchronized (self.expirableCommandsLocker) {
+        NSNumber *key = @(type);
+        NSMutableDictionary *dict = self.expirableCommands[key];
+        if (dict) {
+            [dict removeObjectForKey:namespace];
+        }
     }
 }
 

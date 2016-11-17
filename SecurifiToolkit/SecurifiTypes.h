@@ -11,6 +11,7 @@
 typedef unsigned int sfi_id;
 
 typedef NS_ENUM(unsigned int, SFIDeviceType) {
+    SFIDeviceType_BinarySwitch_0                = 100,//this is for scenes Home/Away row
     SFIDeviceType_UnknownDevice_0               = 0,
     SFIDeviceType_BinarySwitch_1                = 1,
     SFIDeviceType_MultiLevelSwitch_2            = 2,
@@ -58,12 +59,26 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_BinaryPowerSwitch_45          = 45,
     SFIDeviceType_SetPointThermostat_46         = 46,
     SFIDeviceType_HueLamp_48                    = 48,
+    SFIDeviceType_MultiSensor_49                = 49,
     SFIDeviceType_SecurifiSmartSwitch_50        = 50,
     SFIDeviceType_51                            = 51,
     SFIDeviceType_RollerShutter_52              = 52,
     SFIDeviceType_GarageDoorOpener_53           = 53,
-
-    SFIDeviceType_count                         = 53, // always set to the last value; assumes sequence is continuous
+    SFIDeviceType_ZWtoACIRExtender_54           = 54,
+    SFIDeviceType_MultiSoundSiren_55            = 55,
+    SFIDeviceType_EnergyReader_56               = 56,
+    SFIDeviceType_NestThermostat_57             = 57,
+    SFIDeviceType_NestSmokeDetector_58          = 58,
+    SFIDeviceType_BuiltInSiren_60               = 60,
+    SFIDeviceType_SecurifiButton_61             = 61,
+    SFIDeviceType_ZenThermostat_62              = 62,
+    SFIDeviceType_AlmondSiren_63                = 63,
+    SFIDeviceType_AlmondBlink_64                = 64,
+    SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
+    SFIDeviceType_REBOOT_ALMOND                 = 501,
+    SFIDeviceType_Weather                       = 502,
+    
+    SFIDeviceType_count                         = 65, // always set to the last value; assumes sequence is continuous
 };
 
 // Converts a type into a standard mnemonic name suitable for event logging
@@ -75,11 +90,16 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_UNKNOWN = 0,
     SFIDevicePropertyType_AC_CURRENTDIVISOR,
     SFIDevicePropertyType_AC_CURRENTMULTIPLIER,
+    SFIDevicePropertyType_AC_FAN_MODE,
     SFIDevicePropertyType_AC_FREQUENCY,
     SFIDevicePropertyType_AC_FREQUENCYDIVISOR,
     SFIDevicePropertyType_AC_FREQUENCYMULTIPLIER,
+    SFIDevicePropertyType_AC_MODE,
     SFIDevicePropertyType_AC_POWERDIVISOR,
     SFIDevicePropertyType_AC_POWERMULTIPLIER,
+    SFIDevicePropertyType_AC_SETPOINT_HEATING,
+    SFIDevicePropertyType_AC_SETPOINT_COOLING,
+    SFIDevicePropertyType_AC_SWING,
     SFIDevicePropertyType_AC_VOLTAGEDIVISOR,
     SFIDevicePropertyType_AC_VOLTAGEMULTIPLIER,
     SFIDevicePropertyType_ACTIVE_POWER,
@@ -91,6 +111,7 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_BRIGHTNESS,
     SFIDevicePropertyType_COLOR_HUE,
     SFIDevicePropertyType_COLOR_TEMPERATURE,
+    SFIDevicePropertyType_CONFIGURATION,
     SFIDevicePropertyType_CURRENT_POSITION,
     SFIDevicePropertyType_CURRENT_HUE,
     SFIDevicePropertyType_CURRENT_SATURATION,
@@ -110,6 +131,8 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_EMER_ALARM,
     SFIDevicePropertyType_HUMIDITY,
     SFIDevicePropertyType_ILLUMINANCE,
+    SFIDevicePropertyType_ILLUMINANCE_PERCENT,
+    SFIDevicePropertyType_IR_CODE,
     SFIDevicePropertyType_LOCK_CONF,
     SFIDevicePropertyType_LOCK_STATE,
     SFIDevicePropertyType_LOW_BATTERY,
@@ -140,7 +163,45 @@ typedef NS_ENUM(unsigned int, SFIDevicePropertyType) {
     SFIDevicePropertyType_TOLERANCE,
     SFIDevicePropertyType_UNITS,
     SFIDevicePropertyType_USER_CODE,
-
+    SFIDevicePropertyType_CAN_COOL,//md01
+    SFIDevicePropertyType_CAN_HEAT,//md01
+    SFIDevicePropertyType_HAS_FAN,//md01
+    SFIDevicePropertyType_NEST_ID,//md01
+    SFIDevicePropertyType_CO_ALARM_STATE,//md01
+    SFIDevicePropertyType_SMOKE_ALARM_STATE,//md01
+    SFIDevicePropertyType_ISONLINE,//md01
+    SFIDevicePropertyType_AWAY_MODE,//md01
+    SFIDevicePropertyType_RESPONSE_CODE,//md01
+    SFIDevicePropertyType_THERMOSTAT_TARGET,//md01
+    SFIDevicePropertyType_THERMOSTAT_RANGE_LOW,//md01
+    SFIDevicePropertyType_THERMOSTAT_RANGE_HIGH,//md01
+    SFIDevicePropertyType_CURRENT_TEMPERATURE,//md01
+    SFIDevicePropertyType_IS_USING_EMERGENCY_HEAT,//md01
+    SFIDevicePropertyType_HVAC_STATE,//md01
+    SFIDevicePropertyType_HAS_LEAF,//md01
+    SFIDevicePropertyType_NEST_THERMOSTAT_MODE,//md01
+    SFIDevicePropertyType_NEST_THERMOSTAT_FAN_STATE,//md01
+    SFIDevicePropertyType_STOP,//md01
+    SFIDevicePropertyType_UP_DOWN,//md01
+    SFIDevicePropertyType_LUMINANCE_PERCENT,//md01
+    SFIDevicePropertyType_ENERGY,//md01
+    SFIDevicePropertyType_CLAMP1_POWER,//md01
+    SFIDevicePropertyType_CLAMP1_ENERGY,//md01
+    SFIDevicePropertyType_CLAMP2_POWER,//md01
+    SFIDevicePropertyType_CLAMP2_ENERGY,//md01
+    SFIDevicePropertyType_SWITCH_BINARY1,
+    SFIDevicePropertyType_SWITCH_BINARY2,
+    SFIDevicePropertyType_TONE_SELECTED, //mk
+    SFIDevicePropertyType_REBOOT,
+    SFIDevicePropertyType_ENABLE,
+    SFIDevicePropertyType_BUZZ_STATE,
+    SFIDevicePropertyType_TONE,
+    SFIDevicePropertyType_VOLUME,
+    SFIDevicePropertyType_SECONDS,
+    SFIDevicePropertyType_RGB,
+    SFIDevicePropertyType_BLINK_STATE,
+    SFIDevicePropertyType_LED_STATE,
+    SFIDevicePropertyType_PRESS,
     SFIDevicePropertyType_count, // always keep this as the last one; provides a way to iterate through sequence
 };
 
@@ -157,10 +218,11 @@ typedef NS_ENUM(unsigned int, SFIAlmondConnectionMode) {
 };
 
 typedef NS_ENUM(unsigned int, SFIAlmondConnectionStatus) {
-    SFIAlmondConnectionStatus_disconnected,
-    SFIAlmondConnectionStatus_connecting,
-    SFIAlmondConnectionStatus_connected,
-    SFIAlmondConnectionStatus_error,
+    SFIAlmondConnectionStatus_disconnected,     // link is down; default state on link instantiation and prior to bring-up
+    SFIAlmondConnectionStatus_connecting,       // link in process of being established and authenticated
+    SFIAlmondConnectionStatus_connected,        // link is established and normally operating
+    SFIAlmondConnectionStatus_error,            // indicates connection error of some sort
+    SFIAlmondConnectionStatus_error_mode,       // indicates that the almond is not compatible with the selected connection mode
 };
 
 // Per almond "mode" setting indicating

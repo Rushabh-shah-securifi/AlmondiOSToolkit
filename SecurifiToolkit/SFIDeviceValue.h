@@ -70,4 +70,6 @@
 // The values are copied.
 - (void)replaceKnownDeviceValues:(NSArray*)values;
 
++ (NSArray *)removeDeviceValue:(unsigned int)deviceId list:(NSArray *)list;
+
 @end

@@ -5,6 +5,7 @@
 
 #import "NotificationListResponse.h"
 #import "SFINotification.h"
+#import "MDJSON.h"
 
 
 @implementation NotificationListResponse
@@ -18,12 +19,7 @@
 }
 
 + (NotificationListResponse *)internalParseJson:(NSData *)data payloadPropertyName:(NSString *)payloadPropertyName parseNotification:(BOOL)notificationPayload {
-    NSError *error = nil;
-    id json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-    if (error) {
-        NSLog(@"Failed parsing notification response payload, error:%@, payload:%@", error, data);
-        return nil;
-    }
+    id json = data.objectFromJSONData; //[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
     if (![json respondsToSelector:@selector(objectForKey:)]) {
         NSLog(@"Failed parsing notification response payload, expected a dictionary, received: %@", json);
         return nil;

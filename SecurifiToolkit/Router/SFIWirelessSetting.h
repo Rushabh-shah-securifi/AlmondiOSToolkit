@@ -29,6 +29,7 @@
 @property(nonatomic, copy) NSString *wirelessMode;
 @property(nonatomic) int wirelessModeCode;
 @property(nonatomic, copy) NSString *countryRegion;
+@property(nonatomic, copy) NSString *type;
 
 - (NSString *)toXml;
 

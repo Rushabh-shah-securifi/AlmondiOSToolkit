@@ -24,6 +24,9 @@
 @property(nonatomic, readonly) ZHDatabaseStatement *mark_all_viewed_notification_filtered;
 @property(nonatomic, readonly) ZHDatabaseStatement *mark_viewed_notification;
 @property(nonatomic, readonly) ZHDatabaseStatement *delete_notification;
+
+@property(nonatomic, readonly) ZHDatabaseStatement *fetch_recent_recs_device;
+@property(nonatomic, readonly) ZHDatabaseStatement *fetch_recent_recs_client;
 @property(nonatomic, readonly) dispatch_queue_t queue;
 @end
 
@@ -72,6 +75,10 @@
 
     _mark_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where id=?"];
     _delete_notification = [self.db newStatement:@"delete from notifications where id=?"];
+    
+    _fetch_recent_recs_device = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where mac=? and devicetype!=? order by time desc limit 3"];
+    
+    _fetch_recent_recs_client = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where mac=? and devicetype=? order by time desc limit 2"];
 }
 
 #pragma mark - SFIDeviceLogStore methods
@@ -158,10 +165,10 @@
     return results;
 }
 
-- (void)ensureFetchNotifications {
+- (void)ensureFetchNotifications:(BOOL)isForWifiClients {
     id <SFIDeviceLogStoreDelegate> d = self.delegate;
     if (d) {
-        [d deviceLogStoreTryFetchRecords:self];
+        [d deviceLogStoreTryFetchRecords:self forWiFiClient:isForWifiClients];
     }
 }
 
@@ -198,6 +205,33 @@
     return obj;
 }
 
+- (NSArray *)fetchRecentNotifications:(NSString *)mac isSensor:(BOOL)isSensor{
+    NSMutableArray *notifications = [NSMutableArray new];
+    dispatch_sync(self.queue, ^(){
+        ZHDatabaseStatement *stmt;
+        
+        if (isSensor) { //for device
+            stmt = self.fetch_recent_recs_device;
+            [stmt reset];
+            [stmt bindNextText:mac];
+            [stmt bindNextInteger:(ZHDatabase_int)SFIDeviceType_WIFIClient];
+        }
+        else {
+            stmt = self.fetch_recent_recs_client;
+            [stmt reset];
+            [stmt bindNextText:mac];
+            [stmt bindNextInteger:(ZHDatabase_int)SFIDeviceType_WIFIClient];
+        }
+        
+        while ([stmt step]) {
+           [notifications addObject:[self readRecord:stmt]];
+        }
+        
+        [stmt reset];
+    });
+    NSLog(@"notifiatios: %@", notifications);
+    return notifications;
+}
 
 - (void)markViewed:(SFINotification *)notification {
     if (!notification) {

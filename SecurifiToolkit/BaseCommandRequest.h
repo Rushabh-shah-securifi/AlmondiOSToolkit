@@ -13,7 +13,7 @@
 // property for tracking when this request was made; can be used for expiring it
 @property(nonatomic, readonly) NSDate *created;
 
-@property(nonatomic, readonly) sfi_id correlationId;
+@property(nonatomic) sfi_id correlationId;
 
 - (instancetype)init;
 

@@ -16,6 +16,6 @@
 
 - (NSString *)toXml;
 
-- (NSData*)toJson;
+- (NSData *)toJson;
 
 @end

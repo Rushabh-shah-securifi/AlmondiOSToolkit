@@ -10,4 +10,13 @@
 
 @implementation SFIGenericRouterCommand
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.commandSuccess = YES; // default unless set to NO by parser or in error condition
+    }
+
+    return self;
+}
+
 @end
