@@ -9,6 +9,11 @@
 #import "GenericCommand.h"
 #import "SFIAlmondPlus.h"
 #import "KeyChainWrapper.h"
+#import "ConnectionStatus.h"
+#import "LocalNetworkManagement.h"
+#import "Securifitoolkit.h"
+#import "Network.h"
+#import "DynamicAlmondModeChange.h"
 
 #define SEC_PASSWORD @"password"
 
@@ -16,6 +21,8 @@
 @property(nonatomic, readonly) dispatch_semaphore_t test_connection_latch;
 @property(nonatomic, readonly) dispatch_semaphore_t test_command_latch;
 @property(nonatomic) enum TestConnectionResult testResult;
+@property(nonatomic) WebSocketEndpoint *endpoint;
+@property(nonatomic) DynamicAlmondModeChange *res;
 @end
 
 @implementation SFIAlmondLocalNetworkSettings
@@ -23,24 +30,23 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.almondplusName = @"Unknown"; // name is not provided in the summary (why not!!!) so we make sure it is not null, but expect it to be properly set
         self.port = 7681; // default web socket port
     }
-
+    
     return self;
 }
 
-- (enum TestConnectionResult)testConnection {
+- (enum TestConnectionResult)testConnection: (BOOL)fromLoginPage{
     NSString *mac = @"test_almond";
 
-    NetworkConfig *config = [NetworkConfig webSocketConfigAlmond:mac];
-    config.host = self.host;
-    config.port = self.port;
-    config.password = self.password;
+    NetworkConfig *config = [NetworkConfig webSocketConfig:self almondMac:mac];
 
     self.testResult = TestConnectionResult_unknown;
     _test_connection_latch = dispatch_semaphore_create(0);
 
     WebSocketEndpoint *endpoint = [WebSocketEndpoint endpointWithConfig:config];
+    self.endpoint = endpoint;
     endpoint.delegate = self;
 
     [endpoint connect];
@@ -51,30 +57,24 @@
         self.testResult = TestConnectionResult_unknown;
         _test_command_latch = dispatch_semaphore_create(0);
 
-        NSTimeInterval cid = [NSDate date].timeIntervalSince1970;
-        NSDictionary *payload = @{
-                @"MobileInternalIndex" : @(cid),
-                @"CommandType" : @"GetAlmondNameandMAC",
-        };
-
-        GenericCommand *cmd = [GenericCommand jsonPayloadCommand:payload commandType:CommandType_ALMOND_NAME_AND_MAC_REQUEST];
+        GenericCommand *cmd = [GenericCommand websocketAlmondNameAndMac];
         NSError *error = nil;
         if ([endpoint sendCommand:cmd error:&error]) {
             [self waitOnLatch:self.test_command_latch timeout:3 logMsg:@"Failed to send GetAlmondNameandMAC to web socket"];
         }
     }
-
     // clean up
-    endpoint.delegate = nil;
-    [endpoint shutdown];
-    //
+    
+//    endpoint.delegate = nil;
+//    [endpoint shutdown];
+    
     _test_connection_latch = nil;
     _test_command_latch = nil;
-
+    NSLog(@"local testResult  %d",self.testResult);
     return self.testResult;
 }
 
-- (void)processTestConnectionResponsePayload:(NSDictionary*)payload {
+- (void)processTestConnectionResponsePayload:(NSDictionary *)payload {
     NSString *str = payload[@"Success"];
 
     BOOL success = [str isEqualToString:@"true"];
@@ -83,9 +83,15 @@
     if (!success) {
         return;
     }
+    NSLog(@"processTestConnectionResponsePayload %@",payload);
+    NSString *mac_hex = payload[@"MAC"];
+//    if (![self validMac:mac_hex]) {
+//        self.testResult = TestConnectionResult_macMissing;
+//        return;
+//    }
 
-    NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:payload[@"MAC"]];
-
+    NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
+    NSLog(@"mac address %@==%@",mac,self.almondplusMAC);
     if (self.almondplusMAC) {
         // if a MAC is specified then let's compare and make sure the almond to which we connected is the same one specified
         // in these settings.
@@ -112,12 +118,8 @@
 
 
 #pragma mark - NetworkEndpointDelegate methods
-
-- (void)networkEndpointWillStartConnecting:(id <NetworkEndpoint>)endpoint {
-
-}
-
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
+    
     dispatch_semaphore_t latch = self.test_connection_latch;
     if (latch) {
         self.testResult = TestConnectionResult_success;
@@ -126,14 +128,22 @@
 }
 
 - (void)networkEndpointDidDisconnect:(id <NetworkEndpoint>)endpoint {
-
+    NSLog(@"didisconnect is called");
 }
 
 - (void)networkEndpoint:(id <NetworkEndpoint>)endpoint dispatchResponse:(id)payload commandType:(enum CommandType)commandType {
     if (commandType == CommandType_ALMOND_NAME_AND_MAC_RESPONSE) {
-        dispatch_semaphore_t latch = self.test_command_latch;
+        //dispatch_semaphore_t latch = self.test_command_latch;
+        NSLog(@"processTestConnectionResponsePayload almond name and mac %@",payload);
         [self processTestConnectionResponsePayload:payload];
-        dispatch_semaphore_signal(latch);
+       // dispatch_semaphore_signal(latch);
+        
+        SFIAlmondPlus* plus = self.asLocalLinkAlmondPlus;
+        [[SecurifiToolkit sharedInstance] writeCurrentAlmond: plus];
+        
+        [[SecurifiToolkit sharedInstance] createNetworkInstanceAndChangeDelegate:plus webSocketEndPoint:self.endpoint res:_res];
+    }else if (commandType == CommandType_DYNAMIC_ALMOND_MODE_CHANGE) {
+        _res =payload;
     }
 }
 
@@ -164,12 +174,32 @@
     return timedOut;
 }
 
+- (BOOL)hasBasicCompleteSettings {
+    return self.host.length > 0 &&
+            self.port > 0 &&
+            self.login.length > 0 &&
+            self.password.length > 0;
+}
+
+- (BOOL)hasCompleteSettings {
+    return self.almondplusName.length > 0 &&
+            [self validMac:self.almondplusMAC] &&
+            self.hasBasicCompleteSettings;
+}
+
+- (BOOL)validMac:(NSString *)mac {
+    return mac.length > 0 && ![mac isEqualToString:@"<no_mac>"];
+}
+
+- (void)purgePassword {
+    NSString *serviceName = [self makeKeychainServiceName];
+    [KeyChainWrapper removeEntryForUserEmail:SEC_PASSWORD forService:serviceName];
+}
+
 - (id)initWithCoder:(NSCoder *)coder {
     self = [super init];
     if (self) {
         self.enabled = [coder decodeBoolForKey:@"self.enabled"];
-        self.ssid2 = [coder decodeObjectForKey:@"self.ssid2"];
-        self.ssid5 = [coder decodeObjectForKey:@"self.ssid5"];
         self.almondplusName = [coder decodeObjectForKey:@"self.almondplusName"];
         self.almondplusMAC = [coder decodeObjectForKey:@"self.almondplusMAC"];
         self.host = [coder decodeObjectForKey:@"self.host"];
@@ -187,8 +217,6 @@
     [coder encodeInt32:1 forKey:@"self.schemaVersion"]; // for future use/expansion; version this schema
 
     [coder encodeBool:self.enabled forKey:@"self.enabled"];
-    [coder encodeObject:self.ssid2 forKey:@"self.ssid2"];
-    [coder encodeObject:self.ssid5 forKey:@"self.ssid5"];
     [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
     [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
     [coder encodeObject:self.host forKey:@"self.host"];
@@ -196,14 +224,20 @@
     [coder encodeObject:self.login forKey:@"self.login"];
 
     NSString *password = self.password;
-    if (password) {
+    if (password.length > 0) {
         NSString *serviceName = [self makeKeychainServiceName];
         [KeyChainWrapper createEntryForUser:SEC_PASSWORD entryValue:password forService:serviceName];
     }
 }
 
 - (NSString *)makeKeychainServiceName {
-    return [NSString stringWithFormat:@"almond_local_settings:%@", self.almondplusMAC];
+    NSString *mac = self.almondplusMAC;
+
+    if (mac.length == 0) {
+        NSLog(@"makeKeychainServiceName: local settings mac is nil");
+    }
+
+    return [NSString stringWithFormat:@"almond_local_settings:%@", mac];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -211,8 +245,6 @@
 
     if (copy != nil) {
         copy.enabled = self.enabled;
-        copy.ssid2 = self.ssid2;
-        copy.ssid5 = self.ssid5;
         copy.almondplusName = self.almondplusName;
         copy.almondplusMAC = self.almondplusMAC;
         copy.host = self.host;
@@ -240,10 +272,6 @@
         return NO;
     if (self.enabled != settings.enabled)
         return NO;
-    if (self.ssid2 != settings.ssid2 && ![self.ssid2 isEqualToString:settings.ssid2])
-        return NO;
-    if (self.ssid5 != settings.ssid5 && ![self.ssid5 isEqualToString:settings.ssid5])
-        return NO;
     if (self.almondplusName != settings.almondplusName && ![self.almondplusName isEqualToString:settings.almondplusName])
         return NO;
     if (self.almondplusMAC != settings.almondplusMAC && ![self.almondplusMAC isEqualToString:settings.almondplusMAC])
@@ -261,8 +289,6 @@
 
 - (NSUInteger)hash {
     NSUInteger hash = (NSUInteger) self.enabled;
-    hash = hash * 31u + [self.ssid2 hash];
-    hash = hash * 31u + [self.ssid5 hash];
     hash = hash * 31u + [self.almondplusName hash];
     hash = hash * 31u + [self.almondplusMAC hash];
     hash = hash * 31u + [self.host hash];
@@ -275,12 +301,10 @@
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
     [description appendFormat:@"self.enabled=%d", self.enabled];
-    [description appendFormat:@", self.ssid2=%@", self.ssid2];
-    [description appendFormat:@", self.ssid5=%@", self.ssid5];
     [description appendFormat:@", self.almondplusName=%@", self.almondplusName];
     [description appendFormat:@", self.almondplusMAC=%@", self.almondplusMAC];
     [description appendFormat:@", self.host=%@", self.host];
-    [description appendFormat:@", self.port=%u", self.port];
+    [description appendFormat:@", self.port=%lu", (unsigned long) self.port];
     [description appendFormat:@", self.login=%@", self.login];
     [description appendFormat:@", self.password=%@", self.password];
     [description appendString:@">"];

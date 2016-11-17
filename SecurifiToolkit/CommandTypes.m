@@ -9,6 +9,7 @@
 #import "CommandTypes.h"
 
 NSString *securifi_command_type_to_string(CommandType type) {
+    NSLog(@"securifi_command_type_to_string: %d", type);
     switch (type) {
         case CommandType_LOGIN_COMMAND:
             return [NSString stringWithFormat:@"LOGIN_COMMAND_%d", type];
@@ -82,10 +83,10 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"GENERIC_COMMAND_RESPONSE_%d", type];
         case CommandType_GENERIC_COMMAND_NOTIFICATION:
             return [NSString stringWithFormat:@"GENERIC_COMMAND_NOTIFICATION_%d", type];
-//        case CommandType_SENSOR_CHANGE_REQUEST:
-//            return [NSString stringWithFormat:@"SENSOR_CHANGE_REQUEST_%d", type];
-//        case CommandType_SENSOR_CHANGE_RESPONSE:
-//            return [NSString stringWithFormat:@"SENSOR_CHANGE_RESPONSE_%d", type];
+            //        case CommandType_SENSOR_CHANGE_REQUEST:
+            //            return [NSString stringWithFormat:@"SENSOR_CHANGE_REQUEST_%d", type];
+            //        case CommandType_SENSOR_CHANGE_RESPONSE:
+            //            return [NSString stringWithFormat:@"SENSOR_CHANGE_RESPONSE_%d", type];
         case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST:
             return [NSString stringWithFormat:@"DEVICE_DATA_FORCED_UPDATE_REQUEST_%d", type];
         case CommandType_ALMOND_NAME_CHANGE_REQUEST:
@@ -162,12 +163,12 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"ALMOND_MODE_REQUEST_%d", type];
         case CommandType_ALMOND_MODE_RESPONSE:
             return [NSString stringWithFormat:@"ALMOND_MODE_RESPONSE_%d", type];
-
+            
         case CommandType_NOTIFICATIONS_SYNC_REQUEST:
             return [NSString stringWithFormat:@"NOTIFICATIONS_SYNC_REQUEST_%d", type];
         case CommandType_NOTIFICATIONS_SYNC_RESPONSE:
             return [NSString stringWithFormat:@"NOTIFICATIONS_SYNC_RESPONSE_%d", type];
-
+            
         case CommandType_NOTIFICATIONS_COUNT_REQUEST:
             return [NSString stringWithFormat:@"NOTIFICATIONS_COUNT_REQUEST_%d", type];
         case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
@@ -176,7 +177,7 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"NOTIFICATIONS_CLEAR_COUNT_REQUEST_%d", type];
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
             return [NSString stringWithFormat:@"NOTIFICATIONS_CLEAR_COUNT_RESPONSE_%d", type];
-
+            
         case CommandType_DEVICE_LIST_AND_VALUES_RESPONSE:
             return [NSString stringWithFormat:@"DEVICE_LIST_AND_VALUES_RESPONSE_%d", type];
         case CommandType_ALMOND_COMMAND_RESPONSE:
@@ -195,8 +196,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_%d", type];
         case CommandType_GET_ALL_SCENES:
             return [NSString stringWithFormat:@"GET_ALL_SCENES_%d", type];
-        case CommandType_LIST_SCENE_RESPONSE:
-            return [NSString stringWithFormat:@"LIST_SCENE_RESPONSE_%d", type];
+            //        case CommandType_LIST_SCENE_RESPONSE:
+            //            return [NSString stringWithFormat:@"LIST_SCENE_RESPONSE_%d", type];
         case CommandType_DYNAMIC_DELETE_SCENE_REQUEST:
             return [NSString stringWithFormat:@"DYNAMIC_DELETE_SCENE_REQUEST_%d", type];
         case CommandType_WIFI_CLIENTS_LIST_REQUEST:
@@ -224,6 +225,20 @@ NSString *securifi_command_type_to_string(CommandType type) {
         case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
             return [NSString stringWithFormat:@"DYNAMIC_WIFI_CLIENT_REMOVED_ALL_%d", type];
 
+        case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+            return [NSString stringWithFormat:@"DEVICE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
+        case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+            return [NSString stringWithFormat:@"CLIENT_LIST_AND_DYNAMIC_RESPONSES_%d", type];
+        case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
+            return [NSString stringWithFormat:@"SCENE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
+        case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+            return [NSString stringWithFormat:@"RULE_LIST_AND_DYNAMIC_RESPONSES_%d", type];
+        case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
+            return [NSString stringWithFormat:@"CommandType_ROUTER_COMMAND_REQUEST_RESPONSE_%d",type];
+        case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
+            return [NSString stringWithFormat:@"CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE_%d",type];
+        case CommandType_MESH_COMMAND:
+            return [NSString stringWithFormat:@"CommandType_MESH_COMMAND_%d", type];
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -321,7 +336,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_UPDATE_REQUEST:
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
         case CommandType_GET_ALL_SCENES:
-        case CommandType_LIST_SCENE_RESPONSE:
+            //        case CommandType_LIST_SCENE_RESPONSE:
         case CommandType_DYNAMIC_DELETE_SCENE_REQUEST:
         case CommandType_WIFI_CLIENTS_LIST_REQUEST:
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
@@ -334,8 +349,16 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
         case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
         case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
+        case CommandType_RULE_LIST:
+        case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
+        case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
+        case CommandType_MESH_COMMAND:
             return YES;
-
+            
         default:
             return NO;
     }
@@ -347,7 +370,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_NOTIFICATIONS_COUNT_RESPONSE:
         case CommandType_NOTIFICATIONS_CLEAR_COUNT_RESPONSE:
         case CommandType_DEVICELOG_RESPONSE:
-        case CommandType_LIST_SCENE_RESPONSE:
+        case CommandType_GET_ALL_SCENES:
         case CommandType_COMMAND_RESPONSE:
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
@@ -359,10 +382,16 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
         case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
         case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
+        case CommandType_RULE_LIST:
+        case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+        case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
+        case CommandType_MESH_COMMAND:
         case (CommandType) 1551:
         case (CommandType) 99:
             return YES;
-
         default:
             return NO;
     }

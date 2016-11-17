@@ -6,45 +6,69 @@
 #import "SFINotification.h"
 #import "SFIDeviceKnownValues.h"
 
-
 @implementation SFINotification
 
 /*
-mac             => mac
-users           => users
-time            => time
-data            => data
-DevID           => deviceid
-devicename      => devicename
-devicetype      => devicetype
-Index           => index
-IndexName       => indexname
-Value           => indexvalue
+ mac             => mac
+ users           => users
+ time            => time
+ data            => data
+ DevID           => deviceid
+ devicename      => devicename
+ devicetype      => devicetype
+ Index           => index
+ IndexName       => indexname
+ Value           => indexvalue
  */
 
 + (instancetype)parseNotificationPayload:(NSDictionary *)payload {
+    //NSLog(@"sfi notification - parseNotificationPayload");
     SFINotification *obj = [SFINotification new];
     obj.almondMAC = payload[@"mac"];
-
+    
     NSString *str;
-
+    
     str = payload[@"time"];
     obj.time = str.longLongValue;
-
+    
     str = payload[@"deviceid"];
     obj.deviceId = (sfi_id) str.longLongValue;
-
+    
     obj.deviceName = payload[@"devicename"];
-
+//    if ([obj.deviceName isEqualToString:@"Basement (8E69)"]) {
+//        NSDate *date = [NSDate dateWithTimeIntervalSince1970:obj.time];
+//    }
     str = payload[@"devicetype"];
     obj.deviceType = (SFIDeviceType) str.intValue;
-
+    
     str = payload[@"index"];
     obj.valueIndex = (sfi_id) str.longLongValue;
-
+    
     obj.valueType = [SFIDeviceKnownValues nameToPropertyType:payload[@"indexname"]];
     obj.value = payload[@"indexvalue"];
+    
+    
+    //md01<<<<
+    str = payload[@"client_type"];
+    NSString *notiType = payload[@"NotiType"];
+    if (notiType.length > 0 || [notiType isEqualToString:@"wifiClients"]) {
+        //NSLog(@"wifi client - alert: %@", payload[@"alert"]);
+        NSString * name = @"";
+        if (payload[@"client_name"]) {
+            name = payload[@"client_name"];
+        }
+        NSString * type = @"other";
+        if (payload[@"client_type"]) {
+            type = payload[@"client_type"];
+        }
+        NSString * alert = payload[@"alert"];
 
+        obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
+       
+        obj.deviceType = SFIDeviceType_WIFIClient;
+    }
+    //md01>>>
+    
     // protect against errant or missing values in payload
     id counter = payload[@"counter"];
     if (counter) {
@@ -56,35 +80,62 @@ Value           => indexvalue
             NSLog(@"Exception while parsing debug counter, value:'%@', e:%@", counter, e.description);
         }
     }
-
+    
     return obj;
 }
 
 + (instancetype)parseDeviceLogPayload:(NSDictionary *)payload {
     SFINotification *obj = [SFINotification new];
     obj.almondMAC = payload[@"mac"];
-
+    
     NSString *str;
-
+    
     str = payload[@"time"];         // milliseconds
     obj.time = str.longLongValue;
     obj.time = obj.time / 1000;     // convert to NSTimeInterval
-
+    
     str = payload[@"device_id"];
     obj.deviceId = (sfi_id) str.longLongValue;
-
+    
     obj.deviceName = payload[@"device_name"];
-
+    
     str = payload[@"device_type"];
     obj.deviceType = (SFIDeviceType) str.intValue;
-
+    
     str = payload[@"index_id"];
     obj.valueIndex = (sfi_id) str.longLongValue;
-
+    
     obj.valueType = [SFIDeviceKnownValues nameToPropertyType:payload[@"index_name"]];
     obj.value = payload[@"value"];
-
+    
     obj.externalId = payload[@"pk"];
+    //md01<<<<
+    str = payload[@"client_id"];
+    if ([str isKindOfClass:[NSString class]]) {
+        if (str.length>0) {
+            obj.deviceId = (sfi_id) str.longLongValue;
+            
+            NSString * name = @"";
+            if (payload[@"client_name"]) {
+                name = payload[@"client_name"];
+            }
+            NSString * type = @"other";
+            if (payload[@"client_type"]) {
+                if (![[payload[@"client_type"] lowercaseString] isEqualToString:@"unknown"]) {
+                    type = payload[@"client_type"];
+                }
+            }
+            NSString * alert = payload[@"value"];
+            
+//            if ([alert rangeOfString:name].location != NSNotFound) {
+//                alert = [alert stringByReplacingOccurrencesOfString:name withString:@""];;
+//            }
+            //NSLog(@"alert - sfinotification: %@", alert);
+            obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
+            obj.deviceType = SFIDeviceType_WIFIClient;
+        }
+    }
+    //md01>>>
 
     return obj;
 }
@@ -105,7 +156,7 @@ Value           => indexvalue
         self.viewed = [coder decodeBoolForKey:@"self.viewed"];
         self.debugCounter = (long) [coder decodeInt64ForKey:@"self.debugCounter"];
     }
-
+    
     return self;
 }
 
@@ -126,7 +177,7 @@ Value           => indexvalue
 
 - (id)copyWithZone:(NSZone *)zone {
     SFINotification *copy = (SFINotification *) [[[self class] allocWithZone:zone] init];
-
+    
     if (copy != nil) {
         copy.notificationId = self.notificationId;
         copy.externalId = self.externalId;
@@ -141,7 +192,7 @@ Value           => indexvalue
         copy.viewed = self.viewed;
         copy.debugCounter = self.debugCounter;
     }
-
+    
     return copy;
 }
 

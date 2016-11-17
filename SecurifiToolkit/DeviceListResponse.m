@@ -62,8 +62,26 @@
     NSMutableArray *deviceValueList = [NSMutableArray array];
 
     NSDictionary *data = payload[@"data"];
-
     NSArray *devicePosKeys = data.allKeys;
+    
+    if([payload[@"commandtype"] isEqualToString:@"DeviceRemoved"]){
+
+        SFIDevice *device = [SFIDevice new];
+        device.deviceID=(sfi_id)[[devicePosKeys objectAtIndex: 0] intValue];
+        
+        SFIDeviceValue *deviceValue = [SFIDeviceValue new];
+        deviceValue.deviceID=device.deviceID;
+        
+        [devices addObject:device];
+        [deviceValueList addObject:deviceValue];
+        
+        res.deviceList = devices;
+        res.deviceCount = (unsigned int) devices.count;
+        res.deviceValueList = deviceValueList;
+        return res;
+    }
+
+    
     NSArray *sortedPostKeys = [devicePosKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         return [(NSString *)obj1 compare:(NSString *)obj2 options:NSNumericSearch];
     }];
@@ -140,6 +158,20 @@
     values.propertyType = [SFIDeviceKnownValues nameToPropertyType:valueName];
 
     return values;
+}
+
+- (NSString *)description {
+    NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    [description appendFormat:@"self.type=%d", self.type];
+    [description appendFormat:@", self.isSuccessful=%d", self.isSuccessful];
+    [description appendFormat:@", self.updatedDevicesOnly=%d", self.updatedDevicesOnly];
+    [description appendFormat:@", self.deviceCount=%u", self.deviceCount];
+    [description appendFormat:@", self.reason=%@", self.reason];
+    [description appendFormat:@", self.almondMAC=%@", self.almondMAC];
+    [description appendFormat:@", self.deviceList=%@", self.deviceList];
+    [description appendFormat:@", self.deviceValueList=%@", self.deviceValueList];
+    [description appendString:@">"];
+    return description;
 }
 
 @end

@@ -22,54 +22,62 @@
 @implementation SFIDevice
 
 + (NSArray *)addDevice:(SFIDevice *)device list:(NSArray *)list {
+    SFIDevice *toBeRemoved;
     for (SFIDevice *old in list) {
         if (device.deviceID == old.deviceID) {
-            // already in list; do nothing
-            return list;
+            toBeRemoved = old;
+            break;
         }
+        
     }
-
+    
+    
     NSMutableArray *new_list = [NSMutableArray arrayWithArray:list];
+    if(toBeRemoved != nil){
+        [new_list removeObject:toBeRemoved];
+    }
     [new_list addObject:device];
-
+    
     return new_list;
 }
 
 + (NSArray *)removeDevice:(SFIDevice *)device list:(NSArray *)list {
     NSMutableArray *new_list = [NSMutableArray array];
-
+    
     for (SFIDevice *old in list) {
-        if (device.deviceID != old.deviceID) {
-            // already in list; do nothing
-            [new_list addObject:device];
-        }
-    }
+        if (device.deviceID != old.deviceID)
+            [new_list addObject:old];
 
+    }
     return new_list;
+    
 }
+
+
 
 - (SFIDevicePropertyType)statePropertyType {
     switch (self.deviceType) {
-        case SFIDeviceType_MultiLevelSwitch_2: {
+        case SFIDeviceType_MultiLevelSwitch_2:{
             return SFIDevicePropertyType_SWITCH_MULTILEVEL;
         }
-
+            
         case SFIDeviceType_DoorLock_5:
         case SFIDeviceType_ZigbeeDoorLock_28: {
             return SFIDevicePropertyType_LOCK_STATE;
         }
-
-        case SFIDeviceType_StandardWarningDevice_21: {
+            
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_BuiltInSiren_60:{
             return SFIDevicePropertyType_ALARM_STATE;
         }
-
+            
         case SFIDeviceType_Alarm_6:
         case SFIDeviceType_SmokeDetector_36:
         case SFIDeviceType_FloodSensor_37:
         case SFIDeviceType_MoistureSensor_40: {
             return SFIDevicePropertyType_BASIC;
         }
-
+            
         case SFIDeviceType_MotionSensor_11:
         case SFIDeviceType_ContactSwitch_12:
         case SFIDeviceType_FireSensor_13:
@@ -79,7 +87,7 @@
         case SFIDeviceType_Keypad_20: {
             return SFIDevicePropertyType_STATE;
         }
-
+            
         case SFIDeviceType_BinarySwitch_1:
         case SFIDeviceType_MultiLevelOnOff_4:
         case SFIDeviceType_SmartACSwitch_22:
@@ -87,28 +95,30 @@
         case SFIDeviceType_ColorDimmableLight_32:
         case SFIDeviceType_Shade_34:
         case SFIDeviceType_Siren_42:
+        case SFIDeviceType_MultiSwitch_43:
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50: {
             return SFIDevicePropertyType_SWITCH_BINARY;
         }
-
+            
         case SFIDeviceType_BinarySensor_3:
         case SFIDeviceType_ShockSensor_38:
         case SFIDeviceType_DoorSensor_39:
         case SFIDeviceType_MovementSensor_41: {
             return SFIDevicePropertyType_SENSOR_BINARY;
         }
-
+            
         case SFIDeviceType_OccupancySensor_24: {
             return SFIDevicePropertyType_OCCUPANCY;
         };
-
+            
         case SFIDeviceType_GarageDoorOpener_53: {
             return SFIDevicePropertyType_BARRIER_OPERATOR;
         }
-
+         case SFIDeviceType_RollerShutter_52:
+            return SFIDevicePropertyType_SWITCH_MULTILEVEL;
             // Not implemented devices
         case SFIDeviceType_UnknownDevice_0:
         case SFIDeviceType_Thermostat_7:
@@ -125,10 +135,11 @@
         case SFIDeviceType_PressureSensor_30:
         case SFIDeviceType_FlowSensor_31:
         case SFIDeviceType_HAPump_33:
-        case SFIDeviceType_MultiSwitch_43:
         case SFIDeviceType_SetPointThermostat_46:
+        case SFIDeviceType_NestSmokeDetector_58:
+        case SFIDeviceType_NestThermostat_57:
         case SFIDeviceType_51:
-        case SFIDeviceType_RollerShutter_52:
+        
         default: {
             return SFIDevicePropertyType_STATE;
         }
@@ -140,7 +151,7 @@
         case SFIDeviceType_MultiLevelSwitch_2:
         case SFIDeviceType_MultiLevelOnOff_4:
             return SFIDevicePropertyType_SWITCH_MULTILEVEL;
-
+            
         default:
             return [self statePropertyType];
     }
@@ -164,10 +175,12 @@
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
-        case SFIDeviceType_GarageDoorOpener_53: {
+        case SFIDeviceType_GarageDoorOpener_53:
+        case SFIDeviceType_BuiltInSiren_60:
+        case SFIDeviceType_RollerShutter_52:{
             return YES;
         }
-
+            
         default: {
             return NO;
         }
@@ -175,43 +188,104 @@
 }
 
 
+
+- (BOOL)isRuleActuator{
+    //        case SFIDeviceType_Alarm_6:
+    switch (self.deviceType) {
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_MultiLevelSwitch_2:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_DoorLock_5:
+        case SFIDeviceType_Thermostat_7:
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_ZigbeeDoorLock_28:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45:
+        case SFIDeviceType_HueLamp_48:
+        case SFIDeviceType_SecurifiSmartSwitch_50:
+        case SFIDeviceType_NestThermostat_57:
+        case SFIDeviceType_BuiltInSiren_60:
+        case SFIDeviceType_RollerShutter_52:
+        case SFIDeviceType_GarageDoorOpener_53:
+        case SFIDeviceType_ZWtoACIRExtender_54:
+        case SFIDeviceType_MultiSwitch_43:
+        case SFIDeviceType_SetPointThermostat_46:
+        case SFIDeviceType_MultiSoundSiren_55:{
+            return YES;
+        }
+            
+        default: {
+            return NO;
+        }
+    }
+}
+
+- (BOOL)isActuator{
+    //        case SFIDeviceType_Alarm_6:
+    switch (self.deviceType) {
+        case SFIDeviceType_BinarySwitch_1:
+        case SFIDeviceType_MultiLevelSwitch_2:
+        case SFIDeviceType_MultiLevelOnOff_4:
+        case SFIDeviceType_DoorLock_5:
+        case SFIDeviceType_Thermostat_7:
+        case SFIDeviceType_StandardWarningDevice_21:
+        case SFIDeviceType_SmartACSwitch_22:
+        case SFIDeviceType_ZigbeeDoorLock_28:
+        case SFIDeviceType_Siren_42:
+        case SFIDeviceType_UnknownOnOffModule_44:
+        case SFIDeviceType_BinaryPowerSwitch_45:
+        case SFIDeviceType_HueLamp_48:
+        case SFIDeviceType_SecurifiSmartSwitch_50:
+        case SFIDeviceType_NestThermostat_57:
+        case SFIDeviceType_BuiltInSiren_60:{
+            return YES;
+        }
+            
+        default: {
+            return NO;
+        }
+    }
+}
+
 - (SFIDeviceKnownValues *)switchBinaryState:(SFIDeviceValue *)value {
     SFIDeviceKnownValues *deviceValues = nil;
-
+    
     switch (self.deviceType) {
         case SFIDeviceType_MultiLevelSwitch_2: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
-
+            
             int newValue = (deviceValues.intValue == 0) ? 99 : 0;
             [deviceValues setIntValue:newValue];
             break;
         }
-
+            
         case SFIDeviceType_BinarySensor_3: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             [deviceValues setBoolValue:NO];
             break;
         }
-
+            
         case SFIDeviceType_DoorLock_5:
         case SFIDeviceType_Alarm_6: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
-
+            
             int newValue = (deviceValues.intValue == 0) ? 255 : 0;
             [deviceValues setIntValue:newValue];
             break;
         }
-
+            
         case SFIDeviceType_StandardWarningDevice_21: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             int newValue = (deviceValues.intValue == 0) ? 65535 : 0;
             [deviceValues setIntValue:newValue];
             break;
         }
-
+            
         case SFIDeviceType_ZigbeeDoorLock_28: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
-
+            
             int newValue;
             switch (deviceValues.intValue) {
                 case SFIDeviceType_ZigbeeDoorLock_28_NOT_FULLY_LOCKED:
@@ -226,23 +300,23 @@
                 default:
                     newValue = SFIDeviceType_ZigbeeDoorLock_28_LOCKED;
             }
-
+            
             [deviceValues setIntValue:newValue];
             break;
         }
-
+            
         case SFIDeviceType_GarageDoorOpener_53: {
-/*
-    0	we can set 0 (to close) and 255(to open) only	Closed
-    252		closing
-    253		Stopped
-    254		Opening
-    255		Open
- */
+            /*
+             0	we can set 0 (to close) and 255(to open) only	Closed
+             252		closing
+             253		Stopped
+             254		Opening
+             255		Open
+             */
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
-
+            
             int newValue;
-
+            
             switch (deviceValues.intValue) {
                 case SFIDeviceType_GarageDoorOpener_53_CLOSED:
                     newValue = SFIDeviceType_GarageDoorOpener_53_OPEN;
@@ -263,11 +337,11 @@
                     newValue = SFIDeviceType_GarageDoorOpener_53_CLOSED;
                     break;
             }
-
+            
             [deviceValues setIntValue:newValue];
             break;
         }
-
+            
         case SFIDeviceType_BinarySwitch_1:
         case SFIDeviceType_MultiLevelOnOff_4:
         case SFIDeviceType_SmartACSwitch_22:
@@ -276,14 +350,26 @@
         case SFIDeviceType_UnknownOnOffModule_44:
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
-        case SFIDeviceType_SecurifiSmartSwitch_50: {
+        case SFIDeviceType_SecurifiSmartSwitch_50:
+        case SFIDeviceType_NestThermostat_57:
+        case SFIDeviceType_NestSmokeDetector_58:
+        case SFIDeviceType_BuiltInSiren_60: {
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             if (deviceValues.hasValue) {
                 [deviceValues setBoolValue:!deviceValues.boolValue];
             }
             break;
+            
         }
-
+        case SFIDeviceType_RollerShutter_52:{
+            deviceValues = [value knownValuesForProperty:self.statePropertyType];
+            if (deviceValues.hasValue && [deviceValues.value intValue]>0) {
+                [deviceValues setIntValue:0];
+            }else
+                [deviceValues setIntValue:99];
+            break;
+        }
+            
         default: {
             // do nothing
         }
@@ -355,10 +441,9 @@
             break;
         case SFIDeviceType_51:
             break;
-        case SFIDeviceType_RollerShutter_52:
-            break;
+       
     } // end switch
-
+    
     return deviceValues; // can be nil
 }
 
@@ -367,7 +452,7 @@
     if (self) {
         self.notificationMode = SFINotificationMode_unknown;
     }
-
+    
     return self;
 }
 
@@ -376,7 +461,7 @@
     self = [super init];
     if (self) {
         self.notificationMode = SFINotificationMode_unknown;
-
+        
         self.deviceID = (unsigned int) [coder decodeIntForKey:@"self.deviceID"];
         self.deviceName = [coder decodeObjectForKey:@"self.deviceName"];
         self.OZWNode = [coder decodeObjectForKey:@"self.OZWNode"];
@@ -393,7 +478,7 @@
         self.location = [coder decodeObjectForKey:@"self.location"];
         self.almondMAC = [coder decodeObjectForKey:@"self.almondMAC"];
     }
-
+    
     return self;
 }
 
@@ -438,7 +523,7 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     SFIDevice *copy = (SFIDevice *) [[[self class] allocWithZone:zone] init];
-
+    
     if (copy != nil) {
         copy.deviceID = self.deviceID;
         copy.deviceName = self.deviceName;
@@ -456,33 +541,8 @@
         copy.location = self.location;
         copy.almondMAC = self.almondMAC;
     }
-
+    
     return copy;
-}
-
-- (BOOL)isActuator {
-    //        case SFIDeviceType_Alarm_6:
-    switch (self.deviceType) {
-        case SFIDeviceType_BinarySwitch_1:
-        case SFIDeviceType_MultiLevelSwitch_2:
-        case SFIDeviceType_MultiLevelOnOff_4:
-        case SFIDeviceType_DoorLock_5:
-        case SFIDeviceType_Thermostat_7:
-        case SFIDeviceType_StandardWarningDevice_21:
-        case SFIDeviceType_SmartACSwitch_22:
-        case SFIDeviceType_ZigbeeDoorLock_28:
-        case SFIDeviceType_Siren_42:
-        case SFIDeviceType_UnknownOnOffModule_44:
-        case SFIDeviceType_BinaryPowerSwitch_45:
-        case SFIDeviceType_HueLamp_48:
-        case SFIDeviceType_SecurifiSmartSwitch_50: {
-            return YES;
-        }
-
-        default: {
-            return NO;
-        }
-    }
 }
 
 - (BOOL)isTampered:(SFIDeviceValue *)deviceValue {
@@ -506,17 +566,17 @@
         NSLog(@"updateNotificationMode: illegal mode 'SFINotificationMode_unknown'; ignoring change");
         return @[];
     }
-
+    
     // Note side-effect on this instance
     self.notificationMode = mode;
-
+    
     // When changing mode, we have to set the preference for each index and send the list to the cloud.
     // Notification will be sent for all changes to the devices known values; one preference setting for each device property.
     // It seems like the cloud could provide a simple API for doing this work for us.
     //
     // The list of indexes whose preference setting has to be changed
     NSArray *deviceValuesList;
-
+    
     if (self.deviceID == SFIDeviceType_SmartACSwitch_22 || self.deviceID == SFIDeviceType_SecurifiSmartSwitch_50) {
         // Special case these two: we only toggle the setting for the main state index
         // otherwise the notifications will be too many
@@ -527,19 +587,19 @@
         // General case: change all indexes
         deviceValuesList = [value knownDevicesValues];
     }
-
+    
     // The list of preference settings
     NSMutableArray *settings = [[NSMutableArray alloc] init];
-
+    
     for (SFIDeviceKnownValues *deviceValue in deviceValuesList) {
         SFINotificationDevice *notificationDevice = [[SFINotificationDevice alloc] init];
         notificationDevice.deviceID = self.deviceID;
         notificationDevice.notificationMode = self.notificationMode;
         notificationDevice.valueIndex = deviceValue.index;
-
+        
         [settings addObject:notificationDevice];
     }
-
+    
     return settings;
 }
 

@@ -16,7 +16,15 @@
 @property(nonatomic) int blockedMACCount;
 @property(nonatomic) int blockedContentCount;
 @property(nonatomic) NSString *routerUptime;
+@property(nonatomic) NSString *uptime;
 @property(nonatomic) NSString *firmwareVersion;
+@property(nonatomic) NSString *url;
+@property(nonatomic) NSString *login;
+@property(nonatomic) NSString *password;
+@property(nonatomic) NSArray *almondsList;
+@property (nonatomic) NSString *routerMode;
+// passwords sent in summary information are encrypted
+- (NSString *)decryptPassword:(NSString *)almondMac;
 
 - (void)updateWirelessSummaryWithSettings:(NSArray *)wirelessSettings;
 

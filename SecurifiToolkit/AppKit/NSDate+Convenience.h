@@ -21,4 +21,20 @@
 - (NSString *)formattedDateTimeString;
 
 - (NSString *)formattedStringUsingFormat:(NSString *)dateFormat;
+
+- (NSString *)getDayMonthFormat;
+
++ (NSDate*)getDateFromEpoch:(NSString*)epoch;
+
++ (NSDate *)convertStirngToDate:(NSString*)dateString;
+
+- (NSString *)stringFromDate;
+
+-(NSString *)getDay;//6
+
+-(NSString *)getMonthString;
+
++ (NSString *)DateTimeString;
+
++ (NSDate*)getDateFromEpochFormatted:(NSString*)epoch;
 @end

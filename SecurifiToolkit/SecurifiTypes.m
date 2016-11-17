@@ -2,6 +2,7 @@
 
 NSString *securifi_name_to_device_type(SFIDeviceType type) {
     switch (type) {
+        case SFIDeviceType_BinarySwitch_0:return @"0_BinarySwitch";
         case SFIDeviceType_UnknownDevice_0:return @"0_UnknownDevice";
         case SFIDeviceType_BinarySwitch_1:return @"1_BinarySwitch";
         case SFIDeviceType_MultiLevelSwitch_2:return @"2_MultiLevelSwitch";
@@ -49,92 +50,151 @@ NSString *securifi_name_to_device_type(SFIDeviceType type) {
         case SFIDeviceType_BinaryPowerSwitch_45:return @"45_BinaryPowerSwitch";
         case SFIDeviceType_SetPointThermostat_46:return @"46_SetPointThermostat";
         case SFIDeviceType_HueLamp_48:return @"48_HueLamp";
+        case SFIDeviceType_MultiSensor_49:return @"49_MultiSensor";
         case SFIDeviceType_SecurifiSmartSwitch_50:return @"50_SecurifiSmartSwitch";
         case SFIDeviceType_51:return @"51_SFIDeviceType";
         case SFIDeviceType_RollerShutter_52:return @"52_RollerShutter";
         case SFIDeviceType_GarageDoorOpener_53:return @"53_GarageDoorOpener";
+        case SFIDeviceType_ZWtoACIRExtender_54:return @"54_ZWtoACIRExtender";
+        case SFIDeviceType_MultiSoundSiren_55:return @"55_MultiSoundSiren";
+        case SFIDeviceType_EnergyReader_56:return @"56_EnergyReader";
+        case SFIDeviceType_NestThermostat_57:return @"57_NestThermostat";
+        case SFIDeviceType_NestSmokeDetector_58:return @"58_NestSmokeDetector";
+        case SFIDeviceType_BuiltInSiren_60: return @"60_BuiltInSiren";
+        case SFIDeviceType_SecurifiButton_61: return @"61_SecurifiButton";
+        case SFIDeviceType_ZenThermostat_62: return @"62_ZenThermostat";
+        case SFIDeviceType_AlmondSiren_63: return @"63_AlmondSiren";
+        case SFIDeviceType_AlmondBlink_64: return @"64_AlmondBlink";
+        case SFIDeviceType_WIFIClient:return @"WIFIClient";
+        case SFIDeviceType_count:return @"count_iterator_FIX_ME!";
         default: return [NSString stringWithFormat:@"%d_UnknownDevice", type];
     }
 }
 
 NSDictionary *securifi_property_name_to_type_dictionary() {
     static NSDictionary *lookupTable;
-
     if (lookupTable == nil) {
-        lookupTable = @{
-                // Normalize all names to upper case
-                @"AC_CURRENTDIVISOR" : @(SFIDevicePropertyType_AC_CURRENTDIVISOR),
-                @"AC_CURRENTMULTIPLIER" : @(SFIDevicePropertyType_AC_CURRENTMULTIPLIER),
-                @"AC_FREQUENCY" : @(SFIDevicePropertyType_AC_FREQUENCY),
-                @"AC_FREQUENCYDIVISOR" : @(SFIDevicePropertyType_AC_FREQUENCYDIVISOR),
-                @"AC_FREQUENCYMULTIPLIER" : @(SFIDevicePropertyType_AC_FREQUENCYMULTIPLIER),
-                @"AC_POWERDIVISOR" : @(SFIDevicePropertyType_AC_POWERDIVISOR),
-                @"AC_POWERMULTIPLIER" : @(SFIDevicePropertyType_AC_POWERMULTIPLIER),
-                @"AC_VOLTAGEDIVISOR" : @(SFIDevicePropertyType_AC_VOLTAGEDIVISOR),
-                @"AC_VOLTAGEMULTIPLIER" : @(SFIDevicePropertyType_AC_VOLTAGEMULTIPLIER),
-                @"ACTIVE_POWER" : @(SFIDevicePropertyType_ACTIVE_POWER),
-                @"ALARM_STATE" : @(SFIDevicePropertyType_ALARM_STATE),
-                @"ARMMODE" : @(SFIDevicePropertyType_ARMMODE),
-                @"BARRIER OPERATOR" : @(SFIDevicePropertyType_BARRIER_OPERATOR),
-                @"BASIC" : @(SFIDevicePropertyType_BASIC),
-                @"BATTERY" : @(SFIDevicePropertyType_BATTERY),
-                @"BRIGHTNESS" : @(SFIDevicePropertyType_BRIGHTNESS),
-                @"COLOR_TEMPERATURE" : @(SFIDevicePropertyType_COLOR_TEMPERATURE),
-                @"CURRENT POSITION" : @(SFIDevicePropertyType_CURRENT_POSITION),
-                @"CURRENT_HUE" : @(SFIDevicePropertyType_CURRENT_HUE),
-                @"CURRENT_SATURATION" : @(SFIDevicePropertyType_CURRENT_SATURATION),
-                @"CURRENT_X" : @(SFIDevicePropertyType_CURRENT_X),
-                @"CURRENT_Y" : @(SFIDevicePropertyType_CURRENT_Y),
-                @"CURRENTPOSITION-LIFT" : @(SFIDevicePropertyType_CURRENTPOSITION_LIFT),
-                @"CURRENTPOSITION-TILT" : @(SFIDevicePropertyType_CURRENTPOSITION_TILT),
-                @"DC_CURRENT" : @(SFIDevicePropertyType_DC_CURRENT),
-                @"DC_CURRENTDIVISOR" : @(SFIDevicePropertyType_DC_CURRENTDIVISOR),
-                @"DC_CURRENTMULTIPLIER" : @(SFIDevicePropertyType_DC_CURRENTMULTIPLIER),
-                @"DC_POWER" : @(SFIDevicePropertyType_DC_POWER),
-                @"DC_POWERDIVISOR" : @(SFIDevicePropertyType_DC_POWERDIVISOR),
-                @"DC_POWERMULTIPLIER" : @(SFIDevicePropertyType_DC_POWERMULTIPLIER),
-                @"DC_VOLTAGE" : @(SFIDevicePropertyType_DC_VOLTAGE),
-                @"DC_VOLTAGEDIVISOR" : @(SFIDevicePropertyType_DC_VOLTAGEDIVISOR),
-                @"DC_VOLTAGEMULTIPLIER" : @(SFIDevicePropertyType_DC_VOLTAGEMULTIPLIER),
-                @"EMER_ALARM" : @(SFIDevicePropertyType_EMER_ALARM),
-                @"HUE" : @(SFIDevicePropertyType_COLOR_HUE),
-                @"HUMIDITY" : @(SFIDevicePropertyType_HUMIDITY),
-                @"ILLUMINANCE" : @(SFIDevicePropertyType_ILLUMINANCE),
-                @"LOCK_CONF" : @(SFIDevicePropertyType_LOCK_CONF),
-                @"LOCK_STATE" : @(SFIDevicePropertyType_LOCK_STATE),
-                @"LOW BATTERY" : @(SFIDevicePropertyType_LOW_BATTERY),
-                @"MAXIMUM_USERS" : @(SFIDevicePropertyType_MAXIMUM_USERS),
-                @"MEASURED_VALUE" : @(SFIDevicePropertyType_MEASURED_VALUE),
-                @"METERING_DEVICETYPE" : @(SFIDevicePropertyType_METERING_DEVICETYPE),
-                @"OCCUPANCY" : @(SFIDevicePropertyType_OCCUPANCY),
-                @"PANIC_ALARM" : @(SFIDevicePropertyType_PANIC_ALARM),
-                @"POWER" : @(SFIDevicePropertyType_POWER),
-                @"RMS_CURRENT" : @(SFIDevicePropertyType_RMS_CURRENT),
-                @"RMS_VOLTAGE" : @(SFIDevicePropertyType_RMS_VOLTAGE),
-                @"SATURATION" : @(SFIDevicePropertyType_SATURATION),
-                @"SENSOR BINARY" : @(SFIDevicePropertyType_SENSOR_BINARY),
-                @"SENSOR MULTILEVEL" : @(SFIDevicePropertyType_SENSOR_MULTILEVEL),
-                @"STATE" : @(SFIDevicePropertyType_STATE),
-                @"STATUS" : @(SFIDevicePropertyType_STATUS),
-                @"SWITCH BINARY" : @(SFIDevicePropertyType_SWITCH_BINARY),
-                @"SWITCH MULTILEVEL" : @(SFIDevicePropertyType_SWITCH_MULTILEVEL),
-                @"TAMPER" : @(SFIDevicePropertyType_TAMPER),
-                @"TEMPERATURE" : @(SFIDevicePropertyType_TEMPERATURE),
-                @"THERMOSTAT FAN MODE" : @(SFIDevicePropertyType_THERMOSTAT_FAN_MODE),
-                @"THERMOSTAT FAN STATE" : @(SFIDevicePropertyType_THERMOSTAT_FAN_STATE),
-                @"THERMOSTAT MODE" : @(SFIDevicePropertyType_THERMOSTAT_MODE),
-                @"THERMOSTAT OPERATING STATE" : @(SFIDevicePropertyType_THERMOSTAT_OPERATING_STATE),
-                @"THERMOSTAT SETPOINT" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT),
-                @"THERMOSTAT SETPOINT COOLING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_COOLING),
-                @"THERMOSTAT SETPOINT HEATING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING),
-                @"TOLERANCE" : @(SFIDevicePropertyType_TOLERANCE),
-                @"UNITS" : @(SFIDevicePropertyType_UNITS),
-                @"USER_CODE" : @(SFIDevicePropertyType_USER_CODE),
-
-        };
+                lookupTable = @{
+                        // Normalize all names to upper case.
+                        // List entries alphabetically for quick look up.
+                        @"AC FAN MODE" : @(SFIDevicePropertyType_AC_FAN_MODE),
+                        @"AC MODE" : @(SFIDevicePropertyType_AC_MODE),
+                        @"AC SETPOINT COOLING" : @(SFIDevicePropertyType_AC_SETPOINT_COOLING),
+                        @"AC SETPOINT HEATING" : @(SFIDevicePropertyType_AC_SETPOINT_HEATING),
+                        @"AC SWING" : @(SFIDevicePropertyType_AC_SWING),
+                        @"AC_CURRENTDIVISOR" : @(SFIDevicePropertyType_AC_CURRENTDIVISOR),
+                        @"AC_CURRENTMULTIPLIER" : @(SFIDevicePropertyType_AC_CURRENTMULTIPLIER),
+                        @"AC_FREQUENCY" : @(SFIDevicePropertyType_AC_FREQUENCY),
+                        @"AC_FREQUENCYDIVISOR" : @(SFIDevicePropertyType_AC_FREQUENCYDIVISOR),
+                        @"AC_FREQUENCYMULTIPLIER" : @(SFIDevicePropertyType_AC_FREQUENCYMULTIPLIER),
+                        @"AC_POWERDIVISOR" : @(SFIDevicePropertyType_AC_POWERDIVISOR),
+                        @"AC_POWERMULTIPLIER" : @(SFIDevicePropertyType_AC_POWERMULTIPLIER),
+                        @"AC_VOLTAGEDIVISOR" : @(SFIDevicePropertyType_AC_VOLTAGEDIVISOR),
+                        @"AC_VOLTAGEMULTIPLIER" : @(SFIDevicePropertyType_AC_VOLTAGEMULTIPLIER),
+                        @"ACTIVE_POWER" : @(SFIDevicePropertyType_ACTIVE_POWER),
+                        @"ALARM_STATE" : @(SFIDevicePropertyType_ALARM_STATE),
+                        @"ARMMODE" : @(SFIDevicePropertyType_ARMMODE),
+                        @"AWAY_MODE" : @(SFIDevicePropertyType_AWAY_MODE),
+                        @"BARRIER OPERATOR" : @(SFIDevicePropertyType_BARRIER_OPERATOR),
+                        @"BASIC" : @(SFIDevicePropertyType_BASIC),
+                        @"BATTERY" : @(SFIDevicePropertyType_BATTERY),
+                        @"BRIGHTNESS" : @(SFIDevicePropertyType_BRIGHTNESS),
+                        @"CAN_COOL" : @(SFIDevicePropertyType_CAN_COOL),
+                        @"CAN_HEAT" : @(SFIDevicePropertyType_CAN_HEAT),
+                        @"CLAMP1_ENERGY" : @(SFIDevicePropertyType_CLAMP1_ENERGY),
+                        @"CLAMP1_POWER" : @(SFIDevicePropertyType_CLAMP1_POWER),
+                        @"CLAMP2_ENERGY" : @(SFIDevicePropertyType_CLAMP2_ENERGY),
+                        @"CLAMP2_POWER" : @(SFIDevicePropertyType_CLAMP2_POWER),
+                        @"CO_ALARM_STATE" : @(SFIDevicePropertyType_CO_ALARM_STATE),
+                        @"COLOR_TEMPERATURE" : @(SFIDevicePropertyType_COLOR_TEMPERATURE),
+                        @"CONFIGURATION" : @(SFIDevicePropertyType_CONFIGURATION),
+                        @"CURRENT POSITION" : @(SFIDevicePropertyType_CURRENT_POSITION),
+                        @"CURRENT_HUE" : @(SFIDevicePropertyType_CURRENT_HUE),
+                        @"CURRENT_SATURATION" : @(SFIDevicePropertyType_CURRENT_SATURATION),
+                        @"CURRENT_TEMPERATURE" : @(SFIDevicePropertyType_CURRENT_TEMPERATURE),
+                        @"CURRENT_X" : @(SFIDevicePropertyType_CURRENT_X),
+                        @"CURRENT_Y" : @(SFIDevicePropertyType_CURRENT_Y),
+                        @"CURRENTPOSITION-LIFT" : @(SFIDevicePropertyType_CURRENTPOSITION_LIFT),
+                        @"CURRENTPOSITION-TILT" : @(SFIDevicePropertyType_CURRENTPOSITION_TILT),
+                        @"DC_CURRENT" : @(SFIDevicePropertyType_DC_CURRENT),
+                        @"DC_CURRENTDIVISOR" : @(SFIDevicePropertyType_DC_CURRENTDIVISOR),
+                        @"DC_CURRENTMULTIPLIER" : @(SFIDevicePropertyType_DC_CURRENTMULTIPLIER),
+                        @"DC_POWER" : @(SFIDevicePropertyType_DC_POWER),
+                        @"DC_POWERDIVISOR" : @(SFIDevicePropertyType_DC_POWERDIVISOR),
+                        @"DC_POWERMULTIPLIER" : @(SFIDevicePropertyType_DC_POWERMULTIPLIER),
+                        @"DC_VOLTAGE" : @(SFIDevicePropertyType_DC_VOLTAGE),
+                        @"DC_VOLTAGEDIVISOR" : @(SFIDevicePropertyType_DC_VOLTAGEDIVISOR),
+                        @"DC_VOLTAGEMULTIPLIER" : @(SFIDevicePropertyType_DC_VOLTAGEMULTIPLIER),
+                        @"EMER_ALARM" : @(SFIDevicePropertyType_EMER_ALARM),
+                        @"ENERGY" : @(SFIDevicePropertyType_ENERGY),
+                        @"HAS_FAN" : @(SFIDevicePropertyType_HAS_FAN),
+                        @"HAS_LEAF" : @(SFIDevicePropertyType_HAS_LEAF),
+                        @"HUE" : @(SFIDevicePropertyType_COLOR_HUE),
+                        @"HUMIDITY" : @(SFIDevicePropertyType_HUMIDITY),
+                        @"HVAC_STATE" : @(SFIDevicePropertyType_HVAC_STATE),
+                        @"ILLUMINANCE_PERCENT" : @(SFIDevicePropertyType_ILLUMINANCE_PERCENT),
+                        @"ILLUMINANCE OR LUMINANCE_PERCENT" : @(SFIDevicePropertyType_ILLUMINANCE),
+                        @"ILLUMINANCE" : @(SFIDevicePropertyType_ILLUMINANCE),
+                        @"IR CODE" : @(SFIDevicePropertyType_IR_CODE),
+                        @"IS_USING_EMERGENCY_HEAT" : @(SFIDevicePropertyType_IS_USING_EMERGENCY_HEAT),
+                        @"ISONLINE" : @(SFIDevicePropertyType_ISONLINE),
+                        @"LOCK_CONF" : @(SFIDevicePropertyType_LOCK_CONF),
+                        @"LOCK_STATE" : @(SFIDevicePropertyType_LOCK_STATE),
+                        @"LOW BATTERY" : @(SFIDevicePropertyType_LOW_BATTERY),
+                        @"LUMINANCE_PERCENT" : @(SFIDevicePropertyType_LUMINANCE_PERCENT),
+                        @"MAXIMUM_USERS" : @(SFIDevicePropertyType_MAXIMUM_USERS),
+                        @"MEASURED_VALUE" : @(SFIDevicePropertyType_MEASURED_VALUE),
+                        @"METERING_DEVICETYPE" : @(SFIDevicePropertyType_METERING_DEVICETYPE),
+                        @"NEST_ID" : @(SFIDevicePropertyType_NEST_ID),
+                        @"OCCUPANCY" : @(SFIDevicePropertyType_OCCUPANCY),
+                        @"PANIC_ALARM" : @(SFIDevicePropertyType_PANIC_ALARM),
+                        @"POWER" : @(SFIDevicePropertyType_POWER),
+                        @"RESPONSE_CODE" : @(SFIDevicePropertyType_RESPONSE_CODE),
+                        @"RMS_CURRENT" : @(SFIDevicePropertyType_RMS_CURRENT),
+                        @"RMS_VOLTAGE" : @(SFIDevicePropertyType_RMS_VOLTAGE),
+                        @"SATURATION" : @(SFIDevicePropertyType_SATURATION),
+                        @"SENSOR BINARY" : @(SFIDevicePropertyType_SENSOR_BINARY),
+                        @"SENSOR MULTILEVEL" : @(SFIDevicePropertyType_SENSOR_MULTILEVEL),
+                        @"SMOKE_ALARM_STATE" : @(SFIDevicePropertyType_SMOKE_ALARM_STATE),
+                        @"STATE" : @(SFIDevicePropertyType_STATE),
+                        @"STATUS" : @(SFIDevicePropertyType_STATUS),
+                        @"STOP" : @(SFIDevicePropertyType_STOP),
+                        @"SWITCH BINARY" : @(SFIDevicePropertyType_SWITCH_BINARY),
+                        @"SWITCH_BINARY1" : @(SFIDevicePropertyType_SWITCH_BINARY1),
+                        @"SWITCH_BINARY2" : @(SFIDevicePropertyType_SWITCH_BINARY2),
+                        @"SWITCH MULTILEVEL" : @(SFIDevicePropertyType_SWITCH_MULTILEVEL),
+                        @"TAMPER" : @(SFIDevicePropertyType_TAMPER),
+                        @"TEMPERATURE" : @(SFIDevicePropertyType_TEMPERATURE),
+                        @"THERMOSTAT FAN MODE" : @(SFIDevicePropertyType_THERMOSTAT_FAN_MODE),
+                        @"THERMOSTAT FAN STATE" : @(SFIDevicePropertyType_THERMOSTAT_FAN_STATE),
+                        @"THERMOSTAT MODE" : @(SFIDevicePropertyType_THERMOSTAT_MODE),
+                        @"THERMOSTAT OPERATING STATE" : @(SFIDevicePropertyType_THERMOSTAT_OPERATING_STATE),
+                        @"THERMOSTAT SETPOINT COOLING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_COOLING),
+                        @"THERMOSTAT SETPOINT HEATING" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT_HEATING),
+                        @"THERMOSTAT SETPOINT" : @(SFIDevicePropertyType_THERMOSTAT_SETPOINT),
+                        @"THERMOSTAT_FAN_STATE" : @(SFIDevicePropertyType_NEST_THERMOSTAT_FAN_STATE),
+                        @"THERMOSTAT_MODE" : @(SFIDevicePropertyType_NEST_THERMOSTAT_MODE),
+                        @"THERMOSTAT_RANGE_HIGH" : @(SFIDevicePropertyType_THERMOSTAT_RANGE_HIGH),
+                        @"THERMOSTAT_RANGE_LOW" : @(SFIDevicePropertyType_THERMOSTAT_RANGE_LOW),
+                        @"THERMOSTAT_TARGET" : @(SFIDevicePropertyType_THERMOSTAT_TARGET),
+                        @"TOLERANCE" : @(SFIDevicePropertyType_TOLERANCE),
+                        @"UNITS" : @(SFIDevicePropertyType_UNITS),
+                        @"UP_DOWN" : @(SFIDevicePropertyType_UP_DOWN),
+                        @"USER_CODE" : @(SFIDevicePropertyType_USER_CODE),
+                        @"TONE_SELECTED" : @(SFIDevicePropertyType_TONE_SELECTED),
+                        @"ENABLE" : @(SFIDevicePropertyType_ENABLE),
+                        @"BUZZ_STATE" : @(SFIDevicePropertyType_BUZZ_STATE),
+                        @"TONE" : @(SFIDevicePropertyType_TONE),
+                        @"VOLUME" : @(SFIDevicePropertyType_VOLUME),
+                        @"SECONDS" : @(SFIDevicePropertyType_SECONDS),
+                        @"RGB" : @(SFIDevicePropertyType_RGB),
+                        @"BLINK_STATE" : @(SFIDevicePropertyType_BLINK_STATE),
+                        @"LED_STATE" : @(SFIDevicePropertyType_LED_STATE),
+                        @"PRESS" : @(SFIDevicePropertyType_PRESS)
+                        };
     }
     return
-            lookupTable;
+    lookupTable;
 }
 
 SFIDevicePropertyType securifi_name_to_property_type(NSString *valueName) {
@@ -143,9 +203,9 @@ SFIDevicePropertyType securifi_name_to_property_type(NSString *valueName) {
     }
     // normalize all names
     valueName = [valueName uppercaseString];
-
+    
     NSDictionary *lookupTable = securifi_property_name_to_type_dictionary();
-
+    
     NSNumber *o = lookupTable[valueName];
     if (!o) {
         return SFIDevicePropertyType_UNKNOWN;
@@ -155,19 +215,19 @@ SFIDevicePropertyType securifi_name_to_property_type(NSString *valueName) {
 
 NSString *securifi_property_type_to_name(SFIDevicePropertyType propertyType) {
     static NSDictionary *lookupTable;
-
+    
     if (lookupTable == nil) {
         NSDictionary *namesToType = securifi_property_name_to_type_dictionary();
         NSMutableDictionary *typeToName = [NSMutableDictionary dictionary];
-
+        
         for (NSString *key in namesToType.allKeys) {
             NSNumber *value = namesToType[key];
             typeToName[value] = key;
         }
-
+        
         lookupTable = [NSDictionary dictionaryWithDictionary:typeToName];
     }
-
+    
     NSNumber *key = @(propertyType);
     return lookupTable[key];
 }

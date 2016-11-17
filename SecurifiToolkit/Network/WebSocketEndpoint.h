@@ -14,5 +14,7 @@
 @property(nonatomic, weak) id <NetworkEndpointDelegate> delegate;
 
 + (instancetype)endpointWithConfig:(NetworkConfig *)config;
+-(void)setAlmondNameAndMAC:(NSString *)mac;
+
 
 @end

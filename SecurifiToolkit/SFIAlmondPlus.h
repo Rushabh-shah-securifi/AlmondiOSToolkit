@@ -26,6 +26,7 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 
 @property(nonatomic, copy) NSString *almondplusMAC; // mac decimal value
 @property(nonatomic, copy) NSString *almondplusName;
+@property(nonatomic) NSString *firmware;
 @property(nonatomic) int index;
 @property(nonatomic) int colorCodeIndex;
 
@@ -33,6 +34,7 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 @property(nonatomic) NSMutableArray *accessEmailIDs;
 @property(nonatomic) BOOL isExpanded;
 @property(nonatomic, copy) NSString *ownerEmailID;
+@property(nonatomic) NSString *routerMode;
 
 @property(nonatomic) enum SFIAlmondPlusLinkType linkType;
 
@@ -49,6 +51,11 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 // current enough version.
 - (BOOL)supportsSendLogs:(NSString *)almondVersion;
 
+- (BOOL)supportsGenericIndexes:(NSString *)almondVersion;
+
 - (BOOL)isEqualAlmondPlus:(SFIAlmondPlus *)other;
 
++ (BOOL)checkIfFirmwareIsCompatible:(SFIAlmondPlus *)almond;
+
+-(BOOL)siteMapSupportFirmware:(NSString *)almondFiemware;
 @end

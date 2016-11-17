@@ -20,6 +20,10 @@
 @property(nonatomic) SFIDevicePropertyType valueType;
 @property(nonatomic, copy) NSString *value; // device value
 @property(nonatomic) BOOL viewed;
+//@property(nonatomic, copy) NSString *clientName;
+//@property(nonatomic, copy) NSString *clientConnection;
+//@property(nonatomic, copy) NSString *notiType;
+//@property(nonatomic, copy) NSString *clientType;
 
 @property(nonatomic) long debugCounter;
 
