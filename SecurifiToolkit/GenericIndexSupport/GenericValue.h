@@ -18,13 +18,13 @@
 @property (nonatomic)NSString *eventType;
 @property (nonatomic)NSString *transformedValue;
 @property (nonatomic)NSString *notificationText;
-@property (nonatomic)NSString *notificationPrefix;
+@property (nonatomic)NSString *notificationPrefix;//notification
+@property (nonatomic)NSString *unit;// notification
 
 -(id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString *)eventType notificationText:(NSString *)notificationText;
 
 - (id)initWithDisplayText:(NSString*)displayText iconText:(NSString*)iconText value:(NSString*)value excludeFrom:(NSString*)excludeFrom transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix;
 
-- (id)initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix;
 
 - (id)initUnknownDevice;
 
@@ -33,4 +33,9 @@
 - (id)initWithDisplayTextNotification:(NSString*)icon value:(NSString*)value prefix:(NSString *)notificationPrefix;
 
 +(GenericValue*)getCopy:(GenericValue*)genVal;
+
+- (id)initWithDisplayTextNotification:(NSString*)icon value:(NSString*)value prefix:(NSString *)notificationPrefix andUnit:(NSString *)unit;//notification
+
+- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix andUnits:(NSString *)unit;
+
 @end

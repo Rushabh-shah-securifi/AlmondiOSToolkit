@@ -46,9 +46,18 @@
     }
     return self;
 }
+- (id)initWithDisplayTextNotification:(NSString*)icon value:(NSString*)value prefix:(NSString *)notificationPrefix andUnit:(NSString *)unit {
+    self = [super init];
+    if(self){
+        self.icon = icon;
+        self.value = value;
+        self.notificationPrefix = notificationPrefix;
+        self.unit = unit;
+    }
+    return self;
+}
 
-
-- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix{
+- (id) initWithDisplayText:(NSString*)displayText icon:(NSString*)icon toggleValue:(NSString*)toggleValue value:(NSString*)value excludeFrom:(NSString*)excludeFrom eventType:(NSString*)eventType transformedValue:(NSString*)transformedValue prefix:(NSString *)notificationPrefix andUnits:(NSString *)unit{
     self = [super init];
     if(self){
         self.icon = icon;
@@ -59,9 +68,11 @@
         self.eventType = eventType;
         self.transformedValue = transformedValue;
         self.notificationPrefix = notificationPrefix;
+        self.unit = unit;
     }
     return self;
 }
+
 
 +(GenericValue*)getCopy:(GenericValue*)genVal{
     GenericValue *copy = [GenericValue new];

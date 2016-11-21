@@ -530,7 +530,7 @@
 +(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{
     if(formatterDict){
         float factor = formatterDict[FACTOR]? [formatterDict[FACTOR] floatValue]: 1;
-        Formatter *formatter = [[Formatter alloc]initWithFactor:factor min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT] prefix:formatterDict[PREFIX]];
+        Formatter *formatter = [[Formatter alloc]initWithFactor:factor min:[formatterDict[MINMUM] intValue] max:[formatterDict[MAXIMUM] intValue] units:formatterDict[UNIT] prefix:NSLocalizedString(formatterDict[PREFIX],formatterDict[PREFIX])];
         return formatter;
     }
     return nil;
@@ -547,13 +547,13 @@
                                                                       toggleValue:valueDict[TOGGLE_VALUE]
                                                                             value:value
                                                                       excludeFrom:valueDict[EXCLUDE_FROM]
-                                                                        eventType:valueDict[EVENT_TYPE] notificationText:valueDict[NOTIFICATION]];
+                                                                        eventType:valueDict[EVENT_TYPE] notificationText:NSLocalizedString(valueDict[NOTIFICATION],valueDict[NOTIFICATION])];
             [genericValues setObject:genericValue forKey:value];
         }
         return genericValues;
     }
     return nil;
-}
+}/*NSLocalizedString(genericIndexDict[APP_LABEL],genericIndexDict[APP_LABEL])*/
 
 
 - (NSDictionary*)parseJson:(NSString*)fileName{
