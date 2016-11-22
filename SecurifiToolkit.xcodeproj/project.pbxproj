@@ -269,6 +269,10 @@
 		A569B8E21DBE3E8500FBD429 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = A569B8A51DBE3E8500FBD429 /* SRWebSocket.m */; };
 		A5960DD21DC85522000B380C /* DeviceLogsProcessing.m in Sources */ = {isa = PBXBuildFile; fileRef = A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */; };
 		A5960DD51DC86F0F000B380C /* NotificationPreferenceListCallbacks.m in Sources */ = {isa = PBXBuildFile; fileRef = A5960DD41DC86F0F000B380C /* NotificationPreferenceListCallbacks.m */; };
+		A5AAEA071DE417B3004A4FBF /* Network_m_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = A5AAEA061DE417B3004A4FBF /* Network_m_Tests.m */; };
+		A5AAEA091DE417DC004A4FBF /* AlmondManagement_m_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = A5AAEA081DE417DC004A4FBF /* AlmondManagement_m_Tests.m */; };
+		A5AAEA0B1DE41874004A4FBF /* LocalNetworkManagement_m_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = A5AAEA0A1DE41874004A4FBF /* LocalNetworkManagement_m_Tests.m */; };
+		A5AAEA0D1DE4566F004A4FBF /* CloudEndpoitnt_m_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = A5AAEA0C1DE4566F004A4FBF /* CloudEndpoitnt_m_Tests.m */; };
 		A5C41EB51DD4761E0005FD12 /* SecurifiToolkitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C41EB41DD4761E0005FD12 /* SecurifiToolkitTests.m */; };
 		A5C7AE3E1C7C98D6007E630D /* DeviceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = A5C7AE3C1C7C98D6007E630D /* DeviceParser.h */; };
 		A5C7AE3F1C7C98D6007E630D /* DeviceParser.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */; };
@@ -690,6 +694,10 @@
 		A5960DD11DC85522000B380C /* DeviceLogsProcessing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceLogsProcessing.m; sourceTree = "<group>"; };
 		A5960DD31DC86EE3000B380C /* NotificationPreferenceListCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationPreferenceListCallbacks.h; sourceTree = "<group>"; };
 		A5960DD41DC86F0F000B380C /* NotificationPreferenceListCallbacks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationPreferenceListCallbacks.m; sourceTree = "<group>"; };
+		A5AAEA061DE417B3004A4FBF /* Network_m_Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Network_m_Tests.m; sourceTree = "<group>"; };
+		A5AAEA081DE417DC004A4FBF /* AlmondManagement_m_Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondManagement_m_Tests.m; sourceTree = "<group>"; };
+		A5AAEA0A1DE41874004A4FBF /* LocalNetworkManagement_m_Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalNetworkManagement_m_Tests.m; sourceTree = "<group>"; };
+		A5AAEA0C1DE4566F004A4FBF /* CloudEndpoitnt_m_Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudEndpoitnt_m_Tests.m; sourceTree = "<group>"; };
 		A5C41EB21DD4761E0005FD12 /* SecurifiToolkitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SecurifiToolkitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5C41EB41DD4761E0005FD12 /* SecurifiToolkitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecurifiToolkitTests.m; sourceTree = "<group>"; };
 		A5C41EB61DD4761E0005FD12 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1544,6 +1552,10 @@
 		A5C41EB31DD4761E0005FD12 /* SecurifiToolkitTests */ = {
 			isa = PBXGroup;
 			children = (
+				A5AAEA0C1DE4566F004A4FBF /* CloudEndpoitnt_m_Tests.m */,
+				A5AAEA0A1DE41874004A4FBF /* LocalNetworkManagement_m_Tests.m */,
+				A5AAEA081DE417DC004A4FBF /* AlmondManagement_m_Tests.m */,
+				A5AAEA061DE417B3004A4FBF /* Network_m_Tests.m */,
 				A5C41EB41DD4761E0005FD12 /* SecurifiToolkitTests.m */,
 				A5C41EB61DD4761E0005FD12 /* Info.plist */,
 			);
@@ -2217,6 +2229,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5AAEA091DE417DC004A4FBF /* AlmondManagement_m_Tests.m in Sources */,
+				A5AAEA0D1DE4566F004A4FBF /* CloudEndpoitnt_m_Tests.m in Sources */,
+				A5AAEA071DE417B3004A4FBF /* Network_m_Tests.m in Sources */,
+				A5AAEA0B1DE41874004A4FBF /* LocalNetworkManagement_m_Tests.m in Sources */,
 				A5C41EB51DD4761E0005FD12 /* SecurifiToolkitTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

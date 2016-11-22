@@ -68,14 +68,13 @@
 
 - (void)connect {
     __strong Network *blockSelf = self;
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
-    NSLog(@"Initialzing network communication");
-    NSLog(@" Who is setting status Network - connect");
-    NSLog(@"connecting to the network");
     
     if (self.endpoint) {
         return;
     }
+    
+    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)IS_CONNECTING_TO_NETWORK];
+    NSLog(@"Initialzing network communication from network.m");
     
     NetworkConfig *config = self.networkConfig;
     

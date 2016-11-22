@@ -58,6 +58,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
     return self;
 }
 
+
 - (void)dealloc {
     if (_certificate) {
         CFRelease(_certificate);
@@ -65,22 +66,22 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
     }
 }
 
-#pragma mark - NetworkEndpoint protocol methods
 
+#pragma mark - NetworkEndpoint protocol methods
 - (void)connect {
     NSLog(@"Initialzing CloudEndpoint communication");
     __strong CloudEndpoint *block_self = self;
     
     dispatch_async(self.backgroundQueue, ^(void) {
+        NSLog(@"i am entering the backgroundQueue");
         if (block_self.inputStream == nil && block_self.outputStream == nil) {
             [block_self.delegate networkEndpointWillStartConnecting:block_self];
             
             NetworkConfig *configurator = self.networkConfig;
-            
+            NSLog(@"i am entering inside the nil conditions");
             // Load certificate
-            //
             if (configurator.enableCertificateValidation) {
-                DLog(@"Loading certificate");
+                NSLog(@"Loading certificate");
                 [block_self loadCertificate];
             }
             
@@ -90,6 +91,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             NSString *server = configurator.host;
             CFStringRef host = (__bridge CFStringRef) server;
             UInt32 port = (UInt32) configurator.port;
+            NSLog(@"%@ is host and %d is the port",configurator.host, configurator.port);
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
             
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
@@ -111,17 +113,17 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             
             NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
             
-            DLog(@"Scheduling in run loop");
+            NSLog(@"Scheduling in run loop");
             
             [block_self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
             [block_self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
             
-            DLog(@"Opening streams");
+            NSLog(@"Opening streams");
             
             [block_self.inputStream open];
             [block_self.outputStream open];
             
-            DLog(@"Streams open and entering run loop");
+            NSLog(@"Streams open and entering run loop");
             
             [block_self.delegate networkEndpointDidConnect:block_self];
             
@@ -135,14 +137,16 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             NSLog(@"Stream already opened");
         }
         
-        DLog(@"Streams exited run loop");
+        NSLog(@"Streams exited run loop");
         [block_self.delegate networkEndpointDidDisconnect:block_self];
     });
 }
+
 -(void) shutdownAndCallDelegate {
     [self.delegate networkEndpointDidDisconnect:self];
     [self shutdown];
 }
+
 - (void)shutdown {
     NSLog(@" Who is setting status CloudEndpoint - shutdown");
 //    [self.delegate networkEndpointDidDisconnect:self];
@@ -150,11 +154,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
     __strong CloudEndpoint *block_self = self;
     dispatch_async(self.backgroundQueue, ^(void) {
         NSLog(@"[%@] CloudEndpoint is shutting down", block_self.debugDescription);
-        NSLog(@"before time interval");
-        //[NSThread sleepForTimeInterval:3.0f];
-        NSLog(@"after time interval");
-        
-        NSLog(@"disconnecting from cloud network");
         
         @synchronized (self.syncLocker) {
             NSInputStream *in_stream = block_self.inputStream;
@@ -177,7 +176,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             }
         }
         NSLog(@"disconnected from cloud network this %@",self.delegate);
-        
         
     });
     
