@@ -239,6 +239,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE_%d",type];
         case CommandType_MESH_COMMAND:
             return [NSString stringWithFormat:@"CommandType_MESH_COMMAND_%d", type];
+        case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
+            return [NSString stringWithFormat:@"CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE_%d", type];
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -357,6 +359,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
         case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
         case CommandType_MESH_COMMAND:
+        case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
             return YES;
             
         default:
@@ -389,6 +392,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
         case CommandType_MESH_COMMAND:
+        case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case (CommandType) 1551:
         case (CommandType) 99:
             return YES;

@@ -486,7 +486,11 @@
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
             break;
         };
-            
+        case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_ALMOND_LOCATION_CHANIGE_NOTIFIER data:payload];
+            break;
+        };
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:

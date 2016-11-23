@@ -213,6 +213,17 @@
     return genericCmd;
 }
 
++ (instancetype)requestAlmondLocationChange:(int)mii location:(NSString *)location{
+    NSString *mac = [SecurifiToolkit sharedInstance].currentAlmond.almondplusMAC;
+    NSDictionary *payload = @{
+                              @"CommandType":@"AlmondLocationChange",
+                              @"AlmondLocation" : location,
+                              @"AlmondMAC" : mac? mac: @"",
+                              @"MobileInternalIndex":@(mii).stringValue
+                              };
+    return [self jsonPayloadCommand:payload commandType:CommandType_UPDATE_REQUEST];
+}
+
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
     NSError *error;
     NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];

@@ -38,6 +38,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DYNAMIC_ALMOND_ADD                      = 83,
     CommandType_DYNAMIC_ALMOND_DELETE                   = 84,
     CommandType_DYNAMIC_ALMOND_NAME_CHANGE              = 85,
+    CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE          = 1050,
     CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST    = 87,
     CommandType_DYNAMIC_ALMOND_MODE_CHANGE              = 89,
     
