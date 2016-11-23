@@ -17,7 +17,7 @@
 
 @end
 
-//This category is added as inputStream and outputStream private properties so cannot be accessed directly creating a test category will help so.
+//This category is added as inputStream and outputStream private properties so cannot be accessed directly by creating a test category
 @interface CloudEndpoint (Tests)
 - (NSInputStream *)inputStream;
 - (NSOutputStream *)outputStream;
@@ -62,6 +62,10 @@
         XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
         XCTAssertNotNil(endpoint.outputStream);
         XCTAssertNotNil(endpoint.inputStream);
+        
+        //if it is alreay connected then we wont reconnect so it returns right away
+        [endpoint connect];
+        XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
         [expectation fulfill];
     });
     

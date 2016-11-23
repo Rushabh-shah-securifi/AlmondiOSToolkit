@@ -17,20 +17,28 @@
 
 @interface LocalNetworkManagement_m_Tests : XCTestCase
 
+@property BOOL removeLocalNetworkSettings;
 @end
 
 @implementation LocalNetworkManagement_m_Tests
 
 - (void)setUp {
     [super setUp];
+    _removeLocalNetworkSettings = false;
     // Put setup code here. This method is called before the invocation of each test method in the class.
 }
 
 - (void)tearDown {
+    _removeLocalNetworkSettings = false;
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
 }
 
+#pragma mark - notifications
+
+-(void)removeLocalNetworkSettings {
+    _removeLocalNetworkSettings = true;
+}
 
 #pragma mark - Local Network Mangement
 -(void) testStoreLocalNetworkSettings {
@@ -47,6 +55,8 @@
 }
 
 -(void) testRemoveLocalNetworkSettingsForAlmond {
+    NSNotificationCenter* defaultCenter = [NSNotificationCenter defaultCenter];
+    [defaultCenter addObserver:self selector:@selector(removeLocalNetworkSettings) name:kSFIDidUpdateAlmondList object:nil];
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
     SFIAlmondLocalNetworkSettings* settings = [SFIAlmondLocalNetworkSettings new];
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
@@ -81,6 +91,7 @@
     });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertTrue(_removeLocalNetworkSettings);
         XCTAssertEqual([ConnectionStatus getConnectionStatus], NO_NETWORK_CONNECTION);
         [expectation fulfill];
     });

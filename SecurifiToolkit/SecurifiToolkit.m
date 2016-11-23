@@ -380,8 +380,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.scoreboard.reachabilityChangedCount++;
     NSLog(@"onReachability is called from toolkit");
     if(self.isAppInForeGround){
-        if(self.isCloudReachable && [ConnectionStatus getConnectionStatus] == (ConnectionStatusType*)NO_NETWORK_CONNECTION && self.currentConnectionMode == SFIAlmondConnectionMode_cloud)
+        NSLog(@"onReachability is called when app is in foreground");
+        if([ConnectionStatus getConnectionStatus] == (ConnectionStatusType*)NO_NETWORK_CONNECTION && self.currentConnectionMode == SFIAlmondConnectionMode_cloud){
+            NSLog(@"onReachability is called from inside the case");
+        
+            NSLog(@"%d is the cloud reachability", self.isCloudReachable);
+            
             [self asyncInitNetwork];
+        }
     }else{
         NSLog(@"application is in the background so does not start the start the network");
     }
@@ -1130,17 +1136,16 @@ static SecurifiToolkit *toolkit_singleton = nil;
     enum SFIAlmondConnectionMode mode = [self currentConnectionMode];
     Network *network = nil;
     NetworkConfig *networkConfig = nil;
+    [self tearDownNetwork];
     switch (mode) {
         case SFIAlmondConnectionMode_cloud:{
             NSLog(@"entering the cloud mode");
-            [self tearDownNetwork];
             networkConfig = [NetworkConfig cloudConfig:self.config useProductionHost:self.useProductionCloud];
         }
         break;
         case SFIAlmondConnectionMode_local:{
             SFIAlmondPlus* almond = self.currentAlmond;
             NSLog(@"Entering the local mode %@",almond.almondplusMAC);
-            [self tearDownNetwork];
             
             SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
             networkConfig = [NetworkConfig webSocketConfig:settings almondMac:almond.almondplusMAC];

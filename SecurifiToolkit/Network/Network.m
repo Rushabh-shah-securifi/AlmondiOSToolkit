@@ -213,13 +213,9 @@
 - (BOOL)submitCommand:(GenericCommand *)command {
     
     dispatch_async(self.commandQueue, ^() {
-        NSLog(@"am i called1");
         BOOL success = [self.endpoint sendCommand:command error:nil];
-        NSLog(@"am i called2");
         [self.delegate networkDidSendCommand:self command:command];
-        NSLog(@"am i called3");
     });
-    NSLog(@"am i called4");
     return YES;
 }
 
@@ -248,7 +244,7 @@
         if(hasLoginCredentials){
             NSLog(@"i have enter hasLoginCredentials");
             [self.delegate sendTempPassLoginCommand];
-        }else{
+        }else{ 
             NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
             _loginStatus = NetworkLoginStatusNotLoggedIn;
             

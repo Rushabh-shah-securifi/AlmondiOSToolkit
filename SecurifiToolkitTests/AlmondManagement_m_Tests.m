@@ -18,16 +18,19 @@
 
 @interface AlmondManagement_m_Tests : XCTestCase
 
+@property BOOL currentAlmondDidChange;
 @end
 
 @implementation AlmondManagement_m_Tests
 
 - (void)setUp {
     [super setUp];
+    _currentAlmondDidChange = false;
     // Put setup code here. This method is called before the invocation of each test method in the class.
 }
 
 - (void)tearDown {
+    _currentAlmondDidChange = false;
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
 }
@@ -69,7 +72,37 @@
     });
 }
 
+-(void) onCurrentAlmondDidChange{
+    NSLog(@"CurrentAlmondDidChange is called");
+    _currentAlmondDidChange = true;
+}
+
 #pragma mark - Almond Management Test cases
+-(void) testSetCurrentAlmond {
+    
+    XCTestExpectation* expectation = [self expectationWithDescription:@"Testing testSetCurrentAlmond"];
+    NSNotificationCenter* defaultCenter = [NSNotificationCenter defaultCenter];
+    [defaultCenter addObserver:self selector:@selector(onCurrentAlmondDidChange) name:kSFIDidChangeCurrentAlmond object:nil];
+    
+    [AlmondManagement setCurrentAlmond:nil];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertFalse(_currentAlmondDidChange);
+        SFIAlmondPlus* almond = [SFIAlmondPlus new];
+        [AlmondManagement setCurrentAlmond:almond];
+    });
+    
+    //testing if the notification is called
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertTrue(_currentAlmondDidChange);
+        [expectation fulfill];
+    });
+    
+    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *error){
+        NSLog(@"exception is not fulfilled within the timeout");
+    }];
+}
+
 -(void) testWriteCurrentAlmond {
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
     almond.almondplusName = @"TestCasesAlmond";
@@ -113,10 +146,54 @@
             NSLog(@"Timeout Error: %@", error);
         }
     }];
+    
 }
 
-
 #pragma mark - Almond List management
+-(void) testLocalLinkedAlmondList {
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    NSMutableArray* almondList = [NSMutableArray new];
+    SFIAlmondPlus* cloudAlmond1 = [SFIAlmondPlus new];
+    SFIAlmondPlus* cloudAlmond2 = [SFIAlmondPlus new];
+    SFIAlmondPlus* cloudAlmond3 = [SFIAlmondPlus new];
+    
+    cloudAlmond1.almondplusMAC = @"cloudAlmond1";
+    cloudAlmond2.almondplusMAC = @"cloudAlmond2";
+    cloudAlmond3.almondplusMAC = @"cloudLocalAlmond3";
+    
+    [almondList addObject:cloudAlmond1];
+    [almondList addObject:cloudAlmond2];
+    [almondList addObject:cloudAlmond3];
+    
+    [toolkit.dataManager writeAlmondList: almondList];
+    
+    SFIAlmondLocalNetworkSettings* localAlmond1 = [SFIAlmondLocalNetworkSettings new];
+    localAlmond1.almondplusMAC = @"localAlmond1";
+    [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond1];
+    
+    SFIAlmondLocalNetworkSettings* localAlmond2 = [SFIAlmondLocalNetworkSettings new];
+    localAlmond2.almondplusMAC = @"localAlmond2";
+    [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond2];
+    
+    SFIAlmondLocalNetworkSettings* localAlmond3 = [SFIAlmondLocalNetworkSettings new];
+    localAlmond3.almondplusMAC = @"cloudLocalAlmond3";
+    [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond3];
+    
+    NSArray* localList = [AlmondManagement localLinkedAlmondList];
+    
+    for(SFIAlmondPlus* almond in localList){
+        if([almond.])
+    }
+    
+    SFIAlmondPlus* firstAlmond = localList[0];
+    XCTAssertEqual(firstAlmond.linkType, SFIAlmondPlusLinkType_local_only);
+    SFIAlmondPlus* secondAlmond = localList[1];
+    XCTAssertEqual(secondAlmond.linkType, SFIAlmondPlusLinkType_local_only);
+    SFIAlmondPlus* thirdAlmond = localList[2];
+    XCTAssertEqual(thirdAlmond.linkType, SFIAlmondPlusLinkType_cloud_local);
+   
+}
 
 -(void) testManageCurrentAlmondOnAlmondListUpdate_CloudConnection{
     XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];

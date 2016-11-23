@@ -17,7 +17,6 @@
 }
 
 + (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac {
-    NSLog(@"i am called");
     if (!almondMac) {
         return;
     }

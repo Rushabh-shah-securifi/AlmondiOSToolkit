@@ -114,6 +114,7 @@
     return NO;
 }
 
+#pragma mark - Almond List Management
 
 + (NSArray *)localLinkedAlmondList {
     if (![SecurifiToolkit sharedInstance].config.enableLocalNetworking) {
@@ -139,19 +140,25 @@
         SFIAlmondPlus *localAlmond;
         
         for (SFIAlmondPlus *cloud in cloud_set) {
+            NSLog(@"%@ and %@",mac,cloud.almondplusMAC);
             if ([cloud.almondplusMAC isEqualToString:mac]) {
+                NSLog(@"i have entered inside");
                 localAlmond = cloud;
                 [cloud_set removeObject:cloud];
                 break;
             }
         }
         
+        NSLog(@"%@ is the localAlmond", localAlmond);
+        
         if (!localAlmond) {
+            NSLog(@"%@ is the almond mac !localAlmond", localAlmond.almondplusMAC);
             SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
             localAlmond = setting.asLocalLinkAlmondPlus;
         }
         
         if (localAlmond) {
+            NSLog(@"%@ is the almond mac localAlmond", localAlmond.almondplusMAC);
             [local_almonds addObject:localAlmond];
         }
     }
@@ -166,8 +173,6 @@
     
     return local_almonds;
 }
-
-#pragma mark - Almond List Management
 
 + (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network {
     
