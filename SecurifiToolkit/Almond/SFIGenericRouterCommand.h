@@ -31,5 +31,6 @@ typedef NS_ENUM(unsigned int, SFIGenericRouterCommandType) {
 @property(nonatomic) unsigned int completionPercentage;
 @property(nonatomic) int mii;
 @property(nonatomic) NSString *uptime;
+@property(nonatomic) NSString *offlineSlaves;
 
 @end

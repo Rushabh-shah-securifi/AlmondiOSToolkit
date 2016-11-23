@@ -100,6 +100,7 @@
     genericRouterCommand.almondMAC = payload[@"AlmondMAC"];
     genericRouterCommand.completionPercentage = payload[@"Percentage"]? [payload[@"Percentage"] intValue]: 0;
     genericRouterCommand.uptime = payload[@"Uptime"]?: 0;
+    genericRouterCommand.offlineSlaves = payload[@"OfflineSlaves"]?:@"";
     NSLog(@"generic command response msg: %@", genericRouterCommand.responseMessage);
     return  genericRouterCommand;
 }
