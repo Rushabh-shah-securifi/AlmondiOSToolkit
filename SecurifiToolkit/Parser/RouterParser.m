@@ -114,7 +114,7 @@
     routerSummary.password = payload[@"TempPass"];
     routerSummary.routerUptime = payload[@"RouterUptime"];
     routerSummary.firmwareVersion = payload[@"FirmwareVersion"];
-    routerSummary.location = payload[@"AlmondLocation"]?:@"***";
+    routerSummary.location = payload[@"AlmondLocation"];
     routerSummary.wirelessSummaries = [self parseWirelessSettingsSummary:payload[@"WirelessSetting"]];
     routerSummary.almondsList = [self getAlmondsList:payload];
     if(payload[@"RouterMode"]!=NULL){
@@ -127,7 +127,7 @@
 
 +(NSArray*)getAlmondsList:(NSDictionary*)payload{
     NSMutableArray *almondsList = [payload[SLAVES] mutableCopy];
-    NSDictionary *masterAlmond = @{@"Location":payload[@"AlmondLocation"]?:@"***"};
+    NSDictionary *masterAlmond = @{@"Location":payload[@"AlmondLocation"]?:[SecurifiToolkit sharedInstance].currentAlmond.almondplusName};
     [almondsList insertObject:masterAlmond atIndex:0];
     return almondsList;
 }
