@@ -21,6 +21,7 @@
     if (!almond) {
         return;
     }
+    
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
     [[SecurifiToolkit sharedInstance] postNotification:kSFIDidChangeCurrentAlmond data:almond];
@@ -30,6 +31,7 @@
    if(!almond) {
         return;
     }
+    
     NSLog(@"i am called");
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -273,15 +275,17 @@
 // Returns the current Almond, which might or might not be the same as the old one. May return nil.
 + (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
     // if current is "local only" then no need to inspect the almond list; just return the current one.
-    NSLog(@"i am called");
+    
     SecurifiToolkit * toolKit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *current = [toolKit currentAlmond];
-    if (current.linkType == SFIAlmondPlusLinkType_local_only) {
-        return current;
-    }
-    
+//    if (current.linkType == SFIAlmondPlusLinkType_local_only) {
+//        NSLog(@"linkType is local_only");
+//        return current;
+//    }
     // Manage the "Current selected Almond" value
+    
     if (almondList.count == 0) {
+        NSLog(@"entered count 0 case");
         [toolKit purgeStoredData];
         return nil;
     }

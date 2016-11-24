@@ -54,6 +54,52 @@
     XCTAssertNotNil(localSettings);
 }
 
+
+-(void) testGetCurrentLocalAlmondSettings {
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    for(NSString* mac in [toolkit.dataManager readAllAlmondLocalNetworkSettings].allKeys){
+        [toolkit.dataManager deleteLocalNetworkSettingsForAlmond:mac];
+    }
+    
+    SFIAlmondPlus* cloudAlmond = [SFIAlmondPlus new];
+    cloudAlmond.almondplusMAC = @"cloudLocalAlmond3";
+    [AlmondManagement writeCurrentAlmond:cloudAlmond];
+    
+    SFIAlmondLocalNetworkSettings* localAlmond1 = [SFIAlmondLocalNetworkSettings new];
+    localAlmond1.almondplusMAC = @"localAlmond1";
+    [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond1];
+    
+    SFIAlmondLocalNetworkSettings* localAlmond2 = [SFIAlmondLocalNetworkSettings new];
+    localAlmond2.almondplusMAC = @"localAlmond2";
+    [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond2];
+    
+    SFIAlmondLocalNetworkSettings* localAlmond3 = [SFIAlmondLocalNetworkSettings new];
+    localAlmond3.almondplusMAC = @"cloudLocalAlmond3";
+    [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond3];
+    
+    NSLog(@"%@ is current the almond mac", [LocalNetworkManagement getCurrentLocalAlmondSettings].almondplusMAC);
+    XCTAssertEqualObjects([LocalNetworkManagement getCurrentLocalAlmondSettings].almondplusMAC, @"cloudLocalAlmond3");
+    
+    [LocalNetworkManagement removeLocalNetworkSettingsForAlmond:@"cloudLocalAlmond3"];
+    
+    NSLog(@"%@ is current the almond mac", [LocalNetworkManagement getCurrentLocalAlmondSettings].almondplusMAC);
+    XCTAssertNotNil([LocalNetworkManagement getCurrentLocalAlmondSettings].almondplusMAC);
+    XCTAssertNotEqualObjects([LocalNetworkManagement getCurrentLocalAlmondSettings].almondplusMAC, @"cloudLocalAlmond3");
+    
+    [LocalNetworkManagement removeLocalNetworkSettingsForAlmond:localAlmond1.almondplusMAC];
+    [LocalNetworkManagement removeLocalNetworkSettingsForAlmond:localAlmond2.almondplusMAC];
+    [LocalNetworkManagement removeLocalNetworkSettingsForAlmond:localAlmond3.almondplusMAC];
+    
+    XCTAssertNil([LocalNetworkManagement getCurrentLocalAlmondSettings]);
+    
+    [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond1];
+    
+    NSLog(@"%@ is current the almond mac", [LocalNetworkManagement getCurrentLocalAlmondSettings].almondplusMAC);
+    XCTAssertEqualObjects([LocalNetworkManagement getCurrentLocalAlmondSettings].almondplusMAC, localAlmond1.almondplusMAC);
+    
+}
+
 -(void) testRemoveLocalNetworkSettingsForAlmond {
     NSNotificationCenter* defaultCenter = [NSNotificationCenter defaultCenter];
     [defaultCenter addObserver:self selector:@selector(removeLocalNetworkSettings) name:kSFIDidUpdateAlmondList object:nil];

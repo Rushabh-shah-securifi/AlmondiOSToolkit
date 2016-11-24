@@ -17,7 +17,6 @@
 #import "Login.h"
 
 @interface AlmondManagement_m_Tests : XCTestCase
-
 @property BOOL currentAlmondDidChange;
 @end
 
@@ -152,6 +151,7 @@
 #pragma mark - Almond List management
 -(void) testLocalLinkedAlmondList {
     
+    //creating three cloud almonds and three local almond where two local almonds are only present in local and one local almond is present in both cloud and local networks
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     NSMutableArray* almondList = [NSMutableArray new];
     SFIAlmondPlus* cloudAlmond1 = [SFIAlmondPlus new];
@@ -180,19 +180,18 @@
     localAlmond3.almondplusMAC = @"cloudLocalAlmond3";
     [toolkit.dataManager writeAlmondLocalNetworkSettings:localAlmond3];
     
+    //Testing this method
     NSArray* localList = [AlmondManagement localLinkedAlmondList];
     
     for(SFIAlmondPlus* almond in localList){
-        if([almond.])
+        if([almond.almondplusMAC isEqualToString:@"localAlmond1"]){
+            XCTAssertEqual(almond.linkType, SFIAlmondPlusLinkType_local_only);
+        }else if([almond.almondplusMAC isEqualToString:@"localAlmond2"]){
+            XCTAssertEqual(almond.linkType, SFIAlmondPlusLinkType_local_only);
+        }else if([almond.almondplusMAC isEqualToString:@"cloudLocalAlmond3"]){
+            XCTAssertEqual(almond.linkType, SFIAlmondPlusLinkType_cloud_local);
+        }
     }
-    
-    SFIAlmondPlus* firstAlmond = localList[0];
-    XCTAssertEqual(firstAlmond.linkType, SFIAlmondPlusLinkType_local_only);
-    SFIAlmondPlus* secondAlmond = localList[1];
-    XCTAssertEqual(secondAlmond.linkType, SFIAlmondPlusLinkType_local_only);
-    SFIAlmondPlus* thirdAlmond = localList[2];
-    XCTAssertEqual(thirdAlmond.linkType, SFIAlmondPlusLinkType_cloud_local);
-   
 }
 
 -(void) testManageCurrentAlmondOnAlmondListUpdate_CloudConnection{
