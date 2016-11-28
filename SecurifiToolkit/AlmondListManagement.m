@@ -143,6 +143,7 @@
             for (SFIAlmondPlus *almond in almondList) {
                 if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
                     // Current one is still in list, so leave it as current.
+                    [toolKit writeCurrentAlmond:almond];
                     return almond;
                 }
             }
