@@ -7,7 +7,7 @@
 #endif
 
 #import "Log.h"
-//#define NSLog //
+#define NSLog //
 
 #if( DEBUG )
 // Debug logging

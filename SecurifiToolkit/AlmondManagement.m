@@ -191,6 +191,8 @@
     
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
+    
+    
     if(plus!=nil)
         // After requesting the Almond list, we then want to get additional info
         [toolKit asyncInitializeConnection2:network];
@@ -305,6 +307,7 @@
             for (SFIAlmondPlus *almond in almondList) {
                 if ([almond.almondplusMAC isEqualToString:current.almondplusMAC]) {
                     // Current one is still in list, so leave it as current.
+                    [self writeCurrentAlmond:almond];
                     return almond;
                 }
             }

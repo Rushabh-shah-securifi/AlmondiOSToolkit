@@ -311,7 +311,7 @@
 
 -(NSMutableArray*)getSortedDevices{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSSortDescriptor *firstDescriptor = [[NSSortDescriptor alloc] initWithKey:@"location" ascending:YES];
+    NSSortDescriptor *firstDescriptor = [[NSSortDescriptor alloc] initWithKey:@"location" ascending:YES selector:@selector(caseInsensitiveCompare:)];
     NSSortDescriptor *secondDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES selector:@selector(caseInsensitiveCompare:)];
     
     NSArray *sortDescriptors = [NSArray arrayWithObjects:firstDescriptor, secondDescriptor, nil];

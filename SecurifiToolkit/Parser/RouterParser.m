@@ -100,6 +100,7 @@
     genericRouterCommand.almondMAC = payload[@"AlmondMAC"];
     genericRouterCommand.completionPercentage = payload[@"Percentage"]? [payload[@"Percentage"] intValue]: 0;
     genericRouterCommand.uptime = payload[@"Uptime"]?: 0;
+    genericRouterCommand.offlineSlaves = payload[@"OfflineSlaves"]?:@"";
     NSLog(@"generic command response msg: %@", genericRouterCommand.responseMessage);
     return  genericRouterCommand;
 }
@@ -113,6 +114,7 @@
     routerSummary.password = payload[@"TempPass"];
     routerSummary.routerUptime = payload[@"RouterUptime"];
     routerSummary.firmwareVersion = payload[@"FirmwareVersion"];
+    routerSummary.location = payload[@"AlmondLocation"];
     routerSummary.wirelessSummaries = [self parseWirelessSettingsSummary:payload[@"WirelessSetting"]];
     routerSummary.almondsList = [self getAlmondsList:payload];
     if(payload[@"RouterMode"]!=NULL){
@@ -125,7 +127,7 @@
 
 +(NSArray*)getAlmondsList:(NSDictionary*)payload{
     NSMutableArray *almondsList = [payload[SLAVES] mutableCopy];
-    NSDictionary *masterAlmond = @{@"Name":[SecurifiToolkit sharedInstance].currentAlmond.almondplusName};
+    NSDictionary *masterAlmond = @{@"Location":payload[@"AlmondLocation"]?:[SecurifiToolkit sharedInstance].currentAlmond.almondplusName};
     [almondsList insertObject:masterAlmond atIndex:0];
     return almondsList;
 }

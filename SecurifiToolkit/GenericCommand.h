@@ -58,6 +58,8 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)requestRai2DownMobile:(NSString *)almondMac;
 
++ (instancetype)requestAlmondLocationChange:(int)mii location:(NSString *)location;
+
 @property(nonatomic) id command;
 @property(nonatomic) CommandType commandType;
 @property(nonatomic) BOOL isMeshCmd;

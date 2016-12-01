@@ -108,6 +108,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, readonly) dispatch_queue_t networkCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t networkDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
+
 @property(nonatomic, strong) RuleParser *ruleParser;
 @property(nonatomic, strong) SceneParser *sceneParser;
 @property(nonatomic, strong) ClientParser *clientParser;
@@ -129,7 +130,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         toolkit_singleton = [[SecurifiToolkit alloc] initWithConfig:config];
     });
 }
-
 
 + (BOOL)isInitialized {
     return toolkit_singleton != nil;
@@ -426,16 +426,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"INIT SDK. connection already initializing. Returning.");
             return;
         };
-        case DISCONNECTING_NETWORK: {
-            NSLog(@"disconnecting from network is called");
-        }
         case NO_NETWORK_CONNECTION:
         default: {
             NSLog(@"INIT SDK. connection needs establishment. Passing thru");
         };
     }
     NSLog(@"setupnetwork is called from asyncinitnetwork");
-    Network *network = [block_self setUpNetwork];
+    [block_self setUpNetwork];
 }
 
 
@@ -570,7 +567,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     if(network ==nil){
         NSLog(@"calling _asyncInitNetwork %d ",command.command);
-        //[self asyncInitNetwork];
     }
     
     BOOL success = [self.network submitCommand:command];
@@ -1132,7 +1128,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 #pragma mark - Network management
--(Network *)setUpNetwork{
+-(void) setUpNetwork{
     enum SFIAlmondConnectionMode mode = [self currentConnectionMode];
     Network *network = nil;
     NetworkConfig *networkConfig = nil;
@@ -1161,9 +1157,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.network = network;
     
     [network connect];
-    
-    return network;
 }
+
 
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config{
     Network* network = [Network networkWithNetworkConfig:config callbackQueue:self.networkCallbackQueue dynamicCallbackQueue:self.networkDynamicCallbackQueue];
