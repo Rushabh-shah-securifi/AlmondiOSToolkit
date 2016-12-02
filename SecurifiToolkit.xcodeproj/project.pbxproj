@@ -287,7 +287,6 @@
 		A5D9B50D1DB62E7A00BF1F60 /* Log.m in Sources */ = {isa = PBXBuildFile; fileRef = A5D9B50C1DB62E7A00BF1F60 /* Log.m */; };
 		A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804171C75A90E005A8DB3 /* DataBaseManager.h */; };
 		A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804181C75A90E005A8DB3 /* DataBaseManager.m */; };
-		B0E6E3551DEFF628008F57A4 /* AlmondListManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = B0E6E3541DEFF628008F57A4 /* AlmondListManagement.m */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
 		CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */; };
 		CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */; };
@@ -722,7 +721,6 @@
 		A5D9B50C1DB62E7A00BF1F60 /* Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Log.m; path = Parser/Log.m; sourceTree = "<group>"; };
 		A5E804171C75A90E005A8DB3 /* DataBaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBaseManager.h; sourceTree = "<group>"; };
 		A5E804181C75A90E005A8DB3 /* DataBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBaseManager.m; sourceTree = "<group>"; };
-		B0E6E3541DEFF628008F57A4 /* AlmondListManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondListManagement.m; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
 		CE15FFAE186844AA00371183 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		CE15FFB418684D7500371183 /* certificate.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = certificate.cer; sourceTree = "<group>"; };
@@ -1339,7 +1337,6 @@
 				1CFBB54D1A257D1900438B5F /* SecurifiConfigurator.h */,
 				1CFBB54E1A257D1900438B5F /* SecurifiConfigurator.m */,
 				1DF037D41EC5DF2929F41AF8 /* CommandTypes.m */,
-				B0E6E3541DEFF628008F57A4 /* AlmondListManagement.m */,
 			);
 			name = public;
 			sourceTree = "<group>";
@@ -2037,7 +2034,6 @@
 				22A76D3D17912F980099CD8F /* SignupResponse.m in Sources */,
 				A569B8D61DBE3E8500FBD429 /* NSRunLoop+SRWebSocket.m in Sources */,
 				1C3270E91A243B28007202C1 /* SFIWirelessSummary.m in Sources */,
-				B0E6E3551DEFF628008F57A4 /* AlmondListManagement.m in Sources */,
 				CE2EA24E19CFF69F00C6D6A8 /* UnlinkAlmondResponse.m in Sources */,
 				CE2EA25619D00B5200C6D6A8 /* UserInviteResponse.m in Sources */,
 				1C2F60571B69D5B9001CCA34 /* ScenesListRequest.m in Sources */,
