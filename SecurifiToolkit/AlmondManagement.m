@@ -8,6 +8,10 @@
 
 #import "AlmondManagement.h"
 #import "SecurifiToolKit.h"
+#import "NotificationAccessAndRefreshCommands.h"
+#import "AlmondModeRequest.h"
+#import "RouterCommandParser.h"
+#import "LocalNetworkManagement.h"
 
 @implementation AlmondManagement
 
@@ -59,7 +63,7 @@
     
     NSLog(@"almond.linktype: %d", almond.linkType);
     
-    GenericCommand * cmd = [toolKit tryRequestAlmondMode:mac];
+    GenericCommand * cmd = [self tryRequestAlmondMode:mac];
     [toolKit asyncSendToNetwork:cmd];
     
     NSLog(@"device request send");
@@ -195,11 +199,73 @@
     
     if(plus!=nil)
         // After requesting the Almond list, we then want to get additional info
-        [toolKit asyncInitializeConnection2:network];
+        [self asyncInitializeConnection2:network];
     
     // Tell the world
     [toolKit postNotification:kSFIDidUpdateAlmondList data:plus];
 }
+
+
++ (void)asyncInitializeConnection2:(Network *)network {
+    // After successful login, refresh the Almond list and hash values.
+    // This routine is important because the UI will listen for outcomes to these requests.
+    // Specifically, the event kSFIDidUpdateAlmondList.
+    NSLog(@"asyncInitializeConnection2");
+    __weak SecurifiToolkit *block_self = [SecurifiToolkit sharedInstance];
+    
+    SFIAlmondPlus *plus = [block_self currentAlmond];
+    
+    NSLog(@"asyncInitializeConnection plus mac %@",plus.almondplusMAC);
+    if (plus != nil) {
+        NSString *mac = plus.almondplusMAC;
+        GenericCommand *cmd;
+        NSLog(@"commandDispatchQueue 1..");
+        cmd = [GenericCommand requestSensorDeviceList:plus.almondplusMAC];
+        
+        [block_self asyncSendToNetwork:cmd];
+        
+        cmd = [GenericCommand requestSceneList:plus.almondplusMAC];
+        
+        [block_self asyncSendToNetwork:cmd];
+        
+        cmd = [GenericCommand requestAlmondClients:plus.almondplusMAC];
+        
+        [block_self asyncSendToNetwork:cmd];
+        
+        cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
+        
+        [block_self asyncSendToNetwork:cmd];
+        
+        if(block_self.currentConnectionMode!=SFIAlmondConnectionMode_local){
+            cmd = [GenericCommand requestRouterSummary:plus.almondplusMAC];
+            [block_self asyncSendToNetwork:cmd];
+        }
+        
+        cmd = [self tryRequestAlmondMode:mac];
+        if(cmd!=nil)
+            [block_self asyncSendToNetwork:cmd];
+        
+        [NotificationAccessAndRefreshCommands tryRefreshNotifications];
+    }
+}
+
++ (GenericCommand* )tryRequestAlmondMode:(NSString *)almondMac {
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    if (almondMac == nil || toolkit.currentConnectionMode==SFIAlmondConnectionMode_local) {
+        return nil;
+    }
+    
+    AlmondModeRequest *req = [AlmondModeRequest new];
+    req.almondMAC = almondMac;
+    
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_ALMOND_MODE_REQUEST;
+    cmd.command = req;
+    
+    return cmd;
+}
+
+
 
 + (void)onDynamicAlmondListAdd:(AlmondListResponse *)obj {
     
@@ -324,6 +390,137 @@
         }
         return currentAlmond;
     }
+}
+
+#pragma mark - almond mode change response callbacks
+
++ (void)onAlmondModeChangeCompletion:(NSDictionary*)res network:(Network *)network {
+    
+    [network.networkState confirmPendingModeForAlmond];
+    
+    NSString *notification = kSFIDidCompleteAlmondModeChangeRequest;
+    [[SecurifiToolkit sharedInstance] postNotification:notification data:nil];
+}
+
++ (void)onAlmondModeResponse:(AlmondModeResponse *)res network:(Network *)network {
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    NSLog(@"onAlmondModeResponse ");
+    if (res == nil) {
+        return;
+    }
+    
+    if (!res.success) {
+        return;
+    }
+    
+    if([res.almondMAC isEqualToString:toolkit.currentAlmond.almondplusMAC]){
+        [network.networkState markModeForAlmond:toolkit.currentAlmond.almondplusMAC mode:res.mode];
+        NSDictionary *modeNotifyDict =  @{
+                                          @"CommandType": @"AlmondModeResponse",
+                                          @"Mode" : @(res.mode).stringValue
+                                          
+                                          };
+        toolkit.mode_src = res.mode;
+        [toolkit postNotification:kSFIAlmondModeDidChange data:modeNotifyDict];
+    }
+}
+
+
++ (void)onDynamicAlmondModeChange:(DynamicAlmondModeChange *)res network:(Network *)network {
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    NSLog(@"onAlmondModeResponse::: ");
+    if (res == nil) {
+        return;
+    }
+    
+    if (!res.success) {
+        return;
+    }
+    
+    NSLog(@"res dict %@",res);
+    NSLog(@"res.mode: %d %@", res.mode ,toolkit.currentAlmond.almondplusMAC  );
+    //    NSString *modeString = res[@"Mode"];
+    if([res.almondMAC isEqualToString:toolkit.currentAlmond.almondplusMAC]){
+        NSLog(@"Am I inside onDynamicAlmondModeChange");
+        [network.networkState markModeForAlmond:toolkit.currentAlmond.almondplusMAC mode:res.mode];
+        
+        NSDictionary *modeNotifyDict =  @{
+                                          @"CommandType": @"DynamicAlmondModeUpdated",
+                                          @"Mode" : @(res.mode).stringValue
+                                          
+                                          };
+        toolkit.mode_src = res.mode;
+        [toolkit postNotification:kSFIAlmondModeDidChange data:modeNotifyDict];
+    }
+}
+
+#pragma mark - Generic Almond Router commmand callbacks
++ (void)onAlmondRouterGenericNotification:(GenericCommandResponse *)res network:(Network *)network {
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    if (!res) {
+        return;
+    }
+    
+    NSString *mac = res.almondMAC;
+    
+    [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
+    
+    if (!res.isSuccessful) {
+        SFIGenericRouterCommand *routerCommand = [SFIGenericRouterCommand new];
+        routerCommand.almondMAC = mac;
+        routerCommand.commandSuccess = NO;
+        routerCommand.responseMessage = res.reason;
+        
+        [toolkit postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
+    }
+    
+    else {
+        SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:res];
+        routerCommand.almondMAC = mac;
+        
+        [self internalOnGenericRouterCommandResponse:routerCommand];
+    }
+}
+
++ (void)onAlmondRouterGenericCommandResponse:(GenericCommandResponse *)res network:(Network *)network {
+    if (!res) {
+        return;
+    }
+    
+    NSString *mac = res.almondMAC;
+    
+    [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
+    
+    SFIGenericRouterCommand *routerCommand = [RouterCommandParser parseRouterResponse:res];
+    routerCommand.almondMAC = mac;
+    
+    [self internalOnGenericRouterCommandResponse:routerCommand];
+}
+
++ (void)onAlmondRouterCommandResponse:(SFIGenericRouterCommand *)res network:(Network *)network {
+    if (!res) {
+        return;
+    }
+    
+    NSString *mac = res.almondMAC;
+    [network.networkState clearExpirableRequest:ExpirableCommandType_almondStateAndSettingsRequest namespace:mac];
+    [self internalOnGenericRouterCommandResponse:res];
+}
+
++ (void)internalOnGenericRouterCommandResponse:(SFIGenericRouterCommand *)routerCommand {
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    if (routerCommand == nil) {
+        return;
+    }
+    
+    if (routerCommand.commandType == SFIGenericRouterCommandType_WIRELESS_SUMMARY) {
+        // after receiving summary, we update the local wireless connection settings with the current login/password
+        SFIRouterSummary *summary = (SFIRouterSummary *) routerCommand.command;
+        
+        [LocalNetworkManagement tryUpdateLocalNetworkSettingsForAlmond:routerCommand.almondMAC withRouterSummary:summary];
+    }
+    
+    [toolkit postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
 }
 
 @end

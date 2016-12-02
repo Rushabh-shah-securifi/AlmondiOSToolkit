@@ -212,13 +212,19 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config;
 -(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res;
+
 - (void)tearDownLoginSession;
+
 - (void)resetCurrentAlmond;
+
 - (void)postNotification:(NSString *)notificationName data:(id)payload;
-- (void)asyncInitializeConnection2:(Network *)network;
+
 - (void)purgeStoredData;
+
 - (void)tryShutdownAndStartNetworks;
-- (GenericCommand*)tryRequestAlmondMode:(NSString *)almondMac;
+
+//- (GenericCommand*)tryRequestAlmondMode:(NSString *)almondMac;
+
 -(void) asyncInitCloud;
 
 -(Network *)setUpNetwork;
@@ -242,7 +248,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)debugUpdateConfiguration:(SecurifiConfigurator *)configurator;
 
-- (sfi_id)asyncSendAlmondAffiliationRequest:(NSString *)linkCode;
+//- (sfi_id)asyncSendAlmondAffiliationRequest:(NSString *)linkCode;
 
 - (void)asyncSendToNetwork:(GenericCommand *)command;
 
@@ -287,6 +293,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (NSString *)loginEmail;
 
+- (void)onLogoutResponse;
+
 - (void)asyncSendLogout;
 
 // Specify the currently "viewed" Almond. May perform updates in the background to check on Hash values.
@@ -328,12 +336,12 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 // Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard *)scoreboardSnapshot;
 
-- (void)asyncSendValidateCloudAccount:(NSString *)email;
+- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
+
+- (void)asyncRequestResetCloudPassword:(NSString *)email;
 
 // Send a command to the cloud requesting to delete cloud account
 - (void)asyncRequestDeleteCloudAccount:(NSString *)password;
-
-- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
 
 // Send a command to the cloud requesting to unlink the current Almond from cloud account
 - (void)asyncRequestUnlinkAlmond:(NSString *)almondMAC password:(NSString *)password;
@@ -360,17 +368,15 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
     SecurifiToolkitAlmondRouterRequest_wifi_clients,        // connected and blocked devices
 };
 
-// Sends commands directly to the specified Almond, requesting summary and settings information
-- (void)asyncAlmondStatusAndSettingsRequest:(NSString *)almondMac request:(enum SecurifiToolkitAlmondRouterRequest)requestType;
 
 // Sends commands directly to the specified Almond, requesting summary and settings information
 - (void)asyncAlmondSummaryInfoRequest:(NSString *)almondMac;
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
-- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode;
+//- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode;
 
-- (SFIAlmondMode)modeForAlmond:(NSString *)almondMac;
+//- (SFIAlmondMode)modeForAlmond:(NSString *)almondMac;
 
 // Send a command to configure notifications for the specified devices. This is the way to set per-device preferences
 // for receiving notifications. Each device Index is configured separately.
@@ -421,5 +427,4 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (void)shutDownMesh;
 
--(void)routerModeOnCurrentAlmond:(NSString *)routerMOde;
 @end

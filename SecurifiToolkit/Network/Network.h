@@ -32,7 +32,6 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 
 
 @protocol NetworkDelegate
-
 - (void)networkConnectionDidEstablish:(Network *)network;
 
 - (void)networkConnectionDidClose:(Network *)network;
@@ -44,8 +43,6 @@ typedef NS_ENUM(NSUInteger, NetworkLoginStatus) {
 - (void)networkDidReceiveResponse:(Network*)network response:(id)payload responseType:(enum CommandType)commandType;
 
 - (void)networkDidReceiveDynamicUpdate:(Network*)network response:(id)payload responseType:(enum CommandType)commandType;
-
--(void)sendTempPassLoginCommand;
 @end
 
 

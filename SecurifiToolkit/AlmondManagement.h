@@ -15,6 +15,11 @@
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "AlmondListResponse.h"
 #import "DynamicAlmondNameChangeResponse.h"
+#import "AlmondModeResponse.h"
+#import "DynamicAlmondModeChange.h"
+#import "GenericCommandResponse.h"
+
+@class SFIGenericRouterCommand;
 
 @interface AlmondManagement : NSObject
 
@@ -33,6 +38,16 @@
 + (void)onDynamicAlmondListDelete:(AlmondListResponse *)obj network:(Network *)network;
 + (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)data;
 + (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage;
+
+//Almond mode change  callbacks
++ (void)onAlmondModeChangeCompletion:(NSDictionary*)res network:(Network *)network;
++ (void)onAlmondModeResponse:(AlmondModeResponse *)res network:(Network *)network;
++ (void)onDynamicAlmondModeChange:(DynamicAlmondModeChange *)res network:(Network *)network;
+
+//Almond RouterResponse Callbacks
++ (void)onAlmondRouterGenericNotification:(GenericCommandResponse *)res network:(Network *)network;
++ (void)onAlmondRouterGenericCommandResponse:(GenericCommandResponse *)res network:(Network *)network;
++ (void)onAlmondRouterCommandResponse:(SFIGenericRouterCommand *)res network:(Network *)network;
 
 @end
 #endif /* AlmondManagement_h */

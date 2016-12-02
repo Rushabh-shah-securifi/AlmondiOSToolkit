@@ -29,14 +29,10 @@
 }
 
 
-
-
-
 - (void)getAllScenesCallback:(id)sender{
     
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
-    
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     BOOL local = [self isLocal];
     NSDictionary *mainDict;
@@ -46,7 +42,6 @@
         //till cloud changes are integrated
         if(![data[@"data"] isKindOfClass:[NSData class]])
             return;
-
         mainDict = [data[@"data"] objectFromJSONData];
     }
     

@@ -20,6 +20,7 @@
     return self;
 }
 
+
 -(void)initNotification{
     NSLog(@"init device notification");
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];

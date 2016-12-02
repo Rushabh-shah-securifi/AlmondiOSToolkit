@@ -15,6 +15,7 @@
 #import "WebSocketEndpoint.h"
 #import "ConnectionStatus.h"
 #import "KeyChainAccess.h"
+#import "LoginTempPass.h"
 
 @interface Network ()
 @property(nonatomic, readonly) NetworkConfig *networkConfig;
@@ -228,37 +229,7 @@
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
     NSLog(@" Who is setting status Network - networkEndpointDidConnect");
     [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)CONNECTED_TO_NETWORK];
-    SecurifiToolkit *toolkit =[SecurifiToolkit sharedInstance];
-    if([[SecurifiToolkit sharedInstance] currentConnectionMode] == SFIAlmondConnectionMode_local)
-        [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)AUTHENTICATED];
-    
-    self.networkUpNoticePosted = YES;
-    SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
-    BOOL isCloudConnection = [toolKit currentConnectionMode] == (SFIAlmondConnectionMode)SFIAlmondConnectionMode_cloud ?YES : NO;
-    
-    NSLog(@"%d is the cloudConnection", isCloudConnection);
-    if(isCloudConnection){
-        NSLog(@"i have entered this isCloudConnection");
-        BOOL hasLoginCredentials = [KeyChainAccess hasLoginCredentials];
-        if(hasLoginCredentials){
-            NSLog(@"i have enter hasLoginCredentials");
-            [self.delegate sendTempPassLoginCommand];
-        }else{ 
-            NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
-            _loginStatus = NetworkLoginStatusNotLoggedIn;
-            
-            // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
-            // We probably should track things down and find a way to remove a dependency on this event in the UI.
-            [toolKit postNotification:kSFIDidLogoutNotification data:nil];
-            return;
-        }
-    }else{
-        SFIAlmondPlus* plus = toolkit.currentAlmond;
-        [toolkit asyncSendToNetwork:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] ];
-        [toolkit asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
-        [toolkit asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
-        [toolkit asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
-    }
+    [self.delegate networkConnectionDidEstablish:self];
 }
 
 
@@ -266,6 +237,8 @@
     NSLog(@" Who is setting status Network - networkEndpointDidDisconnect");
     [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
     [self.delegate networkConnectionDidClose:self];
+    self.networkUpNoticePosted = YES;
+    _loginStatus = NetworkLoginStatusNotLoggedIn;
 }
 
 
@@ -309,6 +282,7 @@
             [self postData:RESET_PWD_RESPONSE_NOTIFIER data:payload];
             break;
         }
+            
         case CommandType_SENSOR_CHANGE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:SENSOR_CHANGE_NOTIFIER data:payload];

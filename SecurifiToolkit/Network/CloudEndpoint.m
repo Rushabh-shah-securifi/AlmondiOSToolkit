@@ -181,7 +181,218 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
     
 }
 
-#pragma mark - state
+#pragma mark - Command submission
+- (BOOL)sendCommand:(GenericCommand *)command error:(NSError **)outError {
+    
+    return [self internalSendToCloud:self command:command error:outError];
+}
+
+- (BOOL)internalSendToCloud:(CloudEndpoint *)cloudEndpoint command:(GenericCommand*)command error:(NSError **)outError {
+    NSLog(@"internal send to cloud");
+    if (!cloudEndpoint) {
+        DLog(@"%s: aborting send. endoint is null", __PRETTY_FUNCTION__);
+        return NO;
+    }
+    
+    if (!command) {
+        DLog(@"%s: aborting send. command is null", __PRETTY_FUNCTION__);
+        return NO;
+    }
+    
+    @synchronized (self.syncLocker) {
+        DLog(@"Sending command, cmd:%@", command.debugDescription);
+        
+        CommandType commandType = command.commandType;
+        id commandPayload;
+        
+        @try {
+            switch (command.commandType) {
+                case CommandType_LOGIN_COMMAND:
+                case CommandType_LOGIN_TEMPPASS_COMMAND:
+                case CommandType_LOGOUT_ALL_COMMAND:
+                case CommandType_SIGNUP_COMMAND:
+                case CommandType_AFFILIATION_CODE_REQUEST:
+                case CommandType_MOBILE_COMMAND:
+                case CommandType_VALIDATE_REQUEST:
+                case CommandType_RESET_PASSWORD_REQUEST:
+                case CommandType_SENSOR_CHANGE_REQUEST:
+                case CommandType_GENERIC_COMMAND_REQUEST:
+                case CommandType_CHANGE_PASSWORD_REQUEST:
+                case CommandType_DELETE_ACCOUNT_REQUEST:
+                case CommandType_UPDATE_USER_PROFILE_REQUEST:
+                case CommandType_UNLINK_ALMOND_REQUEST:
+                case CommandType_USER_INVITE_REQUEST:
+                case CommandType_DELETE_SECONDARY_USER_REQUEST:
+                case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
+                case CommandType_NOTIFICATION_REGISTRATION:
+                case CommandType_NOTIFICATION_DEREGISTRATION:
+                case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
+                case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
+                case CommandType_ALMOND_MODE_REQUEST:
+                case CommandType_NOTIFICATIONS_SYNC_REQUEST:
+                case CommandType_NOTIFICATIONS_COUNT_REQUEST:
+                case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST:{
+                    id <SecurifiCommand> cmd = command.command;
+                    commandPayload = [cmd toXml];
+                    break;
+                }
+                    // Commands that transfer in Command 61 container
+                case CommandType_ALMOND_MODE_CHANGE_REQUEST:
+                case CommandType_ALMOND_NAME_CHANGE_REQUEST:
+                case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
+                    id <SecurifiCommand> cmd = command.command;
+                    //Send as Command 61
+                    commandType = CommandType_MOBILE_COMMAND;
+                    commandPayload = [cmd toXml];
+                    break;
+                }
+                    
+                case CommandType_LOGOUT_COMMAND: {
+                    commandPayload = LOGOUT_REQUEST_XML;
+                    break;
+                }
+                    
+                case CommandType_CLOUD_SANITY: {
+                    commandPayload = CLOUD_SANITY_REQUEST_XML;
+                    break;
+                }
+                    //PY 150914 Accounts
+                case CommandType_ALMOND_LIST:
+                case CommandType_USER_PROFILE_REQUEST: //PY 150914 Accounts
+                case CommandType_ME_AS_SECONDARY_USER_REQUEST:
+                case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:{
+                    commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
+                    break;
+                }
+                    
+                case CommandType_DEVICELOG_REQUEST: {
+                    NSData *data = command.command;
+                    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                    
+                    commandPayload = [NSString stringWithFormat:@"<root>%@</root>", json];
+                    break;
+                };
+                
+                case CommandType_GET_ALL_SCENES:
+                case CommandType_UPDATE_REQUEST:
+                case CommandType_WIFI_CLIENTS_LIST_REQUEST:
+                case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
+                case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
+                case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
+                case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
+                case CommandType_RULE_LIST:{
+                    commandPayload = command.command;
+                    break;
+                }
+                    
+                default: {
+                    NSString *description = [NSString stringWithFormat:@"%s: Aborting write, unsupported command, cmd=%@", __PRETTY_FUNCTION__, command.command];
+                    //                    *outError = [self makeError:description errorCode:CloudEndpointSocketError_unsupportedCommand];
+                    return NO;
+                }
+            }
+            
+            NSData *write_payload = [commandPayload isKindOfClass:NSData.class] ? commandPayload : [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
+            unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
+            unsigned int header_commandType = (unsigned int) htonl(commandType);
+            
+            if([commandPayload isKindOfClass:[NSData class]]){
+                NSLog(@"Sending payload: %@, \nType: %d", [[NSString alloc] initWithData:commandPayload encoding:NSUTF8StringEncoding], commandType);
+            }else{
+                NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
+            }
+            
+            NSOutputStream *outputStream = cloudEndpoint.outputStream;
+            if (outputStream == nil) {
+                DLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, outputStream);
+                //*outError = [self makeError:@"Securifi - Output stream is nil" errorCode:CloudEndpointSocketError_outputStreamNil];
+                return NO;
+            }
+            
+            // Wait until socket is open
+            NSStreamStatus streamStatus;
+            do {
+                streamStatus = [outputStream streamStatus];
+            } while (streamStatus == NSStreamStatusOpening);
+            
+            switch (streamStatus) {
+                case NSStreamStatusNotOpen:
+                case NSStreamStatusAtEnd:
+                case NSStreamStatusClosed:
+                case NSStreamStatusError:
+                    DLog(@"%s: Aborting write, stream status = %li", (long) streamStatus);
+                    goto socket_failure_handler;
+                    
+                default:
+                    // pass through and continue processing
+                    break;
+            }
+            
+            //if ([ConnectionStatus isStreamConnected] && outputStream.streamStatus != NSStreamStatusError)
+            if (outputStream.streamStatus != NSStreamStatusError){
+                if (-1 == [outputStream write:(uint8_t *) &header_payloadLength maxLength:4]) {
+                    DLog(@"%s: Failed writing 'payload length' 4 bytes");
+                    goto socket_failure_handler;
+                }
+            }
+            
+            //if ([ConnectionStatus isStreamConnected] && outputStream.streamStatus != NSStreamStatusError)
+            if (outputStream.streamStatus != NSStreamStatusError){
+                if (-1 == [outputStream write:(uint8_t *) &header_commandType maxLength:4]) {
+                    DLog(@"%s: Failed writing 'command type' 4 bytes");
+                    goto socket_failure_handler;
+                }
+            }
+            
+            //if ([ConnectionStatus isStreamConnected] && outputStream.streamStatus != NSStreamStatusError)
+            if (outputStream.streamStatus != NSStreamStatusError) {
+                if (-1 == [outputStream write:[write_payload bytes] maxLength:[write_payload length]]) {
+                    DLog(@"%s: Failed writing 'payload' %i bytes", sendCommandPayload.length);
+                    goto socket_failure_handler;
+                }
+            }
+            
+            DLog(@"%s: Exiting sync block", __PRETTY_FUNCTION__);
+            
+            //if (![ConnectionStatus isStreamConnected]) {
+            //DLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, outputStream);
+            //*outError = [self makeError:@"Securifi - Output stream is not connected" /errorCode:CloudEndpointSocketError_notConnectedState];
+            //return NO;
+            //}
+            if (outputStream.streamStatus == NSStreamStatusError) {
+                DLog(@"%s: Output stream has error status, out=%@, err=%@", __PRETTY_FUNCTION__, outputStream, outputStream.streamError);
+                *outError = outputStream.streamError;
+                return NO;
+            }
+            else {
+                DLog(@"%s: sent command to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
+                return YES;
+            }
+            
+        socket_failure_handler:
+            {
+                NSLog(@"Socket failure handler invoked");
+                
+                streamStatus = [outputStream streamStatus];
+                NSString *description = [NSString stringWithFormat:@"Securifi Payload - Send Error, stream status=%li", (long) streamStatus];
+                return NO;
+            }//label socket_failure_handler
+        }
+        @catch (NSException *e) {
+            NSLog(@"%s: Exception : %@", __PRETTY_FUNCTION__, e.reason);
+            @throw;
+        } //try-catch
+    }//synchronized
+}
+
+- (NSError *)makeError:(NSString *)description errorCode:(enum CloudEndpointSocketError)errorCode {
+    NSDictionary *details = @{NSLocalizedDescriptionKey : description};
+    return [NSError errorWithDomain:@"Securifi" code:errorCode userInfo:details];
+}
+
 
 
 #pragma mark - NSStreamDelegate methods
@@ -534,223 +745,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 }
 
 
-#pragma mark - Command submission
-
-- (BOOL)sendCommand:(GenericCommand *)command error:(NSError **)outError {
-    //if (![ConnectionStatus isStreamConnected]) {
-    //DLog(@"SendCommand failed: CloudEndpoint is not connected");
-    //        *outError = [self makeError:@"SubmitCommand failed: CloudEndpoint is not connected" errorCode:CloudEndpointSocketError_notConnectedState];
-    //return NO;
-    //}
-    
-    return [self internalSendToCloud:self command:command error:outError];
-}
-
-- (BOOL)internalSendToCloud:(CloudEndpoint *)cloudEndpoint command:(GenericCommand*)command error:(NSError **)outError {
-    NSLog(@"internal send to cloud");
-    if (!cloudEndpoint) {
-        DLog(@"%s: aborting send. endoint is null", __PRETTY_FUNCTION__);
-        return NO;
-    }
-    
-    if (!command) {
-        DLog(@"%s: aborting send. command is null", __PRETTY_FUNCTION__);
-        return NO;
-    }
-    
-    @synchronized (self.syncLocker) {
-        DLog(@"Sending command, cmd:%@", command.debugDescription);
-        
-        CommandType commandType = command.commandType;
-        id commandPayload;
-        
-        @try {
-            switch (command.commandType) {
-                case CommandType_LOGIN_COMMAND:
-                case CommandType_LOGIN_TEMPPASS_COMMAND:
-                case CommandType_LOGOUT_ALL_COMMAND:
-                case CommandType_SIGNUP_COMMAND:
-                case CommandType_AFFILIATION_CODE_REQUEST:
-                case CommandType_MOBILE_COMMAND:
-                case CommandType_VALIDATE_REQUEST:
-                case CommandType_RESET_PASSWORD_REQUEST:
-                case CommandType_SENSOR_CHANGE_REQUEST:
-                case CommandType_GENERIC_COMMAND_REQUEST:
-                case CommandType_CHANGE_PASSWORD_REQUEST:
-                case CommandType_DELETE_ACCOUNT_REQUEST:
-                case CommandType_UPDATE_USER_PROFILE_REQUEST:
-                case CommandType_UNLINK_ALMOND_REQUEST:
-                case CommandType_USER_INVITE_REQUEST:
-                case CommandType_DELETE_SECONDARY_USER_REQUEST:
-                case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
-                case CommandType_NOTIFICATION_REGISTRATION:
-                case CommandType_NOTIFICATION_DEREGISTRATION:
-                case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
-                case CommandType_NOTIFICATION_PREFERENCE_LIST_REQUEST:
-                case CommandType_ALMOND_MODE_REQUEST:
-                case CommandType_NOTIFICATIONS_SYNC_REQUEST:
-                case CommandType_NOTIFICATIONS_COUNT_REQUEST:
-                case CommandType_NOTIFICATIONS_CLEAR_COUNT_REQUEST:{
-                    id <SecurifiCommand> cmd = command.command;
-                    commandPayload = [cmd toXml];
-                    break;
-                }
-                    // Commands that transfer in Command 61 container
-                case CommandType_ALMOND_MODE_CHANGE_REQUEST:
-                case CommandType_ALMOND_NAME_CHANGE_REQUEST:
-                case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
-                    id <SecurifiCommand> cmd = command.command;
-                    //Send as Command 61
-                    commandType = CommandType_MOBILE_COMMAND;
-                    commandPayload = [cmd toXml];
-                    break;
-                }
-                    
-                case CommandType_LOGOUT_COMMAND: {
-                    commandPayload = LOGOUT_REQUEST_XML;
-                    break;
-                }
-                    
-                case CommandType_CLOUD_SANITY: {
-                    commandPayload = CLOUD_SANITY_REQUEST_XML;
-                    break;
-                }
-                    //PY 150914 Accounts
-                case CommandType_ALMOND_LIST:
-                case CommandType_USER_PROFILE_REQUEST: //PY 150914 Accounts
-                case CommandType_ME_AS_SECONDARY_USER_REQUEST:
-                case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:{
-                    commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
-                    break;
-                }
-                    
-                case CommandType_DEVICELOG_REQUEST: {
-                    NSData *data = command.command;
-                    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                    
-                    commandPayload = [NSString stringWithFormat:@"<root>%@</root>", json];
-                    break;
-                };
-                    
-                case CommandType_GET_ALL_SCENES:
-                case CommandType_UPDATE_REQUEST:
-                case CommandType_WIFI_CLIENTS_LIST_REQUEST:
-                case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
-                case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
-                case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
-                case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
-                case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
-                case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
-                case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
-                case CommandType_RULE_LIST:{
-                    commandPayload = command.command;
-                    break;
-                }
-                    
-                default: {
-                    NSString *description = [NSString stringWithFormat:@"%s: Aborting write, unsupported command, cmd=%@", __PRETTY_FUNCTION__, command.command];
-//                    *outError = [self makeError:description errorCode:CloudEndpointSocketError_unsupportedCommand];
-                    return NO;
-                }
-            }
-            
-            NSData *write_payload = [commandPayload isKindOfClass:NSData.class] ? commandPayload : [commandPayload dataUsingEncoding:NSUTF8StringEncoding];
-            unsigned int header_payloadLength = (unsigned int) htonl([write_payload length]);
-            unsigned int header_commandType = (unsigned int) htonl(commandType);
-            
-            if([commandPayload isKindOfClass:[NSData class]]){
-                NSLog(@"Sending payload: %@, \nType: %d", [[NSString alloc] initWithData:commandPayload encoding:NSUTF8StringEncoding], commandType);
-            }else{
-                NSLog(@"Sending payload: %@, \nType: %d", commandPayload, commandType);
-            }
-            
-            NSOutputStream *outputStream = cloudEndpoint.outputStream;
-            if (outputStream == nil) {
-                DLog(@"%s: Output stream is nil, out=%@", __PRETTY_FUNCTION__, outputStream);
-                //*outError = [self makeError:@"Securifi - Output stream is nil" errorCode:CloudEndpointSocketError_outputStreamNil];
-                return NO;
-            }
-            
-            // Wait until socket is open
-            NSStreamStatus streamStatus;
-            do {
-                streamStatus = [outputStream streamStatus];
-            } while (streamStatus == NSStreamStatusOpening);
-            
-            switch (streamStatus) {
-                case NSStreamStatusNotOpen:
-                case NSStreamStatusAtEnd:
-                case NSStreamStatusClosed:
-                case NSStreamStatusError:
-                    DLog(@"%s: Aborting write, stream status = %li", (long) streamStatus);
-                    goto socket_failure_handler;
-                    
-                default:
-                    // pass through and continue processing
-                    break;
-            }
-            
-            //if ([ConnectionStatus isStreamConnected] && outputStream.streamStatus != NSStreamStatusError)
-            if (outputStream.streamStatus != NSStreamStatusError){
-                if (-1 == [outputStream write:(uint8_t *) &header_payloadLength maxLength:4]) {
-                    DLog(@"%s: Failed writing 'payload length' 4 bytes");
-                    goto socket_failure_handler;
-                }
-            }
-            
-            //if ([ConnectionStatus isStreamConnected] && outputStream.streamStatus != NSStreamStatusError)
-            if (outputStream.streamStatus != NSStreamStatusError){
-                if (-1 == [outputStream write:(uint8_t *) &header_commandType maxLength:4]) {
-                    DLog(@"%s: Failed writing 'command type' 4 bytes");
-                    goto socket_failure_handler;
-                }
-            }
-            
-            //if ([ConnectionStatus isStreamConnected] && outputStream.streamStatus != NSStreamStatusError)
-            if (outputStream.streamStatus != NSStreamStatusError) {
-                if (-1 == [outputStream write:[write_payload bytes] maxLength:[write_payload length]]) {
-                    DLog(@"%s: Failed writing 'payload' %i bytes", sendCommandPayload.length);
-                    goto socket_failure_handler;
-                }
-            }
-            
-            DLog(@"%s: Exiting sync block", __PRETTY_FUNCTION__);
-            
-            //if (![ConnectionStatus isStreamConnected]) {
-            //DLog(@"%s: Output stream is not connected, out=%@", __PRETTY_FUNCTION__, outputStream);
-            //*outError = [self makeError:@"Securifi - Output stream is not connected" /errorCode:CloudEndpointSocketError_notConnectedState];
-            //return NO;
-            //}
-            if (outputStream.streamStatus == NSStreamStatusError) {
-                DLog(@"%s: Output stream has error status, out=%@, err=%@", __PRETTY_FUNCTION__, outputStream, outputStream.streamError);
-                *outError = outputStream.streamError;
-                return NO;
-            }
-            else {
-                DLog(@"%s: sent command to cloud: TIME => %f ", __PRETTY_FUNCTION__, CFAbsoluteTimeGetCurrent());
-                return YES;
-            }
-            
-        socket_failure_handler:
-            {
-                NSLog(@"Socket failure handler invoked");
-                
-                streamStatus = [outputStream streamStatus];
-                NSString *description = [NSString stringWithFormat:@"Securifi Payload - Send Error, stream status=%li", (long) streamStatus];
-                return NO;
-            }//label socket_failure_handler
-        }
-        @catch (NSException *e) {
-            NSLog(@"%s: Exception : %@", __PRETTY_FUNCTION__, e.reason);
-            @throw;
-        } //try-catch
-    }//synchronized
-}
-
-- (NSError *)makeError:(NSString *)description errorCode:(enum CloudEndpointSocketError)errorCode {
-    NSDictionary *details = @{NSLocalizedDescriptionKey : description};
-    return [NSError errorWithDomain:@"Securifi" code:errorCode userInfo:details];
-}
 
 @end
 
