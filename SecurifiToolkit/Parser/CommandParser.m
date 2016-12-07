@@ -280,7 +280,6 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         NSUInteger length = [xmlData length];
         xmlParseChunk(self.context, (const char *)[xmlData bytes], (int) length, 0);
         xmlParseChunk(self.context, NULL, 0, 1);// 1 to end parsing
-
         self.characterBuffer = nil;
     }
     @catch (NSException *e)
@@ -300,10 +299,6 @@ static xmlSAXHandler simpleSAXHandlerStruct;
         case CommandType_AFFILIATION_USER_COMPLETE:
         case CommandType_SIGNUP_RESPONSE:
         case CommandType_ALMOND_LIST_RESPONSE:
-//        case CommandType_DEVICE_DATA_HASH_RESPONSE:
-//        case CommandType_DEVICE_DATA_RESPONSE:
-//        case CommandType_DEVICE_VALUE_LIST_RESPONSE:
-//        case CommandType_DYNAMIC_DEVICE_VALUE_LIST:
         case CommandType_LOGOUT_ALL_RESPONSE:
         case CommandType_LOGOUT_RESPONSE:
         case CommandType_RESET_PASSWORD_RESPONSE:
@@ -339,7 +334,7 @@ static xmlSAXHandler simpleSAXHandlerStruct;
             obj.command = self.command;
             obj.commandType = self.commandType;
             break;
-
+            
         default: {
             // do nothing
             break;

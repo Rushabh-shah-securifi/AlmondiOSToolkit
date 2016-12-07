@@ -191,6 +191,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 @property(nonatomic, readonly) Scoreboard *scoreboard;
 @property(nonatomic, readonly) SecurifiConfigurator *config;
 @property(nonatomic, readonly) SFIOfflineDataManager *dataManager;
+
 @property(nonatomic, readonly) DatabaseStore *notificationsDb;
 @property(nonatomic, readonly) id <SFINotificationStore> notificationsStore;
 @property(nonatomic, strong) Network *network;
@@ -215,15 +216,11 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 - (void)tearDownLoginSession;
 
-- (void)resetCurrentAlmond;
-
 - (void)postNotification:(NSString *)notificationName data:(id)payload;
 
 - (void)purgeStoredData;
 
 - (void)tryShutdownAndStartNetworks;
-
-//- (GenericCommand*)tryRequestAlmondMode:(NSString *)almondMac;
 
 -(void) asyncInitCloud;
 
@@ -298,33 +295,17 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 - (void)asyncSendLogout;
 
 // Specify the currently "viewed" Almond. May perform updates in the background to check on Hash values.
-- (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
+//- (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
 
-- (void)writeCurrentAlmond:(SFIAlmondPlus *)almond;
+//- (void)writeCurrentAlmond:(SFIAlmondPlus *)almond;
 
 // Returns the designated "current" Almond, or nil.
-- (SFIAlmondPlus *)currentAlmond;
+//- (SFIAlmondPlus *)currentAlmond;
 
 - (SFIAlmondPlus *)cloudAlmond:(NSString*)almondMac;
 
 //mode_src for almond mode
 @property int mode_src;
-
-// Fetch the local copy of the Almond's attached to the logon account
-- (NSArray *)almondList;
-
-// returns YES if a cloud affiliated almond exists; does not account for locally connected almond
-- (BOOL)almondExists:(NSString*)almondMac;
-
-// List of all Almonds that are locally linked only. Almonds that have both cloud and local links would be provided
-// by almondList method. Can return nil.
-- (NSArray *)localLinkedAlmondList;
-
-// Fetch the locally stored devices list for the Almond
-- (NSArray *)deviceList:(NSString *)almondMac;
-
-// Fetch the locally stored values for the Almond's devices
-- (NSArray *)deviceValuesList:(NSString *)almondMac;
 
 // Fetch the locally stored values for the Almond's notification preferences
 - (NSArray *)notificationPrefList:(NSString *)almondMac;

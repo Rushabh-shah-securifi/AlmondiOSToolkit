@@ -100,22 +100,21 @@ NSString *const kSFINotificationPreferencesDidChange = @"kSFINotificationPrefere
 NSString *const kSFINotificationPreferencesListDidChange = @"kSFINotificationPreferencesListDidChange";
 NSString *const kSFINotificationPreferenceChangeActionAdd = @"add";
 NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
-
 // ===============================================================================================
+
 
 @interface SecurifiToolkit () <NetworkDelegate>
 @property(nonatomic, readonly) SFIReachabilityManager *cloudReachability;
 @property(nonatomic, readonly) dispatch_queue_t networkCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t networkDynamicCallbackQueue;
 @property(nonatomic, readonly) dispatch_queue_t commandDispatchQueue;
-
 @property(nonatomic, strong) RuleParser *ruleParser;
 @property(nonatomic, strong) SceneParser *sceneParser;
 @property(nonatomic, strong) ClientParser *clientParser;
 @property(nonatomic, strong) DeviceParser *deviceParser;
 @property(nonatomic, strong) RouterParser *routerParser;
-
 @end
+
 
 @implementation SecurifiToolkit
 
@@ -283,7 +282,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
     
     // check current almond config
-    SFIAlmondPlus *current = [self currentAlmond];
+    SFIAlmondPlus *current = [AlmondManagement currentAlmond];
     if (current) {
         if (current.linkType == SFIAlmondPlusLinkType_local_only) {
             NSLog(@"returning mode %d",mode);
@@ -348,7 +347,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 }
 
 - (SFIAlmondConnectionStatus)connectionStatusFromNetworkState:(ConnectionStatusType)status {
-    
     switch (status) {
         case (ConnectionStatusType)NO_NETWORK_CONNECTION:
             return SFIAlmondConnectionStatus_disconnected;
@@ -399,12 +397,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return [self.config copy];
 }
 
+
 -(void) asyncInitCloud {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSLog(@"i am called");
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
     [self tryShutdownAndStartNetworks];
 }
+
 
 // Initialize the SDK. Can be called repeatedly to ensure the SDK is set-up.
 - (void) asyncInitNetwork {
@@ -414,8 +414,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"INIT SDK. SDK is already shutdown. Returning.");
         return;
     }
-    
-    NSLog(@"i am called");
     ConnectionStatusType state = [ConnectionStatus getConnectionStatus];
     switch (state) {
         case AUTHENTICATED:
@@ -490,9 +488,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 //      c. if good response, then process next command
 
 - (void)closeConnection {
-    NSLog(@"I am called");
     [self tearDownNetwork];
 }
+
 
 - (void)asyncSendToNetwork: (GenericCommand *)command {
     
@@ -548,6 +546,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self purgeStoredData];
 }
 
+
 - (void)purgeStoredData {
     NSLog(@"i am called");
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -559,6 +558,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self.deviceLogsDb purgeAll];
     }
 }
+
 
 - (void)onLoginResponse:(LoginResponse *)res network:(Network *)network {
     if (res.isSuccessful) {
@@ -588,16 +588,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
         NSLog(@"I am called");
         [self tearDownNetwork];
     }
-    
     // In any case, notify the UI about the login result
     [self postNotification:kSFIDidCompleteLoginNotification data:res];
 }
+
 
 - (void)onLogoutResponse {
     [self tearDownLoginSession];
     [self tearDownNetwork];
     [self postNotification:kSFIDidLogoutNotification data:nil];
 }
+
 
 - (void)onLogoutAllResponse:(LoginResponse *)res {
     if (res.isSuccessful) {
@@ -635,65 +636,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return command;
 }
 
+
 - (void)onDeleteAccountResponse:(DeleteAccountResponse *)res {
     if (res.isSuccessful) {
         DLog(@"SDK received success on Delete Account");
         // treat it like a logout; clean up and tear down state
         [self onLogoutResponse];
     }
-}
-
-// pre-populates the current almond setting based with the first local almond it finds.
-// called after login session has been purged
-- (void)resetCurrentAlmond {
-    NSLog(@"i am called");
-    NSArray *local = self.localLinkedAlmondList;
-    if (local.count == 0) {
-        // notification will also be called below when setting current one;
-        // we post it here to ensure that UI is aware the current one was reset
-        [self postNotification:kSFIDidChangeCurrentAlmond data:nil];
-    }
-    else {
-        SFIAlmondPlus *plus = local.firstObject;
-        [self setCurrentAlmond:plus];
-    }
-}
-
-#pragma mark - Almond Management
-
-- (void)setCurrentAlmond:(SFIAlmondPlus *)almond {
-    NSLog(@"i am called");
-    [AlmondManagement setCurrentAlmond:almond];
-}
-
-- (void)writeCurrentAlmond:(SFIAlmondPlus *)almond {
-    NSLog(@"i am called");
-  //  self.currentAlmond = almond;
-    [AlmondManagement writeCurrentAlmond:almond];
-}
-
-- (SFIAlmondPlus *)currentAlmond {
-    return [AlmondManagement currentAlmond];
-}
-
-- (NSArray *)almondList {
-    return [self.dataManager readAlmondList];
-}
-
-- (BOOL)almondExists:(NSString *)almondMac {
-    return [AlmondManagement almondExists:almondMac];
-}
-
-- (NSArray *)localLinkedAlmondList {
-    return [AlmondManagement localLinkedAlmondList];
-}
-
-- (NSArray *)deviceList:(NSString *)almondMac {
-    return [self.dataManager readDeviceList:almondMac];
-}
-
-- (NSArray *)deviceValuesList:(NSString *)almondMac {
-    return [self.dataManager readDeviceValueList:almondMac];
 }
 
 - (NSArray *)notificationPrefList:(NSString *)almondMac {
@@ -859,7 +808,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
         break;
         case SFIAlmondConnectionMode_local:{
-            SFIAlmondPlus* almond = self.currentAlmond;
+            SFIAlmondPlus* almond = [AlmondManagement currentAlmond];
             NSLog(@"Entering the local mode %@",almond.almondplusMAC);
             
             SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
@@ -913,7 +862,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         return NO;
     }
     
-    NSLog(@"i am called");
     // if in cloud mode, then fail fast
     if (![self isCurrentConnectionModeCompatible:SFIAlmondConnectionMode_local]) {
         return NO;
@@ -936,36 +884,28 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 
-
 #pragma mark - NetworkDelegate methods
-
 - (void)networkConnectionDidEstablish:(Network *)network {
     if (network == self.network) {
         self.scoreboard.connectionCount++;
     }
-
+    
     if([self currentConnectionMode] == SFIAlmondConnectionMode_local)
         [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType)AUTHENTICATED];
-    
     BOOL isCloudConnection = [self currentConnectionMode] == (SFIAlmondConnectionMode)SFIAlmondConnectionMode_cloud ?YES : NO;
     
-    NSLog(@"%d is the cloudConnection", isCloudConnection);
     if(isCloudConnection){
-        NSLog(@"i have entered this isCloudConnection");
         BOOL hasLoginCredentials = [KeyChainAccess hasLoginCredentials];
         if(hasLoginCredentials){
-            NSLog(@"i have enter hasLoginCredentials");
             [self sendTempPassLoginCommand];
         }else{
-            NSLog(@"%s: no logon credentials", __PRETTY_FUNCTION__);
-            
             // This event is very important because it will prompt the UI not to wait for events and immediately show a logon screen
             // We probably should track things down and find a way to remove a dependency on this event in the UI.
             [self postNotification:kSFIDidLogoutNotification data:nil];
             return;
         }
     }else{
-        SFIAlmondPlus* plus = self.currentAlmond;
+        SFIAlmondPlus* plus = [AlmondManagement currentAlmond];
         [self asyncSendToNetwork:[GenericCommand requestSensorDeviceList:plus.almondplusMAC] ];
         [self asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
         [self asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
@@ -1142,15 +1082,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
             break;
         }
             
-            
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: {
             NSDictionary *dict = payload;
             NSString *name = dict[@"Name"];
             
             NSString *mac_hex = dict[@"MAC"];
             NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
-            NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE %@ mac is %@",[self currentAlmond].almondplusMAC, mac);
-            SFIAlmondPlus *current = [self currentAlmond];
+            NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE %@ mac is %@",[AlmondManagement currentAlmond].almondplusMAC, mac);
+            SFIAlmondPlus *current = [AlmondManagement currentAlmond];
             //if ([current.almondplusMAC isEqualToString:mac]) {
                 NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Inside CurrentAlmond equals %@",current.almondplusName);
                 if ([current.almondplusName isEqualToString:name]) {

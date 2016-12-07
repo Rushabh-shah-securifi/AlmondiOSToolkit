@@ -14,7 +14,7 @@
 #import "Securifitoolkit.h"
 #import "Network.h"
 #import "DynamicAlmondModeChange.h"
-
+#import "AlmondManagement.h"
 #define SEC_PASSWORD @"password"
 
 @interface SFIAlmondLocalNetworkSettings () <NetworkEndpointDelegate>
@@ -33,15 +33,14 @@
         self.almondplusName = @"Unknown"; // name is not provided in the summary (why not!!!) so we make sure it is not null, but expect it to be properly set
         self.port = 7681; // default web socket port
     }
-    
     return self;
 }
 
 - (enum TestConnectionResult)testConnection: (BOOL)fromLoginPage{
     NSString *mac = @"test_almond";
-
+    
     NetworkConfig *config = [NetworkConfig webSocketConfig:self almondMac:mac];
-
+    
     self.testResult = TestConnectionResult_unknown;
     _test_connection_latch = dispatch_semaphore_create(0);
 
@@ -63,10 +62,6 @@
             [self waitOnLatch:self.test_command_latch timeout:3 logMsg:@"Failed to send GetAlmondNameandMAC to web socket"];
         }
     }
-    // clean up
-    
-//    endpoint.delegate = nil;
-//    [endpoint shutdown];
     
     _test_connection_latch = nil;
     _test_command_latch = nil;
@@ -85,10 +80,6 @@
     }
     NSLog(@"processTestConnectionResponsePayload %@",payload);
     NSString *mac_hex = payload[@"MAC"];
-//    if (![self validMac:mac_hex]) {
-//        self.testResult = TestConnectionResult_macMissing;
-//        return;
-//    }
 
     NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
     NSLog(@"mac address %@==%@",mac,self.almondplusMAC);
@@ -139,13 +130,14 @@
        // dispatch_semaphore_signal(latch);
         
         SFIAlmondPlus* plus = self.asLocalLinkAlmondPlus;
-        [[SecurifiToolkit sharedInstance] writeCurrentAlmond: plus];
+        [AlmondManagement writeCurrentAlmond: plus];
         
         [[SecurifiToolkit sharedInstance] createNetworkInstanceAndChangeDelegate:plus webSocketEndPoint:self.endpoint res:_res];
     }else if (commandType == CommandType_DYNAMIC_ALMOND_MODE_CHANGE) {
         _res =payload;
     }
 }
+
 
 // Waits up to the specified number of seconds for the semaphore to be signalled.
 // Returns YES on timeout waiting on the latch.
@@ -218,6 +210,7 @@
     return self;
 }
 
+
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeInt32:1 forKey:@"self.schemaVersion"]; // for future use/expansion; version this schema
 
@@ -245,6 +238,7 @@
     return [NSString stringWithFormat:@"almond_local_settings:%@", mac];
 }
 
+
 - (id)copyWithZone:(NSZone *)zone {
     SFIAlmondLocalNetworkSettings *copy = (SFIAlmondLocalNetworkSettings *) [[[self class] allocWithZone:zone] init];
 
@@ -261,6 +255,7 @@
     return copy;
 }
 
+
 - (BOOL)isEqual:(id)other {
     if (other == self)
         return YES;
@@ -269,6 +264,7 @@
 
     return [self isEqualToSettings:other];
 }
+
 
 - (BOOL)isEqualToSettings:(SFIAlmondLocalNetworkSettings *)settings {
     if (self == settings)
@@ -292,6 +288,7 @@
     return YES;
 }
 
+
 - (NSUInteger)hash {
     NSUInteger hash = (NSUInteger) self.enabled;
     hash = hash * 31u + [self.almondplusName hash];
@@ -302,6 +299,7 @@
     hash = hash * 31u + [self.password hash];
     return hash;
 }
+
 
 - (NSString *)description {
     NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
@@ -315,6 +313,5 @@
     [description appendString:@">"];
     return description;
 }
-
 
 @end

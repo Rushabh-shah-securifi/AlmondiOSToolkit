@@ -10,6 +10,7 @@
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
 #import "AlmondPlusSDKConstants.h"
+#import "AlmondManagement.h"
 
 @implementation SceneParser
 
@@ -48,7 +49,7 @@
     if([mainDict isKindOfClass:[NSDictionary class]] == NO)
         return;
     
-    BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
+    BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:[AlmondManagement currentAlmond].almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
 
@@ -177,7 +178,7 @@
 
 -(BOOL)isLocal{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
     BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     return local;
 }

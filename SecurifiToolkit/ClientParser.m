@@ -15,6 +15,7 @@
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
 #import "KeyChainWrapper.h"
+#import "AlmondManagement.h"
 
 @implementation ClientParser
 - (instancetype)init {
@@ -51,7 +52,7 @@
         return;
     }
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
     BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *mainDict;
     if(local){
@@ -155,7 +156,7 @@
     NSMutableDictionary *commandInfo = [NSMutableDictionary new];
     
     [commandInfo setValue:@"GetClientPreferences" forKey:@"CommandType"];
-    [commandInfo setValue:toolkit.currentAlmond.almondplusMAC forKey:@"AlmondMAC"];
+    [commandInfo setValue:[AlmondManagement currentAlmond].almondplusMAC forKey:@"AlmondMAC"];
     [commandInfo setValue:userID forKey:@"UserID"];
     
     
@@ -238,7 +239,7 @@
     NSLog(@"client preferecne: %@", mainDict);
     
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *plus = [toolkit currentAlmond];
+    SFIAlmondPlus *plus = [AlmondManagement currentAlmond];
     NSString *aMac = mainDict[@"AlmondMAC"];
     int clientID = [mainDict[@"ClientID"] intValue];
     if(![aMac isEqualToString:plus.almondplusMAC])

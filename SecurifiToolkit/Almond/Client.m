@@ -9,6 +9,7 @@
 #import "Client.h"
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
+#import "AlmondManagement.h"
 
 @implementation Client
 
@@ -140,20 +141,21 @@
     Client *client = [self findClientByID:clientId];
     return client.deviceSchedule;
 }
+
 +(BOOL)isSiteMapCompatableLocal{
     SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolKit currentAlmond];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
     bool isLocal = [toolKit useLocalNetwork:almond.almondplusMAC];
     return isLocal;
-    
 }
+
 +(BOOL)siteMapCompatbleFW{
     SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolKit currentAlmond];
-    BOOL isSiteMapSupport = [toolKit.currentAlmond siteMapSupportFirmware:toolKit.currentAlmond.firmware];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
+    BOOL isSiteMapSupport = [[AlmondManagement currentAlmond] siteMapSupportFirmware:[AlmondManagement currentAlmond].firmware];
     return isSiteMapSupport;
-    
 }
+
 +(NSArray*) getClientGenericIndexes{
         NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,@-25,nil];
     if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable){

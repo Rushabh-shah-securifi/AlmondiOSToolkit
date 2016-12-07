@@ -9,6 +9,7 @@
 #import "RouterParser.h"
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
+#import "AlmondManagement.h"
 
 @implementation RouterParser
 
@@ -37,7 +38,7 @@
     }
     
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
     BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
     if(local){
@@ -128,7 +129,7 @@
 
 +(NSArray*)getAlmondsList:(NSDictionary*)payload{
     NSMutableArray *almondsList = [payload[SLAVES] mutableCopy];
-    NSDictionary *masterAlmond = @{@"Location":payload[@"AlmondLocation"]?:[SecurifiToolkit sharedInstance].currentAlmond.almondplusName};
+    NSDictionary *masterAlmond = @{@"Location":payload[@"AlmondLocation"]?:[AlmondManagement currentAlmond].almondplusName};
     [almondsList insertObject:masterAlmond atIndex:0];
     return almondsList;
 }

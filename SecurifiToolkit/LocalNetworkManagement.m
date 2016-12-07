@@ -9,6 +9,7 @@
 #import "LocalNetworkManagement.h"
 #import "Securifitoolkit.h"
 #import "AlmondManagement.h"
+#import "SFIAlmondLocalNetworkSettings.h"
 
 @implementation LocalNetworkManagement
 
@@ -18,7 +19,7 @@
 
 + (SFIAlmondLocalNetworkSettings*) getCurrentLocalAlmondSettings {
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    NSString* almondMac = toolkit.currentAlmond.almondplusMAC;
+    NSString* almondMac = [AlmondManagement currentAlmond].almondplusMAC;
     
     NSDictionary* localNetworkSettings = [toolkit.dataManager readAllAlmondLocalNetworkSettings];
     
@@ -29,7 +30,7 @@
     
     else{
         NSLog(@"testing getcurrentlocalalmondsettings2");
-        NSString* currentAlmondMac = toolkit.currentAlmond.almondplusMAC;
+        NSString* currentAlmondMac = [AlmondManagement currentAlmond].almondplusMAC;
         
         SFIAlmondLocalNetworkSettings* settings;
         for(NSString* mac in localNetworkSettings.allKeys){
@@ -44,7 +45,7 @@
         if(!settings){
             NSLog(@"testing getcurrentlocalalmondsettings5");
             settings = [self localNetworkSettingsForAlmond:[localNetworkSettings.allKeys objectAtIndex:0]];
-            NSLog(@"%@ is the current almond mac value", toolkit.currentAlmond.almondplusMAC);
+            NSLog(@"%@ is the current almond mac value", [AlmondManagement currentAlmond].almondplusMAC);
             NSLog(@"%@ is the almond mac value", settings.almondplusMAC);
         }
         
@@ -60,7 +61,7 @@
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     [toolkit.dataManager deleteLocalNetworkSettingsForAlmond:almondMac];
     
-    SFIAlmondPlus *currentAlmond = toolkit.currentAlmond;
+    SFIAlmondPlus *currentAlmond = [AlmondManagement currentAlmond];
     
     if (currentAlmond!=nil && [currentAlmond.almondplusMAC isEqualToString:almondMac]) {
         
@@ -68,17 +69,15 @@
             NSLog(@"Current Almond equals is ");
             [toolkit tearDownNetwork];
         }
-        
         [AlmondManagement removeCurrentAlmond];
-        
-        NSArray *cloud = toolkit.almondList;
+        NSArray *cloud = [AlmondManagement almondList];
         if (cloud.count > 0) {
-            [toolkit setCurrentAlmond:cloud.firstObject];
+            [AlmondManagement setCurrentAlmond:cloud.firstObject];
         }
         else {
-            NSArray *local = toolkit.localLinkedAlmondList;
+            NSArray *local = [AlmondManagement localLinkedAlmondList];
             if (local.count > 0) {
-                [toolkit setCurrentAlmond:local.firstObject];
+                [AlmondManagement setCurrentAlmond:local.firstObject];
             }
         }
     }
@@ -92,7 +91,6 @@
         NSLog(@"storeLocalNetworkSettings");
         return;
     }
-    
     [[SecurifiToolkit sharedInstance].dataManager writeAlmondLocalNetworkSettings:settings];
 }
 
@@ -115,6 +113,7 @@
     if (summary.login) {
         settings.login = summary.login;
     }
+    
     if (summary.password) {
         NSLog(@"summary.password = %@, uptime: %@",summary.password, summary.uptime);
         NSString *decrypted = [summary decryptPassword:almondMac];

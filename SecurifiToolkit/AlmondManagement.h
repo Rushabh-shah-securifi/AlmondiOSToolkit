@@ -12,7 +12,6 @@
 #import "SFIAlmondPlus.h"
 #import "Network.h"
 #import "NetworkState.h"
-#import "SFIAlmondLocalNetworkSettings.h"
 #import "AlmondListResponse.h"
 #import "DynamicAlmondNameChangeResponse.h"
 #import "AlmondModeResponse.h"
@@ -26,6 +25,7 @@
 + (void)removeCurrentAlmond;
 + (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
 + (void)writeCurrentAlmond:(SFIAlmondPlus *)almond;
++ (NSArray *)almondList;
 + (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond;
 + (SFIAlmondPlus *)currentAlmond;
 + (SFIAlmondPlus *)cloudAlmond:(NSString *)almondMac;

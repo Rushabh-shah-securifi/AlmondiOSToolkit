@@ -123,13 +123,11 @@
     return _networkConfig.mode;
 }
 
-
 - (void)markLoggedInState:(BOOL)loggedIn {
     self.loginStatus = loggedIn ? NetworkLoginStatusLoggedIn : NetworkLoginStatusNotLoggedIn;
 }
 
 #pragma mark - NSStreamDelegate methods
-
 - (void)tryMarkUnitCompletion:(BOOL)success responseType:(CommandType)responseType {
     SUnit *unit = self.currentUnit;
     if (unit) {
@@ -150,7 +148,6 @@
 }
 
 #pragma mark - Payload notification
-
 - (void)postData:(NSString *)notificationName data:(id)payload {
     // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
     // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
@@ -158,6 +155,7 @@
     SLog(@"Posting %@", notificationName);
     [self post:notificationName payload:payload queue:self.callbackQueue];
 }
+
 
 - (void)postDataDynamic:(NSString *)notificationName data:(id)payload commandType:(CommandType)commandType {
     // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
@@ -167,6 +165,7 @@
     [self post:notificationName payload:payload queue:self.dynamicCallbackQueue];
     [self.delegate networkDidReceiveDynamicUpdate:self response:payload responseType:commandType];
 }
+
 
 - (void)delegateData:(id)payload commandType:(CommandType)commandType {
     __weak Network *block_self = self;
@@ -193,13 +192,10 @@
                  @"network" : block_self,
                  };
     }
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
 }
 
-
 #pragma mark - Command submission
-
 - (NSInteger)nextUnitCounter {
     NSInteger next = self.currentUnitCounter + 1;
     self.currentUnitCounter = next;
@@ -219,12 +215,13 @@
     return YES;
 }
 
-#pragma mark - NetworkEndpointDelegate methods
 
+#pragma mark - NetworkEndpointDelegate methods
 - (void)networkEndpointWillStartConnecting:(id <NetworkEndpoint>)endpoint {
     NSLog(@" Who is setting status Network - networkEndpointWillStartConnecting");
     [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType*)IS_CONNECTING_TO_NETWORK];
 }
+
 
 - (void)networkEndpointDidConnect:(id <NetworkEndpoint>)endpoint {
     NSLog(@" Who is setting status Network - networkEndpointDidConnect");
@@ -288,7 +285,7 @@
             [self postData:SENSOR_CHANGE_NOTIFIER data:payload];
             break;
         }
-
+        
         case CommandType_USER_PROFILE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:USER_PROFILE_NOTIFIER data:payload];
@@ -426,22 +423,25 @@
             [self postData:RULE_COMMAND_RESPONSE_NOTIFIER data:payload];
             break;
         };
+            
         case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_DEVICE_LIST_AND_DYNAMIC_RESPONSES_NOTIFIER data:payload];
             break;
         };
+            
         case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:kSFINotificationPreferencesListDidChange data:payload];
             break;
         };
+            
         case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE data:payload];
             break;
         };
-        
+            
         case CommandType_DYNAMIC_ALMOND_MODE_CHANGE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             //            .s
@@ -450,16 +450,19 @@
             //            [self postData:kSFIAlmondModeDidChange data:payload];
             break;
         };
+            
         case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_ROUTER_RESPONSE_NOTIFIER data:payload];
             break;
         };
+            
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DYNAMIC_ALMOND_LOCATION_CHANIGE_NOTIFIER data:payload];
             break;
         };
+            
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:

@@ -431,17 +431,14 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         case NSStreamEventOpenCompleted: {
             break;
         }
-            
         case NSStreamEventHasBytesAvailable:
             if (theStream == self.inputStream) {
                 // Multiple response payloads in one callback is possible
                 while ([self.inputStream hasBytesAvailable]) {
                     uint8_t inputBuffer[4096];
-                    
                     NSInteger bufferLength = [self.inputStream read:inputBuffer maxLength:sizeof(inputBuffer)];
                     if (bufferLength > 0) {
                         // Append received data to partial buffer
-                        
                         [dataBuffer appendBytes:&inputBuffer[0] length:(NSUInteger) bufferLength];
                         
                         while (dataBuffer.length > COMMAND_HEADER_LEN_BYTES) {
@@ -454,7 +451,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             if (dataBuffer.length < COMMAND_HEADER_LEN_BYTES + payloadLength) {
                                 break; // command not completely received
                             }
-                            
                             // the command type pertaining to the response
                             unsigned int commandType_raw;
                             [dataBuffer getBytes:&commandType_raw range:NSMakeRange(4, 4)];
@@ -476,7 +472,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     NSUInteger startLen = @"<root>".length;
                                     NSUInteger endLen = @"</root>".length;
                                     NSRange parseRange = NSMakeRange(COMMAND_HEADER_LEN_BYTES + startLen, payloadLength - endLen - startLen);
-                                    
                                     buffer = [dataBuffer subdataWithRange:parseRange];
                                 }
                                 
@@ -517,7 +512,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
                                     case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
                                     case CommandType_MESH_COMMAND:
-
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
@@ -534,27 +528,22 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             else {
                                 // XML payloads
                                 NSRange parseRange = NSMakeRange(COMMAND_HEADER_LEN_BYTES, payloadLength);
-                                
                                 NSInteger actual_length = dataBuffer.length;
                                 NSInteger expected_length = parseRange.length - parseRange.location;
                                 if (actual_length < expected_length) {
                                     NSLog(@"Ignoring payload, the buffer length is wrong, actual:%li, expected:%li", (long) actual_length, (long) expected_length);
                                     break;
                                 }
-                                
                                 @try {
                                     NSData *buffer = [dataBuffer subdataWithRange:parseRange];
-                                    //                                    DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
-                                    
+                                    //DLog(@"Partial Buffer : %@", [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     CommandParser *parser = [CommandParser new];
                                     NSLog(@"CommandType: %d \nCloud receive:  %@", commandType, [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding]);
                                     GenericCommand *temp = (GenericCommand *) [parser parseXML:buffer];
                                     responsePayload = temp.command;
-                                    
                                     // important to pull command type from the parsed payload because the underlying
                                     // command that we dispatch on can be different than the "container" carrying it
                                     commandType = temp.commandType;
-                                    
                                     parsedPayload = YES;
                                 }
                                 @catch (NSException *ex) {
@@ -564,7 +553,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             } // end if valid command, json, or xml
                             if (parsedPayload) {
                                 // Tell the world the connection is up and running
-                                //                                [self tryPostNetworkUpNotification];
+                                // [self tryPostNetworkUpNotification];
                                 // Process the request by passing it to the delegate
                                 [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
                             }

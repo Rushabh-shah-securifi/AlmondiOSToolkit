@@ -3,6 +3,7 @@
 @interface HTTPRequest()
 @property (nonatomic) NSMutableData *responseData;
 @end
+
 @implementation HTTPRequest
 
 -(void) sendAsyncHTTPSignUPRequestWithEmail:(NSString*)email AndPassword:(NSString*)password{

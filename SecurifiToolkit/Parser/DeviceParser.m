@@ -23,6 +23,7 @@
 #import "NotificationPreferenceListResponse.h"
 #import "NotificationPreferenceListRequest.h"
 #import "LocalNetworkManagement.h"
+#import "AlmondManagement.h"
 
 //#import "SFIRouterSummary.h"
 
@@ -179,7 +180,7 @@
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
     BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
     NSDictionary *payload;
     
@@ -338,7 +339,7 @@
 - (void)onNotificationPrefDidChange:(id)sender {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
 
     
     NSNotification *notifier = (NSNotification *) sender;
@@ -357,7 +358,7 @@
 
 -(void)configureNotificationModesForDevices{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSArray *notificationList = [toolkit notificationPrefList:toolkit.currentAlmond.almondplusMAC];
+    NSArray *notificationList = [toolkit notificationPrefList:[AlmondManagement currentAlmond].almondplusMAC];
     for (Device *device in toolkit.devices) {
         [self configureNotificationMode:device preferences:notificationList];
     }
@@ -382,7 +383,7 @@
 - (void)onDynamicNotificationPreference:(id)sender{
     NSLog(@"onDynamicNotificationPreference");
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [toolkit currentAlmond];
+    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
     
     NSNotification *notifier = (NSNotification *) sender;
     NSDictionary *data = [notifier userInfo];
@@ -580,6 +581,7 @@
     }
     return data;
 }
+
 -(void)onAlmondRouterCommandResponse:(id)sender{
     NSLog(@"Device parser - onAlmondRouterCommandResponse");
     NSNotification *notifier = (NSNotification *) sender;
@@ -595,7 +597,7 @@
             SFIRouterSummary *routerSummary = (SFIRouterSummary *)genericRouterCommand.command;
             NSLog(@"routersummary: %@", routerSummary);
             if([toolkit currentConnectionMode] == SFIAlmondConnectionMode_cloud)
-                [LocalNetworkManagement tryUpdateLocalNetworkSettingsForAlmond:toolkit.currentAlmond.almondplusMAC withRouterSummary:routerSummary];
+                [LocalNetworkManagement tryUpdateLocalNetworkSettingsForAlmond:[AlmondManagement currentAlmond].almondplusMAC withRouterSummary:routerSummary];
             break;
         }
     }

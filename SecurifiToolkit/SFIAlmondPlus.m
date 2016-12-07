@@ -181,6 +181,7 @@
     //NSLog(@"result: %d", result);
     return result;
 }
+
 -(BOOL)siteMapSupportFirmware:(NSString *)almondFiemware{
     if([almondFiemware hasPrefix:@"AL3-"])
         return YES;

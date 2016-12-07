@@ -11,6 +11,7 @@
 #import "NotificationAccessAndRefreshCommands.h"
 #import "AlmondModeRequest.h"
 #import "RouterCommandParser.h"
+#import "SFIAlmondLocalNetworkSettings.h"
 #import "LocalNetworkManagement.h"
 
 @implementation AlmondManagement
@@ -36,7 +37,6 @@
         return;
     }
     
-    NSLog(@"i am called");
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
@@ -52,6 +52,7 @@
     
     NSString *mac = almond.almondplusMAC;
     SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
+
     // reset connections
     if([toolKit currentConnectionMode]==SFIAlmondConnectionMode_local){
         [toolKit tryShutdownAndStartNetworks];
@@ -90,6 +91,7 @@
     //    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser
 }
 
+
 + (SFIAlmondPlus *)currentAlmond {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *data = [defaults objectForKey:kPREF_CURRENT_ALMOND];
@@ -101,6 +103,7 @@
         return nil;
     }
 }
+
 
 + (SFIAlmondPlus *)cloudAlmond:(NSString *)almondMac {
     return [[SecurifiToolkit sharedInstance].dataManager readAlmond:almondMac];
@@ -213,7 +216,7 @@
     NSLog(@"asyncInitializeConnection2");
     __weak SecurifiToolkit *block_self = [SecurifiToolkit sharedInstance];
     
-    SFIAlmondPlus *plus = [block_self currentAlmond];
+    SFIAlmondPlus *plus = [AlmondManagement currentAlmond];
     
     NSLog(@"asyncInitializeConnection plus mac %@",plus.almondplusMAC);
     if (plus != nil) {
@@ -323,13 +326,13 @@
     NSLog(@"Came here onDynamicAlmondNameChange %@",almondName);
     SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
-        SFIAlmondPlus *current = [toolKit currentAlmond];
+        SFIAlmondPlus *current = [self currentAlmond];
         NSLog(@"Came here onDynamicAlmondNameChange inside changed %@",almondName);
         if ([current isEqualAlmondPlus:changed]) {
             changed.colorCodeIndex = current.colorCodeIndex;
             //[toolKit currentAlmond].almondplusName=almondName;
-            NSLog(@"Came here after settings %@",[toolKit currentAlmond].almondplusName);
-            [toolKit writeCurrentAlmond:changed];
+            NSLog(@"Came here after settings %@",[self currentAlmond].almondplusName);
+            [self writeCurrentAlmond:changed];
             //[self setCurrentAlmond:changed];
         }
         
@@ -345,7 +348,7 @@
     // if current is "local only" then no need to inspect the almond list; just return the current one.
     
     SecurifiToolkit * toolKit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *current = [toolKit currentAlmond];
+    SFIAlmondPlus *current = [self currentAlmond];
 //    if (current.linkType == SFIAlmondPlusLinkType_local_only) {
 //        NSLog(@"linkType is local_only");
 //        return current;
@@ -413,8 +416,8 @@
         return;
     }
     
-    if([res.almondMAC isEqualToString:toolkit.currentAlmond.almondplusMAC]){
-        [network.networkState markModeForAlmond:toolkit.currentAlmond.almondplusMAC mode:res.mode];
+    if([res.almondMAC isEqualToString:[self currentAlmond].almondplusMAC]){
+        [network.networkState markModeForAlmond:[self currentAlmond].almondplusMAC mode:res.mode];
         NSDictionary *modeNotifyDict =  @{
                                           @"CommandType": @"AlmondModeResponse",
                                           @"Mode" : @(res.mode).stringValue
@@ -438,12 +441,10 @@
     }
     
     NSLog(@"res dict %@",res);
-    NSLog(@"res.mode: %d %@", res.mode ,toolkit.currentAlmond.almondplusMAC  );
+    NSLog(@"res.mode: %d %@", res.mode ,[self currentAlmond].almondplusMAC  );
     //    NSString *modeString = res[@"Mode"];
-    if([res.almondMAC isEqualToString:toolkit.currentAlmond.almondplusMAC]){
-        NSLog(@"Am I inside onDynamicAlmondModeChange");
-        [network.networkState markModeForAlmond:toolkit.currentAlmond.almondplusMAC mode:res.mode];
-        
+    if([res.almondMAC isEqualToString:[self currentAlmond].almondplusMAC]){
+        [network.networkState markModeForAlmond:[self currentAlmond].almondplusMAC mode:res.mode];
         NSDictionary *modeNotifyDict =  @{
                                           @"CommandType": @"DynamicAlmondModeUpdated",
                                           @"Mode" : @(res.mode).stringValue

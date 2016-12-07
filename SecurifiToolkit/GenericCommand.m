@@ -19,6 +19,7 @@
 #import "AlmondModeChangeRequest.h"
 #import "MDJSON.h"
 #import "SecurifiToolkit.h"
+#import "AlmondManagement.h"
 
 @implementation GenericCommand
 
@@ -214,7 +215,7 @@
 }
 
 + (instancetype)requestAlmondLocationChange:(int)mii location:(NSString *)location{
-    NSString *mac = [SecurifiToolkit sharedInstance].currentAlmond.almondplusMAC;
+    NSString *mac = [AlmondManagement currentAlmond].almondplusMAC;
     NSDictionary *payload = @{
                               @"CommandMode":@"Request",
                               @"CommandType":@"AlmondLocationChange",

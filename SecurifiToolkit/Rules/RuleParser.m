@@ -11,6 +11,7 @@
 #import "SecurifiToolkit.h"
 #import "AlmondPlusSDKConstants.h"
 #import "AlmondJsonCommandKeyConstants.h"
+#import "AlmondManagement.h"
 
 
 @implementation RuleParser
@@ -33,7 +34,7 @@
     if(![self validateResponse:sender])
         return;
     SecurifiToolkit *toolkit=[SecurifiToolkit sharedInstance];
-    BOOL local = [toolkit useLocalNetwork:[toolkit currentAlmond].almondplusMAC];
+    BOOL local = [toolkit useLocalNetwork:[AlmondManagement currentAlmond].almondplusMAC];
     NSDictionary *mainDict=[[(NSNotification *) sender userInfo] valueForKey:@"data"];
     if(!local){
         if(![[[(NSNotification *) sender userInfo] valueForKey:@"data"] isKindOfClass:[NSData class]])
@@ -44,7 +45,7 @@
     if([mainDict isKindOfClass:[NSDictionary class]] == NO)
         return;
     
-    BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:toolkit.currentAlmond.almondplusMAC] || local) ? YES: NO;
+    BOOL isMatchingAlmondOrLocal = ([mainDict[ALMONDMAC] isEqualToString:[AlmondManagement currentAlmond].almondplusMAC] || local) ? YES: NO;
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
     
