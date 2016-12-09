@@ -43,6 +43,7 @@
     [defaults synchronize];
 }
 
+
 + (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
     
     NSLog(@"%@ is the almond name", almond.almondplusName);
@@ -52,7 +53,7 @@
     
     NSString *mac = almond.almondplusMAC;
     SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
-
+    
     // reset connections
     if([toolKit currentConnectionMode]==SFIAlmondConnectionMode_local){
         [toolKit tryShutdownAndStartNetworks];

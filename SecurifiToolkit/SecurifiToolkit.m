@@ -645,10 +645,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
     }
 }
 
+
 - (NSArray *)notificationPrefList:(NSString *)almondMac {
     return [self.dataManager readNotificationPreferenceList:almondMac];
 }
-
 
 
 #pragma mark - Scoreboard management

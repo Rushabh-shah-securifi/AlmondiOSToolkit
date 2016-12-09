@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <OCMock/OCMock.h>
 #import "Securifitoolkit.h"
 #import "ConnectionStatus.h"
 #import "KeyChainAccess.h"
@@ -78,6 +79,21 @@
 
 
 #pragma mark - Almond Management Test cases
+
+-(void) testWriteCurrentAlmond {
+    SFIAlmondPlus* almond = [SFIAlmondPlus new];
+    almond.almondplusName = @"TestCasesAlmond";
+    [AlmondManagement writeCurrentAlmond:almond];
+    NSString* currentAlmondName = [AlmondManagement currentAlmond].almondplusName;
+    XCTAssertEqualObjects(@"TestCasesAlmond", currentAlmondName);
+}
+
+
+-(void) testManageCurrentAlmondChange_CloudConnection {
+    
+}
+
+
 -(void) testSetCurrentAlmond {
     
     XCTestExpectation* expectation = [self expectationWithDescription:@"Testing testSetCurrentAlmond"];
@@ -103,56 +119,6 @@
     }];
 }
 
--(void) testWriteCurrentAlmond {
-    SFIAlmondPlus* almond = [SFIAlmondPlus new];
-    almond.almondplusName = @"TestCasesAlmond";
-    [AlmondManagement writeCurrentAlmond:almond];
-    NSString* currentAlmondName = [AlmondManagement currentAlmond].almondplusName;
-    XCTAssertEqualObjects(@"TestCasesAlmond", currentAlmondName);
-    
-    almond = NULL;
-    [AlmondManagement writeCurrentAlmond:almond];
-    currentAlmondName = [AlmondManagement currentAlmond].almondplusMAC;
-    XCTAssertEqualObjects(@"TestCaseAlmond", currentAlmondName);
-}
-
--(void) testManageCurrentAlmondChange_CloudConnection {
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    
-    [self authenticate];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(14.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        [expectation fulfill];
-    });
-    
-    SFIAlmondPlus* almond = [SFIAlmondPlus new];
-    almond.almondplusName = @"UnKnownAlmondName";
-    almond.almondplusMAC = @"UnknownAlmondMac";
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [AlmondManagement manageCurrentAlmondChange:almond];
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSLog(@"%@ is the sceneslist in testmangeCurrentAlmondChange",toolkit.scenesArray);
-        XCTAssertEqual(toolkit.scenesArray.count,0);
-        XCTAssertEqual(toolkit.devices.count,0);
-        XCTAssertEqual(toolkit.ruleList.count,0);
-        XCTAssertEqual(toolkit.clients.count,0);
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-    });
-    
-    [self waitForExpectationsWithTimeout:28.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
-    
-}
 
 #pragma mark - Almond List management
 -(void) testLocalLinkedAlmondList {
