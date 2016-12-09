@@ -76,6 +76,73 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_dash"]) {
         return @"amazon_dash";
     }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"philips_hue"]) {
+        return @"philips_hue_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"scout_home_security"]) {
+        return @"scout_hub_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"skybell_wifi"]) {
+        return @"skybell_icon";
+    }//
+    if ([[self.deviceType lowercaseString] isEqualToString:@"august_connect"]) {
+        return @"august_connect_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"canary"]) {
+        return @"canary_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"piper"]) {
+        return @"piper_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"ring_doorbell"]) {
+        return @"skybell_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"samsung_smartthings"]) {
+        return @"smartthings_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"belkin_wemo"]) {
+        return @"wemo_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"sonos"]) {
+        return @"speaker_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"airplay_speakers"]) {
+        return @"speaker_icon";
+    }//
+    if ([[self.deviceType lowercaseString] isEqualToString:@"wink"]) {
+        return @"wink_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"canary"]) {
+        return @"canary_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"ge_appliances"]) {
+        return @"ge_appliances_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"honeywell_appliances"]) {
+        return @"ge_appliances_icon";
+    }//
+    if ([[self.deviceType lowercaseString] isEqualToString:@"osram_lightify"]) {
+        return @"osram_lightify";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"ibaby_monitor"]) {
+        return @"videocam_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"motorola_connect"]) {
+        return @"videocam_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"foscam"]) {
+        return @"videocam_icon";
+    }//
+    if ([[self.deviceType lowercaseString] isEqualToString:@"hikvision"]) {
+        return @"videocam_icon";
+    }
+    if ([[self.deviceType lowercaseString] isEqualToString:@"dlink_cameras"]) {
+        return @"videocam_icon";
+    }
+    
+    if ([[self.deviceType lowercaseString] isEqualToString:@"withings"]) {
+        return @"videocam_icon";
+    }
     return @"help_icon";
 }
 
