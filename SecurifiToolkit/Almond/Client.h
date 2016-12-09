@@ -36,8 +36,8 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 @property(nonatomic) BOOL webHistoryEnable;
 @property(nonatomic) BOOL bW_Enable;
 @property(nonatomic) BOOL *canBeBlocked;
-//@property(nonatomic) BOOL is_IoTDeviceType;
-//@property(nonatomic) BOOL iot_serviceEnable;
+@property(nonatomic) BOOL is_IoTDeviceType;
+@property(nonatomic) BOOL iot_serviceEnable;
 
 
 @property(nonatomic) SFINotificationMode notificationMode;
