@@ -796,6 +796,68 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 #pragma mark - Network management
+
+-(struct PopUpSuggestions) suggestionsFromNetworkStateAndConnectiontype {
+    
+    NSString *title;
+    NSString *subTitle1, *subTitle2;
+    SFIAlmondConnectionMode mode1=0, mode2=0;
+    BOOL presentLocalNetworkSettings = false;
+    SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
+    
+    if([ConnectionStatus getConnectionStatus]==AUTHENTICATED){
+        if([toolKit currentConnectionMode] == SFIAlmondConnectionMode_cloud){
+            SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement getCurrentLocalAlmondSettings];
+            NSArray* localAlmonds = [AlmondManagement localLinkedAlmondList];
+            NSLog(@"%@ is the local almond mac name",settings.almondplusMAC);
+            if (settings){
+                for(SFIAlmondPlus* localAlmond in localAlmonds){
+                    if([settings.almondplusMAC isEqualToString:localAlmond.almondplusMAC]){
+                        [AlmondManagement writeCurrentAlmond:localAlmond];
+                        break;
+                    }
+                }
+                title = NSLocalizedString(@"alert.message-Connected to your Almond via cloud.", @"Connected to your Almond via cloud.");
+                subTitle1 = NSLocalizedString(@"switch_local", @"Switch to Local Connection");
+                mode1 = SFIAlmondConnectionMode_local;
+            }else{
+                title = NSLocalizedString(@"alert msg offline Local connection not supported.", @"Local connection settings are missing.");
+                subTitle1 = NSLocalizedString(@"Add Local Connection Settings", @"Add Local Connection Settings");
+                presentLocalNetworkSettings = YES;
+                mode1 = SFIAlmondConnectionMode_local;
+            }
+        }else{
+            title = NSLocalizedString(@"alert.message-Connected to your Almond via local.", @"Connected to your Almond via local.");
+            subTitle1 = NSLocalizedString(@"switch_cloud", @"Switch to Cloud Connection");
+            mode1 = SFIAlmondConnectionMode_cloud;
+        }
+    }else if([ConnectionStatus getConnectionStatus]==NO_NETWORK_CONNECTION || [ConnectionStatus getConnectionStatus] == IS_CONNECTING_TO_NETWORK){
+        if([toolKit currentConnectionMode] == SFIAlmondConnectionMode_cloud){
+            title = NSLocalizedString(@"Alert view fail-Cloud connection to your Almond failed. Tap retry or switch to local connection.", @"Cloud connection to your Almond failed. Tap retry or switch to local connection.");
+            subTitle1 = NSLocalizedString(@"switch_local", @"Switch to Local Connection");
+            subTitle2 = @"Retry Cloud Connection";//NSLocalizedString(@"switch_cloud", @"Switch to Cloud Connection");
+            mode1 = SFIAlmondConnectionMode_local;
+            mode2 = SFIAlmondConnectionMode_cloud;
+        }else{
+            title = NSLocalizedString(@"local_conn_failed_retry", "Local connection to your Almond failed. Tap retry or switch to cloud connection.");
+            subTitle1 = NSLocalizedString(@"alert title offline Local Retry Local Connection", @"Retry Local Connection");
+            subTitle2 = NSLocalizedString(@"switch_cloud", @"Switch to Cloud Connection");
+            mode1 = SFIAlmondConnectionMode_local;
+            mode2 = SFIAlmondConnectionMode_cloud;
+        }
+    }
+    
+    struct PopUpSuggestions data;
+    data.title = title;
+    data.subTitle1 = subTitle1;
+    data.subTitle2 = subTitle2;
+    data.mode1 = mode1;
+    data.mode2 = mode2;
+    data.presentLocalNetworkSettings = presentLocalNetworkSettings;
+    
+    return data;
+}
+
 -(void) setUpNetwork{
     enum SFIAlmondConnectionMode mode = [self currentConnectionMode];
     Network *network = nil;
@@ -998,7 +1060,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
             
         case CommandType_ALMOND_MODE_CHANGE_RESPONSE: {
-            AlmondModeChangeResponse *res = payload;
             [AlmondManagement onAlmondModeChangeCompletion:payload network:network];
             break;
         }

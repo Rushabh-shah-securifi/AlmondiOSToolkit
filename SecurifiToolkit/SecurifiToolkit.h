@@ -184,6 +184,14 @@ extern NSString *const kSFINotificationPreferenceChangeActionAdd;
 // Value used for the method asyncRequestNotificationPreferenceChange:deviceList:action: to disable notifications
 extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
+struct PopUpSuggestions {
+    __unsafe_unretained NSString* title;
+    __unsafe_unretained NSString* subTitle1;
+    __unsafe_unretained NSString* subTitle2;
+     int mode1;
+     int mode2;
+    BOOL presentLocalNetworkSettings;
+};
 
 @interface SecurifiToolkit : NSObject
 
@@ -224,7 +232,7 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 
 -(void) asyncInitCloud;
 
--(Network *)setUpNetwork;
+-(void)setUpNetwork;
 
 -(void) tearDownNetwork;
 
@@ -276,6 +284,8 @@ extern NSString *const kSFINotificationPreferenceChangeActionDelete;
 //- (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary;
 
 //- (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac;
+
+-(struct PopUpSuggestions) suggestionsFromNetworkStateAndConnectiontype;
 
 - (BOOL)isNetworkOnline;
 //- (BOOL)isCloudLoggedIn;
@@ -355,6 +365,8 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
 
+
+
 //- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode;
 
 //- (SFIAlmondMode)modeForAlmond:(NSString *)almondMac;
@@ -404,7 +416,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 - (BOOL)isScreenShown:(NSString *)screen;
 
-- (BOOL)connectMesh;
+- (void)connectMesh;
 
 - (void)shutDownMesh;
 

@@ -329,4 +329,55 @@
     }];
 }
 
+
+
+
+- (void)testSuggestionsFromNetworkStateAndConnectiontype{
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
+    [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    struct PopUpSuggestions data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"Alert view fail-Cloud connection to your Almond failed. Tap retry or switch to local connection.", @"Cloud connection to your Almond failed. Tap retry or switch to local connection."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"switch_local", @"Switch to Local Connection"));
+    XCTAssertEqualObjects(data.subTitle2, @"Retry Cloud Connection");
+    
+    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
+    [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"local_conn_failed_retry", "Local connection to your Almond failed. Tap retry or switch to cloud connection."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"alert title offline Local Retry Local Connection", @"Retry Local Connection"));
+    XCTAssertEqualObjects(data.subTitle2, NSLocalizedString(@"switch_cloud", @"Switch to Cloud Connection"));
+    
+    
+    [ConnectionStatus setConnectionStatusTo:AUTHENTICATED];
+    [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"alert.message-Connected to your Almond via local.", @"Connected to your Almond via local."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"switch_cloud", @"Switch to Cloud Connection"));
+    XCTAssertNil(data.subTitle2);
+    
+    [ConnectionStatus setConnectionStatusTo:AUTHENTICATED];
+    [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    SFIAlmondPlus* almond = [SFIAlmondPlus new];
+    almond.almondplusMAC = @"TestingAlmondMAC";
+    [AlmondManagement writeCurrentAlmond:almond];
+    
+    data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"alert msg offline Local connection not supported.", @"Local connection settings are missing."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"Add Local Connection Settings", @"Add Local Connection Settings"));
+    XCTAssertTrue(data.presentLocalNetworkSettings);
+    XCTAssertNil(data.subTitle2);
+    
+}
+
+
 @end

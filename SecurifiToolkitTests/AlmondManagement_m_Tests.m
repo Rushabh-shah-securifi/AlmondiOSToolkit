@@ -76,6 +76,7 @@
     _currentAlmondDidChange = true;
 }
 
+
 #pragma mark - Almond Management Test cases
 -(void) testSetCurrentAlmond {
     
@@ -105,9 +106,14 @@
 -(void) testWriteCurrentAlmond {
     SFIAlmondPlus* almond = [SFIAlmondPlus new];
     almond.almondplusName = @"TestCasesAlmond";
-    [AlmondManagement setCurrentAlmond:almond];
+    [AlmondManagement writeCurrentAlmond:almond];
     NSString* currentAlmondName = [AlmondManagement currentAlmond].almondplusName;
     XCTAssertEqualObjects(@"TestCasesAlmond", currentAlmondName);
+    
+    almond = NULL;
+    [AlmondManagement writeCurrentAlmond:almond];
+    currentAlmondName = [AlmondManagement currentAlmond].almondplusMAC;
+    XCTAssertEqualObjects(@"TestCaseAlmond", currentAlmondName);
 }
 
 -(void) testManageCurrentAlmondChange_CloudConnection {
@@ -208,7 +214,7 @@
         singleAlmond.almondplusMAC = @"SingleAlmond";
         [almondList addObject:singleAlmond];
         [AlmondManagement manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
-        XCTAssertEqualObjects([toolkit currentAlmond].almondplusMAC, @"SingleAlmond");
+        XCTAssertEqualObjects([AlmondManagement currentAlmond].almondplusMAC, @"SingleAlmond");
     });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(17.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -223,7 +229,7 @@
         [almondList addObject:secondAlmond];
         [almondList addObject:thirdAlmond];
         [AlmondManagement manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
-        XCTAssertEqualObjects([toolkit currentAlmond].almondplusMAC, @"firstAlmond");
+        XCTAssertEqualObjects([AlmondManagement currentAlmond].almondplusMAC, @"firstAlmond");
     });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(18.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -241,10 +247,10 @@
         [almondList addObject:thirdAlmond];
         [almondList addObject:currentAlmond];
         [AlmondManagement writeCurrentAlmond:currentAlmond];
-        NSLog(@"current almond name in testing %@:",[toolkit currentAlmond].almondplusName);
+        NSLog(@"current almond name in testing %@:",[AlmondManagement currentAlmond].almondplusName);
         [AlmondManagement manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
-        NSLog(@"current almond name in testing %@:",[toolkit currentAlmond].almondplusName);
-        XCTAssertEqualObjects([toolkit currentAlmond].almondplusMAC, @"CurrentAlmond");
+        NSLog(@"current almond name in testing %@:",[AlmondManagement currentAlmond].almondplusName);
+        XCTAssertEqualObjects([AlmondManagement currentAlmond].almondplusMAC, @"CurrentAlmond");
         [expectation fulfill];
     });
     
@@ -254,5 +260,55 @@
         }
     }];
 }
+
+
+
+- (void)testSuggestionsFromNetworkStateAndConnectiontype{
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
+    [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    struct PopUpSuggestions data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"Alert view fail-Cloud connection to your Almond failed. Tap retry or switch to local connection.", @"Cloud connection to your Almond failed. Tap retry or switch to local connection."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"switch_local", @"Switch to Local Connection"));
+    XCTAssertEqualObjects(data.subTitle2, @"Retry Cloud Connection");
+    
+    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
+    [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"local_conn_failed_retry", "Local connection to your Almond failed. Tap retry or switch to cloud connection."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"alert title offline Local Retry Local Connection", @"Retry Local Connection"));
+    XCTAssertEqualObjects(data.subTitle2, NSLocalizedString(@"switch_cloud", @"Switch to Cloud Connection"));
+    
+    
+    [ConnectionStatus setConnectionStatusTo:AUTHENTICATED];
+    [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"alert.message-Connected to your Almond via local.", @"Connected to your Almond via local."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"switch_cloud", @"Switch to Cloud Connection"));
+    XCTAssertNil(data.subTitle2);
+    
+    [ConnectionStatus setConnectionStatusTo:AUTHENTICATED];
+    [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    
+    SFIAlmondPlus* almond = [SFIAlmondPlus new];
+    almond.almondplusMAC = @"TestingAlmondMAC";
+    [AlmondManagement writeCurrentAlmond:almond];
+    
+    data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"alert msg offline Local connection not supported.", @"Local connection settings are missing."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"Add Local Connection Settings", @"Add Local Connection Settings"));
+    XCTAssertTrue(data.presentLocalNetworkSettings);
+    XCTAssertNil(data.subTitle2);
+    
+}
+
 
 @end
