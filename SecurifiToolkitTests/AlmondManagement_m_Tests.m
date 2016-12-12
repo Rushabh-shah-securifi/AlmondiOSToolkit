@@ -21,6 +21,7 @@
 @property BOOL currentAlmondDidChange;
 @end
 
+
 @implementation AlmondManagement_m_Tests
 
 - (void)setUp {

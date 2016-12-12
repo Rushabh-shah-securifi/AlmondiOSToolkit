@@ -289,6 +289,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             return mode == SFIAlmondConnectionMode_local;
         }
     }
+    
     return YES;
 }
 
@@ -298,10 +299,13 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return mode;
 }
 
-- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode{
+-(void)writeConnectionModeToDefaults:(enum SFIAlmondConnectionMode)mode {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:mode forKey:kPREF_DEFAULT_CONNECTION_MODE];
-    NSLog(@"i am called");
+}
+
+- (void)setConnectionMode:(enum SFIAlmondConnectionMode)mode{
+    [self writeConnectionModeToDefaults:mode];
     [self tryShutdownAndStartNetworks];
     [self postNotification:kSFIDidChangeAlmondConnectionMode data:nil];
 }
@@ -312,12 +316,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if (!self.config.enableLocalNetworking) {
         return;
     }
-    __weak SecurifiToolkit *block_self = self;
     //FORCED_DISCONNECT state is added here to make sure that toggle between cloud network and local network does not break;
-    dispatch_async(self.commandDispatchQueue, ^() {
-        [block_self tearDownNetwork];
-        [block_self asyncInitNetwork];
-    });
+    [self tearDownNetwork];
+    [self asyncInitNetwork];
 }
 
 
@@ -414,6 +415,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         DLog(@"INIT SDK. SDK is already shutdown. Returning.");
         return;
     }
+    
     ConnectionStatusType state = [ConnectionStatus getConnectionStatus];
     switch (state) {
         case AUTHENTICATED:
@@ -430,6 +432,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"INIT SDK. connection needs establishment. Passing thru");
         };
     }
+    
     NSLog(@"setupnetwork is called from asyncinitnetwork");
     [block_self setUpNetwork];
 }
@@ -912,11 +915,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
     if(old){
         old.delegate = nil;
         [old shutdown];
-        
         self.network = nil;
     }
     [self cleanUp];
 }
+
 
 // internal function used by high-level command dispatch methods for branching on local or cloud command queue
 - (BOOL)useLocalNetwork:(NSString *)almondMac {

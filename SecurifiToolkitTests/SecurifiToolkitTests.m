@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <OCmock/OCMock.h>
 #import "Securifitoolkit.h"
 #import "ConnectionStatus.h"
 #import "KeyChainAccess.h"
@@ -20,33 +21,15 @@
 
 @end
 
+
 @implementation SecurifiToolkitTests
 
 - (void)setUp {
     [super setUp];
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(onReachabilityChanged) name:kSFIReachabilityChangedNotification object:nil];
-    NSLog(@"SetUp method is called");
-    // Put setup code here. This method is called before the invocation of each test method in the class.
 }
 
--(void)onReachabilityChanged {
-    NSLog(@"onReachabilityChanged is called from test cases");
-    if(![SecurifiToolkit sharedInstance].isCloudReachable){
-        XCTAssertTrue(false);
-        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(onReachabilityChanged) name:kSFIReachabilityChangedNotification object:nil];
-    }
-}
-
--(void) testingInternetDown {
-    while(true){
-        [NSThread sleepForTimeInterval:100];
-    }
-}
 
 - (void)tearDown {
-    NSLog(@"tearDown method is called");
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
 }
@@ -90,246 +73,110 @@
 }
 
 
--(void)testUserAuthentication_Cloud {
+- (void)testAsyncInitNetwork {
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    
-    [self authenticate];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        [expectation fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:16.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
-}
-
-
-- (void)testAsyncInitNetwork_withOutLoginCredential_withOutNetwork {
+    SecurifiToolkit* toolkit = [[SecurifiToolkit alloc] init];
     
     [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
+    id mock = [OCMockObject partialMockForObject:toolkit];
     
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    [[mock expect] setUpNetwork];
     
-    [toolkit tearDownLoginSession];
+    [mock asyncInitNetwork];
     
-    [toolkit asyncInitNetwork];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        //do assertions here
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
-        [expectation fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:11.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
-    
-}
-
-
-- (void)testAsyncInitNetwork_withLoginCredentials_withOutNetwork {
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    
-    [self authenticate];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(16.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
-        [toolkit asyncInitNetwork];
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(21.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        //do assertions here
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        [expectation fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:22.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
-}
-
-//if the network is already in connecting or connected or Authenticated it should not retry the connection
--(void) testAsyncInitNetwork_ForConnectionsStates_OtherThan_NO_NETWORK_CONNECTION{
-    [ConnectionStatus setConnectionStatusTo:IS_CONNECTING_TO_NETWORK];
-    
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    [toolkit asyncInitNetwork];
-    
-    XCTAssertEqual([ConnectionStatus getConnectionStatus], IS_CONNECTING_TO_NETWORK);
+    [mock verify];
     
     [ConnectionStatus setConnectionStatusTo:CONNECTED_TO_NETWORK];
-   
-    [toolkit asyncInitNetwork];
     
-    XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
+    [[mock reject] setUpNetwork];
+    
+    [mock asyncInitNetwork];
+    
+    [mock verify];
+    
+    [ConnectionStatus setConnectionStatusTo:IS_CONNECTING_TO_NETWORK];
+    
+    [[mock reject] setUpNetwork];
+    
+    [mock asyncInitNetwork];
+    
+    [mock verify];
     
     [ConnectionStatus setConnectionStatusTo:AUTHENTICATED];
     
-    [toolkit asyncInitNetwork];
+    [[mock reject] setUpNetwork];
     
-    XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
+    [mock asyncInitNetwork];
+    
+    [mock verify];
 }
+
 
 -(void)testSetConnectionMode {
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
+    id mock = [OCMockObject partialMockForObject:toolkit];
     
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [[mock expect] tryShutdownAndStartNetworks];
     
-    [defaults setInteger:SFIAlmondConnectionMode_local forKey:kPREF_DEFAULT_CONNECTION_MODE];
+    [mock setConnectionMode:SFIAlmondConnectionMode_cloud];
     
-    [toolkit tearDownNetwork];
+    [mock verify];
     
-    [self authenticate];
+    XCTAssertEqual([toolkit currentConnectionMode], SFIAlmondConnectionMode_cloud);
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [toolkit setConnectionMode:SFIAlmondConnectionMode_cloud];
-    });
+    [[mock expect] tryShutdownAndStartNetworks];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        XCTAssertEqual([toolkit currentConnectionMode], SFIAlmondConnectionMode_cloud);
-        [expectation fulfill];
-    });
+    [mock setConnectionMode:SFIAlmondConnectionMode_local];
     
-    [self waitForExpectationsWithTimeout:22.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [mock verify];
+    
+    XCTAssertEqual([toolkit currentConnectionMode], SFIAlmondConnectionMode_local);
 }
 
 -(void) testTearDownNetwork {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    SecurifiToolkit* toolkit = [SecurifiToolkit new];
+    toolkit.network = [Network new];
+    [toolkit tearDownNetwork];
+    XCTAssertNil(toolkit.network);
+    XCTAssertNil(toolkit.network.delegate);
+    XCTAssertEqual([ConnectionStatus getConnectionStatus], NO_NETWORK_CONNECTION);
     
-    [toolkit asyncInitNetwork];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSLog(@"logging1 is called");
-        if(toolkit.isCloudReachable){
-            if([KeyChainAccess hasLoginCredentials])
-                XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-            else
-                XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
-            [toolkit tearDownNetwork];
-        }
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            NSLog(@"logging2 is called");
-            XCTAssertNil(toolkit.network);
-            XCTAssertNil(toolkit.network.delegate);
-            XCTAssertEqual([ConnectionStatus getConnectionStatus], NO_NETWORK_CONNECTION);
-            [expectation fulfill];
-        });
-    });
-    
-    [self waitForExpectationsWithTimeout:12.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    id mockToolkit = [OCMockObject partialMockForObject:toolkit];
+    [[mockToolkit expect] cleanUp];
+    [mockToolkit tearDownNetwork];
+    [mockToolkit verify];
 }
 
 
--(void) testTryShutDownAndRestartNetwork_forCloudConnection{
+-(void) testTryShutDownAndRestartNetwork {
     
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    SecurifiToolkit* toolkit = [[SecurifiToolkit alloc] init];
+    toolkit.config.enableLocalNetworking = YES;
     
-    [self authenticate];
+    SecurifiConfigurator* config = [SecurifiConfigurator new];
+    config.enableLocalNetworking = YES;
+    id mock = [OCMockObject partialMockForObject:toolkit];
+    OCMStub([mock config]).andReturn(config);
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [toolkit tryShutdownAndStartNetworks];
-    });
+    [[mock expect] tearDownNetwork];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        [expectation fulfill];
-    });
+    [[mock expect] asyncInitNetwork];
     
-    [self waitForExpectationsWithTimeout:21.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [mock tryShutdownAndStartNetworks];
+    
+    [mock verify];
+    
+    config.enableLocalNetworking = NO;
+    OCMStub([mock config]).andReturn(config);
+    
+    [[mock reject] tearDownNetwork];
+    
+    [[mock reject] asyncInitNetwork];
+    
+    [mock verify];
 }
-
-- (void)testSetupNetwork_withOutLoginCredential_withOutNetwork {
-    
-    [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    
-    [toolkit tearDownLoginSession];
-    
-    [toolkit asyncInitNetwork];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        //do assertions here
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], CONNECTED_TO_NETWORK);
-        [expectation fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:11.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
-}
-
-
-- (void)testSetupNetwork_withLoginCredentials_withOutNetwork {
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    
-    [self authenticate];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(16.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [ConnectionStatus setConnectionStatusTo:NO_NETWORK_CONNECTION];
-        [toolkit asyncInitNetwork];
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(21.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        //do assertions here
-        XCTAssertEqual([ConnectionStatus getConnectionStatus], AUTHENTICATED);
-        [expectation fulfill];
-    });
-    
-    [self waitForExpectationsWithTimeout:22.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
-}
-
-
 
 
 - (void)testSuggestionsFromNetworkStateAndConnectiontype{
@@ -370,13 +217,25 @@
     almond.almondplusMAC = @"TestingAlmondMAC";
     [AlmondManagement writeCurrentAlmond:almond];
     
+    SFIAlmondLocalNetworkSettings* settings = [SFIAlmondLocalNetworkSettings new];
+    settings.almondplusMAC = @"TestingAlmondMAC";
+    [[SecurifiToolkit sharedInstance].dataManager writeAlmondLocalNetworkSettings:settings];
+    
+    data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
+    
+    XCTAssertEqualObjects(data.title, NSLocalizedString(@"alert.message-Connected to your Almond via cloud.", @"Connected to your Almond via cloud."));
+    XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"switch_local", @"Switch to Local Connection"));
+    XCTAssertFalse(data.presentLocalNetworkSettings);
+    XCTAssertNil(data.subTitle2);
+    
+    [LocalNetworkManagement clearLocalNetworkSettings];
+    
     data = [toolkit suggestionsFromNetworkStateAndConnectiontype];
     
     XCTAssertEqualObjects(data.title, NSLocalizedString(@"alert msg offline Local connection not supported.", @"Local connection settings are missing."));
     XCTAssertEqualObjects(data.subTitle1, NSLocalizedString(@"Add Local Connection Settings", @"Add Local Connection Settings"));
     XCTAssertTrue(data.presentLocalNetworkSettings);
     XCTAssertNil(data.subTitle2);
-    
 }
 
 

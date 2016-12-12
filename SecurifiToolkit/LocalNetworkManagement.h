@@ -17,6 +17,7 @@
 + (void)storeLocalNetworkSettings:(SFIAlmondLocalNetworkSettings *)settings;
 + (void)tryUpdateLocalNetworkSettingsForAlmond:(NSString *)almondMac withRouterSummary:(const SFIRouterSummary *)summary;
 + (SFIAlmondLocalNetworkSettings*) getCurrentLocalAlmondSettings;
++ (void)clearLocalNetworkSettings;
 @end
 
 #endif /* LocalNetworkManagement_h */

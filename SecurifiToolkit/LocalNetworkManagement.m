@@ -130,5 +130,13 @@
     [self storeLocalNetworkSettings:settings];
 }
 
++(void) clearLocalNetworkSettings {
+    SecurifiToolkit * toolkit = [SecurifiToolkit sharedInstance];
+    NSDictionary* localNetworkSettings = [toolkit.dataManager readAllAlmondLocalNetworkSettings];
+    
+    for(NSString* mac in localNetworkSettings.allKeys){
+        [self removeLocalNetworkSettingsForAlmond:mac];
+    }
+}
 
 @end
