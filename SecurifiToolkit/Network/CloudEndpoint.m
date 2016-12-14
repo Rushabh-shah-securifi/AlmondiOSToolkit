@@ -80,18 +80,18 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             NetworkConfig *configurator = self.networkConfig;
             NSLog(@"i am entering inside the nil conditions");
             // Load certificate
-            if (configurator.enableCertificateValidation) {
-                NSLog(@"Loading certificate");
-                [block_self loadCertificate];
-            }
+//            if (configurator.enableCertificateValidation) {
+//                NSLog(@"Loading certificate");
+//                [block_self loadCertificate];
+//            }
             
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
             
-            NSString *server = configurator.host;
+            NSString *server = @"1.5.6.100"; //configurator.host;
             CFStringRef host = (__bridge CFStringRef) server;
-            UInt32 port = (UInt32) configurator.port;
-            NSLog(@"%@ is host and %d is the port",configurator.host, configurator.port);
+            UInt32 port = 1028;  (UInt32) configurator.port;
+//            NSLog(@"%@ is host and %d is the port",configurator.host, configurator.port);
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
             
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
@@ -102,8 +102,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             
             [block_self.inputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
             [block_self.outputStream setProperty:NSStreamSocketSecurityLevelNegotiatedSSL forKey:NSStreamSocketSecurityLevelKey];
-            
-            NSNumber *enableChainValidation = configurator.enableCertificateChainValidation ? @YES : @NO;
+            NSNumber *enableChainValidation = @NO;//configurator.enableCertificateChainValidation ? @YES : @NO;
             NSDictionary *settings = @{
                                        (__bridge id) kCFStreamSSLValidatesCertificateChain : enableChainValidation
                                        };
@@ -112,8 +111,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             CFWriteStreamSetProperty(writeStream, kCFStreamPropertySSLSettings, (__bridge CFTypeRef) settings);
             
             NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-            
-            NSLog(@"Scheduling in run loop");
             
             [block_self.inputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
             [block_self.outputStream scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
@@ -158,9 +155,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
         @synchronized (self.syncLocker) {
             NSInputStream *in_stream = block_self.inputStream;
             NSOutputStream *out_stream = block_self.outputStream;
-            
             NSRunLoop *loop = [NSRunLoop currentRunLoop];
-            
             if (out_stream != nil) {
                 out_stream.delegate = nil;
                 [out_stream close];
@@ -183,24 +178,24 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
 
 #pragma mark - Command submission
 - (BOOL)sendCommand:(GenericCommand *)command error:(NSError **)outError {
-    
+    NSLog(@"Command is sent");
     return [self internalSendToCloud:self command:command error:outError];
 }
 
 - (BOOL)internalSendToCloud:(CloudEndpoint *)cloudEndpoint command:(GenericCommand*)command error:(NSError **)outError {
     NSLog(@"internal send to cloud");
     if (!cloudEndpoint) {
-        DLog(@"%s: aborting send. endoint is null", __PRETTY_FUNCTION__);
+        NSLog(@"%s: aborting send. endoint is null", __PRETTY_FUNCTION__);
         return NO;
     }
     
     if (!command) {
-        DLog(@"%s: aborting send. command is null", __PRETTY_FUNCTION__);
+        NSLog(@"%s: aborting send. command is null", __PRETTY_FUNCTION__);
         return NO;
     }
     
     @synchronized (self.syncLocker) {
-        DLog(@"Sending command, cmd:%@", command.debugDescription);
+        NSLog(@"Sending command, cmd:%@", command.debugDescription);
         
         CommandType commandType = command.commandType;
         id commandPayload;
@@ -217,13 +212,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_RESET_PASSWORD_REQUEST:
                 case CommandType_SENSOR_CHANGE_REQUEST:
                 case CommandType_GENERIC_COMMAND_REQUEST:
-                case CommandType_CHANGE_PASSWORD_REQUEST:
-                case CommandType_DELETE_ACCOUNT_REQUEST:
-                case CommandType_UPDATE_USER_PROFILE_REQUEST:
-                case CommandType_UNLINK_ALMOND_REQUEST:
-                case CommandType_USER_INVITE_REQUEST:
-                case CommandType_DELETE_SECONDARY_USER_REQUEST:
-                case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
                 case CommandType_NOTIFICATION_REGISTRATION:
                 case CommandType_NOTIFICATION_DEREGISTRATION:
                 case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
@@ -238,7 +226,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 }
                     // Commands that transfer in Command 61 container
                 case CommandType_ALMOND_MODE_CHANGE_REQUEST:
-                case CommandType_ALMOND_NAME_CHANGE_REQUEST:
                 case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST: {
                     id <SecurifiCommand> cmd = command.command;
                     //Send as Command 61
@@ -247,6 +234,12 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                     break;
                 }
                     
+                case CommandType_ACCOUNTS_ALMOND_RELATED:
+                case CommandType_ACCOUNTS_USER_RELATED: {
+                    commandPayload = command.command;
+                    NSLog(@"The payload is %@",commandPayload);
+                    break;
+                }
                 case CommandType_LOGOUT_COMMAND: {
                     commandPayload = LOGOUT_REQUEST_XML;
                     break;
@@ -257,10 +250,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                     break;
                 }
                     //PY 150914 Accounts
-                case CommandType_ALMOND_LIST:
-                case CommandType_USER_PROFILE_REQUEST: //PY 150914 Accounts
-                case CommandType_ME_AS_SECONDARY_USER_REQUEST:
-                case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:{
+                case CommandType_ALMOND_LIST://PY 150914 Accounts
+                {
                     commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
                     break;
                 }
@@ -496,6 +487,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                         responsePayload = [NotificationListResponse parseDeviceLogsJson:buffer];
                                         parsedPayload = YES;
                                         break;
+                                    case CommandType_ACCOUNTS_USER_RELATED:
+                                    case CommandType_ACCOUNTS_ALMOND_RELATED:
                                     case CommandType_GET_ALL_SCENES:
                                     case CommandType_COMMAND_RESPONSE:
                                     case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
@@ -512,7 +505,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
                                     case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
                                     case CommandType_MESH_COMMAND:
-                                    case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE: 
+                                    case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
@@ -564,7 +557,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                         }
                     }
                 }
-                
                 break;
             }
             

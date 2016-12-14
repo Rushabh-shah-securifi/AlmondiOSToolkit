@@ -30,6 +30,8 @@ typedef NS_ENUM(unsigned int, SFIAlmondPlusLinkType) {
 @property(nonatomic) int index;
 @property(nonatomic) int colorCodeIndex;
 
+@property(nonatomic) BOOL primary;
+@property(nonatomic) NSString* userID;
 @property(nonatomic) int userCount;
 @property(nonatomic) NSMutableArray *accessEmailIDs;
 @property(nonatomic) BOOL isExpanded;

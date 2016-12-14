@@ -62,7 +62,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_USER_INVITE_RESPONSE                    = 256,
     CommandType_ALMOND_AFFILIATION_DATA_REQUEST         = 257,
     CommandType_ALMOND_AFFILIATION_DATA_RESPONSE        = 258,
-    CommandType_USER_PROFILE_REQUEST                    = 259,
+    CommandType_USER_PROFILE_REQUEST                    = 1259,
     CommandType_USER_PROFILE_RESPONSE                   = 260,
     CommandType_UPDATE_USER_PROFILE_REQUEST             = 261,
     CommandType_UPDATE_USER_PROFILE_RESPONSE            = 262,
@@ -135,6 +135,9 @@ typedef NS_ENUM(unsigned int, CommandType) {
 
     
     CommandType_ROUTER_COMMAND_REQUEST_RESPONSE         = 1100,
+    
+    CommandType_ACCOUNTS_USER_RELATED                   = 1110,
+    CommandType_ACCOUNTS_ALMOND_RELATED                 = 1112,
    
 };
 

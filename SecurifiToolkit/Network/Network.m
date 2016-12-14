@@ -192,6 +192,7 @@
                  @"network" : block_self,
                  };
     }
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:notificationName object:nil userInfo:data];
 }
 
@@ -286,6 +287,18 @@
             break;
         }
         
+        case CommandType_ACCOUNTS_ALMOND_RELATED:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self delegateData:payload commandType:commandType];
+            break;
+        }
+            
+        case CommandType_ACCOUNTS_USER_RELATED :{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ACCOUNTS_RELATED data:payload];
+            break;
+        }
+            
         case CommandType_USER_PROFILE_RESPONSE: {
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:USER_PROFILE_NOTIFIER data:payload];

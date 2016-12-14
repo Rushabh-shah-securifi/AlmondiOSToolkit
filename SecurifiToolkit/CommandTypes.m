@@ -337,12 +337,15 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
         case CommandType_MESH_COMMAND:
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
+        case CommandType_ACCOUNTS_USER_RELATED:
+        case CommandType_ACCOUNTS_ALMOND_RELATED:
             return YES;
             
         default:
             return NO;
     }
 }
+
 
 BOOL securifi_valid_json_command_type(CommandType type) {
     switch (type) {
@@ -372,6 +375,8 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case (CommandType) 1551:
         case (CommandType) 99:
+        case CommandType_ACCOUNTS_USER_RELATED:
+        case CommandType_ACCOUNTS_ALMOND_RELATED:
             return YES;
         default:
             return NO;

@@ -22,6 +22,8 @@
 
 @interface AlmondManagement : NSObject
 
++ (NSMutableArray*)getOwnedAlmondList;
++ (NSMutableArray*)getSharedAlmondList;
 + (void)removeCurrentAlmond;
 + (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
 + (void)writeCurrentAlmond:(SFIAlmondPlus *)almond;
@@ -43,6 +45,7 @@
 + (void)onAlmondModeChangeCompletion:(NSDictionary*)res network:(Network *)network;
 + (void)onAlmondModeResponse:(AlmondModeResponse *)res network:(Network *)network;
 + (void)onDynamicAlmondModeChange:(DynamicAlmondModeChange *)res network:(Network *)network;
++ (void)storeAlmondList: (NSDictionary*)dictionary;
 
 //Almond RouterResponse Callbacks
 + (void)onAlmondRouterGenericNotification:(GenericCommandResponse *)res network:(Network *)network;

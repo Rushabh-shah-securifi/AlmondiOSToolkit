@@ -113,6 +113,8 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) ClientParser *clientParser;
 @property(nonatomic, strong) DeviceParser *deviceParser;
 @property(nonatomic, strong) RouterParser *routerParser;
+
+
 @end
 
 
@@ -580,9 +582,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
         // But the client was not logged in. Send them now...
         //        [self asyncInitializeConnection1:network];
-        GenericCommand *cmd = [self makeAlmondListCommand];
-        NSLog(@"almond list command send1");
-        [network submitCommand:cmd];
+        
+        NSMutableDictionary *dataValueAlmondList = [NSMutableDictionary new];
+        [dataValueAlmondList setValue:GET_ALMOND_LIST forKey:COMMAND_TYPE];
+        [self asyncSendRequest:CommandType_ACCOUNTS_ALMOND_RELATED commandString:GET_ALMOND_LIST payloadData:dataValueAlmondList];
     }
     else {
         // Logon failed:
@@ -660,6 +663,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     return [self.scoreboard copy];
 }
 
+
 - (void)markCommandEvent:(CommandType)commandType {
     if (self.config.enableScoreboard) {
         CommandTypeScoreboardEvent *event = [[CommandTypeScoreboardEvent alloc] initWithCommandType:commandType];
@@ -669,132 +673,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 #pragma mark - Account related commands
-- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd {
-    ChangePasswordRequest *request = [ChangePasswordRequest new];
-    request.emailID = [self loginEmail];
-    request.currentPassword = currentPwd;
-    request.changedPassword = changedPwd;
-    
+- (void) asyncSendRequest:(CommandType*)commandType commandString:(NSString*)commandString payloadData:(NSMutableDictionary*)data{
     GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_CHANGE_PASSWORD_REQUEST;
-    cmd.command = request;
-    
+    cmd.commandType = commandType;
+    NSLog(@"%d accounts command is sent",commandType);
+    cmd.command = [CreateJSON withCommandString:commandString getJSONStringfromDictionary:data];
     [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestResetCloudPassword:(NSString *)email {
-    if (email.length == 0) {
-        return;
-    }
-    
-    ResetPasswordRequest *req = [ResetPasswordRequest new];
-    req.email = email;
-    
-    GenericCommand *cmd = [[GenericCommand alloc] init];
-    cmd.commandType = CommandType_RESET_PASSWORD_REQUEST;
-    cmd.command = req;
-    
-    NSLog(@"i am called");
-    // make sure cloud connection is set up
-    [self tearDownLoginSession];
-    [KeyChainAccess setSecEmail:email];
-    
-    [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestDeleteCloudAccount:(NSString *)password {
-    DeleteAccountRequest *request = [DeleteAccountRequest new];
-    request.emailID = [self loginEmail];
-    request.password = password;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_DELETE_ACCOUNT_REQUEST;
-    cmd.command = request;
-    
-    [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestUnlinkAlmond:(NSString *)almondMAC password:(NSString *)password {
-    UnlinkAlmondRequest *request = [UnlinkAlmondRequest new];
-    request.almondMAC = almondMAC;
-    request.password = password;
-    request.emailID = [self loginEmail];
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_UNLINK_ALMOND_REQUEST;
-    cmd.command = request;
-    
-    [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestInviteForSharingAlmond:(NSString *)almondMAC inviteEmail:(NSString *)inviteEmailID {
-    UserInviteRequest *request = [UserInviteRequest new];
-    request.almondMAC = almondMAC;
-    request.emailID = inviteEmailID;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_USER_INVITE_REQUEST;
-    cmd.command = request;
-    
-    [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestDeleteSecondaryUser:(NSString *)almondMAC email:(NSString *)emailID {
-    DeleteSecondaryUserRequest *request = [DeleteSecondaryUserRequest new];
-    request.almondMAC = almondMAC;
-    request.emailID = emailID;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_DELETE_SECONDARY_USER_REQUEST;
-    cmd.command = request;
-    
-   [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestDeleteMeAsSecondaryUser:(NSString *)almondMAC {
-    DeleteMeAsSecondaryUserRequest *request = [DeleteMeAsSecondaryUserRequest new];
-    request.almondMAC = almondMAC;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST;
-    cmd.command = request;
-    
-   [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestChangeAlmondName:(NSString *)changedAlmondName almondMAC:(NSString *)almondMAC {
-    AlmondNameChange *request = [AlmondNameChange new];
-    request.almondMAC = almondMAC;
-    request.changedAlmondName = changedAlmondName;
-    
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_ALMOND_NAME_CHANGE_REQUEST;
-    cmd.command = request;
-    
-    [self asyncSendToNetwork:cmd];
-}
-
-- (void)asyncRequestMeAsSecondaryUser {
-    GenericCommand *cmd = [GenericCommand new];
-    cmd.commandType = CommandType_ME_AS_SECONDARY_USER_REQUEST;
-    cmd.command = [MeAsSecondaryUserRequest new];
-    
-    [self asyncSendToNetwork:cmd];
-}
-
-#pragma mark - Notification Preferences and Almond mode changes
-
-// Checks whether a Mode has already been fetched for the almond, and if so, fails quietly.
-// Otherwise, it requests the mode information.
-
-
-#pragma mark - Command constructors
-
-- (GenericCommand *)makeAlmondListCommand {
-    GenericCommand *command = [GenericCommand new];
-    command.commandType = CommandType_ALMOND_LIST;
-    command.command = [AlmondListRequest new];
-    return command;
 }
 
 
@@ -1043,12 +927,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [self onDeleteAccountResponse:res];
             break;
         }
-            
-        case CommandType_ALMOND_LIST_RESPONSE: {
-            AlmondListResponse *res = payload;
-            [AlmondManagement onAlmondListResponse:res network:network];
-            break;
-        }
         
         case CommandType_GENERIC_COMMAND_RESPONSE: {
             GenericCommandResponse *res = payload;
@@ -1125,7 +1003,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
-            
+        
+        
         case CommandType_DEVICELOG_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationListResponse *res = payload;
@@ -1133,7 +1012,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
+           
+        case CommandType_ACCOUNTS_ALMOND_RELATED:{
+            NSLog(@"%@ is the payload",payload);
+            [AlmondManagement onAlmondListResponse:payload network:network];
+            break;
+        }
             
+
         case CommandType_ALMOND_COMMAND_RESPONSE: {
             SFIGenericRouterCommand *res = payload;
             [AlmondManagement onAlmondRouterCommandResponse:res network:network];

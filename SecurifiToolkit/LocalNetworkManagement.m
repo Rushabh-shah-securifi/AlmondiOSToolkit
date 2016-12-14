@@ -53,6 +53,7 @@
     }
 }
 
+
 + (void)removeLocalNetworkSettingsForAlmond:(NSString *)almondMac {
     if (!almondMac) {
         return;
