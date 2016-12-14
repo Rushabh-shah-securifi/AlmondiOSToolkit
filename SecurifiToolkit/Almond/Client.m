@@ -193,9 +193,10 @@
     return NO;
 }
 
-+ (BOOL)getClientByMAC:(NSString *)mac{
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
++ (Client*)getClientByMAC:(NSString *)mac{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance] ;
     for(Client *client in toolkit.clients){
+       
         if([mac isEqualToString:client.deviceMAC]){
             return client;
         }
