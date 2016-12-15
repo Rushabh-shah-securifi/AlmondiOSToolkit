@@ -137,6 +137,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_ROUTER_COMMAND_REQUEST_RESPONSE         = 1100,
     
     CommandType_ACCOUNTS_USER_RELATED                   = 1110,
+    CommandType_ACCOUNTS_DYNAMIC_RESPONSE               = 1111,
     CommandType_ACCOUNTS_ALMOND_RELATED                 = 1112,
    
 };

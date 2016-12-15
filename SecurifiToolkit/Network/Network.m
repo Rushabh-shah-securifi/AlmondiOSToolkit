@@ -292,6 +292,12 @@
             [self delegateData:payload commandType:commandType];
             break;
         }
+
+        case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:DYNAMIC_ACCOUNT_RESPONSE data:payload];
+            break;
+        }
             
         case CommandType_ACCOUNTS_USER_RELATED :{
             [self tryMarkUnitCompletion:YES responseType:commandType];
@@ -495,7 +501,7 @@
             [self markLoggedInState:obj.isSuccessful];
             // pass through to normal handler below
         };
-            
+        
         case CommandType_LOGOUT_RESPONSE:
         case CommandType_LOGOUT_ALL_RESPONSE:
         case CommandType_ALMOND_LIST_RESPONSE:

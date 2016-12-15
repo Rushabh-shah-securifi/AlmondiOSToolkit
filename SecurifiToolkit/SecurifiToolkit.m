@@ -586,6 +586,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         NSMutableDictionary *dataValueAlmondList = [NSMutableDictionary new];
         [dataValueAlmondList setValue:GET_ALMOND_LIST forKey:COMMAND_TYPE];
         [self asyncSendRequest:CommandType_ACCOUNTS_ALMOND_RELATED commandString:GET_ALMOND_LIST payloadData:dataValueAlmondList];
+        [AlmondManagement initializeValues];
     }
     else {
         // Logon failed:
@@ -1014,12 +1015,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
         };
            
         case CommandType_ACCOUNTS_ALMOND_RELATED:{
-            NSLog(@"%@ is the payload",payload);
             [AlmondManagement onAlmondListResponse:payload network:network];
             break;
         }
             
-
         case CommandType_ALMOND_COMMAND_RESPONSE: {
             SFIGenericRouterCommand *res = payload;
             [AlmondManagement onAlmondRouterCommandResponse:res network:network];

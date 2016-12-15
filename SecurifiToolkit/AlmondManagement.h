@@ -24,6 +24,7 @@
 
 + (NSMutableArray*)getOwnedAlmondList;
 + (NSMutableArray*)getSharedAlmondList;
++ (void)initializeValues;
 + (void)removeCurrentAlmond;
 + (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
 + (void)writeCurrentAlmond:(SFIAlmondPlus *)almond;

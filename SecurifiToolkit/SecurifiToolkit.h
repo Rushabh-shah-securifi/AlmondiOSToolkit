@@ -106,10 +106,11 @@
 #define SEC_IS_ACCOUNT_ACTIVATED                            @"com.securifi.isActivated"
 #define SEC_MINS_REMAINING_FOR_UNACTIVATED_ACCOUNT          @"com.securifi.minsRemaining"
 #define SEC_APN_TOKEN                                       @"com.securifi.apntoken"
-#define ALMOND_AFFILIATION_DATA                                    @"AlmondAffiliationData"
+#define ALMOND_AFFILIATION_DATA                             @"AlmondAffiliationData"
 #define GET_ALMOND_LIST                                     @"GetAlmondList"
 #define COMMAND_TYPE                                        @"CommandType"
 #define ALMOND_LIST_RESPONSE                                @"AlmondListResponse"
+#define USER_PROFILE_REQUEST                                @"UserProfileRequest"
 #define GET_WIRELESS_SUMMARY_COMMAND @"<root><AlmondRouterSummary action=\"get\">1</AlmondRouterSummary></root>"
 #define GET_WIRELESS_SETTINGS_COMMAND @"<root><AlmondWirelessSettings action=\"get\">1</AlmondWirelessSettings></root>"
 #define GET_CONNECTED_DEVICE_COMMAND @"<root><AlmondConnectedDevices action=\"get\">1</AlmondConnectedDevices></root>"
@@ -330,7 +331,7 @@ struct PopUpSuggestions {
 // Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard *)scoreboardSnapshot;
 
-- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
+//- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
 
 - (void)asyncRequestResetCloudPassword:(NSString *)email;
 

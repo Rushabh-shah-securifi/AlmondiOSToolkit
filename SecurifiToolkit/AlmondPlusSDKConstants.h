@@ -22,8 +22,8 @@
 #define LOGIN_PAGE_NOTIFIER                 @"LOGIN_PAGE_NOTIFIER"
 
 // Accounts Settings
-#define LOAD_ALMOND_LIST                             @"LOAD_ALMOND_LIST"
-#define ACCOUNTS_RELATED                        @"ACCOUNTS__RELATED"
+#define ACCOUNTS_RELATED                        @"ACCOUNTS_RELATED"
+#define DYNAMIC_ACCOUNT_RESPONSE                @"DYNAMIC_ACCOUNT_RESPONSE"
 #define USER_PROFILE_NOTIFIER                   @"USER_PROFILE_NOTIFIER"
 #define CHANGE_PWD_RESPONSE_NOTIFIER            @"CHANGE_PWD_RESPONSE_NOTIFIER"
 #define DELETE_ACCOUNT_RESPONSE_NOTIFIER        @"DELETE_ACCOUNT_RESPONSE_NOTIFIER"

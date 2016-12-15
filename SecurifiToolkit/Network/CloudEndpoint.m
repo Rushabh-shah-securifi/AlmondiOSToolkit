@@ -79,19 +79,18 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
             
             NetworkConfig *configurator = self.networkConfig;
             NSLog(@"i am entering inside the nil conditions");
-            // Load certificate
-//            if (configurator.enableCertificateValidation) {
-//                NSLog(@"Loading certificate");
-//                [block_self loadCertificate];
-//            }
+            if (configurator.enableCertificateValidation) {
+                NSLog(@"Loading certificate");
+                [block_self loadCertificate];
+            }
             
             CFReadStreamRef readStream;
             CFWriteStreamRef writeStream;
             
-            NSString *server = @"1.5.6.100"; //configurator.host;
+            NSString *server = configurator.host;
             CFStringRef host = (__bridge CFStringRef) server;
             UInt32 port = 1028;  (UInt32) configurator.port;
-//            NSLog(@"%@ is host and %d is the port",configurator.host, configurator.port);
+
             CFStreamCreatePairWithSocketToHost(NULL, host, port, &readStream, &writeStream);
             
             block_self.inputStream = (__bridge_transfer NSInputStream *) readStream;
@@ -488,6 +487,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                         parsedPayload = YES;
                                         break;
                                     case CommandType_ACCOUNTS_USER_RELATED:
+                                    case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:
                                     case CommandType_ACCOUNTS_ALMOND_RELATED:
                                     case CommandType_GET_ALL_SCENES:
                                     case CommandType_COMMAND_RESPONSE:

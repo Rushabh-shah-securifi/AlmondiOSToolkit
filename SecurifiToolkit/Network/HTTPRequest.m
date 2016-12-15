@@ -30,7 +30,7 @@
 
 -(void) sendHTTPRequestWithData: (NSMutableDictionary*)dictionary withRequestType:(NSString*)requestType {
     
-    NSString *post = [CreateJSON getJSONStringfromDictionary:dictionary];
+    NSString *post = [CreateJSON getJSONStringFromDictionary:dictionary];
     NSLog(@"post req %@",post);
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%lu",(unsigned long)[postData length]];

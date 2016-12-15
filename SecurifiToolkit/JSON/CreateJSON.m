@@ -15,10 +15,10 @@ static NSMutableDictionary* map;
 +(NSString*) withCommandString:(NSString*)commandString getJSONStringfromDictionary: (NSMutableDictionary*)dictionary{
     
     [dictionary setObject:commandString forKey:@"CommandType"];
-    return [self getJSONStringfromDictionary:dictionary];
+    return [self getJSONStringFromDictionary:dictionary];
 }
 
-+(NSString*) getJSONStringfromDictionary: (NSMutableDictionary*) dictionary{
++(NSString*) getJSONStringFromDictionary: (NSMutableDictionary*) dictionary{
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary
                                                        options:1

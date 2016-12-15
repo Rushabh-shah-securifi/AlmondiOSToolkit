@@ -315,7 +315,6 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_UPDATE_REQUEST:
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:
         case CommandType_GET_ALL_SCENES:
-            //        case CommandType_LIST_SCENE_RESPONSE:
         case CommandType_DYNAMIC_DELETE_SCENE_REQUEST:
         case CommandType_WIFI_CLIENTS_LIST_REQUEST:
         case CommandType_WIFI_CLIENTS_LIST_RESPONSE:
@@ -339,6 +338,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case CommandType_ACCOUNTS_USER_RELATED:
         case CommandType_ACCOUNTS_ALMOND_RELATED:
+        case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:
             return YES;
             
         default:
@@ -376,6 +376,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case (CommandType) 1551:
         case (CommandType) 99:
         case CommandType_ACCOUNTS_USER_RELATED:
+        case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:
         case CommandType_ACCOUNTS_ALMOND_RELATED:
             return YES;
         default:

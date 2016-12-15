@@ -17,8 +17,10 @@
 @implementation AlmondManagement
 
 static NSMutableDictionary* almondFromMac;
-
+static NSMutableArray* primaryAlmonds;
+static NSMutableArray* secondaryAlmonds;
 static int responseCount = 0;
+
 
 + (void)removeCurrentAlmond {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
@@ -27,11 +29,28 @@ static int responseCount = 0;
 }
 
 
++(NSMutableArray*) getOwnedAlmondList {
+    NSLog(@"%d is the ownedalmondlist count",primaryAlmonds.count);
+    return primaryAlmonds;
+}
+
+
++(NSMutableArray*) getSharedAlmondList{
+    NSLog(@"%d is the sharedalmondlist count",primaryAlmonds.count);
+    return secondaryAlmonds;
+}
+
++(void)initializeValues{
+    responseCount = 0;
+    almondFromMac = [NSMutableDictionary new];
+    primaryAlmonds = [NSMutableArray new];
+    secondaryAlmonds = [NSMutableArray new];
+}
+
 + (void)setCurrentAlmond:(SFIAlmondPlus *)almond {
     if (!almond) {
         return;
     }
-    
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
     [[SecurifiToolkit sharedInstance] postNotification:kSFIDidChangeCurrentAlmond data:almond];
@@ -64,11 +83,8 @@ static int responseCount = 0;
         [toolKit tryShutdownAndStartNetworks];
         return; 
     }
-    
-    NSLog(@"cleanup is called in manageCurrentAlmondchange");
+
     [toolKit cleanUp];
-    
-    NSLog(@"almond.linktype: %d", almond.linkType);
     
     GenericCommand * cmd = [self tryRequestAlmondMode:mac];
     [toolKit asyncSendToNetwork:cmd];
@@ -93,6 +109,9 @@ static int responseCount = 0;
     cmd = [GenericCommand requestRouterSummary:mac];
     [toolKit asyncSendToNetwork:cmd];
     
+    NSMutableDictionary *dataValueAlmondList = [NSMutableDictionary new];
+    [dataValueAlmondList setValue:USER_PROFILE_REQUEST forKey:COMMAND_TYPE];
+    [toolKit asyncSendRequest:CommandType_ACCOUNTS_USER_RELATED commandString:USER_PROFILE_REQUEST payloadData:dataValueAlmondList];
 }
 
 
@@ -133,6 +152,7 @@ static int responseCount = 0;
     if (![SecurifiToolkit sharedInstance].config.enableLocalNetworking) {
         return nil;
     }
+
     // Below is an important filtering process:
     // in effect, we choose to use the Cloud Almond representation for matching
     // local network configs, because the Almond#linkType property will indicate
@@ -184,6 +204,10 @@ static int responseCount = 0;
 }
 
 
+/*
+//When we request for almondList we get both almondList and Affiliation Data response
+//This function handles both AlmondListResponse and AffiliationData response
+*/
 + (void)onAlmondListResponse:(NSData*)responseData network:(Network *)network {
     
     if(almondFromMac==nil)
@@ -199,6 +223,7 @@ static int responseCount = 0;
     NSLog(@"%d is the almond count",almondCount);
 
     if([dictionary[COMMAND_TYPE] isEqualToString:ALMOND_AFFILIATION_DATA] ){
+        
         for(NSDictionary *almondDictionary in almonds){
             SFIAlmondPlus *currentAlmond;
             currentAlmond = [almondFromMac objectForKey:almondDictionary[@"AlmondMAC"]];
@@ -206,7 +231,6 @@ static int responseCount = 0;
                 NSLog(@"affiliationdata response currentalmond is nil");
                 currentAlmond = [SFIAlmondPlus new];
             }
-            
             if(almondDictionary[@"EmailID"]){
                 NSArray* users = almondDictionary[@"EmailID"];
                 NSMutableArray* secondaryEmails = [NSMutableArray new];
@@ -222,6 +246,7 @@ static int responseCount = 0;
         }
         responseCount++;
         NSLog(@"%d is the responsecount value",responseCount);
+        
     }else if([dictionary[COMMAND_TYPE] isEqualToString:ALMOND_LIST_RESPONSE]){
         for(NSDictionary *almondDictionary in almonds){
             SFIAlmondPlus *currentAlmond;
@@ -234,9 +259,12 @@ static int responseCount = 0;
             currentAlmond.almondplusName = [almondDictionary valueForKey:@"AlmondName"];
             currentAlmond.firmware = [almondDictionary valueForKey:@"FirmwareVersion"];
             if([almondDictionary[@"Ownership"] isEqualToString:@"P"]){
-                currentAlmond.primary = true;
+                NSLog(@"i am primary almond %@", currentAlmond.almondplusMAC);
+                currentAlmond.isPrimaryAlmond = YES;
+                [primaryAlmonds addObject:currentAlmond];
+            }else{
+                [secondaryAlmonds addObject:currentAlmond];
             }
-            
             [almondFromMac setObject:currentAlmond forKey:almondDictionary[@"AlmondMAC"]];
         }
         responseCount++;
@@ -247,7 +275,9 @@ static int responseCount = 0;
         NSMutableArray* almondList = [NSMutableArray new];
         NSLog(@"%d is the almondFromMac count",almondFromMac.count);
         for(NSString* almondMAC in almondFromMac.allKeys){
-            NSLog(@"looping in almonfromMac")
+            NSLog(@"looping in almonfromMac %@",almondMAC);
+            SFIAlmondPlus* almond = almondFromMac[almondMAC];
+            NSLog(@"%@ is the almond name",almond.almondplusName);
             [almondList addObject:almondFromMac[almondMAC]];
         }
         
@@ -263,8 +293,34 @@ static int responseCount = 0;
         
         // Tell the world
         [toolKit postNotification:kSFIDidUpdateAlmondList data:plus];
+        
+        //[self fillPrimaryAndSecondaryAlmonds];
     }
+    
 }
+
+
+//+(void) fillPrimaryAndSecondaryAlmonds {
+//    
+//    primaryAlmonds = [NSMutableArray new];
+//    secondaryAlmonds = [NSMutableArray new];
+//    
+//    NSArray* almondList = [self almondList];
+//    for(SFIAlmondPlus* almond in almondList){
+//        NSLog(@"%d is the value of isprimaryalmond in fill",almond.isPrimaryAlmond);
+//        NSLog(@"%@ is the value of almondname in fill",almond.almondplusName);
+//        NSLog(@"%@ is the value of almondmac in fill",almond.almondplusMAC);
+//        NSLog(@"%@ is the value of almondname in fill",almond.accessEmailIDs);
+//        if(almond.isPrimaryAlmond == YES){
+//            [primaryAlmonds addObject:almond];
+//        }else{
+//            [secondaryAlmonds addObject:almond];
+//        }
+//    }
+//
+//    NSLog(@"%d is the length of primaryAlmond",primaryAlmonds.count);
+//    NSLog(@"%d is the length of secondaryAlmond",secondaryAlmonds.count);
+//}
 
 
 + (void)asyncInitializeConnection2:(Network *)network {
@@ -272,7 +328,6 @@ static int responseCount = 0;
     // This routine is important because the UI will listen for outcomes to these requests.
     // Specifically, the event kSFIDidUpdateAlmondList.
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    
     SFIAlmondPlus *plus = [self currentAlmond];
     
     NSLog(@"asyncInitializeConnection plus mac %@",plus.almondplusMAC);
@@ -309,6 +364,7 @@ static int responseCount = 0;
         [NotificationAccessAndRefreshCommands tryRefreshNotifications];
     }
 }
+
 
 + (GenericCommand* )tryRequestAlmondMode:(NSString *)almondMac {
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
@@ -393,7 +449,6 @@ static int responseCount = 0;
             [self writeCurrentAlmond:changed];
             //[self setCurrentAlmond:changed];
         }
-        
         // Tell the world so they can update their view
         [toolKit postNotification:kSFIDidChangeAlmondName data:obj];
     }

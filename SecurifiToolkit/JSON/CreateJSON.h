@@ -17,5 +17,5 @@
 +(void) initializeDictionary;
 +(NSString *)JSONString;
 +(NSString*) withCommandString:(NSString*)commandString getJSONStringfromDictionary: (NSDictionary*)dictionary;
-+(NSString*) getJSONStringfromDictionary: (NSMutableDictionary*)dictionary;
++(NSString*) getJSONStringFromDictionary: (NSMutableDictionary*)dictionary;
 @end
