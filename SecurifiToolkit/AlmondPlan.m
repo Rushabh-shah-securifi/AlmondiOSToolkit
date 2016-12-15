@@ -52,10 +52,11 @@
     return plan;
 }
 
-+ (void)updateAlmondPlan:(PlanType)planType{
++ (void)updateAlmondPlan:(PlanType)planType epoch:(NSString *)epoch{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     AlmondPlan *plan = toolkit.subscription[[AlmondManagement currentAlmond].almondplusMAC];
     plan.planType = planType;
+    plan.renewalDate = [NSDate getSubscriptionExpiryDate:epoch format:@"dd/MM/yyyy"];
 }
 
 //Free|Cancelled|Paid1M|Paid3M         TrialExpired
@@ -66,6 +67,8 @@
     }else if([planStrLC isEqualToString:@"freeexpired"]){
         return PlanTypeFreeExpired;
     }else if([planStrLC isEqualToString:@"paid1m"]){
+        return PlanTypeOneDay;
+    }else if([planStrLC isEqualToString:@"paid1d"]){
         return PlanTypeOneMonth;
     }else if([planStrLC isEqualToString:@"paid3m"]){
         return PlanTypeThreeMonths;
@@ -78,6 +81,9 @@
     switch (planType) {
         case PlanTypeFree:
             return @"Free";
+            break;
+        case PlanTypeOneDay:
+            return @"Paid1D";
             break;
         case PlanTypeOneMonth:
             return @"Paid1M";
@@ -102,6 +108,9 @@
         case PlanTypeFree:
             return @"Free Plan";
             break;
+        case PlanTypeOneDay:
+            return @"1 Day Test";
+            break;
         case PlanTypeOneMonth:
             return @"1 Month $5";
             break;
@@ -122,6 +131,9 @@
         case PlanTypeFree:
             return 0;
             break;
+        case PlanTypeOneDay:
+            return 1;
+            break;
         case PlanTypeOneMonth:
             return 5;
             break;
@@ -140,6 +152,9 @@
 + (NSInteger)getPlanMonths:(PlanType)planType{
     switch (planType) {
         case PlanTypeFree:
+            return 1;
+            break;
+        case PlanTypeOneDay:
             return 1;
             break;
         case PlanTypeOneMonth:

@@ -11,6 +11,7 @@
 typedef NS_ENUM(NSInteger, PlanType){
     PlanTypeNone,
     PlanTypeFree,
+    PlanTypeOneDay,
     PlanTypeOneMonth,
     PlanTypeThreeMonths,
     PlanTypeSixMonths,
@@ -28,6 +29,6 @@ typedef NS_ENUM(NSInteger, PlanType){
 + (NSInteger)getPlanAmount:(PlanType)planType;
 + (NSString *)getPlanID:(PlanType)planType;
 + (BOOL)hasPaidSubscription;
-+ (void)updateAlmondPlan:(PlanType)planType;
++ (void)updateAlmondPlan:(PlanType)planType epoch:(NSString *)epoch;
 + (NSInteger)getPlanMonths:(PlanType)planType;
 @end

@@ -173,4 +173,7 @@
 
 #define SM_ENABLE @"SMEnable"
 #define BW_ENABLE @"BWEnable"
+
+//subcription
+#define RENEWAL_EPOCH @"RenewalEpoch"
 #endif /* AlmondJsonCommandKeyConstants_h */
