@@ -135,6 +135,8 @@ typedef NS_ENUM(unsigned int, CommandType) {
 
     
     CommandType_ROUTER_COMMAND_REQUEST_RESPONSE         = 1100,
+    CommandType_SUBSCRIPTIONS                           = 1010,
+    CommandType_SUBSCRIBE_ME                            = 1011,
    
 };
 

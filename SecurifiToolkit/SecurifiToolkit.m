@@ -68,6 +68,7 @@
 #import "NotificationAccessAndRefreshCommands.h"
 #import "NotificationPreferenceListCallbacks.h"
 #import <SecurifiToolkit/ClientParser.h>
+#import "AlmondPlan.h"
 
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
@@ -1168,6 +1169,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
             //}
             
             break;
+        }
+        case CommandType_SUBSCRIPTIONS:{//only in cloud
+            NSDictionary *dict = [payload objectFromJSONData];
+            NSLog(@"dict: %@, payload: %@", dict, payload);
+            self.subscription = [AlmondPlan getSubscriptions:dict[@"Almonds"]];
         }
             
         default:

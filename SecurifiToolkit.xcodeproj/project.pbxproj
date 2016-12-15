@@ -418,6 +418,8 @@
 		CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */; };
 		CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
 		CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
+		F4F981D91E02763E00FB0676 /* AlmondPlan.h in Headers */ = {isa = PBXBuildFile; fileRef = F4F981D71E02763E00FB0676 /* AlmondPlan.h */; };
+		F4F981DA1E02763E00FB0676 /* AlmondPlan.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F981D81E02763E00FB0676 /* AlmondPlan.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -849,6 +851,8 @@
 		CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesTimeElement.m; sourceTree = "<group>"; };
 		CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIButtonSubProperties.h; sourceTree = "<group>"; };
 		CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIButtonSubProperties.m; sourceTree = "<group>"; };
+		F4F981D71E02763E00FB0676 /* AlmondPlan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondPlan.h; sourceTree = "<group>"; };
+		F4F981D81E02763E00FB0676 /* AlmondPlan.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondPlan.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1274,6 +1278,8 @@
 				A5D9B4FD1DB4CF5F00BF1F60 /* AlmondManagement.m */,
 				A569B8721DBE10EA00FBD429 /* LocalNetworkManagement.h */,
 				A569B8701DBE108C00FBD429 /* LocalNetworkManagement.m */,
+				F4F981D71E02763E00FB0676 /* AlmondPlan.h */,
+				F4F981D81E02763E00FB0676 /* AlmondPlan.m */,
 				1C3270DB1A243B28007202C1 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
@@ -1752,6 +1758,7 @@
 				A569B8A61DBE3E8500FBD429 /* SRDelegateController.h in Headers */,
 				1CD1D54E1A660B7A00C030E9 /* NotificationPreferenceListResponse.h in Headers */,
 				22FAE88817A8E528002FFEE8 /* Signup.h in Headers */,
+				F4F981D91E02763E00FB0676 /* AlmondPlan.h in Headers */,
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
 				CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */,
 				1C414BE01A79F35D00C448A4 /* SUnit.h in Headers */,
@@ -2056,6 +2063,7 @@
 				2204C20F1794349400B05F17 /* GenericCommand.m in Sources */,
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
 				A569B8711DBE108C00FBD429 /* LocalNetworkManagement.m in Sources */,
+				F4F981DA1E02763E00FB0676 /* AlmondPlan.m in Sources */,
 				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,

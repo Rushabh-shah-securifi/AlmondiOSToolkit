@@ -462,7 +462,11 @@
             [self postData:DYNAMIC_ALMOND_LOCATION_CHANIGE_NOTIFIER data:payload];
             break;
         };
-            
+        case CommandType_SUBSCRIBE_ME:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:SUBSCRIBE_ME_NOTIFIER data:payload];
+            break;
+        }
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
@@ -498,6 +502,7 @@
         case CommandType_DEVICELOG_RESPONSE:
         case CommandType_ALMOND_COMMAND_RESPONSE:
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: // posted from web socket only; payload is dictionary
+        case CommandType_SUBSCRIPTIONS:
         {
             NSLog(@"delegate is working properly");
             [self tryMarkUnitCompletion:YES responseType:commandType];

@@ -92,6 +92,7 @@
     [dateFormatter setDateFormat:@"yyyy-MMM-dd HH:mm:ss zzz"];
     return [dateFormatter dateFromString:formattedString];
 }
+
 + (NSDate*)getDateFromEpochFormatted:(NSString*)epoch{
     NSDate *epochNSDate = [[NSDate alloc] initWithTimeIntervalSince1970:[epoch integerValue]];
     NSString *formattedString = [epochNSDate formattedStringUsingFormat:@"MMM dd HH:mm zzz"];//required to return converted date in the form of date.
@@ -147,4 +148,10 @@
     return stringDate;
 }
 
++ (NSString *)getSubscriptionExpiryDate:(NSString *)epoch format:(NSString *)format{
+    NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:([epoch doubleValue]/1000)];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:format];
+    return [dateFormatter stringFromDate:date];
+}
 @end
