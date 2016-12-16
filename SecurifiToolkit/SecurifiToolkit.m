@@ -14,7 +14,6 @@
 #import "LogoutAllRequest.h"
 #import "KeyChainWrapper.h"
 #import "ChangePasswordRequest.h"
-#import "UnlinkAlmondRequest.h"
 #import "UserInviteRequest.h"
 #import "DeleteAccountRequest.h"
 #import "DeleteSecondaryUserRequest.h"
@@ -583,10 +582,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // But the client was not logged in. Send them now...
         //        [self asyncInitializeConnection1:network];
         
-        NSMutableDictionary *dataValueAlmondList = [NSMutableDictionary new];
-        [dataValueAlmondList setValue:GET_ALMOND_LIST forKey:COMMAND_TYPE];
-        [self asyncSendRequest:CommandType_ACCOUNTS_ALMOND_RELATED commandString:GET_ALMOND_LIST payloadData:dataValueAlmondList];
-        [AlmondManagement initializeValues];
+        [self requestAlmondList];
     }
     else {
         // Logon failed:
@@ -599,6 +595,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
     [self postNotification:kSFIDidCompleteLoginNotification data:res];
 }
 
+- (void)requestAlmondList {
+    NSMutableDictionary *dataValueAlmondList = [NSMutableDictionary new];
+    [dataValueAlmondList setValue:GET_ALMOND_LIST forKey:COMMAND_TYPE];
+    [self asyncSendRequest:CommandType_ALMOND_LIST commandString:GET_ALMOND_LIST payloadData:dataValueAlmondList];
+    [AlmondManagement initializeValues];
+}
 
 - (void)onLogoutResponse {
     [self tearDownLoginSession];
@@ -684,7 +686,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 #pragma mark - Network management
-
 -(struct PopUpSuggestions) suggestionsFromNetworkStateAndConnectiontype {
     
     NSString *title;
@@ -945,14 +946,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [AlmondManagement onAlmondModeChangeCompletion:payload network:network];
             break;
         }
-            
         case CommandType_ALMOND_MODE_RESPONSE: {
             NSLog(@"almond mode payload %@",payload);
             AlmondModeResponse *res = payload;
             [AlmondManagement onAlmondModeResponse:res network:network];
             break;
         }
-            
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationRegistrationResponse *res = payload;
@@ -960,7 +959,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         }
-            
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
             NSLog(@"toolkit - CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE");
             if (self.config.enableNotifications) {
@@ -1004,8 +1002,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
-        
-        
+            
         case CommandType_DEVICELOG_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationListResponse *res = payload;
@@ -1013,9 +1010,22 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         };
-           
-        case CommandType_ACCOUNTS_ALMOND_RELATED:{
-            [AlmondManagement onAlmondListResponse:payload network:network];
+            
+        case CommandType_ALMOND_DYNAMIC_RESPONSE:{
+            [AlmondManagement onAlmondDynamicResponse:payload];
+            [self postNotification:ACCOUNTS_RELATED data:payload];
+        }
+            
+        case CommandType_ALMOND_LIST:{
+            NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:payload
+                                                                       options:kNilOptions
+                                                                         error:nil];
+            
+            if([[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondListResponse"] || [[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondAffiliationData"])
+                [AlmondManagement onAlmondListResponse:payload network:network];
+            else{
+                NSLog(@"%@ is the commandtype",[[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondListResponse"]);
+            }
             break;
         }
             
@@ -1034,10 +1044,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: {
             NSDictionary *dict = payload;
             NSString *name = dict[@"Name"];
-            
             NSString *mac_hex = dict[@"MAC"];
             NSString *mac = [SFIAlmondPlus convertMacHexToDecimal:mac_hex];
             NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE %@ mac is %@",[AlmondManagement currentAlmond].almondplusMAC, mac);
+            
             SFIAlmondPlus *current = [AlmondManagement currentAlmond];
             //if ([current.almondplusMAC isEqualToString:mac]) {
                 NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Inside CurrentAlmond equals %@",current.almondplusName);
@@ -1048,10 +1058,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 DynamicAlmondNameChangeResponse *res = DynamicAlmondNameChangeResponse.new;
                 res.almondplusMAC = current.almondplusMAC;
                 res.almondplusName = name;
-                
                 [AlmondManagement onDynamicAlmondNameChange:res];
             //}
-            
             break;
         }
             
@@ -1066,7 +1074,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         self.scoreboard.dynamicUpdateCount++;
         [self markCommandEvent:commandType];
     }
-    
     switch (commandType) {
         case CommandType_DYNAMIC_ALMOND_ADD: {
             AlmondListResponse *obj = payload;
@@ -1090,7 +1097,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         }
-            
         default:
             break;
     }

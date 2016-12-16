@@ -220,6 +220,7 @@
             device.ID = [devicePosition intValue];
             [deviceList addObject:device];
         }
+        
         NSLog(@"addobjects");
         toolkit.devices = deviceList;
         if(!local){
@@ -228,11 +229,10 @@
             //temp fix - to fetch almond list after firmware update
             if([commandType isEqualToString:@"DynamicDeviceList"]){
                 NSLog(@"sending almond list payload");
-                [toolkit asyncSendToNetwork:[toolkit makeAlmondListCommand]];
+                [toolkit requestAlmondList];
             }
         }
         
-
 //        //    genericdevices
 //        NSMutableArray *genericDeviceTypesArray = [Device getDeviceTypes];
 //        [self addModeClientRebootDeviceTypes:genericDeviceTypesArray];

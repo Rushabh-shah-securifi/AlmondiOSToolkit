@@ -71,6 +71,7 @@
 
     [self writeListToFilePath:self.almondListFp list:cloudAlmonds locker:locker];
 
+    NSLog(@"%d is the count of almondlist",cloudAlmonds.count);
     NSMutableDictionary *local_dict = [self readDictionaryForFilePath:self.almondLocalNetworkSettingsFp locker:locker];
 
     // keep the local settings synced with changes to almond names

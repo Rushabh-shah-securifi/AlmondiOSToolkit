@@ -233,8 +233,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                     break;
                 }
                     
-                case CommandType_ACCOUNTS_ALMOND_RELATED:
-                case CommandType_ACCOUNTS_USER_RELATED: {
+                case CommandType_ACCOUNTS_RELATED:
+                case CommandType_ALMOND_LIST:{
                     commandPayload = command.command;
                     NSLog(@"The payload is %@",commandPayload);
                     break;
@@ -246,12 +246,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                     
                 case CommandType_CLOUD_SANITY: {
                     commandPayload = CLOUD_SANITY_REQUEST_XML;
-                    break;
-                }
-                    //PY 150914 Accounts
-                case CommandType_ALMOND_LIST://PY 150914 Accounts
-                {
-                    commandPayload = ALMOND_LIST_REQUEST_XML; //Refractor - Can be used for commands with no input <root> </root>
                     break;
                 }
                     
@@ -277,7 +271,6 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                     commandPayload = command.command;
                     break;
                 }
-                    
                 default: {
                     NSString *description = [NSString stringWithFormat:@"%s: Aborting write, unsupported command, cmd=%@", __PRETTY_FUNCTION__, command.command];
                     //                    *outError = [self makeError:description errorCode:CloudEndpointSocketError_unsupportedCommand];
@@ -450,6 +443,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                             id responsePayload = nil;
                             BOOL parsedPayload = NO;
                             if (!securifi_valid_command_type(commandType)) {
+                                
                                 NSLog(@"Ignoring payload, the command type is not known to this system, type:%i, payload:%@",
                                       commandType, [[NSString alloc] initWithData:dataBuffer encoding:NSUTF8StringEncoding]);
                             }
@@ -486,9 +480,12 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                         responsePayload = [NotificationListResponse parseDeviceLogsJson:buffer];
                                         parsedPayload = YES;
                                         break;
-                                    case CommandType_ACCOUNTS_USER_RELATED:
+                                    
+    
+                                    case CommandType_ACCOUNTS_RELATED:
                                     case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:
-                                    case CommandType_ACCOUNTS_ALMOND_RELATED:
+                                    case CommandType_ALMOND_DYNAMIC_RESPONSE:
+                                    case CommandType_ALMOND_LIST:
                                     case CommandType_GET_ALL_SCENES:
                                     case CommandType_COMMAND_RESPONSE:
                                     case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE:

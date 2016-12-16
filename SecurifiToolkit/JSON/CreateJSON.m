@@ -18,6 +18,7 @@ static NSMutableDictionary* map;
     return [self getJSONStringFromDictionary:dictionary];
 }
 
+
 +(NSString*) getJSONStringFromDictionary: (NSMutableDictionary*) dictionary{
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary

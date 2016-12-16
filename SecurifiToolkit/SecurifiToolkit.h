@@ -412,7 +412,7 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 
 -(void)cleanUp;
 
-- (GenericCommand *)makeAlmondListCommand;
+- (void)requestAlmondList;
 
 - (void)initializeHelpScreenUserDefaults;
 

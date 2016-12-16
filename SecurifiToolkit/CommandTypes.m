@@ -247,7 +247,6 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_LOGOUT_RESPONSE:
         case CommandType_AFFILIATION_CODE_REQUEST:
         case CommandType_AFFILIATION_USER_COMPLETE:
-        case CommandType_ALMOND_LIST:
         case CommandType_ALMOND_LIST_RESPONSE:
         case CommandType_MOBILE_COMMAND:
         case CommandType_MOBILE_COMMAND_RESPONSE:
@@ -336,11 +335,11 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
         case CommandType_MESH_COMMAND:
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
-        case CommandType_ACCOUNTS_USER_RELATED:
-        case CommandType_ACCOUNTS_ALMOND_RELATED:
+        case CommandType_ACCOUNTS_RELATED:
+        case CommandType_ALMOND_LIST:
         case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:
+        case CommandType_ALMOND_DYNAMIC_RESPONSE:
             return YES;
-            
         default:
             return NO;
     }
@@ -375,9 +374,10 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case (CommandType) 1551:
         case (CommandType) 99:
-        case CommandType_ACCOUNTS_USER_RELATED:
+        case CommandType_ACCOUNTS_RELATED:
         case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:
-        case CommandType_ACCOUNTS_ALMOND_RELATED:
+        case CommandType_ALMOND_LIST:
+        case CommandType_ALMOND_DYNAMIC_RESPONSE:
             return YES;
         default:
             return NO;

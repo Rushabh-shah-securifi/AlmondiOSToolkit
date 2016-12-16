@@ -22,6 +22,7 @@
 
 @interface AlmondManagement : NSObject
 
++ (void)onAlmondDynamicResponse:(NSData*)responseData;
 + (NSMutableArray*)getOwnedAlmondList;
 + (NSMutableArray*)getSharedAlmondList;
 + (void)initializeValues;

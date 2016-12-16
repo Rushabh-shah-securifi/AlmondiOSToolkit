@@ -287,83 +287,27 @@
             break;
         }
         
-        case CommandType_ACCOUNTS_ALMOND_RELATED:{
+        case CommandType_ALMOND_LIST:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self delegateData:payload commandType:commandType];
             break;
         }
-
+        
+        case CommandType_ALMOND_DYNAMIC_RESPONSE:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self delegateData:payload commandType:commandType];
+            break;
+        }
+            
         case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DYNAMIC_ACCOUNT_RESPONSE data:payload];
             break;
         }
             
-        case CommandType_ACCOUNTS_USER_RELATED :{
+        case CommandType_ACCOUNTS_RELATED :{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:ACCOUNTS_RELATED data:payload];
-            break;
-        }
-            
-        case CommandType_USER_PROFILE_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:USER_PROFILE_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_CHANGE_PASSWORD_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:CHANGE_PWD_RESPONSE_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_DELETE_ACCOUNT_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self delegateData:payload commandType:commandType];
-            // fix me: some UI code still dependent on this notification
-            [self postData:DELETE_ACCOUNT_RESPONSE_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_UPDATE_USER_PROFILE_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:UPDATE_USER_PROFILE_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ALMOND_AFFILIATION_DATA_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_UNLINK_ALMOND_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:UNLINK_ALMOND_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_USER_INVITE_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:USER_INVITE_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_DELETE_SECONDARY_USER_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DELETE_SECONDARY_USER_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_ME_AS_SECONDARY_USER_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ME_AS_SECONDARY_USER_NOTIFIER data:payload];
-            break;
-        }
-            
-        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE: {
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DELETE_ME_AS_SECONDARY_USER_NOTIFIER data:payload];
             break;
         }
             
@@ -372,13 +316,14 @@
             [self postData:NOTIFICATION_REGISTRATION_NOTIFIER data:payload];
             break;
         }
-            
+
         case CommandType_GET_ALL_SCENES: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_GET_ALL_SCENES_NOTIFIER data:payload];
             break;
         };
+            
         case CommandType_COMMAND_RESPONSE: {
             //md01
             NSLog(@"network normal command response");
@@ -417,6 +362,7 @@
             [self postData:NOTIFICATION_WIFI_CLIENT_GET_PREFERENCE_REQUEST_NOTIFIER data:payload];
             break;
         };
+            
         case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST: {
             //md01
             [self tryMarkUnitCompletion:YES responseType:commandType];
@@ -482,8 +428,8 @@
             break;
         };
             
-        case CommandType_DYNAMIC_ALMOND_ADD:
-        case CommandType_DYNAMIC_ALMOND_DELETE:
+        //case CommandType_DYNAMIC_ALMOND_ADD:
+        //case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
             
         case CommandType_DYNAMIC_DEVICE_DATA:
