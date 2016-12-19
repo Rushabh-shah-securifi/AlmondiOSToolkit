@@ -418,6 +418,8 @@
 		CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */; };
 		CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
 		CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
+		F4BB64E01E07A85500361126 /* SubscriptionParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F4BB64DE1E07A85400361126 /* SubscriptionParser.h */; };
+		F4BB64E11E07A85500361126 /* SubscriptionParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F4BB64DF1E07A85400361126 /* SubscriptionParser.m */; };
 		F4F981D91E02763E00FB0676 /* AlmondPlan.h in Headers */ = {isa = PBXBuildFile; fileRef = F4F981D71E02763E00FB0676 /* AlmondPlan.h */; };
 		F4F981DA1E02763E00FB0676 /* AlmondPlan.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F981D81E02763E00FB0676 /* AlmondPlan.m */; };
 /* End PBXBuildFile section */
@@ -851,6 +853,8 @@
 		CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesTimeElement.m; sourceTree = "<group>"; };
 		CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIButtonSubProperties.h; sourceTree = "<group>"; };
 		CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIButtonSubProperties.m; sourceTree = "<group>"; };
+		F4BB64DE1E07A85400361126 /* SubscriptionParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionParser.h; sourceTree = "<group>"; };
+		F4BB64DF1E07A85400361126 /* SubscriptionParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionParser.m; sourceTree = "<group>"; };
 		F4F981D71E02763E00FB0676 /* AlmondPlan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondPlan.h; sourceTree = "<group>"; };
 		F4F981D81E02763E00FB0676 /* AlmondPlan.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondPlan.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1128,6 +1132,8 @@
 				A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */,
 				A5C7AE481C807BFA007E630D /* RouterParser.h */,
 				A5C7AE491C807BFA007E630D /* RouterParser.m */,
+				F4BB64DE1E07A85400361126 /* SubscriptionParser.h */,
+				F4BB64DF1E07A85400361126 /* SubscriptionParser.m */,
 			);
 			path = Parser;
 			sourceTree = "<group>";
@@ -1750,6 +1756,7 @@
 				A569B8DC1DBE3E8500FBD429 /* SocketRocket.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
 				CEEAB7A91CACF2B8003C5290 /* Client.h in Headers */,
+				F4BB64E01E07A85500361126 /* SubscriptionParser.h in Headers */,
 				1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */,
 				A52163FE1C983E4E00E7B79D /* Formatter.h in Headers */,
 				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
@@ -2162,6 +2169,7 @@
 				A569B8C41DBE3E8500FBD429 /* SRHTTPConnectMessage.m in Sources */,
 				1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */,
 				CEF6F49F1C92CAAF00C68975 /* Rule.m in Sources */,
+				F4BB64E11E07A85500361126 /* SubscriptionParser.m in Sources */,
 				1DF0391E21650F9E90235929 /* Login.m in Sources */,
 				1DF03DBC398A267A9DC97053 /* Logout.m in Sources */,
 				1DF0394FB68EE0CD0700B060 /* LoginResponse.m in Sources */,

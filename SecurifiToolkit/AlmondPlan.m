@@ -26,7 +26,7 @@
  }
  }
  */
-+ (NSDictionary *)getSubscriptions:(NSDictionary *)almondsDict{
++ (NSMutableDictionary *)getSubscriptions:(NSDictionary *)almondsDict{
     NSMutableDictionary *subcriptionsDict = [NSMutableDictionary new];
     for(NSString *almond in almondsDict.allKeys){
         NSDictionary *almondSubscDict = almondsDict[almond];
@@ -46,6 +46,7 @@
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     AlmondPlan *plan = toolkit.subscription[[AlmondManagement currentAlmond].almondplusMAC];
     if(plan == nil){
+        NSLog(@"plan nil");
         plan = [AlmondPlan new];
         plan.planType = PlanTypeNone;
     }
@@ -53,10 +54,24 @@
 }
 
 + (void)updateAlmondPlan:(PlanType)planType epoch:(NSString *)epoch{
+    NSLog(@"updateAlmondPlan: %d", planType);
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     AlmondPlan *plan = toolkit.subscription[[AlmondManagement currentAlmond].almondplusMAC];
+    if(plan == nil)
+        [self addAlmondPlan:planType epoch:epoch];
+    else{
+        plan.planType = planType;
+        plan.renewalDate = [NSDate getSubscriptionExpiryDate:epoch format:@"dd/MM/yyyy"];
+    }
+}
+
++ (void)addAlmondPlan:(PlanType)planType epoch:(NSString *)epoch{
+    NSLog(@"addAlmondPlan");
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    AlmondPlan *plan = [AlmondPlan new];
     plan.planType = planType;
     plan.renewalDate = [NSDate getSubscriptionExpiryDate:epoch format:@"dd/MM/yyyy"];
+    [toolkit.subscription setObject:plan forKey:[AlmondManagement currentAlmond].almondplusMAC];
 }
 
 //Free|Cancelled|Paid1M|Paid3M         TrialExpired

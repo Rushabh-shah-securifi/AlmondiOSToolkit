@@ -23,7 +23,7 @@ typedef NS_ENUM(NSInteger, PlanType){
 @property (nonatomic)PlanType planType;
 @property (nonatomic)NSString *renewalDate;
 
-+ (NSDictionary *)getSubscriptions:(NSDictionary *)almondsDict;
++ (NSMutableDictionary *)getSubscriptions:(NSDictionary *)almondsDict;
 + (NSString *)getPlanString:(PlanType)planType;
 + (AlmondPlan *)getAlmondPlan;
 + (NSInteger)getPlanAmount:(PlanType)planType;

@@ -82,6 +82,9 @@
 
 #define SUBSCRIBE_ME_NOTIFIER    @"SUBSCRIBE_ME_NOTIFIER"
 
+//Subscription
+#define NOTIFICATION_SUBSCRIPTION_RESPONSE    @"NOTIFICATION_SUBSCRIPTION_RESPONSE"
+#define NOTIFICATION_SUBSCRIPTION_PARSED    @"NOTIFICATION_SUBSCRIPTION_PARSED"
 // XML
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
 #define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"
