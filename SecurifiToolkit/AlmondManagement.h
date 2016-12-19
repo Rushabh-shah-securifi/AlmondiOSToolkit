@@ -31,7 +31,8 @@
 + (SFIAlmondPlus *)cloudAlmond:(NSString *)almondMac;
 + (NSArray *)localLinkedAlmondList;
 + (BOOL)almondExists:(NSString *)almondMac;
-
++ (NSArray *)getAL3s:(NSArray *)cloud;
++ (BOOL)hasAtleaseOneAL3;
 //Almond List Management
 + (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network;
 + (void)onDynamicAlmondListAdd:(AlmondListResponse *)obj;

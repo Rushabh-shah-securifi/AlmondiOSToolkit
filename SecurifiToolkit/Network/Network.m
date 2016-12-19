@@ -467,6 +467,11 @@
             [self postData:SUBSCRIBE_ME_NOTIFIER data:payload];
             break;
         }
+        case CommandType_DYNAMIC_SUBSCRIBE_ME:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_SUBSCRIPTION_RESPONSE data:payload];
+            break;
+        }
         case CommandType_DYNAMIC_ALMOND_ADD:
         case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:

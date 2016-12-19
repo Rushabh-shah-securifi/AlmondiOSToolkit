@@ -516,6 +516,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
                                     case CommandType_SUBSCRIPTIONS:
                                     case CommandType_SUBSCRIBE_ME:
+                                    case CommandType_DYNAMIC_SUBSCRIBE_ME:
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;

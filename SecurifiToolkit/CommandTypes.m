@@ -229,6 +229,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"CommandType_SUBSCRIPTIONS_%d", type];
         case CommandType_SUBSCRIBE_ME:
             return [NSString stringWithFormat:@"CommandType_SUBSCRIBE_ME_%d", type];
+        case CommandType_DYNAMIC_SUBSCRIBE_ME:
+            return [NSString stringWithFormat:@"CommandType_DYNAMIC_SUBSCRIBE_ME_%d", type];
         default: {
             return [NSString stringWithFormat:@"Unknown_%d", type];
         }
@@ -343,6 +345,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case CommandType_SUBSCRIPTIONS:
         case CommandType_SUBSCRIBE_ME:
+        case CommandType_DYNAMIC_SUBSCRIBE_ME:
             return YES;
             
         default:
@@ -378,6 +381,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case CommandType_SUBSCRIPTIONS:
         case CommandType_SUBSCRIBE_ME:
+        case CommandType_DYNAMIC_SUBSCRIBE_ME:
         case (CommandType) 1551:
         case (CommandType) 99:
             return YES;

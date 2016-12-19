@@ -525,4 +525,21 @@
     [toolkit postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
 }
 
++ (NSArray *)getAL3s:(NSArray *)cloud{
+    NSMutableArray *al3Array = [NSMutableArray new];
+    for(SFIAlmondPlus *alm in cloud){
+        if([alm.firmware.lowercaseString hasPrefix:@"al3-"])
+            [al3Array addObject:alm];
+    }
+    return al3Array;
+}
+
++ (BOOL)hasAtleaseOneAL3{
+    NSArray *almonds = [AlmondManagement almondList];
+    for(SFIAlmondPlus *alm in almonds){
+        if([alm.firmware.lowercaseString hasPrefix:@"al3-"])
+            return YES;
+    }
+    return NO;
+}
 @end

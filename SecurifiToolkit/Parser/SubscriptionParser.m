@@ -11,6 +11,7 @@
 #import "AlmondManagement.h"
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
+#import "AlmondPlan.h"
 
 @implementation SubscriptionParser
 - (instancetype)init {
@@ -34,8 +35,7 @@
 
 -(void)parseDeviceListAndDynamicDeviceResponse:(id)sender{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
-    BOOL local = [toolkit useLocalNetwork:almond.almondplusMAC];
+ 
     NSDictionary *payload;
     
     NSNotification *notifier = (NSNotification *) sender;
@@ -44,7 +44,7 @@
         return;
     }
     
-    if(local){
+    if([toolkit currentConnectionMode]==SFIAlmondConnectionMode_local){
         payload = dataInfo[@"data"];
     }else{
         NSLog(@"cloud data");
@@ -53,14 +53,18 @@
         payload = [dataInfo[@"data"] objectFromJSONData];
     }
     
-    //    payload = [self parseJson:@"DeviceListResponse"];
-    //NSLog(@"devices - payload: %@", payload);
+    NSLog(@"dynamic subscription - payload: %@", payload);
     
-    BOOL isMatchingAlmondOrLocal = ([payload[ALMONDMAC] isEqualToString:almond.almondplusMAC] || local) ? YES: NO;
-    if(!isMatchingAlmondOrLocal) //for cloud
+    if([toolkit currentConnectionMode]==SFIAlmondConnectionMode_local)
         return;
     NSString *commandType = payload[COMMAND_TYPE];
-
+    
+    if([commandType isEqualToString:@"SubscribeMe"]){
+        PlanType type = [AlmondPlan getPlanType:payload[@"PlanID"]];
+        [AlmondPlan updateAlmondPlan:type epoch:payload[@"RenewalEpoch"] mac:payload[@"AlmondMAC"]];
+    }else if([commandType isEqualToString:@"DeleteSubscription"]){
+        [AlmondPlan updateAlmondPlan:PlanTypeFreeExpired epoch:nil mac:payload[@"AlmondMAC"]];
+    }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_SUBSCRIPTION_PARSED object:nil];
 }

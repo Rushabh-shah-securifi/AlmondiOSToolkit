@@ -25,10 +25,11 @@ typedef NS_ENUM(NSInteger, PlanType){
 
 + (NSMutableDictionary *)getSubscriptions:(NSDictionary *)almondsDict;
 + (NSString *)getPlanString:(PlanType)planType;
-+ (AlmondPlan *)getAlmondPlan;
++ (AlmondPlan *)getAlmondPlan:(NSString *)mac;
 + (NSInteger)getPlanAmount:(PlanType)planType;
 + (NSString *)getPlanID:(PlanType)planType;
 + (BOOL)hasPaidSubscription;
-+ (void)updateAlmondPlan:(PlanType)planType epoch:(NSString *)epoch;
++ (void)updateAlmondPlan:(PlanType)planType epoch:(NSString *)epoch mac:(NSString *)mac;
 + (NSInteger)getPlanMonths:(PlanType)planType;
++ (PlanType)getPlanType:(NSString *)planString;
 @end
