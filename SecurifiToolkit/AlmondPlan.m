@@ -81,9 +81,9 @@
         return PlanTypeFree;
     }else if([planStrLC isEqualToString:@"freeexpired"]){
         return PlanTypeFreeExpired;
-    }else if([planStrLC isEqualToString:@"paid1m"]){
-        return PlanTypeOneDay;
     }else if([planStrLC isEqualToString:@"paid1d"]){
+        return PlanTypeOneDay;
+    }else if([planStrLC isEqualToString:@"paid1m"]){
         return PlanTypeOneMonth;
     }else if([planStrLC isEqualToString:@"paid3m"]){
         return PlanTypeThreeMonths;
