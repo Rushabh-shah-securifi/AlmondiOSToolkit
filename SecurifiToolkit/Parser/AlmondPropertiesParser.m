@@ -1,19 +1,19 @@
 //
-//  SubscriptionParser.m
+//  AlmondPropertiesParser.m
 //  SecurifiToolkit
 //
 //  Created by Masood on 12/19/16.
 //  Copyright © 2016 Securifi Ltd. All rights reserved.
 //
 
-#import "SubscriptionParser.h"
+#import "AlmondPropertiesParser.h"
 #import "AlmondPlusSDKConstants.h"
 #import "AlmondManagement.h"
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
-#import "AlmondPlan.h"
+#import "AlmondProperties.h"
 
-@implementation SubscriptionParser
+@implementation AlmondPropertiesParser
 - (instancetype)init {
     self = [super init];
     if(self){
@@ -27,15 +27,15 @@
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     
     [center addObserver:self
-               selector:@selector(parseSubscriptionResponse:)
-                   name:NOTIFICATION_SUBSCRIPTION_RESPONSE
+               selector:@selector(parseAlmondProperties:)
+                   name:ALMOND_PROPERTIES_NOTIFIER
                  object:nil];
-
+    
 }
 
--(void)parseSubscriptionResponse:(id)sender{
+-(void)parseAlmondProperties:(id)sender{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
- 
+    
     NSDictionary *payload;
     
     NSNotification *notifier = (NSNotification *) sender;
@@ -59,14 +59,15 @@
         return;
     NSString *commandType = payload[COMMAND_TYPE];
     
-    if([commandType isEqualToString:@"SubscribeMe"]){
-        PlanType type = [AlmondPlan getPlanType:payload[@"PlanID"]];
-        [AlmondPlan updateAlmondPlan:type epoch:payload[@"RenewalEpoch"] mac:payload[@"AlmondMAC"]];
+    if([commandType isEqualToString:@"AlmondProperties"]){
+        AlmondProperties *almondProp = [[AlmondProperties alloc]init];
+        [AlmondProperties parseAlomndProperty:almondProp];
     }
-    else if([commandType isEqualToString:@"DeleteSubscription"]){
-        [AlmondPlan updateAlmondPlan:PlanTypeFreeExpired epoch:nil mac:payload[@"AlmondMAC"]];
+    else if([commandType isEqualToString:@"DynamicAlmondProperties"]){
+        NSString *propertyType = payload[@"Action"];
+        NSString *value = payload[propertyType];
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_SUBSCRIPTION_PARSED object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ALMOND_PROPERTIES_PARSED object:nil];
 }
+
 @end

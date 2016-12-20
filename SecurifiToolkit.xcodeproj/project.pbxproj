@@ -418,6 +418,10 @@
 		CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */; };
 		CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
 		CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
+		F4422A531E07F79100532FC5 /* AlmondPropertiesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F4422A511E07F79100532FC5 /* AlmondPropertiesParser.h */; };
+		F4422A541E07F79100532FC5 /* AlmondPropertiesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F4422A521E07F79100532FC5 /* AlmondPropertiesParser.m */; };
+		F4422A571E08162C00532FC5 /* AlmondProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = F4422A551E08162C00532FC5 /* AlmondProperties.h */; };
+		F4422A581E08162C00532FC5 /* AlmondProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = F4422A561E08162C00532FC5 /* AlmondProperties.m */; };
 		F4BB64E01E07A85500361126 /* SubscriptionParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F4BB64DE1E07A85400361126 /* SubscriptionParser.h */; };
 		F4BB64E11E07A85500361126 /* SubscriptionParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F4BB64DF1E07A85400361126 /* SubscriptionParser.m */; };
 		F4F981D91E02763E00FB0676 /* AlmondPlan.h in Headers */ = {isa = PBXBuildFile; fileRef = F4F981D71E02763E00FB0676 /* AlmondPlan.h */; };
@@ -853,6 +857,10 @@
 		CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesTimeElement.m; sourceTree = "<group>"; };
 		CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIButtonSubProperties.h; sourceTree = "<group>"; };
 		CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIButtonSubProperties.m; sourceTree = "<group>"; };
+		F4422A511E07F79100532FC5 /* AlmondPropertiesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondPropertiesParser.h; sourceTree = "<group>"; };
+		F4422A521E07F79100532FC5 /* AlmondPropertiesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondPropertiesParser.m; sourceTree = "<group>"; };
+		F4422A551E08162C00532FC5 /* AlmondProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondProperties.h; sourceTree = "<group>"; };
+		F4422A561E08162C00532FC5 /* AlmondProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondProperties.m; sourceTree = "<group>"; };
 		F4BB64DE1E07A85400361126 /* SubscriptionParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionParser.h; sourceTree = "<group>"; };
 		F4BB64DF1E07A85400361126 /* SubscriptionParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionParser.m; sourceTree = "<group>"; };
 		F4F981D71E02763E00FB0676 /* AlmondPlan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondPlan.h; sourceTree = "<group>"; };
@@ -1134,6 +1142,8 @@
 				A5C7AE491C807BFA007E630D /* RouterParser.m */,
 				F4BB64DE1E07A85400361126 /* SubscriptionParser.h */,
 				F4BB64DF1E07A85400361126 /* SubscriptionParser.m */,
+				F4422A511E07F79100532FC5 /* AlmondPropertiesParser.h */,
+				F4422A521E07F79100532FC5 /* AlmondPropertiesParser.m */,
 			);
 			path = Parser;
 			sourceTree = "<group>";
@@ -1286,6 +1296,8 @@
 				A569B8701DBE108C00FBD429 /* LocalNetworkManagement.m */,
 				F4F981D71E02763E00FB0676 /* AlmondPlan.h */,
 				F4F981D81E02763E00FB0676 /* AlmondPlan.m */,
+				F4422A551E08162C00532FC5 /* AlmondProperties.h */,
+				F4422A561E08162C00532FC5 /* AlmondProperties.m */,
 				1C3270DB1A243B28007202C1 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
@@ -1741,8 +1753,10 @@
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
 				1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */,
+				F4422A571E08162C00532FC5 /* AlmondProperties.h in Headers */,
 				A569B8E01DBE3E8500FBD429 /* SRWebSocket.h in Headers */,
 				1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */,
+				F4422A531E07F79100532FC5 /* AlmondPropertiesParser.h in Headers */,
 				1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */,
 				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
 				CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */,
@@ -2134,6 +2148,7 @@
 				A5960DD51DC86F0F000B380C /* NotificationPreferenceListCallbacks.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
 				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
+				F4422A581E08162C00532FC5 /* AlmondProperties.m in Sources */,
 				A569B8D31DBE3E8500FBD429 /* SRURLUtilities.m in Sources */,
 				1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */,
 				A52164181C9927D400E7B79D /* DeviceIndex.m in Sources */,
@@ -2181,6 +2196,7 @@
 				1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */,
 				A569B8AA1DBE3E8500FBD429 /* SRIOConsumer.m in Sources */,
 				A569B8B81DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */,
+				F4422A541E07F79100532FC5 /* AlmondPropertiesParser.m in Sources */,
 				A52163FF1C983E4E00E7B79D /* Formatter.m in Sources */,
 				1DF030BA38ACE415D8B22060 /* SecurifiTypes.m in Sources */,
 				1DF03A369FB69FD247EF53C4 /* NSData+Securifi.m in Sources */,

@@ -219,6 +219,8 @@ struct PopUpSuggestions {
 @property(nonatomic)NSString *routerMode;
 @property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
 @property(nonatomic) NSMutableDictionary *subscription;
+@property(nonatomic) NSMutableDictionary *almondProperty;
+
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config;
 -(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res;
 
