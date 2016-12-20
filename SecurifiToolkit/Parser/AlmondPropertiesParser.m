@@ -28,14 +28,15 @@
     
     [center addObserver:self
                selector:@selector(parseAlmondProperties:)
-                   name:ALMOND_PROPERTIES_NOTIFIER
+                   name:ALMOND_PROPERTY_CHANGE_DYNAMIC_NOTIFIER
                  object:nil];
     
 }
 
 -(void)parseAlmondProperties:(id)sender{
+    NSLog(@"parseAlmondProperties");
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    
+    SFIAlmondConnectionMode connectionMode = [toolkit currentConnectionMode];
     NSDictionary *payload;
     
     NSNotification *notifier = (NSNotification *) sender;
@@ -47,26 +48,28 @@
     if([toolkit currentConnectionMode]==SFIAlmondConnectionMode_local){
         payload = dataInfo[@"data"];
     }else{
-        NSLog(@"cloud data");
         if(![dataInfo[@"data"] isKindOfClass:[NSData class]])
             return;
         payload = [dataInfo[@"data"] objectFromJSONData];
     }
     
     NSLog(@"dynamic subscription - payload: %@", payload);
-    
-    if([toolkit currentConnectionMode]==SFIAlmondConnectionMode_local)
+    NSString *almondMAC = payload[ALMONDMAC];
+    if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC]){
         return;
+    }
     NSString *commandType = payload[COMMAND_TYPE];
     
     if([commandType isEqualToString:@"AlmondProperties"]){
-        AlmondProperties *almondProp = [[AlmondProperties alloc]init];
-        [AlmondProperties parseAlomndProperty:almondProp];
+        [AlmondProperties parseAlomndProperty:payload[@"AlmondProperties"]];
     }
     else if([commandType isEqualToString:@"DynamicAlmondProperties"]){
-        NSString *propertyType = payload[@"Action"];
-        NSString *value = payload[propertyType];
+        [AlmondProperties parseDynamicProperty:payload];
     }
+    else if([commandType isEqualToString:@"DynamicAlmondLocationChangeResponse"]){
+        //need to store location in current almond
+    }
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ALMOND_PROPERTIES_PARSED object:nil];
 }
 

@@ -7,10 +7,12 @@
 //
 
 #import "AlmondProperties.h"
+#import "SecurifiToolkit.h"
 
 @implementation AlmondProperties
-+ (AlmondProperties *)parseAlomndProperty:(NSDictionary *)payload{
-    AlmondProperties *almondProp = [AlmondProperties new];
++ (void)parseAlomndProperty:(NSDictionary *)payload{
+    AlmondProperties *almondProp = [SecurifiToolkit sharedInstance].almondProperty;
+    
     almondProp.language = payload[@"Language"];
     almondProp.screenTimeout = payload[@"ScreenTimeout"];
     almondProp.screenLock = payload[@"ScreenLock"];
@@ -34,6 +36,77 @@
     almondProp.upnp = payload[@"Upnp"];
     almondProp.webAdminEnable = payload[@"WebAdminEnable"];
     almondProp.webAdminPassword = payload[@"WebAdminPassword"];
+}
+
++ (AlmondProperties *)getTestAlmondProperties{
+    AlmondProperties *almondProp = [[AlmondProperties alloc]init];
+    
+    almondProp.language = @"en";
+    almondProp.screenTimeout = @"100";
+    almondProp.screenLock = @"true";
+    almondProp.screenPIN = @"encrypted pin";
+    almondProp.routerMode = @"master";
+    
+    almondProp.checkInternetIP = @"10.10.10.10";
+    almondProp.checkInternetURL = @"www.abc.com";
+    almondProp.weatherCentigrade = @"1";
+    almondProp.uptime = @"1234";
+    almondProp.URL = @"www.url.com";
+    
+    almondProp.wanIP = @"10.10.22.22";
+    almondProp.almondLocation = @"home";
+    almondProp.autoUpdate = @"";
+    almondProp.keepSameSSID = @"";
+    almondProp.guestEnable = @"";
+    
+    almondProp.almondName = @"hero";
+    almondProp.almondMode = @"home";
+    almondProp.upnp = @"false";
+    almondProp.webAdminEnable = @"true";
+    almondProp.webAdminPassword = @"encrypted password";
     return almondProp;
 }
+
++ (void)parseDynamicProperty:(NSDictionary *)payload{
+    AlmondProperties *almondProp = [SecurifiToolkit sharedInstance].almondProperty;
+    NSString *action = payload[@"Action"];
+    NSString *value = payload[action];
+    
+    if([action isEqualToString:@"WebAdminEnable"]){
+        almondProp.webAdminEnable = value;
+    }
+    else if([action isEqualToString:@"WebAdminPassword"]){
+        almondProp.webAdminPassword = value;
+        almondProp.uptime = payload[@"Uptime"];
+    }
+    else if([action isEqualToString:@"ScreenLock"]){
+        almondProp.screenLock = value;
+    }
+    else if([action isEqualToString:@"ScreenTimeout"]){
+        almondProp.screenTimeout = value;
+    }
+    else if([action isEqualToString:@"ScreenPIN"]){
+        almondProp.screenPIN = value;
+        almondProp.uptime = payload[@"Uptime"];
+    }
+    else if([action isEqualToString:@"CheckInternetIP"]){
+        almondProp.checkInternetIP = value;
+    }
+    else if([action isEqualToString:@"CheckInternetURL"]){
+        almondProp.checkInternetURL = value;
+    }
+    else if([action isEqualToString:@"Language"]){
+        almondProp.language = value;
+    }
+    else if([action isEqualToString:@"Upnp"]){
+        almondProp.upnp = value;
+    }
+    else if([action isEqualToString:@"KeepSameSSID"]){
+        almondProp.keepSameSSID = value;
+    }
+    else if([action isEqualToString:@"AutoUpdate"]){
+        almondProp.autoUpdate = value;
+    }
+}
+
 @end

@@ -88,6 +88,8 @@
     cmd = [GenericCommand requestRouterSummary:mac];
     [toolKit asyncSendToNetwork:cmd];
     
+    cmd = [GenericCommand requestAlmondProperties:mac];
+    [toolKit asyncSendToNetwork:cmd];
     // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
     //    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser
 }
@@ -225,19 +227,18 @@
         GenericCommand *cmd;
         NSLog(@"commandDispatchQueue 1..");
         cmd = [GenericCommand requestSensorDeviceList:plus.almondplusMAC];
-        
         [block_self asyncSendToNetwork:cmd];
         
         cmd = [GenericCommand requestSceneList:plus.almondplusMAC];
-        
         [block_self asyncSendToNetwork:cmd];
         
         cmd = [GenericCommand requestAlmondClients:plus.almondplusMAC];
-        
         [block_self asyncSendToNetwork:cmd];
         
         cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
+        [block_self asyncSendToNetwork:cmd];
         
+        cmd = [GenericCommand requestAlmondProperties:plus.almondplusMAC];
         [block_self asyncSendToNetwork:cmd];
         
         if(block_self.currentConnectionMode!=SFIAlmondConnectionMode_local){

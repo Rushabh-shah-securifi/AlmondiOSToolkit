@@ -33,5 +33,7 @@
 @property (nonatomic) NSString *webAdminEnable;
 @property (nonatomic) NSString *webAdminPassword;
 
-+ (AlmondProperties *)parseAlomndProperty:(NSDictionary *)payload;
++ (void)parseAlomndProperty:(NSDictionary *)payload;
++ (void)parseDynamicProperty:(NSDictionary *)payload;
++ (AlmondProperties *)getTestAlmondProperties;
 @end

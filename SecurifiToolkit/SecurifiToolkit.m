@@ -70,6 +70,7 @@
 #import <SecurifiToolkit/ClientParser.h>
 #import "AlmondPlan.h"
 #import "SubscriptionParser.h"
+#import "AlmondPropertiesParser.h"
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
 #define kDEVICES_HELP_SHOWN                                 @"kDevicesHelpShown"
@@ -115,6 +116,7 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) DeviceParser *deviceParser;
 @property(nonatomic, strong) RouterParser *routerParser;
 @property(nonatomic) SubscriptionParser *subscriptionParser;
+@property(nonatomic) AlmondPropertiesParser *almondPropertiesParser;
 @end
 
 
@@ -183,6 +185,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.scenesArray = [NSMutableArray new];
     self.clients = [NSMutableArray new];
     self.devices = [NSMutableArray new];
+    self.almondProperty = [[AlmondProperties alloc]init];
     
     self.ruleParser =[[RuleParser alloc]init];
     self.sceneParser =[[SceneParser alloc]init];
@@ -190,6 +193,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.deviceParser = [[DeviceParser alloc]init];
     self.routerParser = [[RouterParser alloc]init];
     self.subscriptionParser = [[SubscriptionParser alloc]init];
+    self.almondPropertiesParser = [[AlmondPropertiesParser alloc]init];
+    
 //    [DataBaseManager initializeDataBase]; //this is for testing, earlier was used to retrive generic indexes.
     if(self.configuration.siteMapEnable){
         [BrowsingHistoryDataBase initializeDataBase];
@@ -978,6 +983,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
         [self asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
         [self asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
+        [self asyncSendToNetwork:[GenericCommand requestAlmondProperties:plus.almondplusMAC]];
     }
 }
 

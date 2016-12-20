@@ -228,6 +228,16 @@
     return genericCmd;
 }
 
++ (instancetype)requestAlmondProperties:(NSString *)mac{
+    sfi_id mii = [GenericCommand nextCorrelationId];
+    NSDictionary *payload = @{
+                              @"CommandType":@"AlmondProperties",
+                              @"AlmondMAC" : mac? mac: @"",
+                              @"Action" : @"get"
+                              };
+    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND];
+    return genericCmd;
+}
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
     NSError *error;
     NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];

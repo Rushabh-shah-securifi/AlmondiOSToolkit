@@ -284,7 +284,8 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                 case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
                 case CommandType_RULE_LIST:
-                case CommandType_SUBSCRIBE_ME:{
+                case CommandType_SUBSCRIBE_ME:
+                case CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND:{
                     commandPayload = command.command;
                     break;
                 }
@@ -514,7 +515,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
                                     case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
                                     case CommandType_MESH_COMMAND:
-                                    case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
+                                    case CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND:
                                     case CommandType_SUBSCRIPTIONS:
                                     case CommandType_SUBSCRIBE_ME:
                                     case CommandType_DYNAMIC_SUBSCRIBE_ME:

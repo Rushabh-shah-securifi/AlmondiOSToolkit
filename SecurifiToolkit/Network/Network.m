@@ -464,9 +464,9 @@
             break;
         };
             
-        case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:{
+        case CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_ALMOND_LOCATION_CHANIGE_NOTIFIER data:payload];
+            [self postData:ALMOND_PROPERTY_CHANGE_DYNAMIC_NOTIFIER data:payload];
             break;
         };
         case CommandType_SUBSCRIBE_ME:{
