@@ -72,6 +72,9 @@
 @property(nonatomic) BOOL isSimulator;
 
 @property(nonatomic) BOOL siteMapEnable;
+
+@property BOOL isPaymentDone;
+
 - (id)copyWithZone:(NSZone *)zone;
 
 @end

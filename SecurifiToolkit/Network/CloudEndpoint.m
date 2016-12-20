@@ -505,6 +505,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
                                     case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
                                     case CommandType_RULE_LIST:
+                                    case CommandType_IOT_SCAN_RESULTS_REQUEST:
                                     case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:

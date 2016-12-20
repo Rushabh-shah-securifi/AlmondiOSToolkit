@@ -225,6 +225,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"CommandType_MESH_COMMAND_%d", type];
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
             return [NSString stringWithFormat:@"CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE_%d", type];
+        case CommandType_IOT_SCAN_RESULTS_REQUEST: return [NSString stringWithFormat:@"CommandType_IOT_SCAN_RESULTS_REQUEST_%d",type];
+
         case CommandType_SUBSCRIPTIONS:
             return [NSString stringWithFormat:@"CommandType_SUBSCRIPTIONS_%d", type];
         case CommandType_SUBSCRIBE_ME:
@@ -341,6 +343,7 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
         case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
+        case CommandType_IOT_SCAN_RESULTS_REQUEST:
         case CommandType_MESH_COMMAND:
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case CommandType_SUBSCRIPTIONS:
@@ -377,6 +380,7 @@ BOOL securifi_valid_json_command_type(CommandType type) {
         case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_RULE_LIST_AND_DYNAMIC_RESPONSES:
         case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
+        case CommandType_IOT_SCAN_RESULTS_REQUEST:
         case CommandType_MESH_COMMAND:
         case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
         case CommandType_SUBSCRIPTIONS:

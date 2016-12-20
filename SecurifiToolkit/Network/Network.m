@@ -373,6 +373,13 @@
             [self postData:NOTIFICATION_COMMAND_TYPE_MESH_RESPONSE data:payload];
             break;
         }
+        case CommandType_IOT_SCAN_RESULTS_REQUEST: {
+            NSLog(@"network mesh command response");
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_COMMAND_TYPE_IOT_SCAN_RESULT data:payload];
+            break;
+        }
+
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
             [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
             break;

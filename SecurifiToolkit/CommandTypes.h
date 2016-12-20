@@ -138,6 +138,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_SUBSCRIPTIONS                           = 1010,
     CommandType_SUBSCRIBE_ME                            = 1011,
     CommandType_DYNAMIC_SUBSCRIBE_ME                    = 1012,
+    CommandType_IOT_SCAN_RESULTS_REQUEST                = 1013,
    
 };
 
