@@ -34,6 +34,7 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 @property(nonatomic) NSString *deviceSchedule;
 @property(nonatomic) NSString *category;
 @property(nonatomic) BOOL webHistoryEnable;
+@property(nonatomic) BOOL isBlock;
 @property(nonatomic) BOOL bW_Enable;
 @property(nonatomic) BOOL *canBeBlocked;
 @property(nonatomic) BOOL is_IoTDeviceType;

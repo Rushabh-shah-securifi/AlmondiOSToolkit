@@ -106,6 +106,7 @@
 #define CONNECTION @"Connection"
 #define MAC @"MAC"
 #define CLIENT_TYPE @"Type"
+#define IOTEnable @"IOTEnable"
 #define LAST_KNOWN_IP @"LastKnownIP"
 #define USE_AS_PRESENCE @"UseAsPresence"
 #define WAIT @"Wait"

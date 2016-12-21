@@ -226,8 +226,8 @@
 
 +(NSArray*) getClientGenericIndexes{
         NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,@-25,nil];
-    if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable){
-         return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-19,@-20,@-3,@-25,nil];
+    if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable && [SecurifiToolkit sharedInstance].configuration.isPaymentDone){
+         return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-26,@-19,@-20,@-3,@-25,nil];
     }
     //for commenting browsing history code
 //    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,nil];
@@ -314,6 +314,24 @@
             }
             break;
         }
+        case -24:{
+            if(get)
+                return client.isBlock? @"true": @"false";
+            else{
+                client.isBlock = newValue.boolValue;
+            }
+            break;
+        }
+        case -26:{
+            if(get)
+                return client.iot_serviceEnable? @"true": @"false";
+            else{
+                client.iot_serviceEnable = newValue.boolValue;
+            }
+            break;
+        }
+
+
         case -25:{
             if(get)
             return client.bW_Enable? @"true": @"false";
