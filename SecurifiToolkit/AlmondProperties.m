@@ -10,7 +10,9 @@
 #import "SecurifiToolkit.h"
 
 @implementation AlmondProperties
+
 + (void)parseAlomndProperty:(NSDictionary *)payload{
+    NSLog(@"parseAlomndProperty");
     AlmondProperties *almondProp = [SecurifiToolkit sharedInstance].almondProperty;
     
     almondProp.language = payload[@"Language"];
@@ -64,6 +66,35 @@
     almondProp.upnp = @"false";
     almondProp.webAdminEnable = @"true";
     almondProp.webAdminPassword = @"encrypted password";
+    return almondProp;
+}
+
++ (AlmondProperties *)getEmptyAlmondProperties{
+    AlmondProperties *almondProp = [[AlmondProperties alloc]init];
+    
+    almondProp.language = @"";
+    almondProp.screenTimeout = @"";
+    almondProp.screenLock = @"";
+    almondProp.screenPIN = @"";
+    almondProp.routerMode = @"";
+    
+    almondProp.checkInternetIP = @"";
+    almondProp.checkInternetURL = @"";
+    almondProp.weatherCentigrade = @"";
+    almondProp.uptime = @"";
+    almondProp.URL = @"";
+    
+    almondProp.wanIP = @"";
+    almondProp.almondLocation = @"";
+    almondProp.autoUpdate = @"";
+    almondProp.keepSameSSID = @"";
+    almondProp.guestEnable = @"";
+    
+    almondProp.almondName = @"";
+    almondProp.almondMode = @"";
+    almondProp.upnp = @"";
+    almondProp.webAdminEnable = @"";
+    almondProp.webAdminPassword = @"";
     return almondProp;
 }
 

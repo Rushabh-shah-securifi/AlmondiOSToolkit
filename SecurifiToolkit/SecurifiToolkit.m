@@ -476,6 +476,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self.clients removeAllObjects];
      if(self.ruleList!=nil && self.ruleList.count>0)
         [self.ruleList removeAllObjects];
+    self.almondProperty = [AlmondProperties new];
 }
 
 

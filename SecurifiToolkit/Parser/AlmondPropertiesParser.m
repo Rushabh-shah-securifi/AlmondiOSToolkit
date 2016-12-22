@@ -55,15 +55,18 @@
     
     NSLog(@"dynamic subscription - payload: %@", payload);
     NSString *almondMAC = payload[ALMONDMAC];
-    if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC]){
-        return;
-    }
     NSString *commandType = payload[COMMAND_TYPE];
     
-    if([commandType isEqualToString:@"AlmondProperties"]){
-        [AlmondProperties parseAlomndProperty:payload[@"AlmondProperties"]];
+    if([commandType isEqualToString:@"DynamicAlmondProperties"]){
+        if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC]){
+            return;
+        }
     }
-    else if([commandType isEqualToString:@"DynamicAlmondProperties"]){
+    
+    if([commandType isEqualToString:@"AlmondPropertiesResponse"]){
+        [AlmondProperties parseAlomndProperty:payload];
+    }
+    else if([commandType isEqualToString:@"DynamicAlmondPropertiesResponse"]){
         [AlmondProperties parseDynamicProperty:payload];
     }
     else if([commandType isEqualToString:@"DynamicAlmondLocationChangeResponse"]){

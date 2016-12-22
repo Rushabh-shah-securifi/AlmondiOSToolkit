@@ -36,4 +36,5 @@
 + (void)parseAlomndProperty:(NSDictionary *)payload;
 + (void)parseDynamicProperty:(NSDictionary *)payload;
 + (AlmondProperties *)getTestAlmondProperties;
++ (AlmondProperties *)getEmptyAlmondProperties;
 @end
