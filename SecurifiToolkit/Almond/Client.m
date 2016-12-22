@@ -79,7 +79,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"philips_hue"]) {
         return @"philips_hue_icon";
     }
-    if ([[self.deviceType lowercaseString] isEqualToString:@"scout_home_security"]) {
+    if ([[self.deviceType lowercaseString] isEqualToString:@"scout_home_system"]) {
         return @"scout_hub_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"skybell_wifi"]) {

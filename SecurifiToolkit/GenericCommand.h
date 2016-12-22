@@ -84,4 +84,6 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 - (NSString *)debugDescription;
 
++ (instancetype)requestScanNow:(NSString *)mac;
+
 @end

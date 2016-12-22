@@ -214,6 +214,7 @@ struct PopUpSuggestions {
 @property(atomic) NSMutableArray *clients;
 @property(atomic) NSMutableArray *devices;
 @property(atomic) NSMutableArray *ruleList;
+@property(atomic) NSMutableDictionary *iotScanResults;
 @property(atomic) NSDictionary *genericDevices;
 @property(atomic) NSDictionary *genericIndexes;
 @property(nonatomic)NSString *routerMode;

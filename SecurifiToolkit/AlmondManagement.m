@@ -241,6 +241,9 @@
         cmd = [GenericCommand requestAlmondProperties:plus.almondplusMAC];
         [block_self asyncSendToNetwork:cmd];
         
+        cmd = [GenericCommand requestScanNow:plus.almondplusMAC];
+         [block_self asyncSendToNetwork:cmd];
+        
         if(block_self.currentConnectionMode!=SFIAlmondConnectionMode_local){
             cmd = [GenericCommand requestRouterSummary:plus.almondplusMAC];
             [block_self asyncSendToNetwork:cmd];

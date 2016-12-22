@@ -374,7 +374,7 @@
             break;
         }
         case CommandType_IOT_SCAN_RESULTS_REQUEST: {
-            NSLog(@"network mesh command response");
+            NSLog(@"network mesh command response CommandType_IOT_SCAN_RESULTS_REQUEST");
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:NOTIFICATION_COMMAND_TYPE_IOT_SCAN_RESULT data:payload];
             break;

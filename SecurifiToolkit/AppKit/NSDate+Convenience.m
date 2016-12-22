@@ -147,6 +147,12 @@
     NSString *stringDate = [dateFormatter stringFromDate:self];
     return stringDate;
 }
+- (NSString *)stringFromDateAMPM{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm a"];
+    NSString *stringDate = [dateFormatter stringFromDate:self];
+    return stringDate;
+}
 
 + (NSString *)getSubscriptionExpiryDate:(NSString *)epoch format:(NSString *)format{
     NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:([epoch doubleValue]/1000)];
