@@ -70,12 +70,15 @@
     NSLog(@"maind dict devices %@",mainDict[@"Devices"]);
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
+        if([self checkForValidresponse:dict]){
             NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
             [scanNowArr addObject:iotDeviceObj];
+        }
     }
     [toolkit.iotScanResults setObject:scanNowArr forKey:@"scanDevice"];
     [toolkit.iotScanResults setObject:mainDict[@"ScanTime"] forKey:@"scanTime"];
     [toolkit.iotScanResults setObject:mainDict[@"ExcludedMAC"] forKey:@"scanExclude"];
+    [toolkit.iotScanResults setObject:mainDict[@"Count"] forKey:@"scanCount"];
     NSLog(@"final toolkit.iotScanResults %@",toolkit.iotScanResults);
     
     
@@ -149,6 +152,31 @@
 //    "CommandType": "IOTScanResponse",
 //    "Success": "true"
 //
+
+-(BOOL)checkForValidresponse:(NSDictionary *)deviceDict{
+    NSArray *ports = deviceDict[@"Ports"];
+    NSString *telnet = deviceDict[@"Telnet"];
+    NSString *Http = deviceDict[@"Http"];
+    NSArray *ForwardRules = deviceDict[@"ForwardRules"];
+    NSArray *UpnpRules = deviceDict[@"UpnpRules"];
+    NSMutableArray *arr = [[NSMutableArray alloc]init];
+    if([Http isEqualToString:@"1"])
+        [arr addObject:@"1"];
+    if([telnet isEqualToString:@"1"])
+        [arr addObject:@"3"];
+    if(ports.count> 0)
+        [arr addObject:@"2"];
+    if(ForwardRules.count> 0)
+        [arr addObject:@"4"];
+    if(UpnpRules > 0)
+        [arr addObject:@"5"];
+    
+    if(arr.count > 0)
+        return YES;
+    else
+        return NO;
+        
+}
 
 -(NSDictionary *)iotDeviceObj:(NSDictionary *)deviceDict{
     NSArray *ports = deviceDict[@"Ports"];
