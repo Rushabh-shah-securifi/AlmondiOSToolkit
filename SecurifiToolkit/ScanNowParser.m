@@ -50,6 +50,12 @@
     toolkit.iotScanResults = [[NSMutableDictionary alloc]init];
     //if(![mainDict[@"AlmondMAC"] isEqualToString:[AlmondManagement currentAlmond].almondplusMAC])
     NSMutableArray *scanNowArr = [[NSMutableArray alloc]init];
+    
+    if(mainDict == NULL)
+        return;
+    if(mainDict[@"Devices"] == NULL)
+        return;
+    
     NSLog(@"maind dict devices %@",mainDict[@"Devices"]);
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {

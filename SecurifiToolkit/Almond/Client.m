@@ -330,6 +330,14 @@
             }
             break;
         }
+        case -27:{
+            if(get)
+                return client.iot_dnsEnable? @"true": @"false";
+            else{
+                client.iot_dnsEnable = newValue.boolValue;
+            }
+            break;
+        }
 
 
         case -25:{
