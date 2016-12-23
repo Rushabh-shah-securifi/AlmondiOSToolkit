@@ -312,6 +312,8 @@
 		CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */; };
 		CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */; };
+		CE3AC2101E0BF5CA0094E25C /* ScanNowParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3AC20E1E0BF5CA0094E25C /* ScanNowParser.h */; };
+		CE3AC2111E0BF5CA0094E25C /* ScanNowParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3AC20F1E0BF5CA0094E25C /* ScanNowParser.m */; };
 		CE3EDAEC1D46390600C153A6 /* BrowsingHistoryUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */; };
 		CE3EDAED1D46390600C153A6 /* BrowsingHistoryUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */; };
 		CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -754,6 +756,8 @@
 		CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserRequest.m; sourceTree = "<group>"; };
 		CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMeAsSecondaryUserResponse.h; sourceTree = "<group>"; };
 		CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserResponse.m; sourceTree = "<group>"; };
+		CE3AC20E1E0BF5CA0094E25C /* ScanNowParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScanNowParser.h; sourceTree = "<group>"; };
+		CE3AC20F1E0BF5CA0094E25C /* ScanNowParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScanNowParser.m; sourceTree = "<group>"; };
 		CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowsingHistoryUtil.h; sourceTree = "<group>"; };
 		CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowsingHistoryUtil.m; sourceTree = "<group>"; };
 		CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFICredentialsValidator.h; sourceTree = "<group>"; };
@@ -1247,6 +1251,8 @@
 				A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */,
 				A5D9B50B1DB62E6900BF1F60 /* Log.h */,
 				A5D9B50C1DB62E7A00BF1F60 /* Log.m */,
+				CE3AC20E1E0BF5CA0094E25C /* ScanNowParser.h */,
+				CE3AC20F1E0BF5CA0094E25C /* ScanNowParser.m */,
 			);
 			path = SecurifiToolkit;
 			sourceTree = "<group>";
@@ -1755,6 +1761,7 @@
 				1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */,
 				F4422A571E08162C00532FC5 /* AlmondProperties.h in Headers */,
 				A569B8E01DBE3E8500FBD429 /* SRWebSocket.h in Headers */,
+				CE3AC2101E0BF5CA0094E25C /* ScanNowParser.h in Headers */,
 				1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */,
 				F4422A531E07F79100532FC5 /* AlmondPropertiesParser.h in Headers */,
 				1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */,
@@ -2195,6 +2202,7 @@
 				1DF03FE22D7AB1C44290B0BC /* CommandTypeScoreboardEvent.m in Sources */,
 				1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */,
 				A569B8AA1DBE3E8500FBD429 /* SRIOConsumer.m in Sources */,
+				CE3AC2111E0BF5CA0094E25C /* ScanNowParser.m in Sources */,
 				A569B8B81DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */,
 				F4422A541E07F79100532FC5 /* AlmondPropertiesParser.m in Sources */,
 				A52163FF1C983E4E00E7B79D /* Formatter.m in Sources */,

@@ -46,9 +46,11 @@
     if(![mainDict[@"CommandType"] isEqualToString:@"IOTScanResponse"])
         return;
     NSLog(@"[AlmondManagement currentAlmond].almondplusMAC %@",[AlmondManagement currentAlmond].almondplusMAC);
-    
+    toolkit.iotScanResults = nil;
+    toolkit.iotScanResults = [[NSMutableDictionary alloc]init];
     //if(![mainDict[@"AlmondMAC"] isEqualToString:[AlmondManagement currentAlmond].almondplusMAC])
     NSMutableArray *scanNowArr = [[NSMutableArray alloc]init];
+    NSLog(@"maind dict devices %@",mainDict[@"Devices"]);
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
             NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
@@ -57,6 +59,7 @@
     [toolkit.iotScanResults setObject:scanNowArr forKey:@"scanDevice"];
     [toolkit.iotScanResults setObject:mainDict[@"ScanTime"] forKey:@"scanTime"];
     [toolkit.iotScanResults setObject:mainDict[@"ExcludedMAC"] forKey:@"scanExclude"];
+    NSLog(@"final toolkit.iotScanResults %@",toolkit.iotScanResults);
     
     
     NSDictionary *resData = nil;
@@ -149,6 +152,7 @@
                                  @"MAC":deviceDict[@"MAC"]
                                  };
     
+    NSLog(@"return dict %@",returnDict);
     
     return  returnDict;
 }
