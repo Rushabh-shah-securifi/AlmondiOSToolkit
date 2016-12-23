@@ -45,11 +45,22 @@
     
     if(![mainDict[@"CommandType"] isEqualToString:@"IOTScanResponse"])
         return;
+     NSMutableArray *scanNowArr = [[NSMutableArray alloc]init];
+    if([mainDict[@"Reason"] isEqualToString:@"No Data Found"]){
+        toolkit.iotScanResults = nil;
+        toolkit.iotScanResults = [[NSMutableDictionary alloc]init];
+        NSDictionary *resData = nil;
+        if (mainDict) {
+            resData = @{
+                        @"data" : mainDict
+                        };
+        }
+     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_IOT_SCAN_RESULT_CONTROLLER_NOTIFIER object:nil userInfo:resData];
+}
     NSLog(@"[AlmondManagement currentAlmond].almondplusMAC %@",[AlmondManagement currentAlmond].almondplusMAC);
-    toolkit.iotScanResults = nil;
-    toolkit.iotScanResults = [[NSMutableDictionary alloc]init];
+   
     //if(![mainDict[@"AlmondMAC"] isEqualToString:[AlmondManagement currentAlmond].almondplusMAC])
-    NSMutableArray *scanNowArr = [[NSMutableArray alloc]init];
+   
     
     if(mainDict == NULL)
         return;

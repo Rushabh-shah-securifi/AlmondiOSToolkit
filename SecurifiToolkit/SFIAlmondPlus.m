@@ -182,6 +182,7 @@
     return result;
 }
 -(BOOL)iotSupportFirmwareVersion:(NSString *)almondFiemware{
+    NSLog(@"almondFiemware results %@",almondFiemware);
      BOOL result = [self compareVersions:almondFiemware supportedVersion:@"AL3-R014m"];
     NSLog(@"results1 %d",result);
     
