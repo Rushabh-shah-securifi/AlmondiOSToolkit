@@ -90,6 +90,9 @@
     
     cmd = [GenericCommand requestAlmondProperties:mac];
     [toolKit asyncSendToNetwork:cmd];
+    
+    cmd = [GenericCommand requestScanNow:mac];
+    [toolKit asyncSendToNetwork:cmd];
     // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
     //    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser
 }

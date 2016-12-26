@@ -988,6 +988,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
         [self asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
         [self asyncSendToNetwork:[GenericCommand requestAlmondProperties:plus.almondplusMAC]];
+        [self asyncSendToNetwork:[GenericCommand requestScanNow:plus.almondplusMAC]];
     }
 }
 
