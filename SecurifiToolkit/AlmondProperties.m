@@ -8,6 +8,7 @@
 
 #import "AlmondProperties.h"
 #import "SecurifiToolkit.h"
+#import "NSData+Securifi.h"
 
 @implementation AlmondProperties
 
@@ -140,4 +141,9 @@
     }
 }
 
++ (NSString *)getBase64EncryptedSting:(NSString *)mac uptime:(NSString *)uptime password:(NSString *)pass{
+    NSData* data = [pass dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *encryptedData = [data securifiEncryptPassword:mac uptime:uptime];
+    return [encryptedData base64EncodedString];
+}
 @end

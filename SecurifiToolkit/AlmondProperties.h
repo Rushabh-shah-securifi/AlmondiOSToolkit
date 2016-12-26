@@ -37,4 +37,5 @@
 + (void)parseDynamicProperty:(NSDictionary *)payload;
 + (AlmondProperties *)getTestAlmondProperties;
 + (AlmondProperties *)getEmptyAlmondProperties;
++ (NSString *)getBase64EncryptedSting:(NSString *)mac uptime:(NSString *)uptime password:(NSString *)pass;
 @end
