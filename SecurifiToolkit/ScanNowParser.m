@@ -45,10 +45,11 @@
     
     if(![mainDict[@"CommandType"] isEqualToString:@"IOTScanResponse"])
         return;
+    toolkit.iotScanResults = nil;
+    toolkit.iotScanResults = [[NSMutableDictionary alloc]init];
      NSMutableArray *scanNowArr = [[NSMutableArray alloc]init];
     if([mainDict[@"Reason"] isEqualToString:@"No Data Found"]){
-        toolkit.iotScanResults = nil;
-        toolkit.iotScanResults = [[NSMutableDictionary alloc]init];
+       
         NSDictionary *resData = nil;
         if (mainDict) {
             resData = @{
@@ -67,7 +68,6 @@
     if(mainDict[@"Devices"] == NULL)
         return;
     
-    NSLog(@"maind dict devices %@",mainDict[@"Devices"]);
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
         if([self checkForValidresponse:dict]){
@@ -79,7 +79,6 @@
     [toolkit.iotScanResults setObject:mainDict[@"ScanTime"] forKey:@"scanTime"];
     [toolkit.iotScanResults setObject:mainDict[@"ExcludedMAC"] forKey:@"scanExclude"];
     [toolkit.iotScanResults setObject:mainDict[@"Count"] forKey:@"scanCount"];
-    NSLog(@"final toolkit.iotScanResults %@",toolkit.iotScanResults);
     
     
     NSDictionary *resData = nil;
@@ -168,8 +167,10 @@
         [arr addObject:@"2"];
     if(ForwardRules.count> 0)
         [arr addObject:@"4"];
-    if(UpnpRules > 0)
+    if(UpnpRules.count > 0)
         [arr addObject:@"5"];
+    NSLog(@"deviceDict = %@",deviceDict);
+    NSLog(@"arr count %ld",arr.count);
     
     if(arr.count > 0)
         return YES;
