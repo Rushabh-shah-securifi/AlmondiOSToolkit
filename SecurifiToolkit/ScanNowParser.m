@@ -180,20 +180,21 @@
 }
 
 -(NSDictionary *)iotDeviceObj:(NSDictionary *)deviceDict{
+    NSLog(@"deviceDict = = %@",deviceDict);
     NSArray *ports = deviceDict[@"Ports"];
     NSString *telnet = deviceDict[@"Telnet"];
     NSString *Http = deviceDict[@"Http"];
     NSArray *ForwardRules = deviceDict[@"ForwardRules"];
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
-    NSDictionary *returnDict = @{@"Telnet":@{@"P":[telnet isEqualToString:@"0"]?@"0":@"1",
+    NSDictionary *returnDict = @{@"Telnet":@{@"P":[telnet isEqualToString:@"1"]?@"1":@"0",
                                              @"Tag":@"1"},
-                                 @"Ports":@{@"P":ports.count?@"0":@"1",
+                                 @"Ports":@{@"P":ports.count>0?@"1":@"0",
                                             @"Tag":@"2"},
-                                 @"Http":@{@"P":[Http isEqualToString:@"0"]?@"0":@"1",
+                                 @"Http":@{@"P":[Http isEqualToString:@"1"]?@"1":@"0",
                                            @"Tag":@"3"},
-                                 @"ForwardRules":@{@"P":ForwardRules.count?@"0":@"1",
+                                 @"ForwardRules":@{@"P":ForwardRules.count>0?@"1":@"0",
                                                    @"Tag":@"4"},
-                                 @"UpnpRules":@{@"P":UpnpRules.count?@"0":@"1",
+                                 @"UpnpRules":@{@"P":UpnpRules.count>0?@"1":@"0",
                                                 @"Tag":@"5"},
                                  @"MAC":deviceDict[@"MAC"]
                                  };

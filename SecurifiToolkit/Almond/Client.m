@@ -70,6 +70,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"camera"]) {
         return @"camera_icon";
     }
+    
     if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_echo"]) {
         return @"amazon_echo";
     }
@@ -106,6 +107,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"sonos"]) {
         return @"speaker_icon";
     }
+    
     if ([[self.deviceType lowercaseString] isEqualToString:@"airplay_speakers"]) {
         return @"speaker_icon";
     }//
@@ -143,7 +145,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"withings"]) {
         return @"videocam_icon";
     }
-    return @"help_icon";
+    return @"generic";
 }
 
 - (NSString *)getNotificationTypeByName:(NSString *)name {
