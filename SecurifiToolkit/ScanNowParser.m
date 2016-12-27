@@ -71,13 +71,20 @@
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
         if([self checkForValidresponse:dict]){
+            if([self checkForClientPresent:toolkit.clients mac:dict[@"MAC"]]){
             NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
             [scanNowArr addObject:iotDeviceObj];
+            }
         }
+    }
+    NSMutableArray *excludedArr = [[NSMutableArray alloc]init];
+    for(NSString *mac in mainDict[@"ExcludedMAC"]){
+        if([self checkForClientPresent:toolkit.clients mac:mac])
+            [excludedArr addObject:mac];
     }
     [toolkit.iotScanResults setObject:scanNowArr forKey:@"scanDevice"];
     [toolkit.iotScanResults setObject:mainDict[@"ScanTime"] forKey:@"scanTime"];
-    [toolkit.iotScanResults setObject:mainDict[@"ExcludedMAC"] forKey:@"scanExclude"];
+    [toolkit.iotScanResults setObject:excludedArr forKey:@"scanExclude"];
     [toolkit.iotScanResults setObject:mainDict[@"Count"] forKey:@"scanCount"];
     
     
@@ -91,6 +98,13 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_IOT_SCAN_RESULT_CONTROLLER_NOTIFIER object:nil userInfo:resData];
     
     
+}
+-(BOOL)checkForClientPresent:(NSArray *)clientList mac:(NSString *)mac{
+    for(Client *client in clientList){
+        if([client.deviceMAC isEqualToString:mac])
+            return YES;
+    }
+    return NO;
 }
 //
 //
