@@ -696,7 +696,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
     
     if([ConnectionStatus getConnectionStatus]==AUTHENTICATED){
         if([toolKit currentConnectionMode] == SFIAlmondConnectionMode_cloud){
+            
             SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement getCurrentLocalAlmondSettings];
+            
             NSArray* localAlmonds = [AlmondManagement localLinkedAlmondList];
             NSLog(@"%@ is the local almond mac name",settings.almondplusMAC);
             if (settings){
@@ -1013,14 +1015,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
             
         case CommandType_ALMOND_DYNAMIC_RESPONSE:{
             [AlmondManagement onAlmondDynamicResponse:payload];
-            [self postNotification:ACCOUNTS_RELATED data:payload];
         }
             
         case CommandType_ALMOND_LIST:{
             NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:payload
                                                                        options:kNilOptions
                                                                          error:nil];
-            
             if([[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondListResponse"] || [[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondAffiliationData"])
                 [AlmondManagement onAlmondListResponse:payload network:network];
             else{

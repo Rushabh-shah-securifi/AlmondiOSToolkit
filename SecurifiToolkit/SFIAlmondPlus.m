@@ -15,16 +15,14 @@
     //Step 1: Conversion from decimal to hexadecimal
     DLog(@"%llu", (unsigned long long) [macDecimal longLongValue]);
     NSString *hexIP = [NSString stringWithFormat:@"%llX", (unsigned long long) [macDecimal longLongValue]];
-
     NSMutableString *wifiMAC = [[NSMutableString alloc] init];
     //Step 2: Divide in pairs of 2 hex
     for (NSUInteger i = 0; i < [hexIP length]; i = i + 2) {
         NSString *ichar = [NSString stringWithFormat:@"%c%c:", [hexIP characterAtIndex:i], [hexIP characterAtIndex:i + 1]];
         [wifiMAC appendString:ichar];
     }
-
+    
     [wifiMAC deleteCharactersInRange:NSMakeRange([wifiMAC length] - 1, 1)];
-
     DLog(@"WifiMAC: %@", wifiMAC);
     return wifiMAC;
 }
@@ -68,6 +66,7 @@
         self.colorCodeIndex = [coder decodeIntForKey:@"self.colorCodeIndex"];
         //PY 190914 - Owned Almond information
         self.userCount = [coder decodeIntForKey:@"self.userCount"];
+        self.isPrimaryAlmond = [coder decodeIntForKey:@"self.isPrimaryAlmond"];
         self.accessEmailIDs = [coder decodeObjectForKey:@"self.accessEmailIDs"];
         self.isExpanded = [coder decodeBoolForKey:@"self.isExpanded"];
         self.ownerEmailID = [coder decodeObjectForKey:@"self.ownerEmailID"];
@@ -79,19 +78,17 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeInt32:1 forKey:@"self.schemaVersion"]; // for future use/expansion; version this schema
-
     [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
     [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
     [coder encodeObject:self.firmware forKey:@"self.firmware"];
     [coder encodeInt:self.index forKey:@"self.index"];
     [coder encodeInt:self.colorCodeIndex forKey:@"self.colorCodeIndex"];
-
     //PY 190914 - Owned Almond information
     [coder encodeInt:self.userCount forKey:@"self.userCount"];
+    [coder encodeInt:self.isPrimaryAlmond forKey: @"self.isPrimaryAlmond"];
     [coder encodeObject:self.accessEmailIDs forKey:@"self.accessEmailIDs"];
     [coder encodeBool:self.isExpanded forKey:@"self.isExpanded"];
     [coder encodeObject:self.ownerEmailID forKey:@"self.ownerEmailID"];
-
     [coder encodeInt:self.linkType forKey:@"self.linkType"];
 }
 
@@ -103,6 +100,7 @@
     [description appendFormat:@", self.index=%i", self.index];
     [description appendFormat:@", self.colorCodeIndex=%i", self.colorCodeIndex];
     [description appendFormat:@", self.userCount=%i", self.userCount];
+    [description appendFormat:@", self.isPrimaryAlmond=%d", self.isPrimaryAlmond];
     [description appendFormat:@", self.accessEmailIDs=%@", self.accessEmailIDs];
     [description appendFormat:@", self.isExpanded=%d", self.isExpanded];
     [description appendFormat:@", self.ownerEmailID=%@", self.ownerEmailID];
@@ -119,6 +117,7 @@
         copy.almondplusName = self.almondplusName;
         copy.firmware = self.firmware;
         copy.index = self.index;
+        copy.isPrimaryAlmond = self.isPrimaryAlmond;
         copy.colorCodeIndex = self.colorCodeIndex;
         copy.userCount = self.userCount;
         copy.accessEmailIDs = self.accessEmailIDs;

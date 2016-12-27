@@ -24,29 +24,22 @@
     NSDictionary* localNetworkSettings = [toolkit.dataManager readAllAlmondLocalNetworkSettings];
     
     if([localNetworkSettings count] == 0){
-        NSLog(@"testing getcurrentlocalalmondsettings1");
         return nil;
     }
     
     else{
-        NSLog(@"testing getcurrentlocalalmondsettings2");
         NSString* currentAlmondMac = [AlmondManagement currentAlmond].almondplusMAC;
         
         SFIAlmondLocalNetworkSettings* settings;
         for(NSString* mac in localNetworkSettings.allKeys){
-            NSLog(@"testing getcurrentlocalalmondsettings3");
             if([currentAlmondMac isEqualToString:mac]){
-                NSLog(@"testing getcurrentlocalalmondsettings4");
                 settings = [self localNetworkSettingsForAlmond:mac];
                 break;
             }
         }
 
         if(!settings){
-            NSLog(@"testing getcurrentlocalalmondsettings5");
             settings = [self localNetworkSettingsForAlmond:[localNetworkSettings.allKeys objectAtIndex:0]];
-            NSLog(@"%@ is the current almond mac value", [AlmondManagement currentAlmond].almondplusMAC);
-            NSLog(@"%@ is the almond mac value", settings.almondplusMAC);
         }
         
         return settings;

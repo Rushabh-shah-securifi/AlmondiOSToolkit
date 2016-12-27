@@ -10,12 +10,11 @@
 
 #import <SecurifiToolkit/SecurifiTypes.h>
 #import <SecurifiToolkit/NSDate+Convenience.h>
-
+#import <SecurifiToolkit/SFIAlmondPlus.h>
 #import <SecurifiToolkit/SecurifiConfigurator.h>
 #import <SecurifiToolkit/GenericCommand.h>
 #import <SecurifiToolkit/SFIDevice.h>
 #import <SecurifiToolkit/SFIDeviceValue.h>
-#import <SecurifiToolkit/SFIAlmondPlus.h>
 #import <SecurifiToolkit/SFIDeviceKnownValues.h>
 #import <SecurifiToolkit/Scoreboard.h>
 #import <SecurifiToolkit/AlmondPlusSDKConstants.h>

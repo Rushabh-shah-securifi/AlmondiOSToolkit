@@ -63,7 +63,7 @@ typedef NS_ENUM(unsigned int, TestConnectionResult) {
 
 - (void)purgePassword;
 
-- (id)initWithCoder:(NSCoder *)coder;
+- (id)initWithCoder:(NSCoder*)coder;
 
 - (void)encodeWithCoder:(NSCoder *)coder;
 

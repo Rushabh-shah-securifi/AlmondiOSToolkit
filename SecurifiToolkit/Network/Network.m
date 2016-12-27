@@ -286,28 +286,32 @@
             [self postData:SENSOR_CHANGE_NOTIFIER data:payload];
             break;
         }
+            
+        //all account related responses have this type, use this to show failure reasons
+        case CommandType_ACCOUNTS_RELATED :{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:ACCOUNTS_RELATED data:payload];
+            break;
+        }
         
+        //AlmondListResponse and AlmondAffiliationDataResponse have this command response
         case CommandType_ALMOND_LIST:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self delegateData:payload commandType:commandType];
             break;
         }
-        
-        case CommandType_ALMOND_DYNAMIC_RESPONSE:{
-            [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self delegateData:payload commandType:commandType];
-            break;
-        }
-            
+
+        //DynamicUserProfileResponse have this command type
         case CommandType_ACCOUNTS_DYNAMIC_RESPONSE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
             [self postData:DYNAMIC_ACCOUNT_RESPONSE data:payload];
             break;
         }
             
-        case CommandType_ACCOUNTS_RELATED :{
+        //DynamicAlmondAdd, DynamicAlmondDelete, DynamicUserAdd and DynamicUserDelete have this command type
+        case CommandType_ALMOND_DYNAMIC_RESPONSE:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:ACCOUNTS_RELATED data:payload];
+            [self delegateData:payload commandType:commandType];
             break;
         }
             

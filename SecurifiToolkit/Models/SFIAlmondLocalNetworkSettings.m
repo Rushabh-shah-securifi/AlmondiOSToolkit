@@ -213,14 +213,13 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeInt32:1 forKey:@"self.schemaVersion"]; // for future use/expansion; version this schema
-
     [coder encodeBool:self.enabled forKey:@"self.enabled"];
     [coder encodeObject:self.almondplusName forKey:@"self.almondplusName"];
     [coder encodeObject:self.almondplusMAC forKey:@"self.almondplusMAC"];
     [coder encodeObject:self.host forKey:@"self.host"];
     [coder encodeInt64:self.port forKey:@"self.port"];
     [coder encodeObject:self.login forKey:@"self.login"];
-
+    
     NSString *password = self.password;
     if (password.length > 0) {
         NSString *serviceName = [self makeKeychainServiceName];

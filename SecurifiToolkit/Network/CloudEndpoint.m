@@ -546,6 +546,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                 // Tell the world the connection is up and running
                                 // [self tryPostNetworkUpNotification];
                                 // Process the request by passing it to the delegate
+                                NSLog(@"%@ is the response payload", responsePayload);
                                 [self.delegate networkEndpoint:self dispatchResponse:responsePayload commandType:(CommandType) commandType];
                             }
                             
