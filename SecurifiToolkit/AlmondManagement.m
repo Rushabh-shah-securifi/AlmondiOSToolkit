@@ -549,4 +549,15 @@
     }
     return NO;
 }
+
++ (SFIAlmondPlus *)tryLoadCurrentAL3{
+    NSString *currentAlmMac = [AlmondManagement currentAlmond].almondplusMAC;
+    NSArray *al3List = [self getAL3s:[AlmondManagement almondList]];
+    for(SFIAlmondPlus *alm in al3List){
+        if([alm.almondplusMAC isEqualToString:currentAlmMac])
+            return alm;
+    }
+    return [al3List objectAtIndex:0];
+}
+
 @end
