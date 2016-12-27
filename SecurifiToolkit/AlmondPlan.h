@@ -33,4 +33,5 @@ typedef NS_ENUM(NSInteger, PlanType){
 + (NSInteger)getPlanMonths:(PlanType)planType;
 + (PlanType)getPlanType:(NSString *)planString;
 + (BOOL)hasSubscription:(NSString *)mac;
++ (void)resetAlmondPlan:(NSString *)mac;
 @end

@@ -53,6 +53,14 @@
     return plan;
 }
 
++ (void)resetAlmondPlan:(NSString *)mac{
+    NSLog(@"reset mac: %@", mac);
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    AlmondPlan *plan = toolkit.subscription[mac];
+    if(plan)
+        plan.planType = PlanTypeNone;
+}
+
 + (void)updateAlmondPlan:(PlanType)planType epoch:(NSString *)epoch mac:(NSString *)mac{
     NSLog(@"updateAlmondPlan: %d", planType);
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];

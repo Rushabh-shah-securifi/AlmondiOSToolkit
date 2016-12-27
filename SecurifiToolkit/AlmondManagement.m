@@ -13,6 +13,7 @@
 #import "RouterCommandParser.h"
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "LocalNetworkManagement.h"
+#import "AlmondPlan.h"
 
 @implementation AlmondManagement
 
@@ -310,6 +311,7 @@
     for (SFIAlmondPlus *deleted in obj.almondPlusMACList) {
         // remove cached data about the Almond and sensors
         newAlmondList = [toolKit.dataManager deleteAlmond:deleted];
+        [AlmondPlan resetAlmondPlan:deleted.almondplusMAC];
         
         if (toolKit.config.enableNotifications) {
             // clear out Notification settings
