@@ -268,7 +268,7 @@
     GenericCommand *cmd = [GenericCommand new];
     cmd.command = [payload JSONString];
     cmd.commandType = commandType;
-    NSLog(@"command type %d",commandType)
+    NSLog(@"command type %d",commandType);
     return cmd;
 }
 
