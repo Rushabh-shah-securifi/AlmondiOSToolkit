@@ -228,6 +228,27 @@
     return genericCmd;
 }
 
++ (instancetype)requestScanNow:(NSString *)mac{
+    sfi_id mii = [GenericCommand nextCorrelationId];
+    NSDictionary *commandInfo = @{@"CommandType":@"IOTScanResults",
+                                  @"AlmondMAC":mac? mac: @""
+                                  };
+    NSLog(@"IOT Scan Results %@",commandInfo);
+    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:commandInfo commandType:CommandType_IOT_SCAN_RESULTS_REQUEST];
+    return genericCmd;
+}
+
++ (instancetype)requestAlmondProperties:(NSString *)mac{
+    sfi_id mii = [GenericCommand nextCorrelationId];
+    NSDictionary *payload = @{
+                              @"CommandType":@"AlmondProperties",
+                              @"AlmondMAC" : mac? mac: @"",
+                              @"Action" : @"get"
+                              };
+    GenericCommand *genericCmd =  [GenericCommand jsonStringPayloadCommand:payload commandType:CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND];
+    return genericCmd;
+}
+
 + (instancetype)jsonPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType {
     NSError *error;
     NSData *data = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];
@@ -247,6 +268,7 @@
     GenericCommand *cmd = [GenericCommand new];
     cmd.command = [payload JSONString];
     cmd.commandType = commandType;
+    NSLog(@"command type %d",commandType);
     return cmd;
 }
 

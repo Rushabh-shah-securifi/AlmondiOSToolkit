@@ -590,12 +590,12 @@ typedef void(^myCompletion)(BOOL);
     const char *dbpath = [databasePath UTF8String];
     
     if (sqlite3_open(dbpath, &database) == SQLITE_OK)
-    {
-        int record = [self getCount:amac clientMac:cmac];
+    {   int record = 0;
+        //int record = [self getCount:amac clientMac:cmac];
         
             NSLog(@"database path %s",dbpath);
             sqlite3_stmt *statement;
-            NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\" AND TIME IN(SELECT TIME FROM HistoryTB order by TIME ASC limit %d)",amac,cmac,record];
+            NSString *delStatmrnt = [NSString stringWithFormat:@"DELETE FROM HistoryTB WHERE AMAC = \"%@\" AND CMAC = \"%@\"",amac,cmac];
             if (sqlite3_prepare_v2(database, [delStatmrnt UTF8String], -1, &statement, NULL) == SQLITE_OK)
             {
                 if(sqlite3_step(statement) == SQLITE_DONE)

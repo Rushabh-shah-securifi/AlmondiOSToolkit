@@ -180,8 +180,16 @@
     //NSLog(@"result: %d", result);
     return result;
 }
+-(BOOL)iotSupportFirmwareVersion:(NSString *)almondFiemware{
+    NSLog(@"almondFiemware results %@",almondFiemware);
+     BOOL result = [self compareVersions:almondFiemware supportedVersion:@"AL3-R014m"];
+    NSLog(@"results1 %d",result);
+    
+    return result;
+}
 
 -(BOOL)siteMapSupportFirmware:(NSString *)almondFiemware{
+    
     if([almondFiemware hasPrefix:@"AL3-"])
         return YES;
     else

@@ -29,7 +29,7 @@ typedef NS_ENUM(unsigned int, CommandType) {
     CommandType_DYNAMIC_ALMOND_ADD                      = 83,
     CommandType_DYNAMIC_ALMOND_DELETE                   = 84,
     CommandType_DYNAMIC_ALMOND_NAME_CHANGE              = 85,
-    CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE          = 1050,
+    CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND     = 1050,
     CommandType_DYNAMIC_NOTIFICATION_PREFERENCE_LIST    = 87,
     CommandType_DYNAMIC_ALMOND_MODE_CHANGE              = 89,
     
@@ -133,11 +133,16 @@ typedef NS_ENUM(unsigned int, CommandType) {
 
     
     CommandType_ROUTER_COMMAND_REQUEST_RESPONSE         = 1100,
-    
+
     CommandType_ACCOUNTS_RELATED                        = 1110,
     CommandType_ACCOUNTS_DYNAMIC_RESPONSE               = 1111,
     CommandType_ALMOND_LIST                             = 1112,
     CommandType_ALMOND_DYNAMIC_RESPONSE                 = 1113,
+
+    CommandType_SUBSCRIPTIONS                           = 1010,
+    CommandType_SUBSCRIBE_ME                            = 1011,
+    CommandType_DYNAMIC_SUBSCRIBE_ME                    = 1012,
+    CommandType_IOT_SCAN_RESULTS_REQUEST                = 1013,
    
 };
 

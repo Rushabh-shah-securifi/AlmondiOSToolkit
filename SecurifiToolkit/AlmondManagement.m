@@ -14,6 +14,7 @@
 #import "RouterCommandParser.h"
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "LocalNetworkManagement.h"
+#import "AlmondPlan.h"
 
 @implementation AlmondManagement
 
@@ -114,6 +115,14 @@ static int responseCount = 0;
     NSLog(@" requestRouterSummary request send ");
     cmd = [GenericCommand requestRouterSummary:mac];
     [toolKit asyncSendToNetwork:cmd];
+    
+    cmd = [GenericCommand requestAlmondProperties:mac];
+    [toolKit asyncSendToNetwork:cmd];
+    
+    cmd = [GenericCommand requestScanNow:mac];
+    [toolKit asyncSendToNetwork:cmd];
+    // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
+    //    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser
 }
 
 
@@ -443,10 +452,15 @@ static int responseCount = 0;
         cmd = [GenericCommand requestAlmondClients:plus.almondplusMAC];
         
         [toolkit asyncSendToNetwork:cmd];
-        
+
         cmd = [GenericCommand requestAlmondRules:plus.almondplusMAC];
-        
         [toolkit asyncSendToNetwork:cmd];
+        
+        cmd = [GenericCommand requestAlmondProperties:plus.almondplusMAC];
+        [toolkit asyncSendToNetwork:cmd];
+        
+        cmd = [GenericCommand requestScanNow:plus.almondplusMAC];
+         [toolkit asyncSendToNetwork:cmd];
         
         if(toolkit.currentConnectionMode!=SFIAlmondConnectionMode_local){
             cmd = [GenericCommand requestRouterSummary:plus.almondplusMAC];
@@ -477,8 +491,6 @@ static int responseCount = 0;
     
     return cmd;
 }
-
-
 
 + (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)obj {
     
@@ -688,6 +700,34 @@ static int responseCount = 0;
     }
     
     [toolkit postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
+}
+
++ (NSArray *)getAL3s:(NSArray *)cloud{
+    NSMutableArray *al3Array = [NSMutableArray new];
+    for(SFIAlmondPlus *alm in cloud){
+        if([alm.firmware.lowercaseString hasPrefix:@"al3-"])
+            [al3Array addObject:alm];
+    }
+    return al3Array;
+}
+
++ (BOOL)hasAtleaseOneAL3{
+    NSArray *almonds = [AlmondManagement almondList];
+    for(SFIAlmondPlus *alm in almonds){
+        if([alm.firmware.lowercaseString hasPrefix:@"al3-"])
+            return YES;
+    }
+    return NO;
+}
+
++ (SFIAlmondPlus *)tryLoadCurrentAL3{
+    NSString *currentAlmMac = [AlmondManagement currentAlmond].almondplusMAC;
+    NSArray *al3List = [self getAL3s:[AlmondManagement almondList]];
+    for(SFIAlmondPlus *alm in al3List){
+        if([alm.almondplusMAC isEqualToString:currentAlmMac])
+            return alm;
+    }
+    return [al3List objectAtIndex:0];
 }
 
 @end

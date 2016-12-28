@@ -313,6 +313,8 @@
 		CE2EA27219D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */; };
 		CE2EA27519D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CE2EA27619D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */; };
+		CE3AC2101E0BF5CA0094E25C /* ScanNowParser.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3AC20E1E0BF5CA0094E25C /* ScanNowParser.h */; };
+		CE3AC2111E0BF5CA0094E25C /* ScanNowParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3AC20F1E0BF5CA0094E25C /* ScanNowParser.m */; };
 		CE3EDAEC1D46390600C153A6 /* BrowsingHistoryUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */; };
 		CE3EDAED1D46390600C153A6 /* BrowsingHistoryUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */; };
 		CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -419,6 +421,14 @@
 		CEF6F4A71C92CAAF00C68975 /* SFIButtonSubProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */; };
 		CEF6F4A81C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
 		CEF6F4A91C92CAAF00C68975 /* SFIButtonSubProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */; };
+		F4422A531E07F79100532FC5 /* AlmondPropertiesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F4422A511E07F79100532FC5 /* AlmondPropertiesParser.h */; };
+		F4422A541E07F79100532FC5 /* AlmondPropertiesParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F4422A521E07F79100532FC5 /* AlmondPropertiesParser.m */; };
+		F4422A571E08162C00532FC5 /* AlmondProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = F4422A551E08162C00532FC5 /* AlmondProperties.h */; };
+		F4422A581E08162C00532FC5 /* AlmondProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = F4422A561E08162C00532FC5 /* AlmondProperties.m */; };
+		F4BB64E01E07A85500361126 /* SubscriptionParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F4BB64DE1E07A85400361126 /* SubscriptionParser.h */; };
+		F4BB64E11E07A85500361126 /* SubscriptionParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F4BB64DF1E07A85400361126 /* SubscriptionParser.m */; };
+		F4F981D91E02763E00FB0676 /* AlmondPlan.h in Headers */ = {isa = PBXBuildFile; fileRef = F4F981D71E02763E00FB0676 /* AlmondPlan.h */; };
+		F4F981DA1E02763E00FB0676 /* AlmondPlan.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F981D81E02763E00FB0676 /* AlmondPlan.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -749,6 +759,8 @@
 		CE2EA27019D2B6B600C6D6A8 /* DeleteMeAsSecondaryUserRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserRequest.m; sourceTree = "<group>"; };
 		CE2EA27319D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMeAsSecondaryUserResponse.h; sourceTree = "<group>"; };
 		CE2EA27419D2B6C600C6D6A8 /* DeleteMeAsSecondaryUserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMeAsSecondaryUserResponse.m; sourceTree = "<group>"; };
+		CE3AC20E1E0BF5CA0094E25C /* ScanNowParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScanNowParser.h; sourceTree = "<group>"; };
+		CE3AC20F1E0BF5CA0094E25C /* ScanNowParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScanNowParser.m; sourceTree = "<group>"; };
 		CE3EDAEA1D46390600C153A6 /* BrowsingHistoryUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowsingHistoryUtil.h; sourceTree = "<group>"; };
 		CE3EDAEB1D46390600C153A6 /* BrowsingHistoryUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowsingHistoryUtil.m; sourceTree = "<group>"; };
 		CE458D5A19EBBBC000689251 /* SFICredentialsValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFICredentialsValidator.h; sourceTree = "<group>"; };
@@ -852,6 +864,14 @@
 		CEF6F49B1C92CAAF00C68975 /* RulesTimeElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RulesTimeElement.m; sourceTree = "<group>"; };
 		CEF6F49C1C92CAAF00C68975 /* SFIButtonSubProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFIButtonSubProperties.h; sourceTree = "<group>"; };
 		CEF6F49D1C92CAAF00C68975 /* SFIButtonSubProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFIButtonSubProperties.m; sourceTree = "<group>"; };
+		F4422A511E07F79100532FC5 /* AlmondPropertiesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondPropertiesParser.h; sourceTree = "<group>"; };
+		F4422A521E07F79100532FC5 /* AlmondPropertiesParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondPropertiesParser.m; sourceTree = "<group>"; };
+		F4422A551E08162C00532FC5 /* AlmondProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondProperties.h; sourceTree = "<group>"; };
+		F4422A561E08162C00532FC5 /* AlmondProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondProperties.m; sourceTree = "<group>"; };
+		F4BB64DE1E07A85400361126 /* SubscriptionParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionParser.h; sourceTree = "<group>"; };
+		F4BB64DF1E07A85400361126 /* SubscriptionParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionParser.m; sourceTree = "<group>"; };
+		F4F981D71E02763E00FB0676 /* AlmondPlan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlmondPlan.h; sourceTree = "<group>"; };
+		F4F981D81E02763E00FB0676 /* AlmondPlan.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlmondPlan.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1127,6 +1147,10 @@
 				A5C7AE3D1C7C98D6007E630D /* DeviceParser.m */,
 				A5C7AE481C807BFA007E630D /* RouterParser.h */,
 				A5C7AE491C807BFA007E630D /* RouterParser.m */,
+				F4BB64DE1E07A85400361126 /* SubscriptionParser.h */,
+				F4BB64DF1E07A85400361126 /* SubscriptionParser.m */,
+				F4422A511E07F79100532FC5 /* AlmondPropertiesParser.h */,
+				F4422A521E07F79100532FC5 /* AlmondPropertiesParser.m */,
 			);
 			path = Parser;
 			sourceTree = "<group>";
@@ -1230,6 +1254,8 @@
 				A521640F1C9841E300E7B79D /* AlmondJsonCommandKeyConstants.h */,
 				A5D9B50B1DB62E6900BF1F60 /* Log.h */,
 				A5D9B50C1DB62E7A00BF1F60 /* Log.m */,
+				CE3AC20E1E0BF5CA0094E25C /* ScanNowParser.h */,
+				CE3AC20F1E0BF5CA0094E25C /* ScanNowParser.m */,
 			);
 			path = SecurifiToolkit;
 			sourceTree = "<group>";
@@ -1279,6 +1305,10 @@
 				A569B8701DBE108C00FBD429 /* LocalNetworkManagement.m */,
 				B00565661E12351800C4CA81 /* SFISecondaryUser.h */,
 				B00565671E12357D00C4CA81 /* SFISecondaryUser.m */,
+				F4F981D71E02763E00FB0676 /* AlmondPlan.h */,
+				F4F981D81E02763E00FB0676 /* AlmondPlan.m */,
+				F4422A551E08162C00532FC5 /* AlmondProperties.h */,
+				F4422A561E08162C00532FC5 /* AlmondProperties.m */,
 				1C3270DB1A243B28007202C1 /* Router */,
 				CE458D5919EBBB5000689251 /* util */,
 				1C75820919B028F70074C601 /* Stats */,
@@ -1734,8 +1764,11 @@
 				CE91316D19C9A2DD00D94876 /* ChangePasswordRequest.h in Headers */,
 				CE2EA26519D04BEA00C6D6A8 /* AlmondNameChangeResponse.h in Headers */,
 				1CD1D5481A660B7A00C030E9 /* NotificationDeleteRegistrationRequest.h in Headers */,
+				F4422A571E08162C00532FC5 /* AlmondProperties.h in Headers */,
 				A569B8E01DBE3E8500FBD429 /* SRWebSocket.h in Headers */,
+				CE3AC2101E0BF5CA0094E25C /* ScanNowParser.h in Headers */,
 				1C414BD21A79F2BE00C448A4 /* SFIOfflineDataManager.h in Headers */,
+				F4422A531E07F79100532FC5 /* AlmondPropertiesParser.h in Headers */,
 				1C414BEA1A7B625400C448A4 /* NSDate+Convenience.h in Headers */,
 				CE7F218419CC012C008AD4FB /* AlmondAffiliationData.h in Headers */,
 				CE7F218819CC0166008AD4FB /* AlmondAffiliationDataResponse.h in Headers */,
@@ -1749,6 +1782,7 @@
 				A569B8DC1DBE3E8500FBD429 /* SocketRocket.h in Headers */,
 				CE7EA7DE18978910005DCBA3 /* Base64.h in Headers */,
 				CEEAB7A91CACF2B8003C5290 /* Client.h in Headers */,
+				F4BB64E01E07A85500361126 /* SubscriptionParser.h in Headers */,
 				1C3270EA1A243B28007202C1 /* SFIWirelessUsers.h in Headers */,
 				A52163FE1C983E4E00E7B79D /* Formatter.h in Headers */,
 				CE2EA25D19D03FC900C6D6A8 /* DeleteSecondaryUserResponse.h in Headers */,
@@ -1757,6 +1791,7 @@
 				A569B8A61DBE3E8500FBD429 /* SRDelegateController.h in Headers */,
 				1CD1D54E1A660B7A00C030E9 /* NotificationPreferenceListResponse.h in Headers */,
 				22FAE88817A8E528002FFEE8 /* Signup.h in Headers */,
+				F4F981D91E02763E00FB0676 /* AlmondPlan.h in Headers */,
 				CE9A2916188D30270063D562 /* SensorChangeResponse.h in Headers */,
 				CE458D5C19EBBBC000689251 /* SFICredentialsValidator.h in Headers */,
 				1C414BE01A79F35D00C448A4 /* SUnit.h in Headers */,
@@ -2061,6 +2096,7 @@
 				2204C20F1794349400B05F17 /* GenericCommand.m in Sources */,
 				1C75820D19B028F70074C601 /* Scoreboard.m in Sources */,
 				A569B8711DBE108C00FBD429 /* LocalNetworkManagement.m in Sources */,
+				F4F981DA1E02763E00FB0676 /* AlmondPlan.m in Sources */,
 				CE91315719C6B94500D94876 /* UserProfileResponse.m in Sources */,
 				CE2EA26E19D15DE300C6D6A8 /* MeAsSecondaryUserResponse.m in Sources */,
 				CE91315319C6B83B00D94876 /* UserProfileRequest.m in Sources */,
@@ -2125,6 +2161,7 @@
 				A5960DD51DC86F0F000B380C /* NotificationPreferenceListCallbacks.m in Sources */,
 				CE9C5B4B188669B6006F2306 /* SensorForcedUpdateRequest.m in Sources */,
 				1DF036E84160903EF0EC312A /* XMLWriter.m in Sources */,
+				F4422A581E08162C00532FC5 /* AlmondProperties.m in Sources */,
 				A569B8D31DBE3E8500FBD429 /* SRURLUtilities.m in Sources */,
 				1C3270EB1A243B28007202C1 /* SFIWirelessUsers.m in Sources */,
 				A52164181C9927D400E7B79D /* DeviceIndex.m in Sources */,
@@ -2160,6 +2197,7 @@
 				A569B8C41DBE3E8500FBD429 /* SRHTTPConnectMessage.m in Sources */,
 				1DF031BE3A10A0D38B4729A8 /* SFIAlmondLocalNetworkSettings.m in Sources */,
 				CEF6F49F1C92CAAF00C68975 /* Rule.m in Sources */,
+				F4BB64E11E07A85500361126 /* SubscriptionParser.m in Sources */,
 				1DF0391E21650F9E90235929 /* Login.m in Sources */,
 				1DF03DBC398A267A9DC97053 /* Logout.m in Sources */,
 				1DF0394FB68EE0CD0700B060 /* LoginResponse.m in Sources */,
@@ -2170,7 +2208,9 @@
 				1DF03FE22D7AB1C44290B0BC /* CommandTypeScoreboardEvent.m in Sources */,
 				1DF031E4EB99B646E0382E13 /* CommandTypes.m in Sources */,
 				A569B8AA1DBE3E8500FBD429 /* SRIOConsumer.m in Sources */,
+				CE3AC2111E0BF5CA0094E25C /* ScanNowParser.m in Sources */,
 				A569B8B81DBE3E8500FBD429 /* SRPinningSecurityPolicy.m in Sources */,
+				F4422A541E07F79100532FC5 /* AlmondPropertiesParser.m in Sources */,
 				A52163FF1C983E4E00E7B79D /* Formatter.m in Sources */,
 				1DF030BA38ACE415D8B22060 /* SecurifiTypes.m in Sources */,
 				1DF03A369FB69FD247EF53C4 /* NSData+Securifi.m in Sources */,

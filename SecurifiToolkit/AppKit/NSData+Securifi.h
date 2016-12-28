@@ -10,5 +10,5 @@
 // Encapsulates the procedure for decrypting the Almond admin password that is sent in an AlmondRouterSummary response payload.
 // Returns nil on failure to decrypt
 - (NSString *)securifiDecryptPasswordForAlmond:(NSString *)almondMac almondUptime:(NSString *)almondUptimeInt;
-
+- (NSData *)securifiEncryptPassword:(NSString *)almondMac uptime:(NSString *)almondUptimeInt;
 @end

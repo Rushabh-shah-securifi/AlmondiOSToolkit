@@ -166,6 +166,7 @@
 }
 
 -(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{
+    NSLog(@"setDeviceProperties dict %@",dict);
     device.name = dict[CLIENT_NAME];
     device.manufacturer = dict[MANUFACTURER];
     device.rssi = dict[RSSI];
@@ -184,11 +185,14 @@
 //    NSLog(@"dict[SM_ENABLE] = %@ device.name %@",dict[SM_ENABLE],device.name);
     device.webHistoryEnable = [dict[SM_ENABLE] boolValue];
     device.bW_Enable = [dict[BW_ENABLE] boolValue];
+    NSLog(@"type == %@.. ",dict[CLIENT_TYPE]);
     device.is_IoTDeviceType = [self isIoTdevice:dict[CLIENT_TYPE]];
-    device.iot_serviceEnable = YES;
+    NSLog(@"type iot == %d ",device.is_IoTDeviceType);
+    device.iot_serviceEnable = [dict[IOTEnable] boolValue];
+    device.iot_dnsEnable = [dict[DNSEnable] boolValue];
 }
 -(BOOL)isIoTdevice:(NSString *)clientType{
-    NSArray *iotTypes = @[@"withings",@"dlink_cameras",@"hikvision",@"foscam",@"motorola_connect ",@"ibaby_monitor",@"osram_lightify",@"honeywell_appliances",@"ge_appliances",@"wink",@"airplay_speakers",@"sonos",@"belkin_wemo",@"samsung_smartthings",@"ring_doorbell",@"piper",@"canary ",@"august_connect",@"nest_cam ",@"skybell_wifi",@"scout_home_system",@"philips_hue ",@"nest_protect",@"nest_thermostat ",@"amazon_dash",@"amazon_echo"];
+    NSArray *iotTypes = @[@"withings",@"dlink_cameras",@"hikvision",@"foscam",@"motorola_connect",@"ibaby_monitor",@"osram_lightify",@"honeywell_appliances",@"ge_appliances",@"wink",@"airplay_speakers",@"sonos",@"belkin_wemo",@"samsung_smartthings",@"ring_doorbell",@"piper",@"canary",@"august_connect",@"nest_cam",@"skybell_wifi",@"scout_home_system",@"nest_protect",@"nest_thermostat",@"amazon_dash",@"amazon_echo",@"nest",@"philips_hue"];
         if([iotTypes containsObject: clientType] )
             return YES;
         else return  NO;

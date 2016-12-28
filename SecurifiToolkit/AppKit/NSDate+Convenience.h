@@ -37,4 +37,8 @@
 + (NSString *)DateTimeString;
 
 + (NSDate*)getDateFromEpochFormatted:(NSString*)epoch;
+
++ (NSString *)getSubscriptionExpiryDate:(NSString *)epoch format:(NSString *)format;
+
+- (NSString *)stringFromDateAMPM;
 @end

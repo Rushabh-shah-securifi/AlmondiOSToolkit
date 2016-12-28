@@ -342,6 +342,13 @@
             [self postData:NOTIFICATION_COMMAND_TYPE_MESH_RESPONSE data:payload];
             break;
         }
+        case CommandType_IOT_SCAN_RESULTS_REQUEST: {
+            NSLog(@"network mesh command response CommandType_IOT_SCAN_RESULTS_REQUEST");
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_COMMAND_TYPE_IOT_SCAN_RESULT data:payload];
+            break;
+        }
+
         case CommandType_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE: {
             [self postDataDynamic:NOTIFICATION_DYNAMIC_SET_CREATE_DELETE_ACTIVATE_SCENE_NOTIFIER data:payload commandType:commandType];
             break;
@@ -427,14 +434,24 @@
             break;
         };
             
-        case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:{
+        case CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND:{
             [self tryMarkUnitCompletion:YES responseType:commandType];
-            [self postData:DYNAMIC_ALMOND_LOCATION_CHANIGE_NOTIFIER data:payload];
+            [self postData:ALMOND_PROPERTY_CHANGE_DYNAMIC_NOTIFIER data:payload];
             break;
         };
-            
-        //case CommandType_DYNAMIC_ALMOND_ADD:
-        //case CommandType_DYNAMIC_ALMOND_DELETE:
+
+        case CommandType_SUBSCRIBE_ME:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:SUBSCRIBE_ME_NOTIFIER data:payload];
+            break;
+        }
+        case CommandType_DYNAMIC_SUBSCRIBE_ME:{
+            [self tryMarkUnitCompletion:YES responseType:commandType];
+            [self postData:NOTIFICATION_SUBSCRIPTION_RESPONSE data:payload];
+            break;
+        }
+        case CommandType_DYNAMIC_ALMOND_ADD:
+        case CommandType_DYNAMIC_ALMOND_DELETE:
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
             
         case CommandType_DYNAMIC_DEVICE_DATA:
@@ -468,6 +485,7 @@
         case CommandType_DEVICELOG_RESPONSE:
         case CommandType_ALMOND_COMMAND_RESPONSE:
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: // posted from web socket only; payload is dictionary
+        case CommandType_SUBSCRIPTIONS:
         {
             NSLog(@"delegate is working properly");
             [self tryMarkUnitCompletion:YES responseType:commandType];

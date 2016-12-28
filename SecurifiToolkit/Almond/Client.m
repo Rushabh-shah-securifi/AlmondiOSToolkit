@@ -70,6 +70,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"camera"]) {
         return @"camera_icon";
     }
+    
     if ([[self.deviceType lowercaseString] isEqualToString:@"amazon_echo"]) {
         return @"amazon_echo";
     }
@@ -79,7 +80,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"philips_hue"]) {
         return @"philips_hue_icon";
     }
-    if ([[self.deviceType lowercaseString] isEqualToString:@"scout_home_security"]) {
+    if ([[self.deviceType lowercaseString] isEqualToString:@"scout_home_system"]) {
         return @"scout_hub_icon";
     }
     if ([[self.deviceType lowercaseString] isEqualToString:@"skybell_wifi"]) {
@@ -106,6 +107,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"sonos"]) {
         return @"speaker_icon";
     }
+    
     if ([[self.deviceType lowercaseString] isEqualToString:@"airplay_speakers"]) {
         return @"speaker_icon";
     }//
@@ -143,7 +145,7 @@
     if ([[self.deviceType lowercaseString] isEqualToString:@"withings"]) {
         return @"videocam_icon";
     }
-    return @"help_icon";
+    return @"generic";
 }
 
 - (NSString *)getNotificationTypeByName:(NSString *)name {
@@ -193,9 +195,10 @@
     return NO;
 }
 
-+ (BOOL)getClientByMAC:(NSString *)mac{
-    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
++ (Client*)getClientByMAC:(NSString *)mac{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance] ;
     for(Client *client in toolkit.clients){
+       
         if([mac isEqualToString:client.deviceMAC]){
             return client;
         }
@@ -225,8 +228,10 @@
 
 +(NSArray*) getClientGenericIndexes{
         NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,@-25,nil];
-    if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable){
-         return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-19,@-20,@-3,@-25,nil];
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+     BOOL local = [toolkit useLocalNetwork:[AlmondManagement currentAlmond].almondplusMAC];
+    if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable && [SecurifiToolkit sharedInstance].configuration.isPaymentDone && !local){
+         return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-26,@-19,@-20,@-3,@-25,nil];
     }
     //for commenting browsing history code
 //    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,nil];
@@ -313,6 +318,32 @@
             }
             break;
         }
+        case -24:{
+            if(get)
+                return client.isBlock? @"true": @"false";
+            else{
+                client.isBlock = newValue.boolValue;
+            }
+            break;
+        }
+        case -26:{
+            if(get)
+                return client.iot_serviceEnable? @"true": @"false";
+            else{
+                client.iot_serviceEnable = newValue.boolValue;
+            }
+            break;
+        }
+        case -27:{
+            if(get)
+                return client.iot_dnsEnable? @"true": @"false";
+            else{
+                client.iot_dnsEnable = newValue.boolValue;
+            }
+            break;
+        }
+
+
         case -25:{
             if(get)
             return client.bW_Enable? @"true": @"false";
@@ -400,6 +431,8 @@
         copy.category = self.category;
         copy.webHistoryEnable = self.webHistoryEnable;
         copy.bW_Enable = self.bW_Enable;
+        copy.iot_serviceEnable = self.iot_serviceEnable;
+        copy.iot_dnsEnable = self.iot_dnsEnable;
     }
     return copy;
 }

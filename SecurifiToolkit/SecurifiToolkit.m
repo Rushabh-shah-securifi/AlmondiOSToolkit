@@ -50,6 +50,7 @@
 #import "AffiliationUserRequest.h"
 #import "ResetPasswordRequest.h"
 #import "ClientParser.h"
+#import "ScanNowParser.h"
 #import "SceneParser.h"
 #import "RuleParser.h"
 #import "DeviceParser.h"
@@ -67,7 +68,9 @@
 #import "NotificationAccessAndRefreshCommands.h"
 #import "NotificationPreferenceListCallbacks.h"
 #import <SecurifiToolkit/ClientParser.h>
-
+#import "AlmondPlan.h"
+#import "SubscriptionParser.h"
+#import "AlmondPropertiesParser.h"
 
 #define kDASHBOARD_HELP_SHOWN                               @"kDashboardHelpShown"
 #define kDEVICES_HELP_SHOWN                                 @"kDevicesHelpShown"
@@ -110,10 +113,11 @@ NSString *const kSFINotificationPreferenceChangeActionDelete = @"delete";
 @property(nonatomic, strong) RuleParser *ruleParser;
 @property(nonatomic, strong) SceneParser *sceneParser;
 @property(nonatomic, strong) ClientParser *clientParser;
+@property(nonatomic,strong) ScanNowParser *scanNowParser;
 @property(nonatomic, strong) DeviceParser *deviceParser;
 @property(nonatomic, strong) RouterParser *routerParser;
-
-
+@property(nonatomic) SubscriptionParser *subscriptionParser;
+@property(nonatomic) AlmondPropertiesParser *almondPropertiesParser;
 @end
 
 
@@ -182,12 +186,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.scenesArray = [NSMutableArray new];
     self.clients = [NSMutableArray new];
     self.devices = [NSMutableArray new];
+    self.almondProperty = [[AlmondProperties alloc]init];
     
     self.ruleParser =[[RuleParser alloc]init];
     self.sceneParser =[[SceneParser alloc]init];
     self.clientParser =[[ClientParser alloc]init];
+    self.scanNowParser = [[ScanNowParser alloc]init];
     self.deviceParser = [[DeviceParser alloc]init];
     self.routerParser = [[RouterParser alloc]init];
+    self.subscriptionParser = [[SubscriptionParser alloc]init];
+    self.almondPropertiesParser = [[AlmondPropertiesParser alloc]init];
+    
 //    [DataBaseManager initializeDataBase]; //this is for testing, earlier was used to retrive generic indexes.
     if(self.configuration.siteMapEnable){
         [BrowsingHistoryDataBase initializeDataBase];
@@ -469,6 +478,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self.clients removeAllObjects];
      if(self.ruleList!=nil && self.ruleList.count>0)
         [self.ruleList removeAllObjects];
+    self.almondProperty = [AlmondProperties new];
 }
 
 
@@ -863,6 +873,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self asyncSendToNetwork:[GenericCommand requestAlmondClients:plus.almondplusMAC] ];
         [self asyncSendToNetwork:[GenericCommand requestSceneList:plus.almondplusMAC] ];
         [self asyncSendToNetwork:[GenericCommand requestAlmondRules:plus.almondplusMAC]];
+        [self asyncSendToNetwork:[GenericCommand requestAlmondProperties:plus.almondplusMAC]];
+        [self asyncSendToNetwork:[GenericCommand requestScanNow:plus.almondplusMAC]];
     }
 }
 
@@ -1061,6 +1073,11 @@ static SecurifiToolkit *toolkit_singleton = nil;
                 [AlmondManagement onDynamicAlmondNameChange:res];
             //}
             break;
+        }
+        case CommandType_SUBSCRIPTIONS:{//only in cloud
+            NSDictionary *dict = [payload objectFromJSONData];
+            NSLog(@"dict: %@, payload: %@", dict, payload);
+            self.subscription = [AlmondPlan getSubscriptions:dict[@"Almonds"]];
         }
             
         default:

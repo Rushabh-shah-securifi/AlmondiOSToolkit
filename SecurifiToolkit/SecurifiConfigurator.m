@@ -38,6 +38,7 @@
         self.enableSensorTileDebugInfo = NO;
         self.isSimulator = NO;
         self.siteMapEnable = YES;
+        self.isPaymentDone = YES;
     
     }
 

@@ -91,7 +91,7 @@
 #import "WebSocketEndpoint.h"
 #import "DynamicAlmondModeChange.h"
 #import "DeviceLogsProcessing.h"
-
+#import "AlmondProperties.h"
 
 #define kCURRENT_TEMPERATURE_FORMAT                         @"kCurrentThemperatureFormat"
 #define kPREF_CURRENT_ALMOND                                @"kAlmondCurrent"
@@ -217,10 +217,13 @@ struct PopUpSuggestions {
 @property(atomic) NSMutableArray *clients;
 @property(atomic) NSMutableArray *devices;
 @property(atomic) NSMutableArray *ruleList;
+@property(atomic) NSMutableDictionary *iotScanResults;
 @property(atomic) NSDictionary *genericDevices;
 @property(atomic) NSDictionary *genericIndexes;
 @property(nonatomic)NSString *routerMode;
 @property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
+@property(nonatomic) NSMutableDictionary *subscription;
+@property(nonatomic) AlmondProperties *almondProperty;
 
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config;
 -(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res;

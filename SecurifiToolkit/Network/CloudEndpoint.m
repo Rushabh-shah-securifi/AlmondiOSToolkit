@@ -267,7 +267,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                 case CommandType_ROUTER_COMMAND_REQUEST_RESPONSE:
                 case CommandType_WIFI_CLIENT_UPDATE_PREFERENCE_REQUEST:
                 case CommandType_WIFI_CLIENT_GET_PREFERENCE_REQUEST:
-                case CommandType_RULE_LIST:{
+                case CommandType_RULE_LIST:
+                case CommandType_SUBSCRIBE_ME:
+                case CommandType_IOT_SCAN_RESULTS_REQUEST:
+                case CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND:{
                     commandPayload = command.command;
                     break;
                 }
@@ -494,6 +497,7 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_WIFI_CLIENT_PREFERENCE_DYNAMIC_UPDATE:
                                     case CommandType_DYNAMIC_WIFI_CLIENT_REMOVED_ALL:
                                     case CommandType_RULE_LIST:
+                                    case CommandType_IOT_SCAN_RESULTS_REQUEST:
                                     case CommandType_DEVICE_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_CLIENT_LIST_AND_DYNAMIC_RESPONSES:
                                     case CommandType_SCENE_LIST_AND_DYNAMIC_RESPONSES:
@@ -502,7 +506,10 @@ typedef NS_ENUM(unsigned int, CloudEndpointSocketError) {
                                     case CommandType_NOTIFICATION_PREF_CHANGE_DYNAMIC_RESPONSE:
                                     case CommandType_DYNAMIC_ALMOND_NAME_CHANGE:
                                     case CommandType_MESH_COMMAND:
-                                    case CommandType_DYNAMIC_ALMOND_LOCATION_CHANGE:
+                                    case CommandType_ALMOND_PROPERTY_AND_DYNAMIC_COMMAND:
+                                    case CommandType_SUBSCRIPTIONS:
+                                    case CommandType_SUBSCRIBE_ME:
+                                    case CommandType_DYNAMIC_SUBSCRIBE_ME:
                                     case (CommandType) 99:
                                         // these commands are not wrapped; simply pass the JSON back
                                         responsePayload = buffer;
