@@ -77,7 +77,6 @@ static int responseCount = 0;
 
 
 + (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
-    NSLog(@"%@ is the almond name", almond.almondplusName);
     if (!almond) {
         return;
     }
@@ -96,23 +95,18 @@ static int responseCount = 0;
     GenericCommand * cmd = [self tryRequestAlmondMode:mac];
     [toolKit asyncSendToNetwork:cmd];
     
-    NSLog(@"device request send");
     cmd = [GenericCommand requestSensorDeviceList:mac];
     [toolKit asyncSendToNetwork:cmd];
     
-    NSLog(@"clients request send");
     cmd = [GenericCommand requestAlmondClients:mac];
     [toolKit asyncSendToNetwork:cmd];
     
-    NSLog(@"scene request send ");
     cmd = [GenericCommand requestSceneList:mac];
     [toolKit asyncSendToNetwork:cmd];
     
-    NSLog(@" rule request send ");
     cmd = [GenericCommand requestAlmondRules:mac];
     [toolKit asyncSendToNetwork:cmd];
     
-    NSLog(@" requestRouterSummary request send ");
     cmd = [GenericCommand requestRouterSummary:mac];
     [toolKit asyncSendToNetwork:cmd];
     
@@ -171,7 +165,7 @@ static int responseCount = 0;
         almond.almondplusMAC = [response objectForKey:@"AlmondMAC"];
         almond.firmware = [response objectForKey:@"FirmwareVersion"];
         almond.ownerEmailID = [response objectForKey:@"OwnerEmailID"];
-        if([[response objectForKey:@"OwnerShip"] isEqualToString:@"P"]){
+        if([[response objectForKey:@"Ownership"] isEqualToString:@"P"]){
             almond.isPrimaryAlmond = true;
         }
         
@@ -246,6 +240,7 @@ static int responseCount = 0;
     [[SecurifiToolkit sharedInstance] postNotification:RELOAD_ACCOUNTS_PAGE data:nil];
 }
 
+
 +(void)addAlmondToList:(SFIAlmondPlus*)almond {
     
     NSMutableArray* almondList = [NSMutableArray new];
@@ -255,7 +250,7 @@ static int responseCount = 0;
     }
     
     [almondList addObject:almond];
-    NSLog(@"%d is the count of almondlist after addition",almondList.count);
+    
     [self wrietAlmondListToDataManager:almondList];
 }
 
@@ -267,14 +262,13 @@ static int responseCount = 0;
             [almondList addObject:almond];
         }
     }
-    NSLog(@"%d is the count of almondlist after deletion",almondList.count);
+    
     [self wrietAlmondListToDataManager:almondList];
 }
 
 
 +(void) wrietAlmondListToDataManager:(NSMutableArray*)almondList {
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    NSLog(@"%d is the count of almondlist",almondList.count);
     [toolkit.dataManager writeAlmondList:almondList];
     // Ensure Current Almond is consistent with new list
     SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:YES];
@@ -309,9 +303,7 @@ static int responseCount = 0;
         SFIAlmondPlus *localAlmond;
         
         for (SFIAlmondPlus *cloud in cloud_set) {
-            NSLog(@"%@ and %@",mac,cloud.almondplusMAC);
             if ([cloud.almondplusMAC isEqualToString:mac]) {
-                NSLog(@"i have entered inside");
                 localAlmond = cloud;
                 [cloud_set removeObject:cloud];
                 break;
@@ -319,13 +311,11 @@ static int responseCount = 0;
         }
         
         if (!localAlmond) {
-            NSLog(@"%@ is the almond mac !localAlmond", localAlmond.almondplusMAC);
             SFIAlmondLocalNetworkSettings *setting = local_settings[mac];
             localAlmond = setting.asLocalLinkAlmondPlus;
         }
         
         if (localAlmond) {
-            NSLog(@"%@ is the almond mac localAlmond", localAlmond.almondplusMAC);
             [local_almonds addObject:localAlmond];
         }
     }
@@ -355,11 +345,9 @@ static int responseCount = 0;
     
     NSDictionary* almonds = [dictionary valueForKeyPath:@"Almond"];
     int almondCount = (int)almonds.count;
-    NSLog(@"%d is the almond count",almondCount);
 
     if([dictionary[COMMAND_TYPE] isEqualToString:ALMOND_AFFILIATION_DATA] ){
-        
-        NSLog(@"%@ is the almondlistresponse", dictionary);
+    
         for(NSDictionary *almondDictionary in almonds){
             SFIAlmondPlus *currentAlmond;
             currentAlmond = [almondFromMac objectForKey:almondDictionary[@"AlmondMAC"]];
@@ -385,9 +373,6 @@ static int responseCount = 0;
         }
         responseCount++;
     }else if([dictionary[COMMAND_TYPE] isEqualToString:ALMOND_LIST_RESPONSE]){
-        
-        NSLog(@"%@ is the almondaffiliationdataresponse", dictionary);
-        
         for(NSDictionary *almondDictionary in almonds){
             SFIAlmondPlus *currentAlmond;
             currentAlmond = [almondFromMac objectForKey:almondDictionary[@"AlmondMAC"]];
@@ -504,13 +489,9 @@ static int responseCount = 0;
     SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
         SFIAlmondPlus *current = [self currentAlmond];
-        NSLog(@"Came here onDynamicAlmondNameChange inside changed %@",almondName);
         if ([current isEqualAlmondPlus:changed]) {
             changed.colorCodeIndex = current.colorCodeIndex;
-            //[toolKit currentAlmond].almondplusName=almondName;
-            NSLog(@"Came here after settings %@",[self currentAlmond].almondplusName);
             [self writeCurrentAlmond:changed];
-            //[self setCurrentAlmond:changed];
         }
         // Tell the world so they can update their view
         [toolKit postNotification:kSFIDidChangeAlmondName data:obj];
@@ -524,23 +505,16 @@ static int responseCount = 0;
     // if current is "local only" then no need to inspect the almond list; just return the current one.
     
     NSArray* list = [self almondList];
-    NSLog(@"%d is the length of list in managecurrentAlmondOnAlmondListUpdate", list.count);
-    NSLog(@"%d is the length of mutable array",almondList.count);
-    
     SecurifiToolkit * toolKit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *current = [self currentAlmond];
     
-    NSLog(@"%d is the length of mutable array",almondList.count);
     if (almondList.count == 0) {
-        NSLog(@"%d is the length of mutable array",almondList.count);
-        NSLog(@"entered count 0 case");
         [toolKit purgeStoredData];
         return nil;
     }
     
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
-        NSLog(@"%@ %@is the almondname, mac",currentAlmond.almondplusName,currentAlmond.almondplusMAC);
         if (doManage) {
             [self setCurrentAlmond:currentAlmond];
         }
@@ -585,7 +559,6 @@ static int responseCount = 0;
 
 + (void)onAlmondModeResponse:(AlmondModeResponse *)res network:(Network *)network {
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
-    NSLog(@"onAlmondModeResponse ");
     if (res == nil) {
         return;
     }
@@ -617,8 +590,6 @@ static int responseCount = 0;
         return;
     }
     
-    NSLog(@"res dict %@",res);
-    NSLog(@"res.mode: %d %@", res.mode ,[self currentAlmond].almondplusMAC  );
     //    NSString *modeString = res[@"Mode"];
     if([res.almondMAC isEqualToString:[self currentAlmond].almondplusMAC]){
         [network.networkState markModeForAlmond:[self currentAlmond].almondplusMAC mode:res.mode];
