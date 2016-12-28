@@ -48,6 +48,7 @@
     toolkit.iotScanResults = nil;
     toolkit.iotScanResults = [[NSMutableDictionary alloc]init];
      NSMutableArray *scanNowArr = [[NSMutableArray alloc]init];
+    NSMutableArray *helthyDeviceArr = [[NSMutableArray alloc]init];
     if([mainDict[@"Reason"] isEqualToString:@"No Data Found"]){
        
         NSDictionary *resData = nil;
@@ -70,10 +71,14 @@
     
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
-        if([self checkForValidresponse:dict]){
-            if([self checkForClientPresent:toolkit.clients mac:dict[@"MAC"]]){
-            NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
-            [scanNowArr addObject:iotDeviceObj];
+        if([self checkForClientPresent:toolkit.clients mac:dict[@"MAC"]]){
+            if([self checkForValidresponse:dict]){
+                NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
+                [scanNowArr addObject:iotDeviceObj];
+            }
+            else{
+                NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
+                [helthyDeviceArr addObject:iotDeviceObj];
             }
         }
     }
@@ -83,9 +88,13 @@
             [excludedArr addObject:mac];
     }
     [toolkit.iotScanResults setObject:scanNowArr forKey:@"scanDevice"];
+    NSLog(@"iot device response %@",mainDict);
+    [toolkit.iotScanResults setObject:helthyDeviceArr forKey:@"HealthyDevice"];
     [toolkit.iotScanResults setObject:mainDict[@"ScanTime"] forKey:@"scanTime"];
+    
     [toolkit.iotScanResults setObject:excludedArr forKey:@"scanExclude"];
-    [toolkit.iotScanResults setObject:mainDict[@"Count"] forKey:@"scanCount"];
+//    [toolkit.iotScanResults setObject:mainDict[@"Count"] forKey:@"scanCount"];
+    [toolkit.iotScanResults setObject:mainDict[@"Count"]?mainDict[@"Count"]:@"0" forKey:@"scanCount"];
     
     
     NSDictionary *resData = nil;
@@ -101,8 +110,10 @@
 }
 -(BOOL)checkForClientPresent:(NSArray *)clientList mac:(NSString *)mac{
     for(Client *client in clientList){
-        if([client.deviceMAC isEqualToString:mac])
+        if([client.deviceMAC isEqualToString:mac]){
+            NSLog(@"client.name in excluded %@",client.name);
             return YES;
+        }
     }
     return NO;
 }
@@ -195,27 +206,46 @@
 
 -(NSDictionary *)iotDeviceObj:(NSDictionary *)deviceDict{
     NSLog(@"deviceDict = = %@",deviceDict);
-    NSArray *ports = deviceDict[@"Ports"];
+    
     NSString *telnet = deviceDict[@"Telnet"];
     NSString *Http = deviceDict[@"Http"];
+    
     NSArray *ForwardRules = deviceDict[@"ForwardRules"];
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
+    NSArray *ports = deviceDict[@"Ports"];
+    NSArray *upnpPorts = [self getPorts:UpnpRules];
+    NSArray *ForwardRulesPorts = [self getPorts:ForwardRules];
+    
     NSDictionary *returnDict = @{@"Telnet":@{@"P":[telnet isEqualToString:@"1"]?@"1":@"0",
-                                             @"Tag":@"1"},
+                                             @"Tag":@"1",
+                                             @"Value":@[]},
                                  @"Ports":@{@"P":ports.count>0?@"1":@"0",
-                                            @"Tag":@"2"},
+                                            @"Tag":@"2",
+                                            @"Value":ports},
                                  @"Http":@{@"P":[Http isEqualToString:@"1"]?@"1":@"0",
-                                           @"Tag":@"3"},
+                                           @"Tag":@"3"
+                                           ,
+                                           @"Value":@[]},
                                  @"ForwardRules":@{@"P":ForwardRules.count>0?@"1":@"0",
-                                                   @"Tag":@"4"},
+                                                   @"Tag":@"4",
+                                                   @"Value":ForwardRules},
                                  @"UpnpRules":@{@"P":UpnpRules.count>0?@"1":@"0",
-                                                @"Tag":@"5"},
+                                                @"Tag":@"5",
+                                                @"Value":upnpPorts},
                                  @"MAC":deviceDict[@"MAC"]
                                  };
     
     NSLog(@"return dict %@",returnDict);
     
     return  returnDict;
+}
+-(NSArray *)getPorts:(NSArray *)ObjArr{
+    NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
+    for (NSDictionary *upnpObj in ObjArr) {
+        NSString *upnpPort = upnpObj[@"Ports"];
+        [upnpPortsArr addObject:upnpPort];
+    }
+    return  upnpPortsArr;
 }
 -(BOOL)validateResponse:(id)sender{
     if(sender==nil)
