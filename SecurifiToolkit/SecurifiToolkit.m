@@ -1092,16 +1092,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         [self markCommandEvent:commandType];
     }
     switch (commandType) {
-        case CommandType_DYNAMIC_ALMOND_ADD: {
-            AlmondListResponse *obj = payload;
-            [AlmondManagement onDynamicAlmondListAdd:obj];
-            break;
-        }
-        case CommandType_DYNAMIC_ALMOND_DELETE: {
-            AlmondListResponse *obj = payload;
-            [AlmondManagement onDynamicAlmondListDelete:obj network:network];
-            break;
-        }
         case CommandType_DYNAMIC_ALMOND_NAME_CHANGE: {
             DynamicAlmondNameChangeResponse *obj = payload;
             [AlmondManagement onDynamicAlmondNameChange:obj];

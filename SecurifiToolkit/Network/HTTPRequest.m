@@ -56,9 +56,9 @@
         }
         else{
             NSDictionary *response = [NSJSONSerialization JSONObjectWithData:data options:nil error:nil];
+            NSLog(@"%@ is the HTTP response",response);
             if(response == NULL)
                 return ;
-            NSLog(@"%@ is the response for signup",response);
             if([requestType isEqualToString:@"SignUp"])
                 [[NSNotificationCenter defaultCenter] postNotificationName:SIGN_UP_NOTIFIER object:nil userInfo:response];
             else if([requestType isEqualToString:@"ResetPassword"])

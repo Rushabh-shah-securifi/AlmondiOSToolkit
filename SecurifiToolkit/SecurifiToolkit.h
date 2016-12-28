@@ -310,13 +310,6 @@ struct PopUpSuggestions {
 
 - (void)asyncSendLogout;
 
-// Specify the currently "viewed" Almond. May perform updates in the background to check on Hash values.
-//- (void)setCurrentAlmond:(SFIAlmondPlus *)almond;
-
-//- (void)writeCurrentAlmond:(SFIAlmondPlus *)almond;
-
-// Returns the designated "current" Almond, or nil.
-//- (SFIAlmondPlus *)currentAlmond;
 
 - (SFIAlmondPlus *)cloudAlmond:(NSString*)almondMac;
 
@@ -332,10 +325,6 @@ struct PopUpSuggestions {
 
 // Returns running stats on internals of this toolkit; useful for debugging and development
 - (Scoreboard *)scoreboardSnapshot;
-
-//- (void)asyncRequestChangeCloudPassword:(NSString *)currentPwd changedPwd:(NSString *)changedPwd;
-
-- (void)asyncRequestResetCloudPassword:(NSString *)email;
 
 // Send a command to the cloud requesting to delete cloud account
 - (void)asyncRequestDeleteCloudAccount:(NSString *)password;
@@ -370,43 +359,6 @@ typedef NS_ENUM(unsigned int, SecurifiToolkitAlmondRouterRequest) {
 - (void)asyncAlmondSummaryInfoRequest:(NSString *)almondMac;
 
 - (sfi_id)asyncUpdateAlmondWirelessSettings:(NSString *)almondMAC wirelessSettings:(SFIWirelessSetting *)settings;
-
-
-
-//- (sfi_id)asyncRequestAlmondModeChange:(NSString *)almondMac mode:(SFIAlmondMode)newMode;
-
-//- (SFIAlmondMode)modeForAlmond:(NSString *)almondMac;
-
-// Send a command to configure notifications for the specified devices. This is the way to set per-device preferences
-// for receiving notifications. Each device Index is configured separately.
-// Supported actions are:
-// kSFINotificationPreferenceChangeActionAdd;
-// kSFINotificationPreferenceChangeActionDelete;
-//- (void)asyncRequestNotificationPreferenceChange:(NSString *)almondMAC deviceList:(NSArray *)deviceList forAction:(NSString *)action mii:(int)mii;
-
-//- (NSInteger)countUnviewedNotifications;
-
-//- (id <SFINotificationStore>)newNotificationStore;
-
-// makes a copy of the notifications database; used for debugging
-//- (BOOL)copyNotificationStoreTo:(NSString *)filePath;
-
-// Initiates a process to synchronize the on-board Notifications database with the cloud.
-// If a request is already in flight, this call fails fast and silently.
-// Posts kSFINotificationDidStore when new notifications have been fetched.
-//- (void)tryRefreshNotifications;
-
-// Called after all Notifications/Activity have been viewed. The Clear command is sent to the cloud to reset the
-// global state shared across all logged-in devices.
-//- (void)tryClearNotificationCount;
-
-// Called to synchronize the badge count as specified in a Push Notification payload. The badge count reflects then
-// latest known global "new notification" count.
-//- (NSInteger)notificationsBadgeCount;
-
-//- (void)setNotificationsBadgeCount:(NSInteger)count;
-
-//- (id <SFINotificationStore>)newDeviceLogStore:(NSString *)almondMac deviceId:(sfi_id)deviceId  forWifiClients:(BOOL)isForWifiClients;
 
 - (BOOL)useLocalNetwork:(NSString *)almondMac;
 

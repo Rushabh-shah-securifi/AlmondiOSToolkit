@@ -71,10 +71,6 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"GENERIC_COMMAND_RESPONSE_%d", type];
         case CommandType_GENERIC_COMMAND_NOTIFICATION:
             return [NSString stringWithFormat:@"GENERIC_COMMAND_NOTIFICATION_%d", type];
-            //        case CommandType_SENSOR_CHANGE_REQUEST:
-            //            return [NSString stringWithFormat:@"SENSOR_CHANGE_REQUEST_%d", type];
-            //        case CommandType_SENSOR_CHANGE_RESPONSE:
-            //            return [NSString stringWithFormat:@"SENSOR_CHANGE_RESPONSE_%d", type];
         case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST:
             return [NSString stringWithFormat:@"DEVICE_DATA_FORCED_UPDATE_REQUEST_%d", type];
         case CommandType_ALMOND_NAME_CHANGE_REQUEST:
@@ -85,46 +81,8 @@ NSString *securifi_command_type_to_string(CommandType type) {
             return [NSString stringWithFormat:@"ALMOND_MODE_CHANGE_REQUEST_%d", type];
         case CommandType_ALMOND_MODE_CHANGE_RESPONSE:
             return [NSString stringWithFormat:@"ALMOND_MODE_CHANGE_RESPONSE_%d", type];
-        case CommandType_CHANGE_PASSWORD_REQUEST:
-            return [NSString stringWithFormat:@"CHANGE_PASSWORD_REQUEST_%d", type];
-        case CommandType_CHANGE_PASSWORD_RESPONSE:
-            return [NSString stringWithFormat:@"CHANGE_PASSWORD_RESPONSE_%d", type];
-        case CommandType_DELETE_ACCOUNT_REQUEST:
-            return [NSString stringWithFormat:@"DELETE_ACCOUNT_REQUEST_%d", type];
         case CommandType_DELETE_ACCOUNT_RESPONSE:
             return [NSString stringWithFormat:@"DELETE_ACCOUNT_RESPONSE_%d", type];
-        case CommandType_USER_INVITE_REQUEST:
-            return [NSString stringWithFormat:@"USER_INVITE_REQUEST_%d", type];
-        case CommandType_USER_INVITE_RESPONSE:
-            return [NSString stringWithFormat:@"USER_INVITE_RESPONSE_%d", type];
-        case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:
-            return [NSString stringWithFormat:@"ALMOND_AFFILIATION_DATA_REQUEST_%d", type];
-        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE:
-            return [NSString stringWithFormat:@"ALMOND_AFFILIATION_DATA_RESPONSE_%d", type];
-        case CommandType_USER_PROFILE_REQUEST:
-            return [NSString stringWithFormat:@"USER_PROFILE_REQUEST_%d", type];
-        case CommandType_USER_PROFILE_RESPONSE:
-            return [NSString stringWithFormat:@"USER_PROFILE_RESPONSE_%d", type];
-        case CommandType_UPDATE_USER_PROFILE_REQUEST:
-            return [NSString stringWithFormat:@"UPDATE_USER_PROFILE_REQUEST_%d", type];
-        case CommandType_UPDATE_USER_PROFILE_RESPONSE:
-            return [NSString stringWithFormat:@"UPDATE_USER_PROFILE_RESPONSE_%d", type];
-        case CommandType_ME_AS_SECONDARY_USER_REQUEST:
-            return [NSString stringWithFormat:@"ME_AS_SECONDARY_USER_REQUEST_%d", type];
-        case CommandType_ME_AS_SECONDARY_USER_RESPONSE:
-            return [NSString stringWithFormat:@"ME_AS_SECONDARY_USER_RESPONSE_%d", type];
-        case CommandType_DELETE_SECONDARY_USER_REQUEST:
-            return [NSString stringWithFormat:@"DELETE_SECONDARY_USER_REQUEST_%d", type];
-        case CommandType_DELETE_SECONDARY_USER_RESPONSE:
-            return [NSString stringWithFormat:@"DELETE_SECONDARY_USER_RESPONSE_%d", type];
-        case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
-            return [NSString stringWithFormat:@"DELETE_ME_AS_SECONDARY_USER_REQUEST_%d", type];
-        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:
-            return [NSString stringWithFormat:@"DELETE_ME_AS_SECONDARY_USER_RESPONSE_%d", type];
-        case CommandType_UNLINK_ALMOND_REQUEST:
-            return [NSString stringWithFormat:@"UNLINK_ALMOND_REQUEST_%d", type];
-        case CommandType_UNLINK_ALMOND_RESPONSE:
-            return [NSString stringWithFormat:@"UNLINK_ALMOND_RESPONSE_%d", type];
         case CommandType_NOTIFICATION_PREF_CHANGE_REQUEST:
             return [NSString stringWithFormat:@"NOTIFICATION_PREF_CHANGE_REQUEST_%d", type];
         case CommandType_NOTIFICATION_PREF_CHANGE_RESPONSE:
@@ -280,26 +238,6 @@ BOOL securifi_valid_command_type(CommandType type) {
         case CommandType_DEVICE_DATA_FORCED_UPDATE_REQUEST:
         case CommandType_ALMOND_NAME_CHANGE_REQUEST:
         case CommandType_ALMOND_NAME_CHANGE_RESPONSE:
-        case CommandType_CHANGE_PASSWORD_REQUEST:
-        case CommandType_CHANGE_PASSWORD_RESPONSE:
-        case CommandType_DELETE_ACCOUNT_REQUEST:
-        case CommandType_DELETE_ACCOUNT_RESPONSE:
-        case CommandType_USER_INVITE_REQUEST:
-        case CommandType_USER_INVITE_RESPONSE:
-        case CommandType_ALMOND_AFFILIATION_DATA_REQUEST:
-        case CommandType_ALMOND_AFFILIATION_DATA_RESPONSE:
-        case CommandType_USER_PROFILE_REQUEST:
-        case CommandType_USER_PROFILE_RESPONSE:
-        case CommandType_UPDATE_USER_PROFILE_REQUEST:
-        case CommandType_UPDATE_USER_PROFILE_RESPONSE:
-        case CommandType_ME_AS_SECONDARY_USER_REQUEST:
-        case CommandType_ME_AS_SECONDARY_USER_RESPONSE:
-        case CommandType_DELETE_SECONDARY_USER_REQUEST:
-        case CommandType_DELETE_SECONDARY_USER_RESPONSE:
-        case CommandType_DELETE_ME_AS_SECONDARY_USER_REQUEST:
-        case CommandType_DELETE_ME_AS_SECONDARY_USER_RESPONSE:
-        case CommandType_UNLINK_ALMOND_REQUEST:
-        case CommandType_UNLINK_ALMOND_RESPONSE:
         case CommandType_NOTIFICATION_REGISTRATION:
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE:
         case CommandType_NOTIFICATION_DEREGISTRATION:
