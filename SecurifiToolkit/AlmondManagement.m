@@ -178,13 +178,13 @@ static int responseCount = 0;
         
     }else if([commandType isEqualToString:@"DynamicUserAdd"]){
         
-        [self addSecondaryUserToAlmondWithMAC:[response objectForKey:@"AlmondMAC"] withUserID:[response objectForKey:@"UserID"] andEmailID:[response objectForKey:@"EmailID"]];
+        NSString* userID = ![[response objectForKey:@"UserID"] isKindOfClass:[NSString class]]?[[response objectForKey:@"UserID"] stringValue]:[response objectForKey:@"UserID"];
+        [self addSecondaryUserToAlmondWithMAC:[response objectForKey:@"AlmondMAC"] withUserID:userID andEmailID:[response objectForKey:@"EmailID"]];
     }
 }
 
 
-+(void) removeSecondaryUserFromAlmondWithMAC:(NSString*)almondMAC withUserID:(NSString*)userID {
-    
++(void)removeSecondaryUserFromAlmondWithMAC:(NSString*)almondMAC withUserID:(NSString*)userID {
     NSArray* almondList = [self almondList];
     NSMutableArray* newAlmondList = [NSMutableArray new];
     for(SFIAlmondPlus* almond in almondList){
@@ -193,7 +193,6 @@ static int responseCount = 0;
             NSMutableArray* newAcessibleEmailIDs = [NSMutableArray new];
             
             for(SFISecondaryUser* user in accessibleEmailIDs){
-                user.userId = [NSString ]
                 if(![user.userId isEqualToString:userID]){
                     [newAcessibleEmailIDs addObject:user];
                 }

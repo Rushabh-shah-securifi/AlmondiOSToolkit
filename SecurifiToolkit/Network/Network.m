@@ -114,11 +114,9 @@
     [self.endpoint shutdown];
     [self networkEndpointDidDisconnect:self.endpoint];
     self.endpoint = nil;
-    //[self.delegate networkConnectionDidClose:self];
 }
 
 #pragma mark - state
-
 - (enum NetworkEndpointMode)mode {
     return _networkConfig.mode;
 }
@@ -126,6 +124,7 @@
 - (void)markLoggedInState:(BOOL)loggedIn {
     self.loginStatus = loggedIn ? NetworkLoginStatusLoggedIn : NetworkLoginStatusNotLoggedIn;
 }
+
 
 #pragma mark - NSStreamDelegate methods
 - (void)tryMarkUnitCompletion:(BOOL)success responseType:(CommandType)responseType {
@@ -139,6 +138,7 @@
     }
 }
 
+
 - (void)tryAbortUnit {
     SUnit *unit = self.currentUnit;
     if (unit) {
@@ -146,6 +146,7 @@
         [unit abort];
     }
 }
+
 
 #pragma mark - Payload notification
 - (void)postData:(NSString *)notificationName data:(id)payload {
