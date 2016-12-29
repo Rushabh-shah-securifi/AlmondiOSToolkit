@@ -364,13 +364,12 @@
 //        return current;
 //    }
     // Manage the "Current selected Almond" value
-    
+    toolKit.lastScanTime = 0;
     if (almondList.count == 0) {
         NSLog(@"entered count 0 case");
         [toolKit purgeStoredData];
         return nil;
     }
-    
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
@@ -394,6 +393,7 @@
         
         // Current one is not in new list.
         // Just pick the first one in this case
+        toolKit.lastScanTime = 0;
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
             [AlmondManagement setCurrentAlmond:currentAlmond];

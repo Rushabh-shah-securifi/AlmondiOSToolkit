@@ -223,6 +223,7 @@ struct PopUpSuggestions {
 @property(nonatomic) AlmondProperties *almondProperty;
 @property(nonatomic)NSInteger lastScanTime;
 
+
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config;
 -(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res;
 
