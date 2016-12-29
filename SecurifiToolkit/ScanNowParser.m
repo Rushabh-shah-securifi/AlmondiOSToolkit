@@ -55,8 +55,9 @@
         if (mainDict) {
             resData = @{
                         @"data" : mainDict
-                        };
+               };
         }
+        [toolkit.iotScanResults setObject:@"NoDataFound" forKey:@"NoDataFound"];
      [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_IOT_SCAN_RESULT_CONTROLLER_NOTIFIER object:nil userInfo:resData];
         return;
 }
