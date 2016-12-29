@@ -149,7 +149,7 @@
 }
 - (NSString *)stringFromDateAMPM{
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"HH:mm"];
+    [dateFormatter setDateFormat:@"MMM dd/yy HH:mm"];
     NSString *stringDate = [dateFormatter stringFromDate:self];
     return stringDate;
 }

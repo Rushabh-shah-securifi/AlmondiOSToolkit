@@ -221,6 +221,7 @@ struct PopUpSuggestions {
 @property(nonatomic, readonly) DatabaseStore *deviceLogsDb;
 @property(nonatomic) NSMutableDictionary *subscription;
 @property(nonatomic) AlmondProperties *almondProperty;
+@property(nonatomic)NSInteger lastScanTime;
 
 -(Network*) createNetworkWithConfig:(NetworkConfig *)config;
 -(void)createNetworkInstanceAndChangeDelegate:(SFIAlmondPlus*)plus webSocketEndPoint:(WebSocketEndpoint*)endpoint res:(DynamicAlmondModeChange *)res;

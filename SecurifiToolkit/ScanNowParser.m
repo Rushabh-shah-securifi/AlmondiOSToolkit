@@ -58,12 +58,13 @@
                         };
         }
      [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_IOT_SCAN_RESULT_CONTROLLER_NOTIFIER object:nil userInfo:resData];
+        return;
 }
     NSLog(@"[AlmondManagement currentAlmond].almondplusMAC %@",[AlmondManagement currentAlmond].almondplusMAC);
    
     //if(![mainDict[@"AlmondMAC"] isEqualToString:[AlmondManagement currentAlmond].almondplusMAC])
    
-    
+    NSLog(@"iot device response %@",mainDict);
     if(mainDict == NULL)
         return;
     if(mainDict[@"Devices"] == NULL)
@@ -88,14 +89,13 @@
             [excludedArr addObject:mac];
     }
     [toolkit.iotScanResults setObject:scanNowArr forKey:@"scanDevice"];
-    NSLog(@"iot device response %@",mainDict);
+   
     [toolkit.iotScanResults setObject:helthyDeviceArr forKey:@"HealthyDevice"];
     [toolkit.iotScanResults setObject:mainDict[@"ScanTime"] forKey:@"scanTime"];
     
     [toolkit.iotScanResults setObject:excludedArr forKey:@"scanExclude"];
 //    [toolkit.iotScanResults setObject:mainDict[@"Count"] forKey:@"scanCount"];
     [toolkit.iotScanResults setObject:mainDict[@"Count"]?mainDict[@"Count"]:@"0" forKey:@"scanCount"];
-    
     
     NSDictionary *resData = nil;
     if (mainDict) {
