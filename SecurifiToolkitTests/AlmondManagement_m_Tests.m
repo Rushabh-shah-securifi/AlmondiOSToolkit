@@ -16,11 +16,24 @@
 #import "SFIAlmondLocalNetworkSettings.h"
 #import "LocalNetworkManagement.h"
 #import "Login.h"
+#import "SFISecondaryUser.h"
+
 
 @interface AlmondManagement_m_Tests : XCTestCase
+
 @property BOOL currentAlmondDidChange;
+
 @end
 
+@interface AlmondManagement (Testing)
+
++(void) fillAlmondListWithAlmondListDataResponse: (NSArray*)almondAffiliationResponse intoDictionary:(NSMutableDictionary*)almondListData;
+
++(void) fillAlmondListWithAffiliationDataResponse:(NSArray*)almondListResponse intoDictionary:(NSMutableDictionary*)almondListData;
+
++ (void)onAlmondListAndAffiliationDataResponse:(NSData*)responseData network:(Network *)network;
+
+@end
 
 @implementation AlmondManagement_m_Tests
 
@@ -90,11 +103,6 @@
 }
 
 
--(void) testManageCurrentAlmondChange_CloudConnection {
-    
-}
-
-
 -(void) testSetCurrentAlmond {
     
     XCTestExpectation* expectation = [self expectationWithDescription:@"Testing testSetCurrentAlmond"];
@@ -122,6 +130,102 @@
 
 
 #pragma mark - Almond List management
+-(void) testfillAlmondListWithAlmondListDataResponse {
+    
+    NSArray* almondListDataResponse = @[@{@"AlmondName":@"almondName" ,@"AlmondMAC":@"251176220099140" ,@"FirmwareVersion":@"AL3-R008dp",@"Ownership":@"P"},@{@"AlmondName":@"sat@AL2",@"AlmondMAC":@"251176215907164",@"FirmwareVersion":@"AL2-R095z",@"Ownership":@"S"},@{@"AlmondName":@"Almond+ Sfi",@"AlmondMAC":@"251176217032880",@"FirmwareVersion":@"AP2-R089aw-L009-W016-ZW016-ZB005-BETA",@"Ownership":@"S"}];
+    
+    NSMutableDictionary* almondListData = [NSMutableDictionary new];
+    
+    [AlmondManagement fillAlmondListWithAlmondListDataResponse:almondListDataResponse intoDictionary:almondListData];
+    
+    SFIAlmondPlus* almond = almondListData[@"251176220099140"];
+    XCTAssertEqualObjects(almond.almondplusName, @"almondName");
+    XCTAssertEqualObjects(almond.firmware, @"AL3-R008dp");
+    XCTAssertEqual(almond.isPrimaryAlmond, 1);
+    XCTAssertNil(almond.ownerEmailID);
+    XCTAssertNil(almond.accessEmailIDs);
+    
+    almond = almondListData[@"251176215907164"];
+    XCTAssertEqualObjects(almond.almondplusName, @"sat@AL2");
+    XCTAssertEqualObjects(almond.firmware, @"AL2-R095z");
+    XCTAssertEqual(almond.isPrimaryAlmond, 0);
+    XCTAssertNil(almond.ownerEmailID);
+    XCTAssertNil(almond.accessEmailIDs);
+
+    
+    almond = almondListData[@"251176217032880"];
+    XCTAssertEqualObjects(almond.almondplusName, @"Almond+ Sfi");
+    XCTAssertEqualObjects(almond.firmware, @"AP2-R089aw-L009-W016-ZW016-ZB005-BETA");
+    XCTAssertEqual(almond.isPrimaryAlmond, 0);
+    XCTAssertNil(almond.ownerEmailID);
+    XCTAssertNil(almond.accessEmailIDs);
+    
+}
+
+-(void) testFillAlmondAffiliationDataResponseIntoAlmondList {
+    
+    NSArray* almondListDataResponse = @[@{@"AlmondMAC":@"251176220099140",@"EmailID":@[@{@"UserID":@"522255655",@"SecondaryEmail":@"murali.kurapati@securifi.com"},@{@"UserID":@"522268840",@"SecondaryEmail":@"test@gmail.com"},@{@"UserID":@"106212",@"SecondaryEmail":@"krishnendu.s@securifi.com"}]},@{@"AlmondMAC":@"251176217032880",@"OwnerEmailID":@"krishnendu.s@securifi.com"}];
+    
+    NSMutableDictionary* almondListData = [NSMutableDictionary new];
+    
+    [AlmondManagement fillAlmondListWithAffiliationDataResponse:almondListDataResponse intoDictionary:almondListData];
+    
+    SFIAlmondPlus* almond = almondListData[@"251176220099140"];
+    XCTAssertNil(almond.almondplusName);
+    XCTAssertNil(almond.firmware);
+    XCTAssertEqual(almond.isPrimaryAlmond, 0);
+    XCTAssertNil(almond.ownerEmailID);
+    XCTAssertEqual(almond.accessEmailIDs.count , 3);
+    
+    XCTAssertEqualObjects(((SFISecondaryUser*)(almond.accessEmailIDs[0])).userId, @"522255655");
+    XCTAssertEqualObjects(((SFISecondaryUser*)(almond.accessEmailIDs[0])).emailId, @"murali.kurapati@securifi.com");
+    
+    XCTAssertEqualObjects(((SFISecondaryUser*)(almond.accessEmailIDs[1])).userId, @"522268840");
+    XCTAssertEqualObjects(((SFISecondaryUser*)(almond.accessEmailIDs[1])).emailId, @"test@gmail.com");
+    
+    XCTAssertEqualObjects(((SFISecondaryUser*)(almond.accessEmailIDs[2])).userId, @"106212");
+    XCTAssertEqualObjects(((SFISecondaryUser*)(almond.accessEmailIDs[2])).emailId, @"krishnendu.s@securifi.com");
+
+    almond = almondListData[@"251176217032880"];
+    XCTAssertNil(almond.almondplusName);
+    XCTAssertNil(almond.firmware);
+    XCTAssertEqual(almond.isPrimaryAlmond, 0);
+    XCTAssertEqualObjects(almond.ownerEmailID , @"krishnendu.s@securifi.com");
+    XCTAssertEqual(almond.accessEmailIDs.count , 0);
+}
+
+-(void) testOnAlmondListAndAffiliationDataResponse {
+    
+    AlmondManagement* almondManagment = [AlmondManagement new];
+    
+    id mockedAlmondManagement = [OCMockObject partialMockForObject:almondManagment];
+    
+    [[mockedAlmondManagement expect] fillAlmondListWithAlmondListDataResponse: nil intoDictionary:nil];
+    
+    [[mockedAlmondManagement reject] fillAlmondListWithAffiliationDataResponse: nil intoDictionary:nil];
+    
+    NSMutableDictionary* response = [NSMutableDictionary new];
+    
+    response[@"CommandType"] = @"AlmondListResponse";
+    
+    Network* network;
+    
+    [mockedAlmondManagement onAlmondListAndAffiliationDataResponse:response network:network];
+    
+    [mockedAlmondManagement verify];
+    
+    [[mockedAlmondManagement reject] fillAlmondListWithAlmondListDataResponse: nil intoDictionary:nil];
+    
+    [[mockedAlmondManagement expect] fillAlmondListWithAffiliationDataResponse: nil intoDictionary:nil];
+
+    response[@"CommandType"] = @"AlmondAffiliationData";
+    
+    [mockedAlmondManagement onAlmondListAndAffiliationDataResponse:response network:network];
+    
+    [mockedAlmondManagement verify];
+}
+
+
 -(void) testLocalLinkedAlmondList {
     
     //creating three cloud almonds and three local almond where two local almonds are only present in local and one local almond is present in both cloud and local networks
@@ -167,10 +271,10 @@
     }
 }
 
+
 -(void) testManageCurrentAlmondOnAlmondListUpdate_CloudConnection{
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
-    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Testing Async Method Works!"];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setInteger:SFIAlmondConnectionMode_cloud forKey:kPREF_DEFAULT_CONNECTION_MODE];
     

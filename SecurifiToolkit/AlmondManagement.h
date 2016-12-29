@@ -40,7 +40,7 @@
 + (SFIAlmondPlus *)tryLoadCurrentAL3;
 
 //Almond List Management
-+ (void)onAlmondListResponse:(AlmondListResponse *)obj network:(Network *)network;
++ (void)onAlmondListAndAffiliationDataResponse:(NSDictionary*)responseData network:(Network *)network;
 + (void)onDynamicAlmondListAdd:(AlmondListResponse *)obj;
 + (void)onDynamicAlmondListDelete:(AlmondListResponse *)obj network:(Network *)network;
 + (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)data;

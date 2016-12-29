@@ -446,6 +446,13 @@
 			remoteGlobalIDString = 221185F4178D453A00EE23ED;
 			remoteInfo = SecurifiCloudResources;
 		};
+		B0748C521E154FB300063184 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 221185B2178D371100EE23ED /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 221185B9178D371200EE23ED;
+			remoteInfo = SecurifiToolkit;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1916,6 +1923,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B0748C531E154FB300063184 /* PBXTargetDependency */,
 			);
 			name = SecurifiToolkitTests;
 			productName = SecurifiToolkitTests;
@@ -2283,6 +2291,11 @@
 			isa = PBXTargetDependency;
 			target = 221185F4178D453A00EE23ED /* SecurifiCloudResources */;
 			targetProxy = 22118604178D4D9A00EE23ED /* PBXContainerItemProxy */;
+		};
+		B0748C531E154FB300063184 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 221185B9178D371200EE23ED /* SecurifiToolkit */;
+			targetProxy = B0748C521E154FB300063184 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

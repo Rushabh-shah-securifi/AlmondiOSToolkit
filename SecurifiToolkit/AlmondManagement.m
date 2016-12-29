@@ -18,15 +18,15 @@
 
 @implementation AlmondManagement
 
-static NSMutableDictionary* almondFromMac;
-
-static int responseCount = 0;
+static NSMutableDictionary* almondListData;
+static int count = 0;
 
 + (void)removeCurrentAlmond {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs removeObjectForKey:kPREF_CURRENT_ALMOND];
     [prefs synchronize];
 }
+
 
 +(NSMutableArray*) getOwnedAlmondList {
     NSMutableArray* list = [NSMutableArray new];
@@ -48,16 +48,10 @@ static int responseCount = 0;
 }
 
 
-+(void)initializeValues{
-    responseCount = 0;
-    almondFromMac = [NSMutableDictionary new];
-}
-
 + (void)setCurrentAlmond:(SFIAlmondPlus *)almond {
     if (!almond) {
         return;
     }
-    
     [self writeCurrentAlmond:almond];
     [self manageCurrentAlmondChange:almond];
     [[SecurifiToolkit sharedInstance] postNotification:kSFIDidChangeCurrentAlmond data:almond];
@@ -68,15 +62,14 @@ static int responseCount = 0;
    if(!almond) {
         return;
     }
-    
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:almond];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:data forKey:kPREF_CURRENT_ALMOND];
     [defaults synchronize];
 }
 
-
 + (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
+    
     if (!almond) {
         return;
     }
@@ -160,11 +153,13 @@ static int responseCount = 0;
         return;
     
     if([commandType isEqualToString:@"DynamicAlmondAdd"]){
+        
         SFIAlmondPlus* almond = [SFIAlmondPlus new];
         almond.almondplusName = [response objectForKey:@"AlmondName"];
         almond.almondplusMAC = [response objectForKey:@"AlmondMAC"];
         almond.firmware = [response objectForKey:@"FirmwareVersion"];
         almond.ownerEmailID = [response objectForKey:@"OwnerEmailID"];
+        
         if([[response objectForKey:@"Ownership"] isEqualToString:@"P"]){
             almond.isPrimaryAlmond = true;
         }
@@ -178,7 +173,6 @@ static int responseCount = 0;
     }else if([commandType isEqualToString:@"DynamicUserDelete"]){
         
         [self removeSecondaryUserFromAlmondWithMAC:[response objectForKey:@"AlmondMAC"] withUserID:[response objectForKey:@"UserID"]];
-        
     }else if([commandType isEqualToString:@"DynamicUserAdd"]){
         
         NSString* userID = ![[response objectForKey:@"UserID"] isKindOfClass:[NSString class]]?[[response objectForKey:@"UserID"] stringValue]:[response objectForKey:@"UserID"];
@@ -188,6 +182,7 @@ static int responseCount = 0;
 
 
 +(void)removeSecondaryUserFromAlmondWithMAC:(NSString*)almondMAC withUserID:(NSString*)userID {
+    
     NSArray* almondList = [self almondList];
     NSMutableArray* newAlmondList = [NSMutableArray new];
     for(SFIAlmondPlus* almond in almondList){
@@ -280,6 +275,7 @@ static int responseCount = 0;
 
 #pragma mark - Almond List Management
 + (NSArray *)localLinkedAlmondList {
+    
     if (![SecurifiToolkit sharedInstance].config.enableLocalNetworking) {
         return nil;
     }
@@ -336,80 +332,109 @@ static int responseCount = 0;
 //This function handles both AlmondListResponse and AffiliationData response to create almondlist
 */
 
-+ (void)onAlmondListResponse:(NSData*)responseData network:(Network *)network {
++ (void)onAlmondListAndAffiliationDataResponse:(NSDictionary*)response network:(Network *)network {
     
-    SecurifiToolkit* toolKit = [SecurifiToolkit sharedInstance];
-    NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:responseData
-                                                               options:kNilOptions
-                                                                 error:nil];
+    count++;
     
-    NSDictionary* almonds = [dictionary valueForKeyPath:@"Almond"];
-    int almondCount = (int)almonds.count;
-
-    if([dictionary[COMMAND_TYPE] isEqualToString:ALMOND_AFFILIATION_DATA] ){
-    
-        for(NSDictionary *almondDictionary in almonds){
-            SFIAlmondPlus *currentAlmond;
-            currentAlmond = [almondFromMac objectForKey:almondDictionary[@"AlmondMAC"]];
-            if(currentAlmond==nil){
-                currentAlmond = [SFIAlmondPlus new];
-            }
-
-            if(almondDictionary[@"EmailID"]){
-                NSArray* users = almondDictionary[@"EmailID"];
-                NSMutableArray* secondaryEmails = [NSMutableArray new];
-                for(NSDictionary* user in users){
-                    SFISecondaryUser* secondaryUser = [SFISecondaryUser new];
-                    secondaryUser.emailId = user[@"SecondaryEmail"];
-                    secondaryUser.userId = user[@"UserID"];
-                    [secondaryEmails addObject:secondaryUser];
-                }
-
-                currentAlmond.accessEmailIDs = secondaryEmails;
-            }else if(almondDictionary[@"OwnerEmailID"]){
-                currentAlmond.ownerEmailID = almondDictionary[@"OwnerEmailID"];
-            }
-            [almondFromMac setObject:currentAlmond forKey:almondDictionary[@"AlmondMAC"]];
-        }
-        responseCount++;
-    }else if([dictionary[COMMAND_TYPE] isEqualToString:ALMOND_LIST_RESPONSE]){
-        for(NSDictionary *almondDictionary in almonds){
-            SFIAlmondPlus *currentAlmond;
-            currentAlmond = [almondFromMac objectForKey:almondDictionary[@"AlmondMAC"]];
-            if(currentAlmond == nil){
-                currentAlmond = [SFIAlmondPlus new];
-            }
-            currentAlmond.almondplusMAC = [almondDictionary valueForKey:@"AlmondMAC"];
-            currentAlmond.almondplusName = [almondDictionary valueForKey:@"AlmondName"];
-            currentAlmond.firmware = [almondDictionary valueForKey:@"FirmwareVersion"];
-            if([almondDictionary[@"Ownership"] isEqualToString:@"P"]){
-                currentAlmond.isPrimaryAlmond = true;
-            }
-            [almondFromMac setObject:currentAlmond forKey:almondDictionary[@"AlmondMAC"]];
-        }
-        responseCount++;
+    if(count == 1){
+        almondListData = [NSMutableDictionary new];
     }
     
-    //if response count ==2 then both almondlist and affiliation data has come and we can update the almond list
-    if(responseCount==2){
-        NSMutableArray* almondList = [NSMutableArray new];
-        for(NSString* almondMAC in almondFromMac.allKeys){
-            SFIAlmondPlus* almond = almondFromMac[almondMAC];
-            [almondList addObject:almondFromMac[almondMAC]];
+    NSDictionary* almondsDataResponse = response[@"Almond"];
+    
+    if([response[COMMAND_TYPE] isEqualToString:ALMOND_LIST_RESPONSE]){
+        
+        [self fillAlmondListWithAlmondListDataResponse:almondsDataResponse intoDictionary:almondListData];
+        
+    }else if([response[COMMAND_TYPE] isEqualToString:ALMOND_AFFILIATION_DATA] ){
+        
+        [self fillAlmondListWithAffiliationDataResponse:almondsDataResponse intoDictionary:almondListData];
+        
+    }
+    
+    if(count==2){
+        [self updateAlmondList:almondListData withNetwork:network];
+        count = 0;
+    }
+}
+
+
++(void) fillAlmondListWithAlmondListDataResponse: (NSArray*)almondAffiliationResponse intoDictionary:(NSMutableDictionary*)almondListData{
+    
+    for(NSDictionary *almond in almondAffiliationResponse){
+        
+        SFIAlmondPlus *newAlmond = almondListData[almond[@"AlmondMAC"]];
+        
+        if(newAlmond == nil){
+            newAlmond = [SFIAlmondPlus new];
         }
         
-        // Store the new list
-        [toolKit.dataManager writeAlmondList:almondList];
+        newAlmond.almondplusMAC = almond[@"AlmondMAC"];
+        newAlmond.almondplusName = almond[@"AlmondName"];
+        newAlmond.firmware = almond[@"FirmwareVersion"];
         
-        SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
+        if([almond[@"Ownership"] isEqualToString:@"P"]){
+            newAlmond.isPrimaryAlmond = true;
+        }
         
-        if(plus!=nil)
-            // After requesting the Almond list, we then want to get additional info
-            [self asyncInitializeConnection2:network];
-        
-        // Tell the world
-        [toolKit postNotification:kSFIDidUpdateAlmondList data:plus];
+        [almondListData setObject:newAlmond forKey:almond[@"AlmondMAC"]];
     }
+}
+
+
++(void) fillAlmondListWithAffiliationDataResponse:(NSArray*)almondListResponse intoDictionary:(NSMutableDictionary*)almondListData{
+    
+    for(NSDictionary *almond in almondListResponse){
+        
+        SFIAlmondPlus *newAlmond;
+        newAlmond = [almondListData objectForKey:almond[@"AlmondMAC"]];
+        
+        if(newAlmond==nil){
+            newAlmond = [SFIAlmondPlus new];
+        }
+        
+        if(almond[@"EmailID"]){
+            
+            NSArray* users = almond[@"EmailID"];
+            NSMutableArray* secondaryEmails = [NSMutableArray new];
+            
+            for(NSDictionary* user in users){
+                SFISecondaryUser* secondaryUser = [SFISecondaryUser new];
+                secondaryUser.emailId = user[@"SecondaryEmail"];
+                secondaryUser.userId = user[@"UserID"];
+                [secondaryEmails addObject:secondaryUser];
+            }
+            
+            newAlmond.accessEmailIDs = secondaryEmails;
+            
+        }else if(almond[@"OwnerEmailID"]){
+            newAlmond.ownerEmailID = almond[@"OwnerEmailID"];
+        }
+        
+        [almondListData setObject:newAlmond forKey:almond[@"AlmondMAC"]];
+    }
+}
+
+
++ (void) updateAlmondList:(NSMutableDictionary*)almondListData withNetwork:(Network*) network {
+    
+    SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
+    
+    NSMutableArray* almondList = [NSMutableArray new];
+    for(NSString* almondMAC in almondListData.allKeys){
+        SFIAlmondPlus* almond = almondListData[almondMAC];
+        [almondList addObject:almondListData[almondMAC]];
+    }
+    // Store the new list
+    [toolkit.dataManager writeAlmondList:almondList];
+    
+    SFIAlmondPlus *plus = [self manageCurrentAlmondOnAlmondListUpdate:almondList manageCurrentAlmondChange:NO];
+    
+    if(plus!=nil)
+        // After requesting the Almond list, we then want to get additional info
+        [self asyncInitializeConnection2:network];
+    // Tell the world
+    [toolkit postNotification:kSFIDidUpdateAlmondList data:plus];
 }
 
 
@@ -462,6 +487,7 @@ static int responseCount = 0;
 
 
 + (GenericCommand* )tryRequestAlmondMode:(NSString *)almondMac {
+    
     SecurifiToolkit* toolkit = [SecurifiToolkit sharedInstance];
     if (almondMac == nil || toolkit.currentConnectionMode==SFIAlmondConnectionMode_local) {
         return nil;
@@ -477,10 +503,12 @@ static int responseCount = 0;
     return cmd;
 }
 
+
 + (void)onDynamicAlmondNameChange:(DynamicAlmondNameChangeResponse *)obj {
     
     SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
     NSString *almondName = obj.almondplusName;
+    
     if (almondName.length == 0) {
         return;
     }
@@ -497,6 +525,7 @@ static int responseCount = 0;
         [toolKit postNotification:kSFIDidChangeAlmondName data:obj];
     }
 }
+
 
 // When the cloud almond list is changed, ensure the Current Almond setting is consistent with the list.
 // This method has side-effects and can change settings.

@@ -591,7 +591,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         // Request updates: normally, once a logon token has been retrieved, we just issue these commands as part of SDK initialization.
         // But the client was not logged in. Send them now...
         //        [self asyncInitializeConnection1:network];
-        
         [self requestAlmondList];
     }
     else {
@@ -609,8 +608,8 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSMutableDictionary *dataValueAlmondList = [NSMutableDictionary new];
     [dataValueAlmondList setValue:GET_ALMOND_LIST forKey:COMMAND_TYPE];
     [self asyncSendRequest:CommandType_ALMOND_LIST commandString:GET_ALMOND_LIST payloadData:dataValueAlmondList];
-    [AlmondManagement initializeValues];
 }
+
 
 - (void)onLogoutResponse {
     [self tearDownLoginSession];
@@ -697,7 +696,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 #pragma mark - Network management
 -(struct PopUpSuggestions) suggestionsFromNetworkStateAndConnectiontype {
-    
     NSString *title;
     NSString *subTitle1, *subTitle2;
     SFIAlmondConnectionMode mode1=0, mode2=0;
@@ -1030,14 +1028,12 @@ static SecurifiToolkit *toolkit_singleton = nil;
         }
             
         case CommandType_ALMOND_LIST:{
-            NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:payload
-                                                                       options:kNilOptions
-                                                                         error:nil];
-            if([[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondListResponse"] || [[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondAffiliationData"])
-                [AlmondManagement onAlmondListResponse:payload network:network];
-            else{
-                NSLog(@"%@ is the commandtype",[[dictionary objectForKey:COMMAND_TYPE] isEqualToString:@"AlmondListResponse"]);
-            }
+            
+            NSDictionary* response = [NSJSONSerialization JSONObjectWithData:payload
+                                                                     options:kNilOptions
+                                                                       error:nil];
+            
+            [AlmondManagement onAlmondListAndAffiliationDataResponse:response network:network];
             break;
         }
             
