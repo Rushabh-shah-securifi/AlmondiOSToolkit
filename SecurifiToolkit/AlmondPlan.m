@@ -157,28 +157,28 @@
     }
 }
 
-+ (NSInteger)getPlanAmount:(PlanType)planType{
++ (NSString *)getPlanAmount:(PlanType)planType{
     switch (planType) {
         case PlanTypeFree:
-            return 0;
+            return @"0";
             break;
         case PlanTypeOneDay:
-            return 1;
+            return @"1";
             break;
         case PlanTypeOneMonth:
-            return 3.99;
+            return @"3.99";
             break;
         case PlanTypeThreeMonths:
-            return 12;
+            return @"12";
             break;
         case PlanTypeSixMonths:
-            return 20;
+            return @"20";
             break;
         case PlanTypeOneYear:
-            return 39.99;
+            return @"39.99";
             break;
         default:
-            return -1;
+            return @"-1";
             break;
     }
 }
