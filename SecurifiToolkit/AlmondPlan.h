@@ -15,6 +15,7 @@ typedef NS_ENUM(NSInteger, PlanType){
     PlanTypeOneMonth,
     PlanTypeThreeMonths,
     PlanTypeSixMonths,
+    PlanTypeOneYear,
     PlanTypeCancel,
     PlanTypeFreeExpired
 };

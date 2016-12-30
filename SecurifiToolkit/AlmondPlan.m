@@ -97,6 +97,8 @@
         return PlanTypeThreeMonths;
     }else if([planStrLC isEqualToString:@"paid6m"]){
         return PlanTypeSixMonths;
+    }else if([planStrLC isEqualToString:@"paid1y"]){
+        return PlanTypeOneYear;
     }
 }
 
@@ -117,6 +119,9 @@
         case PlanTypeSixMonths:
             return @"Paid6M";
             break;
+        case PlanTypeOneYear:
+            return @"Paid1Y";
+            break;
         default:
             return @"***";
             break;
@@ -135,13 +140,16 @@
             return @"1 Day Test";
             break;
         case PlanTypeOneMonth:
-            return @"1 Month $5";
+            return @"1 Month $3.99";
             break;
         case PlanTypeThreeMonths:
             return @"3 Months $12";
             break;
         case PlanTypeSixMonths:
             return @"6 Months $20";
+            break;
+        case PlanTypeOneYear:
+            return @"1 Year $39.99";
             break;
         default:
             return @"***";
@@ -158,13 +166,16 @@
             return 1;
             break;
         case PlanTypeOneMonth:
-            return 5;
+            return 3.99;
             break;
         case PlanTypeThreeMonths:
             return 12;
             break;
         case PlanTypeSixMonths:
             return 20;
+            break;
+        case PlanTypeOneYear:
+            return 39.99;
             break;
         default:
             return -1;
@@ -188,6 +199,9 @@
             break;
         case PlanTypeSixMonths:
             return 6;
+            break;
+        case PlanTypeOneYear:
+            return 12;
             break;
         default:
             return -1;
