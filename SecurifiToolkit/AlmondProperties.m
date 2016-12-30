@@ -20,12 +20,12 @@
     almondProp.screenTimeout = payload[@"ScreenTimeout"];
     almondProp.screenLock = payload[@"ScreenLock"];
     almondProp.screenPIN = payload[@"ScreenPIN"];
-    almondProp.routerMode = payload[@"RouterMode"];
+    almondProp.uptime = payload[@"Uptime"];
 
+    almondProp.routerMode = payload[@"RouterMode"];
     almondProp.checkInternetIP = payload[@"CheckInternetIP"];
     almondProp.checkInternetURL = payload[@"CheckInternetURL"];
     almondProp.weatherCentigrade = payload[@"weatherCentigrade"];
-    almondProp.uptime = payload[@"Uptime"];
     almondProp.URL = payload[@"URL"];
 
     almondProp.wanIP = payload[@"WanIP"];
@@ -39,6 +39,7 @@
     almondProp.upnp = payload[@"Upnp"];
     almondProp.webAdminEnable = payload[@"WebAdminEnable"];
     almondProp.webAdminPassword = payload[@"WebAdminPassword"];
+    almondProp.uptime1 = payload[@"Uptime1"];
 }
 
 + (AlmondProperties *)getTestAlmondProperties{
@@ -99,17 +100,31 @@
     return almondProp;
 }
 
++ (void)parseNewDynamicProperty:(NSDictionary *)payload{
+    NSDictionary *almondPropery = payload[@"AlmondProperties"];
+    for(NSString *action in almondPropery.allKeys){
+        [self updateProperty:action value:almondPropery[action]];
+    }
+}
+
 + (void)parseDynamicProperty:(NSDictionary *)payload{
-    AlmondProperties *almondProp = [SecurifiToolkit sharedInstance].almondProperty;
     NSString *action = payload[@"Action"];
     NSString *value = payload[action];
+    [self updateProperty:action value:value];
+}
+
++ (void)updateProperty:(NSString*)action value:(NSString *)value{
+    NSLog(@"update property");
+    AlmondProperties *almondProp = [SecurifiToolkit sharedInstance].almondProperty;
     
     if([action isEqualToString:@"WebAdminEnable"]){
         almondProp.webAdminEnable = value;
     }
     else if([action isEqualToString:@"WebAdminPassword"]){
         almondProp.webAdminPassword = value;
-        almondProp.uptime = payload[@"Uptime"];
+    }
+    else if([action isEqualToString:@"Uptime1"]){
+        almondProp.uptime1 = value;
     }
     else if([action isEqualToString:@"ScreenLock"]){
         almondProp.screenLock = value;
@@ -119,7 +134,9 @@
     }
     else if([action isEqualToString:@"ScreenPIN"]){
         almondProp.screenPIN = value;
-        almondProp.uptime = payload[@"Uptime"];
+    }
+    else if([action isEqualToString:@"Uptime"]){
+        almondProp.uptime = value;
     }
     else if([action isEqualToString:@"CheckInternetIP"]){
         almondProp.checkInternetIP = value;

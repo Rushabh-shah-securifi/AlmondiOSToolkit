@@ -13,12 +13,12 @@
 @property (nonatomic) NSString *screenTimeout;
 @property (nonatomic) NSString *screenLock;
 @property (nonatomic) NSString *screenPIN;
-@property (nonatomic) NSString *routerMode;
+@property (nonatomic) NSString *uptime;
 
+@property (nonatomic) NSString *routerMode;
 @property (nonatomic) NSString *checkInternetIP;
 @property (nonatomic) NSString *checkInternetURL;
 @property (nonatomic) NSString *weatherCentigrade;
-@property (nonatomic) NSString *uptime;
 @property (nonatomic) NSString *URL;
 
 @property (nonatomic) NSString *wanIP;
@@ -32,10 +32,12 @@
 @property (nonatomic) NSString *upnp;
 @property (nonatomic) NSString *webAdminEnable;
 @property (nonatomic) NSString *webAdminPassword;
+@property (nonatomic) NSString *uptime1;
 
 + (void)parseAlomndProperty:(NSDictionary *)payload;
 + (void)parseDynamicProperty:(NSDictionary *)payload;
 + (AlmondProperties *)getTestAlmondProperties;
 + (AlmondProperties *)getEmptyAlmondProperties;
 + (NSString *)getBase64EncryptedSting:(NSString *)mac uptime:(NSString *)uptime password:(NSString *)pass;
++ (void)parseNewDynamicProperty:(NSDictionary *)payload;
 @end

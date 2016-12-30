@@ -57,17 +57,26 @@
     NSString *almondMAC = payload[ALMONDMAC];
     NSString *commandType = payload[COMMAND_TYPE];
     
-    if([commandType isEqualToString:@"DynamicAlmondProperties"]){
-        if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC]){
-            return;
+
+    if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC]){
+        return;
+
+    if([commandType isEqualToString:@"AlmondPropertiesResponse"] || [commandType isEqualToString:@"AlmondProperties"]){
+        if(payload[@"AlmondProperties"]){//to handle while affiliation
+            [AlmondProperties parseAlomndProperty:payload[@"AlmondProperties"]];
+        }else{
+            [AlmondProperties parseAlomndProperty:payload];
         }
+        
     }
     
-    if([commandType isEqualToString:@"AlmondPropertiesResponse"]){
-        [AlmondProperties parseAlomndProperty:payload];
-    }
     else if([commandType isEqualToString:@"DynamicAlmondPropertiesResponse"]){
-        [AlmondProperties parseDynamicProperty:payload];
+        if(payload[@"AlmondProperties"]){
+            [AlmondProperties parseNewDynamicProperty:payload];
+        }else{//to support old firmware
+            [AlmondProperties parseDynamicProperty:payload];
+        }
+        
     }
     else if([commandType isEqualToString:@"DynamicAlmondLocationChangeResponse"]){
         //need to store location in current almond
