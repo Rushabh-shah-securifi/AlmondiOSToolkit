@@ -103,6 +103,10 @@
     NSString *latest_str = latest_splits[1];
     NSString *current_str = current_splits[1];
     
+    if(current_str.length == 6 && [current_splits[0] isEqualToString:@"AL3"]){
+        return AlmondVersionCheckerResult_currentNewerThanLatest;
+    }
+    
     NSComparisonResult result = [latest_str compare:current_str];
     
     switch (result) {
