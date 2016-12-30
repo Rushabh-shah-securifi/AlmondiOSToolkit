@@ -8,6 +8,7 @@
 
 #import "SFIWirelessSetting.h"
 #import "SFIXmlWriter.h"
+#import "AlmondVersionChecker.h"
 
 @implementation SFIWirelessSetting
 
@@ -63,5 +64,23 @@
     return copy;
 }
 
++ (BOOL)supportsCopy2g:(NSString *)firmware{
+    NSLog(@"supports copy 2g: %@", firmware);
+    if([firmware.lowercaseString hasPrefix:@"al3"]){
+        AlmondVersionCheckerResult result = [AlmondVersionChecker compareVersions:@"AL3-R014y" currentVersion:firmware];
+        if(result == AlmondVersionCheckerResult_currentSameAsLatest || result == AlmondVersionCheckerResult_currentNewerThanLatest){
+            return YES;
+        }else{
+            return NO;
+        }
+    }
+    else{
+        return NO;
+    }
+}
+
++ (BOOL)is5G:(NSString *)type{
+    return [type isEqualToString:@"5G"];
+}
 
 @end

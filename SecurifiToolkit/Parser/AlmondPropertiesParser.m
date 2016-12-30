@@ -56,10 +56,6 @@
     NSLog(@"dynamic subscription - payload: %@", payload);
     NSString *almondMAC = payload[ALMONDMAC];
     NSString *commandType = payload[COMMAND_TYPE];
-    
-
-    if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC])
-        return;
 
     if([commandType isEqualToString:@"AlmondPropertiesResponse"] || [commandType isEqualToString:@"AlmondProperties"]){
         if(payload[@"AlmondProperties"]){//to handle while affiliation
@@ -71,6 +67,9 @@
     }
     
     else if([commandType isEqualToString:@"DynamicAlmondPropertiesResponse"]){
+        if([self isNotMatchingMac:almondMAC])
+            return;
+        
         if(payload[@"AlmondProperties"]){
             [AlmondProperties parseNewDynamicProperty:payload];
         }else{//to support old firmware
@@ -80,9 +79,19 @@
     }
     else if([commandType isEqualToString:@"DynamicAlmondLocationChangeResponse"]){
         //need to store location in current almond
+        if([self isNotMatchingMac:almondMAC])
+            return;
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ALMOND_PROPERTIES_PARSED object:nil];
+}
+
+- (BOOL)isNotMatchingMac:(NSString *)almondMAC{
+    SFIAlmondConnectionMode connectionMode = [[SecurifiToolkit sharedInstance] currentConnectionMode];
+    if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC])
+        return YES;
+    else
+        return NO;
 }
 
 @end
