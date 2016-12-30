@@ -58,7 +58,7 @@
     NSString *commandType = payload[COMMAND_TYPE];
     
 
-    if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC]){
+    if(connectionMode == SFIAlmondConnectionMode_cloud && ![almondMAC isEqualToString:[AlmondManagement currentAlmond].almondplusMAC])
         return;
 
     if([commandType isEqualToString:@"AlmondPropertiesResponse"] || [commandType isEqualToString:@"AlmondProperties"]){
