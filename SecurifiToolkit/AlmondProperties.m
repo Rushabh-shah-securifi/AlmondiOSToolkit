@@ -101,6 +101,7 @@
 }
 
 + (void)parseNewDynamicProperty:(NSDictionary *)payload{
+    NSLog(@"parseNewDynamicProperty 1");
     NSDictionary *almondPropery = payload[@"AlmondProperties"];
     for(NSString *action in almondPropery.allKeys){
         [self updateProperty:action value:almondPropery[action]];
@@ -110,6 +111,7 @@
 + (void)parseDynamicProperty:(NSDictionary *)payload{
     NSString *action = payload[@"Action"];
     NSString *value = payload[action];
+    NSLog(@"parseNewDynamicProperty 1");
     [self updateProperty:action value:value];
 }
 
@@ -159,8 +161,15 @@
 }
 
 + (NSString *)getBase64EncryptedSting:(NSString *)mac uptime:(NSString *)uptime password:(NSString *)pass{
-    NSData* data = [pass dataUsingEncoding:NSUTF8StringEncoding];
-    NSData *encryptedData = [data securifiEncryptPassword:mac uptime:uptime];
+    NSData* immutdata = [pass dataUsingEncoding:NSUTF8StringEncoding];
+    NSMutableData *mutableData = [immutdata mutableCopy];
+    NSLog(@"datalength bf: %d", mutableData.length);
+    for(int i = 0; i < 128 - immutdata.length; i++){
+        unsigned char zeroByte = 0;
+        [mutableData appendBytes:&zeroByte length:1];
+    }
+    NSLog(@"datalength af: %d", mutableData.length);
+    NSData *encryptedData = [mutableData securifiEncryptPassword:mac uptime:uptime];
     return [encryptedData base64EncodedString];
 }
 @end
