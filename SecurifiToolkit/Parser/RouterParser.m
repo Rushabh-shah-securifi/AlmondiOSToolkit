@@ -119,12 +119,22 @@
     routerSummary.location = payload[@"AlmondLocation"];
     routerSummary.wirelessSummaries = [self parseWirelessSettingsSummary:payload[@"WirelessSetting"]];
     routerSummary.almondsList = [self getAlmondsList:payload];
+    routerSummary.maxHopCount = [self getMaxHopCount:payload[SLAVES]];
     if(payload[@"RouterMode"]!=NULL){
         routerSummary.routerMode = payload[@"RouterMode"];
         [SecurifiToolkit sharedInstance].routerMode = payload[@"RouterMode"];
         NSLog(@"router mode = %@",[SecurifiToolkit sharedInstance].routerMode);
     }
     return routerSummary;
+}
+
++ (NSInteger *)getMaxHopCount:(NSArray *)slaves{
+    NSInteger maxCount = 0;
+    for(NSDictionary *slave in slaves){
+        if([slave[HOP_COUNT] integerValue] > maxCount)
+            maxCount = [slave[HOP_COUNT] integerValue];
+    }
+    return maxCount;
 }
 
 +(NSArray*)getAlmondsList:(NSDictionary*)payload{
