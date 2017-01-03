@@ -139,7 +139,10 @@
 
 +(NSArray*)getAlmondsList:(NSDictionary*)payload{
     NSMutableArray *almondsList = [payload[SLAVES] mutableCopy];
-    NSDictionary *masterAlmond = @{@"Location":payload[@"AlmondLocation"]?:[AlmondManagement currentAlmond].almondplusName};
+    
+    //added name to be compatible with old firmware
+    NSString *almLocationOrName = payload[@"AlmondLocation"]? : [AlmondManagement currentAlmond].almondplusName;
+    NSDictionary *masterAlmond = @{@"Location": almLocationOrName?:@""};
     [almondsList insertObject:masterAlmond atIndex:0];
     return almondsList;
 }
