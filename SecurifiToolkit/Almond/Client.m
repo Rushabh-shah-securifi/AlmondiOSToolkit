@@ -246,8 +246,8 @@
         }
         case -12:
         {
-            if(get == NO)
-            client.previousType = client.deviceType;
+//            if(get == NO)
+//            client.previousType = client.deviceType;
             
             client.deviceType=get? client.deviceType:newValue;
             return client.deviceType;

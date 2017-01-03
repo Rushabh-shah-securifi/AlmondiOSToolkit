@@ -114,12 +114,6 @@
         
         Client *client = [Client findClientByID:ID];
         if(client){
-//            if([client.previousType isEqualToString:@"amazon_echo"] || [client.previousType isEqualToString:@"nest"]){
-////                client.previousType = client.deviceType;
-//                            NSLog(@"client previous type %@",client.previousType);
-//                            NSLog(@"client device type %@",client.deviceType);
-//                
-//                    }
             [self setDeviceProperties:client forDict:updatedClientPayload];
             NSLog(@"client set previous type %@",client.previousType);
             NSLog(@"client set device type %@",client.deviceType);//
@@ -183,6 +177,9 @@
     device.deviceIP = dict[LAST_KNOWN_IP];
     device.deviceConnection = dict[CONNECTION];
     device.deviceLastActiveTime = dict[LAST_ACTIVE_EPOCH];
+    
+    device.previousType = device.deviceType;
+    
     device.deviceType = dict[CLIENT_TYPE];
     device.deviceUseAsPresence = [dict[USE_AS_PRESENCE] boolValue];
     device.isActive = [dict[ACTIVE] boolValue];
@@ -199,14 +196,7 @@
     NSLog(@"type iot == %d ",device.is_IoTDeviceType);
     device.iot_serviceEnable = [dict[IOTEnable] boolValue];
     device.iot_dnsEnable = [dict[DNSEnable] boolValue];
-    if([device.deviceType isEqualToString:@"amazon_echo"]){
-        device.previousType = @"nest";
-    }
-    else if ([device.deviceType isEqualToString:@"nest"]){
-        device.previousType = @"amazon_echo";
-    }
-    
-    
+
     
 }
 -(BOOL)isIoTdevice:(NSString *)clientType{
