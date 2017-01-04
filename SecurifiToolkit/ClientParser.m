@@ -113,9 +113,11 @@
         NSDictionary *updatedClientPayload = [clientPayload objectForKey:ID];
         
         Client *client = [Client findClientByID:ID];
-        if(client)
+        if(client){
             [self setDeviceProperties:client forDict:updatedClientPayload];
-        NSLog(@"dynamic client updated mainDict = %@",mainDict);
+            NSLog(@"client set previous type %@",client.previousType);
+            NSLog(@"client set device type %@",client.deviceType);//
+        }
         
     }
     else if([commandType isEqualToString:DYNAMIC_CLIENT_REMOVED]) {
@@ -167,6 +169,7 @@
 
 -(void)setDeviceProperties:(Client*)device forDict:(NSDictionary*)dict{
     NSLog(@"setDeviceProperties dict %@",dict);
+   
     device.name = dict[CLIENT_NAME];
     device.manufacturer = dict[MANUFACTURER];
     device.rssi = dict[RSSI];
@@ -174,6 +177,9 @@
     device.deviceIP = dict[LAST_KNOWN_IP];
     device.deviceConnection = dict[CONNECTION];
     device.deviceLastActiveTime = dict[LAST_ACTIVE_EPOCH];
+    
+    device.previousType = device.deviceType;
+    
     device.deviceType = dict[CLIENT_TYPE];
     device.deviceUseAsPresence = [dict[USE_AS_PRESENCE] boolValue];
     device.isActive = [dict[ACTIVE] boolValue];
@@ -190,10 +196,12 @@
     NSLog(@"type iot == %d ",device.is_IoTDeviceType);
     device.iot_serviceEnable = [dict[IOTEnable] boolValue];
     device.iot_dnsEnable = [dict[DNSEnable] boolValue];
+
+    
 }
 -(BOOL)isIoTdevice:(NSString *)clientType{
-    NSArray *iotTypes = @[@"withings",@"dlink_cameras",@"hikvision",@"foscam",@"motorola_connect",@"ibaby_monitor",@"osram_lightify",@"honeywell_appliances",@"ge_appliances",@"wink",@"airplay_speakers",@"sonos",@"belkin_wemo",@"samsung_smartthings",@"ring_doorbell",@"piper",@"canary",@"august_connect",@"nest_cam",@"skybell_wifi",@"scout_home_system",@"nest_protect",@"nest_thermostat",@"amazon_dash",@"amazon_echo",@"nest",@"philips_hue"];
-        if([iotTypes containsObject: clientType] )
+    NSArray *iotTypes = @[@"withings",@"dlink_cameras",@"hikvision",@"foscam",@"motorola_connect",@"ibaby_monitor",@"osram_lightify",@"honeywell_appliances",@"ge_appliances",@"wink",@"airplay_speakers",@"sonos",@"belkin_wemo",@"samsung_smartthings",@"ring_doorbell",@"piper",@"canary",@"august_connect",@"nest_cam",@"nest_protect",@"nest_thermostat",@"amazon_dash",@"amazon_echo",@"nest",@"philips_hue"];
+        if([iotTypes containsObject: clientType])
             return YES;
         else return  NO;
 }

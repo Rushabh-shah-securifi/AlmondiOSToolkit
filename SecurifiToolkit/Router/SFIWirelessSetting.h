@@ -35,4 +35,7 @@
 
 - (id)copyWithZone:(NSZone *)zone;
 
++ (BOOL)supportsCopy2g:(NSString *)firmware;
+
++ (BOOL)is5G:(NSString *)type;
 @end

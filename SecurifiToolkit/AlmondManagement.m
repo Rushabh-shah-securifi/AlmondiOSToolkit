@@ -183,7 +183,6 @@ static int count = 0;
 
 
 +(void)removeSecondaryUserFromAlmondWithMAC:(NSString*)almondMAC withUserID:(NSString*)userID {
-    
     NSArray* almondList = [self almondList];
     NSMutableArray* newAlmondList = [NSMutableArray new];
     for(SFIAlmondPlus* almond in almondList){
@@ -544,12 +543,16 @@ static int count = 0;
     
     SecurifiToolkit * toolKit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *current = [self currentAlmond];
-    
+//    if (current.linkType == SFIAlmondPlusLinkType_local_only) {
+//        NSLog(@"linkType is local_only");
+//        return current;
+//    }
+    // Manage the "Current selected Almond" value
+    toolKit.lastScanTime = 0;
     if (almondList.count == 0) {
         [toolKit purgeStoredData];
         return nil;
     }
-    
     else if (almondList.count == 1) {
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
@@ -573,6 +576,7 @@ static int count = 0;
         
         // Current one is not in new list.
         // Just pick the first one in this case
+        toolKit.lastScanTime = 0;
         SFIAlmondPlus *currentAlmond = almondList[0];
         if (doManage) {
             [self setCurrentAlmond:currentAlmond];

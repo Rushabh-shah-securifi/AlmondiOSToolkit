@@ -36,6 +36,7 @@
                                           }
                                           
                                           AlmondVersionCheckerResult result = [AlmondVersionChecker compareVersions:latestVersion currentVersion:currentVersion];
+                                          NSLog(@"current: %@, latest: %@", currentVersion, latestVersion);
                                           [self.delegate versionCheckerDidQueryVersion:almond result:result currentVersion:currentVersion latestVersion:latestVersion];
                                       }];
     
@@ -102,6 +103,16 @@
     
     NSString *latest_str = latest_splits[1];
     NSString *current_str = current_splits[1];
+    
+    //start - note only to resolve al3 beta conflict
+    NSRange range = NSMakeRange(0, 4);
+    if(current_str.length != latest_str.length && [current_splits[0] isEqualToString:@"AL3"] && [[latest_str substringWithRange:range] isEqualToString:[current_str substringWithRange:range]]){//beta firmware lenghts are of 5 and 6. and beta check is only for al3
+        if(current_str.length < latest_str.length){
+            return AlmondVersionCheckerResult_currentOlderThanLatest;
+        }
+        return AlmondVersionCheckerResult_currentNewerThanLatest;
+    }
+    //end
     
     NSComparisonResult result = [latest_str compare:current_str];
     

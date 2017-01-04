@@ -211,7 +211,9 @@
     
     NSString *current_str = cur_alm_splits[1];
     NSString *supported_str = supported_alm_splits[1];
-    
+    if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
+       return YES;
+    }
     //NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
     NSComparisonResult result = [current_str compare:supported_str];
     //NSLog(@"result %d", result);

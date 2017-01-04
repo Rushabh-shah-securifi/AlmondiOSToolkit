@@ -119,6 +119,7 @@
     routerSummary.location = payload[@"AlmondLocation"];
     routerSummary.wirelessSummaries = [self parseWirelessSettingsSummary:payload[@"WirelessSetting"]];
     routerSummary.almondsList = [self getAlmondsList:payload];
+    routerSummary.maxHopCount = [self getMaxHopCount:payload[SLAVES]];
     if(payload[@"RouterMode"]!=NULL){
         routerSummary.routerMode = payload[@"RouterMode"];
         [SecurifiToolkit sharedInstance].routerMode = payload[@"RouterMode"];
@@ -127,9 +128,21 @@
     return routerSummary;
 }
 
++ (NSInteger *)getMaxHopCount:(NSArray *)slaves{
+    NSInteger maxCount = 0;
+    for(NSDictionary *slave in slaves){
+        if([slave[HOP_COUNT] integerValue] > maxCount)
+            maxCount = [slave[HOP_COUNT] integerValue];
+    }
+    return maxCount;
+}
+
 +(NSArray*)getAlmondsList:(NSDictionary*)payload{
     NSMutableArray *almondsList = [payload[SLAVES] mutableCopy];
-    NSDictionary *masterAlmond = @{@"Location":payload[@"AlmondLocation"]?:[AlmondManagement currentAlmond].almondplusName};
+    
+    //added name to be compatible with old firmware
+    NSString *almLocationOrName = payload[@"AlmondLocation"]? : [AlmondManagement currentAlmond].almondplusName;
+    NSDictionary *masterAlmond = @{@"Location": almLocationOrName?:@""};
     [almondsList insertObject:masterAlmond atIndex:0];
     return almondsList;
 }

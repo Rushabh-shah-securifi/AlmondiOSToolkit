@@ -64,6 +64,7 @@
             [toolkit tearDownNetwork];
         }
         [AlmondManagement removeCurrentAlmond];
+        toolkit.lastScanTime = 0;
         NSArray *cloud = [AlmondManagement almondList];
         if (cloud.count > 0) {
             [AlmondManagement setCurrentAlmond:cloud.firstObject];
@@ -71,6 +72,7 @@
         else {
             NSArray *local = [AlmondManagement localLinkedAlmondList];
             if (local.count > 0) {
+                toolkit.lastScanTime = 0;
                 [AlmondManagement setCurrentAlmond:local.firstObject];
             }
         }
