@@ -1654,6 +1654,7 @@
     unlinkAlmondResp.reason = reason;
     return unlinkAlmondResp;
 }
+
 -(NotificationRegistrationResponse*) notificationRegistrationResponseWithisSuccessful:(BOOL)isSuccessful reasonCode:(int)reasoncode reason:(NSString*)reason{
     NotificationRegistrationResponse *notificationRegistrationResp = [[NotificationRegistrationResponse alloc] init];
     notificationRegistrationResp.isSuccessful = isSuccessful;

@@ -170,7 +170,6 @@
 
 - (void)delegateData:(id)payload commandType:(CommandType)commandType {
     __weak Network *block_self = self;
-    NSLog(@"delegate data is called");
     dispatch_sync(self.callbackQueue, ^() {
         [block_self.delegate networkDidReceiveResponse:block_self response:payload responseType:commandType];
     });
@@ -221,7 +220,7 @@
 #pragma mark - NetworkEndpointDelegate methods
 - (void)networkEndpointWillStartConnecting:(id <NetworkEndpoint>)endpoint {
     NSLog(@" Who is setting status Network - networkEndpointWillStartConnecting");
-    [ConnectionStatus setConnectionStatusTo:(ConnectionStatusType*)IS_CONNECTING_TO_NETWORK];
+    [ConnectionStatus setConnectionStatusTo:IS_CONNECTING_TO_NETWORK];
 }
 
 

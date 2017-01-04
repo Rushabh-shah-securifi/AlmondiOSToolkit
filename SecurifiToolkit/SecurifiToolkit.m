@@ -771,7 +771,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case SFIAlmondConnectionMode_local:{
             SFIAlmondPlus* almond = [AlmondManagement currentAlmond];
             NSLog(@"Entering the local mode %@",almond.almondplusMAC);
-            
             SFIAlmondLocalNetworkSettings *settings = [LocalNetworkManagement localNetworkSettingsForAlmond:almond.almondplusMAC];
             networkConfig = [NetworkConfig webSocketConfig:settings almondMac:almond.almondplusMAC];
         }
@@ -941,7 +940,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [self onDeleteAccountResponse:res];
             break;
         }
-        
+            
         case CommandType_GENERIC_COMMAND_RESPONSE: {
             GenericCommandResponse *res = payload;
             [AlmondManagement onAlmondRouterGenericCommandResponse:res network:network];
@@ -958,12 +957,14 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [AlmondManagement onAlmondModeChangeCompletion:payload network:network];
             break;
         }
+            
         case CommandType_ALMOND_MODE_RESPONSE: {
             NSLog(@"almond mode payload %@",payload);
             AlmondModeResponse *res = payload;
             [AlmondManagement onAlmondModeResponse:res network:network];
             break;
         }
+            
         case CommandType_NOTIFICATION_REGISTRATION_RESPONSE: {
             if (self.config.enableNotifications) {
                 NotificationRegistrationResponse *res = payload;
@@ -971,6 +972,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             }
             break;
         }
+            
         case CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE: {
             NSLog(@"toolkit - CommandType_NOTIFICATION_PREFERENCE_LIST_RESPONSE");
             if (self.config.enableNotifications) {
@@ -1032,8 +1034,10 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSDictionary* response = [NSJSONSerialization JSONObjectWithData:payload
                                                                      options:kNilOptions
                                                                        error:nil];
+            [AlmondManagement processTheAlmondManagementCommand:response withNetwork:network];
             
-            [AlmondManagement onAlmondListAndAffiliationDataResponse:response network:network];
+            int a=10;
+            printf("%d is the value of the format specifier",a);
             break;
         }
             

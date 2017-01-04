@@ -173,6 +173,7 @@ static int count = 0;
     }else if([commandType isEqualToString:@"DynamicUserDelete"]){
         
         [self removeSecondaryUserFromAlmondWithMAC:[response objectForKey:@"AlmondMAC"] withUserID:[response objectForKey:@"UserID"]];
+        
     }else if([commandType isEqualToString:@"DynamicUserAdd"]){
         
         NSString* userID = ![[response objectForKey:@"UserID"] isKindOfClass:[NSString class]]?[[response objectForKey:@"UserID"] stringValue]:[response objectForKey:@"UserID"];
@@ -331,8 +332,18 @@ static int count = 0;
 //When we request for almondList we get both almondList and Affiliation Data response
 //This function handles both AlmondListResponse and AffiliationData response to create almondlist
 */
++ (void)processTheAlmondManagementCommand: (NSDictionary*)response withNetwork:(Network*)network {
+    if([response[COMMAND_TYPE] isEqualToString:ALMOND_LIST_RESPONSE]||[response[COMMAND_TYPE] isEqualToString:ALMOND_AFFILIATION_DATA]){
+        [self onAlmondListAndAffiliationDataResponse:response network:network];
+    }
+}
 
 + (void)onAlmondListAndAffiliationDataResponse:(NSDictionary*)response network:(Network *)network {
+    
+//    if([response[COMMAND_TYPE] isEqualToString:@"UnlinkAlmondResponse"]){
+//        [self removeAlmondFromList:response[@"AlmondMAC"]];
+//        return;
+//    }
     
     count++;
     
@@ -340,7 +351,7 @@ static int count = 0;
         almondListData = [NSMutableDictionary new];
     }
     
-    NSDictionary* almondsDataResponse = response[@"Almond"];
+    NSArray* almondsDataResponse = response[@"Almond"];
     
     if([response[COMMAND_TYPE] isEqualToString:ALMOND_LIST_RESPONSE]){
         
@@ -349,7 +360,6 @@ static int count = 0;
     }else if([response[COMMAND_TYPE] isEqualToString:ALMOND_AFFILIATION_DATA] ){
         
         [self fillAlmondListWithAffiliationDataResponse:almondsDataResponse intoDictionary:almondListData];
-        
     }
     
     if(count==2){
@@ -422,7 +432,6 @@ static int count = 0;
     
     NSMutableArray* almondList = [NSMutableArray new];
     for(NSString* almondMAC in almondListData.allKeys){
-        SFIAlmondPlus* almond = almondListData[almondMAC];
         [almondList addObject:almondListData[almondMAC]];
     }
     // Store the new list
@@ -533,7 +542,6 @@ static int count = 0;
 + (SFIAlmondPlus *)manageCurrentAlmondOnAlmondListUpdate:(NSArray *)almondList manageCurrentAlmondChange:(BOOL)doManage {
     // if current is "local only" then no need to inspect the almond list; just return the current one.
     
-    NSArray* list = [self almondList];
     SecurifiToolkit * toolKit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *current = [self currentAlmond];
     
