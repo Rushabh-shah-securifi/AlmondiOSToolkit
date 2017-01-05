@@ -10,6 +10,7 @@
 #import "SecurifiToolkit.h"
 #import "AlmondJsonCommandKeyConstants.h"
 #import "AlmondManagement.h"
+#import "NSData+Securifi.h"
 
 @implementation RouterParser
 
@@ -59,15 +60,26 @@
     SFIGenericRouterCommand *genericRouterCommand;
     NSString *commandType = payload[@"CommandType"];
     if([commandType isEqualToString:@"RouterSummary"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload] commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY payload:payload];
+        genericRouterCommand = [self createGenericRouterCommand:[self parseRouterSummary:payload]
+                                                    commandType:SFIGenericRouterCommandType_WIRELESS_SUMMARY
+                                                        payload:payload];
         
     }else if([commandType isEqualToString:@"GetWirelessSettings"]){
-        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:payload[@"CountryRegion"]]
+        genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"]
+                                                                                 regionCode:payload[@"CountryRegion"]]
                                                     commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS payload:payload];
+        
+        if(payload[@"Password"]){
+            [self addPasswordToSettings:genericRouterCommand.command payload:payload];
+        }
     }
     else if([commandType isEqualToString:@"SetWirelessSettings"]){
         genericRouterCommand = [self createGenericRouterCommand:[self parseWirelessSettings:payload[@"WirelessSetting"] regionCode:@"CountryRegion"]
                                                     commandType:SFIGenericRouterCommandType_WIRELESS_SETTINGS payload:payload];
+        
+        if(payload[@"Uptime"]){
+            [self addPasswordSetWireless:genericRouterCommand.command payload:payload];
+        }
     }
 
     else if([commandType isEqualToString:@"FirmwareUpdate"]){
@@ -91,6 +103,53 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_ROUTER_RESPONSE_CONTROLLER_NOTIFIER object:nil userInfo:data];
 }
 
+//2g, guest2g, 5g, guest5g for getwireless
++(void)addPasswordToSettings:(NSArray *)settings payload:(NSDictionary *)payload{
+    NSString *pLen = payload[@"PLen"]; //"8,0,8,0"
+    NSString *decryptedPass = [self getDecryptedPass:payload[@"Password"] uptime:payload[@"Uptime"]];
+    
+    NSArray *pLenSplits = [pLen componentsSeparatedByString:@","];
+    NSRange range = NSMakeRange(0, [pLenSplits[0] integerValue]);
+    NSString *pass2G = [decryptedPass substringWithRange:range];
+    
+    range = NSMakeRange(pass2G.length, [pLenSplits[1] integerValue]);
+    NSString *pass2GGuest = [decryptedPass substringWithRange:range];
+    
+    range = NSMakeRange(pass2G.length + pass2GGuest.length, [pLenSplits[2] integerValue]);
+    NSString *pass5G = [decryptedPass substringWithRange:range];
+    
+    range = NSMakeRange(pass2G.length + pass2GGuest.length + pass5G.length, [pLenSplits[3] integerValue]);
+    NSString *pass5GGuest = [decryptedPass substringWithRange:range];
+    
+    
+    for(SFIWirelessSetting *setting in settings){
+        if([setting.type isEqualToString:@"2G"]){
+            setting.password = pass2G;
+        }
+        else if([setting.type isEqualToString:@"Guest2G"]){
+            setting.password = pass2GGuest;
+        }
+        else if([setting.type isEqualToString:@"5G"]){
+            setting.password = pass5G;
+        }
+        else if([setting.type isEqualToString:@"Guest5G"]){
+            setting.password = pass5GGuest;
+        }
+    }
+}
+
++ (void)addPasswordSetWireless:(NSArray *)settings payload:(NSDictionary *)payload{
+    SFIWirelessSetting *newSettingObj = settings.firstObject;
+    newSettingObj.password = [self getDecryptedPass:newSettingObj.password uptime:payload[@"Uptime"]];
+}
+
++ (NSString *)getDecryptedPass:(NSString *)encryptedPass uptime:(NSString *)uptime{
+    if(encryptedPass.length == 0)
+        return @"";
+    NSData *payload = [[NSData alloc] initWithBase64EncodedString:encryptedPass options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    return [payload securifiDecryptPasswordForAlmond:[AlmondManagement currentAlmond].almondplusMAC almondUptime:uptime];
+}
+
 +(SFIGenericRouterCommand*)createGenericRouterCommand:(id)command commandType:(SFIGenericRouterCommandType)type payload:(NSDictionary *)payload{
     SFIGenericRouterCommand *genericRouterCommand = [SFIGenericRouterCommand new];
     genericRouterCommand.command = command;
@@ -103,6 +162,7 @@
     genericRouterCommand.completionPercentage = payload[@"Percentage"]? [payload[@"Percentage"] intValue]: 0;
     genericRouterCommand.uptime = payload[@"Uptime"]?: 0;
     genericRouterCommand.offlineSlaves = payload[@"OfflineSlaves"]?:@"";
+    
     NSLog(@"generic command response msg: %@", genericRouterCommand.responseMessage);
     return  genericRouterCommand;
 }
