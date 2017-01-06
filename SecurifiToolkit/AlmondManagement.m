@@ -68,6 +68,7 @@ static int count = 0;
     [defaults synchronize];
 }
 
+
 + (void)manageCurrentAlmondChange:(SFIAlmondPlus *)almond {
     
     if (!almond) {
@@ -141,6 +142,30 @@ static int count = 0;
         }
     }
     return NO;
+}
+
+
++ (NSString*) getUserIDfromEmail: (NSString*)email andAlmondMAC: (NSString*)almondMAC {
+    
+    SFIAlmondPlus* almond = [self findAlmondFromAlmondListWithMAC:almondMAC];
+    NSArray* secondaryUsers = almond.accessEmailIDs;
+    
+    for(SFISecondaryUser* user in secondaryUsers){
+        if([user.emailId isEqualToString:email]){
+            return user.userId;
+        }
+    }
+    
+    return nil;
+}
+
++(SFIAlmondPlus*)findAlmondFromAlmondListWithMAC: (NSString*)almondPlusMAC {
+    NSArray* almondList = [self almondList];
+    for(SFIAlmondPlus* almond in almondList){
+        if([almond.almondplusMAC isEqualToString:almondPlusMAC]){
+            return almond;
+        }
+    }
 }
 
 + (void)onAlmondDynamicResponse:(NSData*)responseData{
@@ -338,11 +363,6 @@ static int count = 0;
 }
 
 + (void)onAlmondListAndAffiliationDataResponse:(NSDictionary*)response network:(Network *)network {
-    
-//    if([response[COMMAND_TYPE] isEqualToString:@"UnlinkAlmondResponse"]){
-//        [self removeAlmondFromList:response[@"AlmondMAC"]];
-//        return;
-//    }
     
     count++;
     

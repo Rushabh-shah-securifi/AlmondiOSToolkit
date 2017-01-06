@@ -276,7 +276,6 @@ static xmlSAXHandler simpleSAXHandlerStruct;
     @try{
         self.characterBuffer = [[NSMutableData alloc] init];
         _context = xmlCreatePushParserCtxt(&simpleSAXHandlerStruct, (__bridge void *)(self), NULL, 0, NULL);
-
         NSUInteger length = [xmlData length];
         xmlParseChunk(self.context, (const char *)[xmlData bytes], (int) length, 0);
         xmlParseChunk(self.context, NULL, 0, 1);// 1 to end parsing
@@ -1546,25 +1545,6 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
     //// NSLog(@"Prefix in endElementSAX : %s",prefix);
     //// NSLog(@"LocalName in endElementSAX : %s",localname);
     if (prefix == NULL) {
-        
-        //        if (!strncmp((const char *)localname, kName_UserID, kLength_MaxTag)
-        //            && (parser.storingCommandType == CommandType_AFFILIATION_CODE_RESPONSE))
-        //        {
-        //            [parser.command setUserID:[parser currentString]];
-        //            // [SNLog Log:@"Method Name: %s AFF response Object Data  UserID: %@", __PRETTY_FUNCTION__,[parser.command UserID]];
-        //        }
-        //        else if (!strncmp((const char *)localname, kName_AffiliationCode, kLength_MaxTag)
-        //                 && (parser.storingCommandType == CommandType_AFFILIATION_CODE_RESPONSE))
-        //        {
-        //            [parser.command setCode:[parser currentString]];
-        //            // [SNLog Log:@"Method Name: %s AFF response Object Data  Code: %@", __PRETTY_FUNCTION__,[parser.command Code]];
-        //        }
-        //        else if (!strncmp((const char *)localname, kName_AffiliationUserResponse, kLength_MaxTag) && (parser.storingCommandType == CommandType_AFFILIATION_CODE_RESPONSE)) {
-        //            // [SNLog Log:@"Method Name: %s Affiliation command parsing done", __PRETTY_FUNCTION__];
-        //            parser.commandType = AFFILIATION_CODE_RESPONSE;
-        //            parser.parsingCommand = NO;
-        //        }
-        //else
         if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
             && (parser.storingCommandType == CommandType_AFFILIATION_USER_COMPLETE))
         {
@@ -1680,176 +1660,6 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.commandType = CommandType_SIGNUP_RESPONSE;
             parser.parsingCommand = NO;
         }
-//        //Device Data Hash Response
-//        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
-//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
-//        {
-//            [parser.command setReason:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_Hash, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
-//        {
-//            [parser.command setAlmondHash:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_DeviceDataHashResponse, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_HASH_RESPONSE))
-//        {
-//            // [SNLog Log:@"Method Name: %s Device Hash Command Parsing done", __PRETTY_FUNCTION__];
-//            parser.commandType = CommandType_DEVICE_DATA_HASH_RESPONSE;
-//            parser.parsingCommand = NO;
-//            
-//        }
-//        //Device Data Response - START
-//        else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
-//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.command setReason:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDeviceList addObject:parser.tmpDevice];
-//            
-//        }else if (!strncmp((const char *)localname, kName_DeviceName, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setDeviceName:[parser currentString]];
-//            
-//        }
-//        else if (!strncmp((const char *)localname, kName_OZWNode, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setOZWNode:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_ZigBeeShortID, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setZigBeeShortID:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_ZigBeeEUI64, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setZigBeeEUI64:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_DeviceTechnology, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setDeviceTechnology:(unsigned int) [[parser currentString] intValue]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_AssociationTimestamp, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setAssociationTimestamp:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_DeviceType, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setDeviceType:(SFIDeviceType) [[parser currentString] intValue]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_DeviceTypeName, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setDeviceTypeName:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_FriendlyDeviceType, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setFriendlyDeviceType:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_DeviceFunction, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setDeviceFunction:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_AllowNotification, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setAllowNotification:[parser currentString]];
-//            
-//        }else if (!strncmp((const char *)localname, kName_ValueCount, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setValueCount:(unsigned int) [[parser currentString] intValue]];
-//        }
-//        //PY 121113
-//        else if (!strncmp((const char *)localname, kName_Location, kLength_MaxTag)
-//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.tmpDevice setLocation:[parser currentString]];
-//            
-//        }
-//        else if (!strncmp((const char *)localname, kName_DeviceDataResponse, kLength_MaxTag)
-//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.command setDeviceList:parser.tmpDeviceList];
-//            // [SNLog Log:@"Method Name: %s Device Data Command Parsing done Size: %d ", __PRETTY_FUNCTION__ , [parser.tmpDeviceList count]];
-//            //PY 230913
-//            if(parser.currentTmpMACValue!=nil){
-//                 [parser.command setAlmondMAC:parser.currentTmpMACValue];
-//                //parser.commandType = DEVICEDATA_CLOUD_RESPONSE;
-//                parser.currentTmpMACValue = nil;
-//            }
-//            
-//            parser.commandType = CommandType_DEVICE_DATA_RESPONSE;
-//            parser.parsingCommand = NO;
-//            
-//        }
-//        //Device Data Response - END
-//        //PY 221113 - Command 81
-//        else if (!strncmp((const char *)localname, kName_DynamicDeviceData, kLength_MaxTag)
-//                 && (parser.storingCommandType == CommandType_DEVICE_DATA_RESPONSE))
-//        {
-//            [parser.command setDeviceList:parser.tmpDeviceList];
-//            // [SNLog Log:@"Method Name: %s Device Data Command Parsing done Size: %d ", __PRETTY_FUNCTION__ , [parser.tmpDeviceList count]];
-//            //PY 230913 - Device Data Command 81
-//            if(parser.currentTmpMACValue!=nil){
-//                // [SNLog Log:@"Method Name: %s Cloud Initiated", __PRETTY_FUNCTION__];
-//                [parser.command setAlmondMAC:parser.currentTmpMACValue];
-//                parser.currentTmpMACValue = nil;
-//            }
-//            parser.parsingCommand = NO;
-//            parser.commandType = CommandType_DYNAMIC_DEVICE_DATA;
-//        }
-//        
-//        //Device Value Response - START
-//        //PY 190913 - Device Value List
-//        else if (!strncmp((const char *)localname, kName_LastKnownValue, kLength_MaxTag)
-//                 && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-//        {
-//            // // NSLog(@"Last known value: %@ " , [parser currentString]);
-//            NSString *currentValue = [parser currentString];
-//            
-//            // [SNLog Log:@"Method Name: %s Last known value: %@ " , __PRETTY_FUNCTION__, currentValue];
-//            [parser.tmpDeviceKnownValue setValue:currentValue];
-//            [parser.knownDeviceValues addObject:parser.tmpDeviceKnownValue];
-//            
-//        }else if (!strncmp((const char *)localname, kName_ValueVariables, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-//        {
-//            [parser.tmpDeviceValue replaceKnownDeviceValues:parser.knownDeviceValues];
-//            
-//        }
-//        else if (!strncmp((const char *)localname, kName_Device, kLength_MaxTag)
-//                 && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-//        {
-//            [parser.deviceValues addObject:parser.tmpDeviceValue];
-//            
-//        }
-//        else if (!strncmp((const char *)localname, kName_DeviceValueListResponse, kLength_MaxTag)
-//                  && (parser.storingCommandType == CommandType_DEVICE_VALUE_LIST_RESPONSE))
-//        {
-//            [parser.command setDeviceValueList:parser.deviceValues];
-//            parser.commandType = CommandType_DEVICE_VALUE_LIST_RESPONSE;
-//            parser.parsingCommand = NO;
-//
-//            if (parser.currentTmpMACValue != nil) {
-//                [parser.command setAlmondMAC:parser.currentTmpMACValue];
-//                parser.currentTmpMACValue = nil;
-//            }
-//        }
-        
-        //Device Value Response - END
-        //Mobile Command Response - START
         else if (!strncmp((const char *)localname, kName_Reason, kLength_MaxTag)
                  && (parser.storingCommandType == CommandType_MOBILE_COMMAND_RESPONSE))
         {
@@ -2170,7 +1980,6 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
         else if (!strncmp((const char *)localname, kName_AlmondplusMAC, kLength_MaxTag)
             && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_NAME_CHANGE))
         {
-            
             [parser.command setAlmondplusMAC:[parser currentString]];
         }
         else if (!strncmp((const char *)localname, kName_AlmondName, kLength_MaxTag)
@@ -2182,7 +1991,6 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             parser.commandType = CommandType_DYNAMIC_ALMOND_NAME_CHANGE;
             parser.parsingCommand = NO;
         }
-
         else if (!strncmp((const char *)localname, kName_AlmondMode, kLength_MaxTag)
             && (parser.storingCommandType == CommandType_DYNAMIC_ALMOND_MODE_CHANGE))
         {
@@ -2219,7 +2027,6 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
             NSString *modeSetBy = [parser currentString];
             [parser.command setUserId:modeSetBy];
         }
-
         else if (!strncmp((const char *)localname, kName_AlmondModeResponse, kLength_MaxTag)) {
             parser.commandType = CommandType_ALMOND_MODE_RESPONSE;
             parser.parsingCommand = NO;
@@ -2373,8 +2180,8 @@ static void	endElementSAX(void *ctx, const xmlChar *localname, const xmlChar *pr
 /*
  This callback is invoked when the parser encounters character data inside a node. The parser class determines how to use the character data.
  */
+
 static void	charactersFoundSAX(void *ctx, const xmlChar *ch, int len) {
-    
     CommandParser *parser = (__bridge CommandParser *)ctx;
     // A state variable, "storingCharacters", is set when nodes of interest begin and end.
     // This determines whether character data is handled or ignored.
@@ -2390,7 +2197,6 @@ static void	charactersFoundSAX(void *ctx, const xmlChar *ch, int len) {
 static void errorEncounteredSAX(void __unused *ctx, const char *msg, ...) {
     //Handle errors as appropriate for your application.
     va_list arglist;
-    
     printf( "Error: " );
     va_start( arglist, msg );
     vprintf( msg, arglist );

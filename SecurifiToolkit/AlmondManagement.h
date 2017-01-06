@@ -22,6 +22,7 @@
 
 @interface AlmondManagement : NSObject
 
++ (NSString*) getUserIDfromEmail: (NSString*)email andAlmondMAC: (NSString*)almondMAC;
 + (void)onAlmondDynamicResponse:(NSData*)responseData;
 + (NSMutableArray*)getOwnedAlmondList;
 + (NSMutableArray*)getSharedAlmondList;
@@ -38,6 +39,7 @@
 + (NSArray *)getAL3s:(NSArray *)cloud;
 + (BOOL)hasAtleaseOneAL3;
 + (SFIAlmondPlus *)tryLoadCurrentAL3;
+
 
 //Almond List Management
 + (void)processTheAlmondManagementCommand: (NSDictionary*)response withNetwork:(Network*)network;
