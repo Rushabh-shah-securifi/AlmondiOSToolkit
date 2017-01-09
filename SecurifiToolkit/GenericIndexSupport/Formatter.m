@@ -12,13 +12,14 @@
 @end
 
 @implementation Formatter
--(id)initWithFactor:(float)factor min:(int)min max:(int)max units:(NSString*)units{
+-(id)initWithFactor:(float)factor min:(int)min max:(int)max units:(NSString*)units prefix:(NSString *)prefix{
     self = [super init];
     if(self){
         self.factor = factor;
         self.min = min;
         self.max = max;
         self.units = units;
+        self.prefix = prefix;
     }
     return self;
 }
