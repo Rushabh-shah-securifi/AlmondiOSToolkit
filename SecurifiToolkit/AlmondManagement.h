@@ -36,9 +36,9 @@
 + (SFIAlmondPlus *)cloudAlmond:(NSString *)almondMac;
 + (NSArray *)localLinkedAlmondList;
 + (BOOL)almondExists:(NSString *)almondMac;
-+ (NSArray *)getAL3s:(NSArray *)cloud;
-+ (BOOL)hasAtleaseOneAL3;
-+ (SFIAlmondPlus *)tryLoadCurrentAL3;
++ (NSArray *)getPrimaryAL3s:(NSArray *)cloud;
++ (BOOL)hasAtleaseOnePrimaryAL3;
++ (SFIAlmondPlus *)tryGetCurrentPrimaryAL3;
 
 
 //Almond List Management

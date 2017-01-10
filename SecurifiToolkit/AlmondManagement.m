@@ -734,27 +734,27 @@ static int count = 0;
     [toolkit postNotification:kSFIDidReceiveGenericAlmondRouterResponse data:routerCommand];
 }
 
-+ (NSArray *)getAL3s:(NSArray *)cloud{
++ (NSArray *)getPrimaryAL3s:(NSArray *)cloud{
     NSMutableArray *al3Array = [NSMutableArray new];
     for(SFIAlmondPlus *alm in cloud){
-        if([alm.firmware.lowercaseString hasPrefix:@"al3-"])
+        if([alm.firmware.lowercaseString hasPrefix:@"al3-"] && alm.isPrimaryAlmond)
             [al3Array addObject:alm];
     }
     return al3Array;
 }
 
-+ (BOOL)hasAtleaseOneAL3{
++ (BOOL)hasAtleaseOnePrimaryAL3{
     NSArray *almonds = [AlmondManagement almondList];
     for(SFIAlmondPlus *alm in almonds){
-        if([alm.firmware.lowercaseString hasPrefix:@"al3-"])
+        if([alm.firmware.lowercaseString hasPrefix:@"al3-"] && alm.isPrimaryAlmond)
             return YES;
     }
     return NO;
 }
 
-+ (SFIAlmondPlus *)tryLoadCurrentAL3{
++ (SFIAlmondPlus *)tryGetCurrentPrimaryAL3{
     NSString *currentAlmMac = [AlmondManagement currentAlmond].almondplusMAC;
-    NSArray *al3List = [self getAL3s:[AlmondManagement almondList]];
+    NSArray *al3List = [self getPrimaryAL3s:[AlmondManagement almondList]];
     for(SFIAlmondPlus *alm in al3List){
         if([alm.almondplusMAC isEqualToString:currentAlmMac])
             return alm;

@@ -210,7 +210,13 @@
 }
 + (BOOL)hasPaidSubscription{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    for(AlmondPlan *plan in toolkit.subscription.allValues){
+    
+    for(NSString *mac in toolkit.subscription.allKeys){
+        AlmondPlan *plan = toolkit.subscription[mac];
+        SFIAlmondPlus *almond = [AlmondManagement cloudAlmond:mac];
+        if(almond.isPrimaryAlmond == NO)
+            continue;
+        
         if(plan.planType != PlanTypeFree && plan.planType != PlanTypeFreeExpired && plan.planType != PlanTypeNone){
             return YES;
         }
@@ -218,6 +224,7 @@
     return NO;
 }
 
+//for Iot
 + (BOOL)hasSubscription:(NSString *)mac{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
     AlmondPlan *plan = toolkit.subscription[mac];
