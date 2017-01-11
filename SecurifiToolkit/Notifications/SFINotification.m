@@ -46,12 +46,11 @@
     
     obj.valueType = [SFIDeviceKnownValues nameToPropertyType:payload[@"indexname"]];
     obj.value = payload[@"indexvalue"];
+    obj.notiCat = SFINotificationCategory_SmartDevice;
     
-    
-    //md01<<<<
-    str = payload[@"client_type"];
     NSString *notiType = payload[@"NotiType"];
-    if (notiType.length > 0 || [notiType isEqualToString:@"wifiClients"]) {
+    //md01<<<<
+    if ([notiType isEqualToString:@"wifiClients"]) {
         //NSLog(@"wifi client - alert: %@", payload[@"alert"]);
         NSString * name = @"";
         if (payload[@"client_name"]) {
@@ -66,8 +65,20 @@
         obj.deviceName = [NSString stringWithFormat:@"%@|%@|%@|%@" ,name,type,payload[@"client_id"],alert];
        
         obj.deviceType = SFIDeviceType_WIFIClient;
+        obj.notiCat = SFINotificationCategory_Clients;
     }
     //md01>>>
+    
+    //DirectPass
+    else if([notiType isEqualToString:@"DirectPass"]) {
+        NSLog(@"Direct Pass - alert: %@", payload[@"alert"]);
+        
+        obj.deviceName = payload[@"alert"]; //storing alert in device name
+        obj.deviceType = SFIDeviceType_DirectPass;
+        obj.notiCat = SFINotificationCategory_Iot;
+    }
+    //DirectPass
+    
     
     // protect against errant or missing values in payload
     id counter = payload[@"counter"];

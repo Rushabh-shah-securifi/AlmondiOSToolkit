@@ -35,7 +35,11 @@
 
 - (void)deleteAllNotifications;
 
-- (NSArray *)fetchRecentNotifications:(NSString *)mac isSensor:(BOOL)isSensor;
+- (NSArray *)fetchRecentSmartDeviceNotifications:(NSString *)mac;
+
+- (NSArray *)fetchRecentClientNotifications:(NSString *)mac;
+
+- (NSArray *)fetchRecentIotNotifications:(NSString *)mac;
 @end
 
 

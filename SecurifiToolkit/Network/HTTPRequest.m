@@ -12,7 +12,7 @@
     NSMutableDictionary* dictionary = [NSMutableDictionary new];
     [dictionary setValue:email forKey:@"emailID"];
     [dictionary setValue:password forKey:@"password"];
-    [dictionary setValue:@"Ecommerce" forKey:@"type"];
+//    [dictionary setValue:@"Ecommerce" forKey:@"type"];
     [self sendHTTPRequestWithData:dictionary withRequestType:@"SignUp"];
 }
 

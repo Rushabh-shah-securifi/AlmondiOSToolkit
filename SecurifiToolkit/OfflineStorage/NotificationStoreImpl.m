@@ -27,6 +27,7 @@
 
 @property(nonatomic, readonly) ZHDatabaseStatement *fetch_recent_recs_device;
 @property(nonatomic, readonly) ZHDatabaseStatement *fetch_recent_recs_client;
+@property(nonatomic, readonly) ZHDatabaseStatement *fetch_recent_recs_IoT;
 @property(nonatomic, readonly) dispatch_queue_t queue;
 @end
 
@@ -76,9 +77,11 @@
     _mark_viewed_notification = [self.db newStatement:@"update notifications set viewed=? where id=?"];
     _delete_notification = [self.db newStatement:@"delete from notifications where id=?"];
     
-    _fetch_recent_recs_device = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where mac=? and devicetype!=? order by time desc limit 3"];
+    _fetch_recent_recs_device = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where mac=? and notiCat=? order by time desc limit 3"];
     
-    _fetch_recent_recs_client = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where mac=? and devicetype=? order by time desc limit 2"];
+    _fetch_recent_recs_client = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where mac=? and notiCat=? order by time desc limit 2"];
+    
+    _fetch_recent_recs_IoT = [self.db newStatement:@"select id, external_id, mac, time, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed from notifications where mac=? and notiCat=? order by time desc limit 2"];
 }
 
 #pragma mark - SFIDeviceLogStore methods
@@ -205,23 +208,33 @@
     return obj;
 }
 
-- (NSArray *)fetchRecentNotifications:(NSString *)mac isSensor:(BOOL)isSensor{
+- (NSArray *)fetchRecentSmartDeviceNotifications:(NSString *)mac{
+    NSMutableArray *notifications = [NSMutableArray new];
+    
+    return [self fetchRecentNotifications:self.fetch_recent_recs_device mac:mac notiCat:SFINotificationCategory_SmartDevice];
+}
+
+- (NSArray *)fetchRecentClientNotifications:(NSString *)mac{
+    NSMutableArray *notifications = [NSMutableArray new];
+    
+    return [self fetchRecentNotifications:self.fetch_recent_recs_client mac:mac notiCat:SFINotificationCategory_Clients];
+}
+
+- (NSArray *)fetchRecentIotNotifications:(NSString *)mac{
+    NSMutableArray *notifications = [NSMutableArray new];
+    
+    return [self fetchRecentNotifications:self.fetch_recent_recs_IoT mac:mac notiCat:SFINotificationCategory_Iot];
+}
+
+- (NSArray *)fetchRecentNotifications:(NSString *)q_stmt mac:(NSString *)mac notiCat:(SFINotificationCategory)notiCat{
     NSMutableArray *notifications = [NSMutableArray new];
     dispatch_sync(self.queue, ^(){
         ZHDatabaseStatement *stmt;
         
-        if (isSensor) { //for device
-            stmt = self.fetch_recent_recs_device;
-            [stmt reset];
-            [stmt bindNextText:mac];
-            [stmt bindNextInteger:(ZHDatabase_int)SFIDeviceType_WIFIClient];
-        }
-        else {
-            stmt = self.fetch_recent_recs_client;
-            [stmt reset];
-            [stmt bindNextText:mac];
-            [stmt bindNextInteger:(ZHDatabase_int)SFIDeviceType_WIFIClient];
-        }
+        stmt = q_stmt;
+        [stmt reset];
+        [stmt bindNextText:mac];
+        [stmt bindNextInteger:(ZHDatabase_int)notiCat];
         
         while ([stmt step]) {
            [notifications addObject:[self readRecord:stmt]];
@@ -316,7 +329,7 @@
     obj.value = stmt.stepNextString; // indexvalue
 
     obj.viewed = stmt.stepNextBool; // viewed
-
+    obj.notiCat = stmt.stepNextInteger;
     return obj;
 }
 
