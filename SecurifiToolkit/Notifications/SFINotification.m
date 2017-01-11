@@ -73,8 +73,8 @@
     else if([notiType isEqualToString:@"DirectPass"]) {
         NSLog(@"Direct Pass - alert: %@", payload[@"alert"]);
         
-        obj.deviceName = payload[@"alert"]; //storing alert in device name
-//        obj.deviceType = SFIDeviceType_DirectPass;
+        obj.deviceName = payload[@"alert"];
+        obj.deviceType = SFIDeviceType_DirectPass;
         obj.notiCat = SFINotificationCategory_Iot;
     }
     //DirectPass
