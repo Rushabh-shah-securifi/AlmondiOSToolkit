@@ -109,6 +109,9 @@
     NSString *decryptedPass = [self getDecryptedPass:payload[@"Password"] uptime:payload[@"Uptime"]];
     
     NSArray *pLenSplits = [pLen componentsSeparatedByString:@","];
+    if(pLenSplits.count <= 3)//crash fix
+        return;
+    
     NSRange range = NSMakeRange(0, [pLenSplits[0] integerValue]);
     NSString *pass2G = [decryptedPass substringWithRange:range];
     

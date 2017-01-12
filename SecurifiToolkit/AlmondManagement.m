@@ -192,8 +192,9 @@ static int count = 0;
         [self addAlmondToList:almond];
         
     }else if([commandType isEqualToString:@"DynamicAlmondDelete"]){
-        
-        [self removeAlmondFromList:[response objectForKey:@"AlmondMAC"]];
+        NSString *almondMac = [response objectForKey:@"AlmondMAC"];
+        [self removeAlmondFromList:almondMac];
+        [AlmondPlan resetAlmondPlan:almondMac];
         
     }else if([commandType isEqualToString:@"DynamicUserDelete"]){
         
