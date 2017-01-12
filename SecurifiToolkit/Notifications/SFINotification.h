@@ -20,6 +20,7 @@
 @property(nonatomic) SFIDevicePropertyType valueType;
 @property(nonatomic, copy) NSString *value; // device value
 @property(nonatomic) BOOL viewed;
+@property(nonatomic) SFINotificationCategory notiCat;
 //@property(nonatomic, copy) NSString *clientName;
 //@property(nonatomic, copy) NSString *clientConnection;
 //@property(nonatomic, copy) NSString *notiType;

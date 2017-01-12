@@ -20,6 +20,8 @@
 
 - (void) HTTPResponseReceived: (LoginResponse*) response;
 
+- (void)responseDict:(NSDictionary*)responseDict;
+
 @end
 
 @interface HTTPRequest : NSObject
@@ -33,5 +35,9 @@
 -(void) sendAsyncHTTPResetPasswordRequest: (NSString*)emailID;
 
 -(void) sendAsyncHTTPRequestResendActivationLink: (NSString*)emailID;
+
+-(void)cancleConnection;
+
+-(void)sendHttpRequest:(NSString *)post;
 
 @end

@@ -77,7 +77,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_WIFIClient                    = 500,//added for notifications for quick solution
     SFIDeviceType_REBOOT_ALMOND                 = 501,
     SFIDeviceType_Weather                       = 502,
-    
+    SFIDeviceType_DirectPass                    = 503,//added for notifications for directpass
     SFIDeviceType_count                         = 65, // always set to the last value; assumes sequence is continuous
 };
 
@@ -241,4 +241,10 @@ typedef NS_ENUM(int, SFINotificationMode) {
     SFINotificationMode_away                    = 3,
 };
 
+// Per device notification preferences
+typedef NS_ENUM(int, SFINotificationCategory) {
+    SFINotificationCategory_SmartDevice                     = 0,
+    SFINotificationCategory_Clients                         = 1,
+    SFINotificationCategory_Iot                             = 2,
+};
 #endif

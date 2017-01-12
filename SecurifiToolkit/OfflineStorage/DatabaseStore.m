@@ -98,7 +98,7 @@ create index notifications_mac on notifications (mac, time);
 //    exists = NO;
     if (!exists) {
         [self.db execute:@"drop table if exists notifications"];
-        [self.db execute:@"create table notifications (id integer primary key, external_id varchar(128) unique not null, mac varchar(24), users varchar(128), date_bucket double, time double, data text, deviceid integer, devicename varchar(256), devicetype integer, value_index integer, value_indexname varchar(256), indexvalue varchar(20), viewed integer);"];
+        [self.db execute:@"create table notifications (id integer primary key, external_id varchar(128) unique not null, mac varchar(24), users varchar(128), date_bucket double, time double, data text, deviceid integer, devicename varchar(256), devicetype integer, value_index integer, value_indexname varchar(256), indexvalue varchar(20), viewed integer, notiCat integer);"];
         [self.db execute:@"create index notifications_bucket on notifications (date_bucket, time);"];
         [self.db execute:@"create index notifications_time on notifications (time);"];
         [self.db execute:@"create index notifications_mac on notifications (mac, time);"];
@@ -120,7 +120,7 @@ create index notifications_mac on notifications (mac, time);
     // for security reasons, do not allow backups to iCloud
     [self markExcludeFileFromBackup:db_url];
 
-    _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"];
+    _insert_notification = [self.db newStatement:@"insert into notifications (external_id, mac, users, date_bucket, time, data, deviceid, devicename, devicetype, value_index, value_indexname, indexvalue, viewed, notiCat) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"];
     _count_notification = [self.db newStatement:@"select count(*) from notifications where external_id=?"];
     _trim_notifications = [self.db newStatement:@"delete from notifications where id in (select id from notifications order by time desc limit ? offset ?)"];
     _update_unread_count = [self.db newStatement:@"update notifications set viewed=? where time <= (select time from notifications order by time desc limit 1 offset ?)"];
@@ -222,7 +222,7 @@ create index notifications_mac on notifications (mac, time);
         [stmt bindNextText:notification.value]; // indexvalue
 
         [stmt bindNextBool:notification.viewed]; // normally, this is NO for new notifications, but caller can control this
-
+        [stmt bindNextInteger:notification.notiCat];
         success = [stmt execute];
         if (!success) {
             NSLog(@"Failed to insert notification into database, obj:%@", notification);
