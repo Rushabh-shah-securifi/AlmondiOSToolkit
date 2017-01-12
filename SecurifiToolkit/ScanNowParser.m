@@ -74,16 +74,20 @@
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
         if([self checkForClientPresent:toolkit.clients mac:dict[@"MAC"]]){
-            if([self checkForValidresponse:dict]){
+            if([self checkForValidresponse:dict] && ![self isToAddHealthyDevices:dict]){
                 NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
                 [scanNowArr addObject:iotDeviceObj];
             }
             else{
                 NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
                 [helthyDeviceArr addObject:iotDeviceObj];
+                
             }
         }
     }
+    NSLog(@"scanNowArr  == %@",scanNowArr);
+    NSLog(@"helthyDeviceArr  == %@",helthyDeviceArr);
+    
     NSMutableArray *excludedArr = [[NSMutableArray alloc]init];
     for(NSString *mac in mainDict[@"ExcludedMAC"]){
         if([self checkForClientPresent:toolkit.clients mac:mac])
@@ -95,7 +99,6 @@
     [toolkit.iotScanResults setObject:mainDict[@"ScanTime"] forKey:@"scanTime"];
     
     [toolkit.iotScanResults setObject:excludedArr forKey:@"scanExclude"];
-//    [toolkit.iotScanResults setObject:mainDict[@"Count"] forKey:@"scanCount"];
     [toolkit.iotScanResults setObject:mainDict[@"Count"]?mainDict[@"Count"]:@"0" forKey:@"scanCount"];
     
     NSDictionary *resData = nil;
@@ -213,15 +216,18 @@
     
     NSArray *ForwardRules = deviceDict[@"ForwardRules"];
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
-    NSArray *ports = deviceDict[@"Ports"];
+    NSArray *ports =deviceDict[@"Ports"];
     NSArray *upnpPorts = [self getPorts:UpnpRules];
     NSArray *ForwardRulesPorts = [self getPorts:ForwardRules];
+    
+    NSString *opnPorttag = [self getPortTag:ports];
+    NSString *upnptag = [self getUpnpTag:upnpPorts];
     
     NSDictionary *returnDict = @{@"Telnet":@{@"P":[telnet isEqualToString:@"1"]?@"1":@"0",
                                              @"Tag":@"1",
                                              @"Value":@[]},
                                  @"Ports":@{@"P":ports.count>0?@"1":@"0",
-                                            @"Tag":@"2",
+                                            @"Tag":opnPorttag,
                                             @"Value":ports},
                                  @"Http":@{@"P":[Http isEqualToString:@"1"]?@"1":@"0",
                                            @"Tag":@"3"
@@ -231,7 +237,7 @@
                                                    @"Tag":@"4",
                                                    @"Value":ForwardRules},
                                  @"UpnpRules":@{@"P":UpnpRules.count>0?@"1":@"0",
-                                                @"Tag":@"5",
+                                                @"Tag":upnptag,
                                                 @"Value":upnpPorts},
                                  @"MAC":deviceDict[@"MAC"]
                                  };
@@ -239,6 +245,63 @@
     NSLog(@"return dict %@",returnDict);
     
     return  returnDict;
+}
+-(NSString *)getPortTag:(NSArray *)ports{
+    for (NSString *port in ports) {
+        if([port intValue] > 1024)// not add vulnerable list
+            return @"6";
+    }
+    return  @"2";
+}
+-(NSString *)getUpnpTag:(NSArray *)ports{
+    for (NSString *port in ports) {
+        if([port intValue] > 1024)// not add vulnerable list
+            return @"7";
+    }
+    return  @"5";
+}
+
+-(BOOL)isToAddHealthyDevices:(NSDictionary *)iotDict{
+    NSArray *ports = iotDict[@"Ports"];
+    BOOL addToHealthy;
+    for (NSString *port in ports) {
+        if([port intValue] > 1024)// not add vulnerable list
+            addToHealthy = YES;
+        else{
+            addToHealthy = NO;
+            break;
+        }
+    }
+    return  addToHealthy;
+}
+-(BOOL )openPort:(NSDictionary *)iotDict{
+    NSDictionary *portDict = iotDict[@"Ports"];
+    NSArray *values = portDict[@"Value"];
+    BOOL allPortOn;
+    for (NSString *port in values) {
+        if([port intValue] > 1024)// not add vulnerable list
+            allPortOn = NO;
+        else{
+            allPortOn = YES;
+            break;
+        }
+    }
+    return  allPortOn;
+}
+-(BOOL )openPortHealthy:(NSDictionary *)iotDict{
+    NSDictionary *portDict = iotDict[@"Ports"];
+    NSArray *values = portDict[@"Value"];
+    BOOL allPortOn;
+    for (NSString *port in values) {
+        if([port intValue] < 1024)
+            allPortOn = NO;
+        else{
+            allPortOn = YES;
+            break;
+        }
+    }
+    
+    return allPortOn;
 }
 -(NSArray *)getPorts:(NSArray *)ObjArr{
     NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
