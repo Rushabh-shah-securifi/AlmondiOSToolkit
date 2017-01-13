@@ -71,10 +71,8 @@
     }];
 }
 
+
 -(void)sendHttpRequest:(NSString *)post {// make it paramater CMAC AMAC StartTag EndTag
-    //NSString *post = [NSString stringWithFormat: @"userName=%@&password=%@", self.userName, self.password];
-    
-    
     NSLog(@"post req = %@",post);
     NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[postData length]];
@@ -85,21 +83,26 @@
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"]; [request setTimeoutInterval:20.0];
     [request setHTTPBody:postData];
     self.conn = [NSURLConnection connectionWithRequest:request delegate:self];
-    
-    
-    
 }
+
+
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response { _responseData = [[NSMutableData alloc] init];
     NSLog(@"didReceiveResponse");
 }
+
+
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     [_responseData appendData:data];
     NSLog(@"didReceiveData");
 }
+
+
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
     NSLog(@"willCacheResponse");
     return nil;
 }
+
+
 - (NSDictionary*)parseJson:(NSString*)fileName{
     NSError *error = nil;
     NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName
@@ -109,21 +112,23 @@
                                                          options:kNilOptions
                                                            error:&error];
     
-    
     if (error != nil) {
         //NSLog(@"Error: was not able to load json file: %@.",fileName);
     }
     return data;
 }
+
+
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     //Now you can do what you want with the response string from the data
     if(_responseData == nil)
         return;
+    
     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:_responseData options:0 error:nil];
     [_responseData setLength:0];
     _responseData = nil;
+    
     /*note get endidentifier from db */
-    //dispatch_async(self.sendReqQueue,^(){
     if(dict == NULL)
         return;
     if(dict[@"Data"] == NULL)
@@ -132,6 +137,8 @@
         return;
     [self.delegate responseDict:dict];
 }
+
+
 -(void)cancleConnection{
     [self.conn cancel];
     self.conn = nil;

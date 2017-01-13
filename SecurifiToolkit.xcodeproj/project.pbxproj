@@ -288,6 +288,8 @@
 		A5E804191C75A90E005A8DB3 /* DataBaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A5E804171C75A90E005A8DB3 /* DataBaseManager.h */; };
 		A5E8041A1C75A90E005A8DB3 /* DataBaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E804181C75A90E005A8DB3 /* DataBaseManager.m */; };
 		B00565681E12357D00C4CA81 /* SFISecondaryUser.m in Sources */ = {isa = PBXBuildFile; fileRef = B00565671E12357D00C4CA81 /* SFISecondaryUser.m */; };
+		B00EA8BB1E29077300B57DA2 /* CommonMethodsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B00EA8BA1E29077300B57DA2 /* CommonMethodsTests.m */; };
+		B00EA8BD1E290F2900B57DA2 /* libOCMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B00EA8BC1E290F2900B57DA2 /* libOCMock.a */; };
 		CE15FFAD1868432200371183 /* cert.cer in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE15FFAC186842F400371183 /* cert.cer */; };
 		CE2EA24919CFF67300C6D6A8 /* UnlinkAlmondRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = CE2EA24719CFF67300C6D6A8 /* UnlinkAlmondRequest.h */; };
 		CE2EA24A19CFF67300C6D6A8 /* UnlinkAlmondRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE2EA24819CFF67300C6D6A8 /* UnlinkAlmondRequest.m */; };
@@ -739,6 +741,8 @@
 		A5E804181C75A90E005A8DB3 /* DataBaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataBaseManager.m; sourceTree = "<group>"; };
 		B00565661E12351800C4CA81 /* SFISecondaryUser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SFISecondaryUser.h; sourceTree = "<group>"; };
 		B00565671E12357D00C4CA81 /* SFISecondaryUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFISecondaryUser.m; sourceTree = "<group>"; };
+		B00EA8BA1E29077300B57DA2 /* CommonMethodsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonMethodsTests.m; sourceTree = "<group>"; };
+		B00EA8BC1E290F2900B57DA2 /* libOCMock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOCMock.a; path = usr/lib/libOCMock.a; sourceTree = "<group>"; };
 		CE15FFAC186842F400371183 /* cert.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.cer; sourceTree = "<group>"; };
 		CE15FFAE186844AA00371183 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		CE15FFB418684D7500371183 /* certificate.cer */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = certificate.cer; sourceTree = "<group>"; };
@@ -886,6 +890,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B00EA8BD1E290F2900B57DA2 /* libOCMock.a in Frameworks */,
 				1C4382FF1B2FFA9400F6AB7A /* Security.framework in Frameworks */,
 				1C4382FE1B2FFA8800F6AB7A /* CFNetwork.framework in Frameworks */,
 				CE9A290F188D0D2B0063D562 /* CoreFoundation.framework in Frameworks */,
@@ -1208,6 +1213,7 @@
 		221185BC178D371200EE23ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B00EA8BC1E290F2900B57DA2 /* libOCMock.a */,
 				A569B8E31DBE414100FBD429 /* libicucore.tbd */,
 				1CA80E4D1BAFA721002EB836 /* libxml2.dylib */,
 				1CA80E471BAFA482002EB836 /* libsqlite3.dylib */,
@@ -1582,6 +1588,7 @@
 		A5C41EB31DD4761E0005FD12 /* SecurifiToolkitTests */ = {
 			isa = PBXGroup;
 			children = (
+				B00EA8BA1E29077300B57DA2 /* CommonMethodsTests.m */,
 				A5AAEA0C1DE4566F004A4FBF /* CloudEndpoitnt_m_Tests.m */,
 				A5AAEA0A1DE41874004A4FBF /* LocalNetworkManagement_m_Tests.m */,
 				A5AAEA081DE417DC004A4FBF /* AlmondManagement_m_Tests.m */,
@@ -2272,6 +2279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A5AAEA091DE417DC004A4FBF /* AlmondManagement_m_Tests.m in Sources */,
+				B00EA8BB1E29077300B57DA2 /* CommonMethodsTests.m in Sources */,
 				A5AAEA0D1DE4566F004A4FBF /* CloudEndpoitnt_m_Tests.m in Sources */,
 				A5AAEA071DE417B3004A4FBF /* Network_m_Tests.m in Sources */,
 				A5AAEA0B1DE41874004A4FBF /* LocalNetworkManagement_m_Tests.m in Sources */,
@@ -2381,6 +2389,10 @@
 					"$(inherited)",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = $SDKROOT/usr/include/libxml2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/usr/lib",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"$(inherited)",
@@ -2406,6 +2418,10 @@
 					"$(inherited)",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = $SDKROOT/usr/include/libxml2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/usr/lib",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"$(inherited)",

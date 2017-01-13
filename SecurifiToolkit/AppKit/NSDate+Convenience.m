@@ -121,6 +121,7 @@
     
     return [NSString stringWithFormat:@"%@ %d %@",[self getDayString], day, [self getMonthString]];
 }
+
 -(NSString *)getDay{//6
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth fromDate:self];
     NSInteger day = [components day];

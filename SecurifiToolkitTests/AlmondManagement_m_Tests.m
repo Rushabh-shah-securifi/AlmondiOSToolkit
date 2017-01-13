@@ -130,8 +130,8 @@
 
 
 #pragma mark - Almond List management
+
 -(void) testfillAlmondListWithAlmondListDataResponse {
-    
     NSArray* almondListDataResponse = @[@{@"AlmondName":@"almondName" ,@"AlmondMAC":@"251176220099140" ,@"FirmwareVersion":@"AL3-R008dp",@"Ownership":@"P"},@{@"AlmondName":@"sat@AL2",@"AlmondMAC":@"251176215907164",@"FirmwareVersion":@"AL2-R095z",@"Ownership":@"S"},@{@"AlmondName":@"Almond+ Sfi",@"AlmondMAC":@"251176217032880",@"FirmwareVersion":@"AP2-R089aw-L009-W016-ZW016-ZB005-BETA",@"Ownership":@"S"}];
     
     NSMutableDictionary* almondListData = [NSMutableDictionary new];

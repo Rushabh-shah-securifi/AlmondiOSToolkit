@@ -14,7 +14,6 @@
 
 #import <sqlite3.h>
 
-
 #define DATABASE_FILE @"BrowsingHistory.db"
 #define HISTORYTABLE @"HistoryTB"
 
@@ -27,6 +26,8 @@ static NSString *databasePath;
 static BrowsingHistoryDataBase *dbSharedInstance = nil;
 static sqlite3 *database = nil;
 typedef void(^myCompletion)(BOOL);
+
+
 #pragma mark initializeMethods
 +(void)initializeDataBase{
     NSLog(@"Calling this Database");
@@ -125,6 +126,7 @@ typedef void(^myCompletion)(BOOL);
     }
     return data;
 }
+
 #pragma mark getBrowsingHistoryMethods
 + (NSArray *)getAllBrowsingHistorywithLimit:(int)limit almonsMac:(NSString *)amac clientMac:(NSString *)cmac{
     
@@ -242,7 +244,6 @@ typedef void(^myCompletion)(BOOL);
 //    NSLog(@" max date %@ and min date %@",[CompleteDB getMaxDate:amac clientMac:camc],[CompleteDB getLastDate:amac clientMac:camc]);
 //    NSLog(@"date present %d",[CompleteDB searchDatePresentOrNot:amac clientMac:camc andDate:@"2016-10-19"]);
     
-    
     NSString *query = @"INSERT OR REPLACE INTO HistoryTB (DATE,AMAC,CMAC, URIS,CATEGORYID,TIME,CATEGORY,CATEGORYNAME,DATEINT) VALUES(?,?,?,?,?,?,?,?,?)";
     [self setHistoryTable];
     if([self openDB]== NO)
@@ -288,8 +289,6 @@ typedef void(^myCompletion)(BOOL);
     const char *insert_stmt = [query UTF8String];
     sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL);
     
-    
-
     for(NSDictionary *uriDict in allObj)
     {
         if(sqlite3_prepare_v2(database, insert_stmt,-1, &statement, NULL)== SQLITE_OK){
@@ -360,7 +359,6 @@ typedef void(^myCompletion)(BOOL);
     NSDictionary *first_uriDict = [allObj firstObject];
     NSString *first_date = first_uriDict[@"Date"];
     
-    
     NSDictionary *last_uriDict = [allObj lastObject];
     NSString *last_date = last_uriDict[@"Date"];
     
@@ -374,6 +372,8 @@ typedef void(^myCompletion)(BOOL);
     }
     return ;
 }
+
+
 +(void)addtoCompleteDB:(NSString *)firstDate lastDate:(NSString*)lastDate amac:(NSString*)amac cmac:(NSString *)cmac{
     NSDateFormatter *f = [[NSDateFormatter alloc] init];
     [f setDateFormat:@"yyyy-MM-dd"];
