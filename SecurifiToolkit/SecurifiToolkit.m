@@ -173,7 +173,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(onReachabilityChanged:) name:kSFIReachabilityChangedNotification object:nil];
     }
-    
     return self;
 }
 
@@ -181,6 +180,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center removeObserver:self];
 }
+
 
 - (void)initialize{
     self.scenesArray = [NSMutableArray new];
@@ -688,7 +688,6 @@ static SecurifiToolkit *toolkit_singleton = nil;
 - (void) asyncSendRequest:(CommandType*)commandType commandString:(NSString*)commandString payloadData:(NSMutableDictionary*)data{
     GenericCommand *cmd = [GenericCommand new];
     cmd.commandType = commandType;
-    NSLog(@"%d accounts command is sent",commandType);
     cmd.command = [CreateJSON withCommandString:commandString getJSONStringfromDictionary:data];
     [self asyncSendToNetwork:cmd];
 }
@@ -1052,7 +1051,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
             [AlmondManagement onDynamicAlmondModeChange:obj network:network];
             break;
         }
-            
+        
         case CommandType_ALMOND_NAME_AND_MAC_RESPONSE: {
             NSDictionary *dict = payload;
             NSString *name = dict[@"Name"];
@@ -1061,17 +1060,15 @@ static SecurifiToolkit *toolkit_singleton = nil;
             NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE %@ mac is %@",[AlmondManagement currentAlmond].almondplusMAC, mac);
             
             SFIAlmondPlus *current = [AlmondManagement currentAlmond];
-            //if ([current.almondplusMAC isEqualToString:mac]) {
-                NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Inside CurrentAlmond equals %@",current.almondplusName);
-                if ([current.almondplusName isEqualToString:name]) {
-                    NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Returning %@",current.almondplusName);
-                    return; // name is the same
-                }
-                DynamicAlmondNameChangeResponse *res = DynamicAlmondNameChangeResponse.new;
-                res.almondplusMAC = current.almondplusMAC;
-                res.almondplusName = name;
-                [AlmondManagement onDynamicAlmondNameChange:res];
-            //}
+            NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Inside CurrentAlmond equals %@",current.almondplusName);
+            if ([current.almondplusName isEqualToString:name]) {
+                NSLog(@"Came here CommandType_ALMOND_NAME_AND_MAC_RESPONSE Returning %@",current.almondplusName);
+                return; // name is the same
+            }
+            DynamicAlmondNameChangeResponse *res = DynamicAlmondNameChangeResponse.new;
+            res.almondplusMAC = current.almondplusMAC;
+            res.almondplusName = name;
+            [AlmondManagement onDynamicAlmondNameChange:res];
             break;
         }
         case CommandType_SUBSCRIPTIONS:{//only in cloud
@@ -1115,9 +1112,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     // An interesting behavior: notifications are posted mainly to the UI. There is an assumption built into the system that
     // the notifications are posted synchronously from the SDK. Change the dispatch queue to async, and the
     // UI can easily become confused. This needs to be sorted out.
-    
     __weak id block_payload = payload;
-    
     dispatch_sync(self.networkCallbackQueue, ^() {
         NSDictionary *data = nil;
         if (payload) {

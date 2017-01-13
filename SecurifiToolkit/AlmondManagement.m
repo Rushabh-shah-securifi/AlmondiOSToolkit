@@ -168,6 +168,7 @@ static int count = 0;
     }
 }
 
+
 + (void)onAlmondDynamicResponse:(NSData*)responseData{
     NSDictionary* response = [NSJSONSerialization JSONObjectWithData:responseData
                                                                options:kNilOptions
@@ -201,9 +202,8 @@ static int count = 0;
         [self removeSecondaryUserFromAlmondWithMAC:[response objectForKey:@"AlmondMAC"] withUserID:[response objectForKey:@"UserID"]];
         
     }else if([commandType isEqualToString:@"DynamicUserAdd"]){
-        
         NSString* userID = ![[response objectForKey:@"UserID"] isKindOfClass:[NSString class]]?[[response objectForKey:@"UserID"] stringValue]:[response objectForKey:@"UserID"];
-        [self addSecondaryUserToAlmondWithMAC:[response objectForKey:@"AlmondMAC"] withUserID:userID andEmailID:[response objectForKey:@"EmailID"]];
+        [self addSecondaryUserToAlmondWithMAC:[response objectForKey:@"AlmondMAC"] withUserID:userID andEmailID:[response objectForKey:@"EmailID"] ];
     }
 }
 
@@ -259,6 +259,7 @@ static int count = 0;
     
     [[SecurifiToolkit sharedInstance].dataManager writeAlmondList:newAlmondList];
     [[SecurifiToolkit sharedInstance] postNotification:RELOAD_ACCOUNTS_PAGE data:nil];
+    [[SecurifiToolkit sharedInstance] postNotification:USER_INVITE_RESPONSE data:nil];
 }
 
 
@@ -542,7 +543,6 @@ static int count = 0;
         return;
     }
     
-    NSLog(@"Came here onDynamicAlmondNameChange %@",almondName);
     SFIAlmondPlus *changed = [toolKit.dataManager changeAlmondName:almondName almondMac:obj.almondplusMAC];
     if (changed) {
         SFIAlmondPlus *current = [self currentAlmond];
