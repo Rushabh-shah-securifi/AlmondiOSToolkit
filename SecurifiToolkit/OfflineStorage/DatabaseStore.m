@@ -15,6 +15,8 @@
 #define MAX_NOTIFICATIONS 1000
 #define KEY_BADGE_COUNT @"badge_count"
 
+//starting with 1
+#define LATEST_DB_VERSION @"1"
 /*
 
 mac             => mac
@@ -95,6 +97,12 @@ create index notifications_mac on notifications (mac, time);
 
     _db = [[ZHDatabase alloc] initWithPath:db_path];
 
+    if(exists){
+        if([self databaseSchemaVersion] != LATEST_DB_VERSION.integerValue){
+            [self.db execute:@"alter table notifications add column notiCat integer"];
+            [self.db execute:[NSString stringWithFormat:@"PRAGMA user_version = %@", LATEST_DB_VERSION]];
+        }
+    }
 //    exists = NO;
     if (!exists) {
         [self.db execute:@"drop table if exists notifications"];
@@ -135,6 +143,11 @@ create index notifications_mac on notifications (mac, time);
     _exists_syncpoint = [self.db newStatement:@"select count(*) from notifications_syncpoints where syncpoint=?"];
 
     _queue = dispatch_queue_create("DatabaseStore", DISPATCH_QUEUE_SERIAL);
+}
+
+- (NSInteger)databaseSchemaVersion {
+    NSInteger version = [self.db executeReturnInteger:@"PRAGMA user_version"];
+    return version;
 }
 
 - (id <SFINotificationStore>)newNotificationStore {
