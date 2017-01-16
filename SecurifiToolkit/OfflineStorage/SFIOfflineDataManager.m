@@ -97,7 +97,11 @@
     return [self readListFromFilePath:self.almondListFp locker:self.syncLocker];
 }
 
+
 - (SFIAlmondPlus *)readAlmond:(NSString *)almondMac {
+    
+    almondMac = [NSString stringWithFormat:@"%@",almondMac];
+    
     if (almondMac.length == 0) {
         return nil;
     }
