@@ -231,7 +231,7 @@
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
      BOOL local = [toolkit useLocalNetwork:[AlmondManagement currentAlmond].almondplusMAC];
     if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable && [SecurifiToolkit sharedInstance].configuration.isPaymentDone && !local){
-         return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-26,@-19,@-20,@-3,@-25,nil];
+         return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-27,@-19,@-20,@-3,@-25,nil];
     }
     //for commenting browsing history code
 //    NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,nil];
