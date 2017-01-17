@@ -187,6 +187,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
     self.clients = [NSMutableArray new];
     self.devices = [NSMutableArray new];
     self.almondProperty = [[AlmondProperties alloc]init];
+    self.subscription = [NSMutableDictionary new];
     
     self.ruleParser =[[RuleParser alloc]init];
     self.sceneParser =[[SceneParser alloc]init];
@@ -612,6 +613,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 
 - (void)onLogoutResponse {
+    //clear almond subscriptions
+    [self.subscription removeAllObjects];
+    
     [self tearDownLoginSession];
     [self tearDownNetwork];
     [self postNotification:kSFIDidLogoutNotification data:nil];
