@@ -288,7 +288,10 @@
             [portArr addObject:port];
         }
     }
-    return  portArr;
+    NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:portArr];
+    NSArray *arrayWithoutDuplicates = [orderedSet array];
+    return  arrayWithoutDuplicates;
+    
 }
 -(BOOL )openPortHealthy:(NSDictionary *)iotDict{
     NSDictionary *portDict = iotDict[@"Ports"];
