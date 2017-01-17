@@ -436,7 +436,6 @@
         copy.bW_Enable = self.bW_Enable;
         copy.iot_serviceEnable = self.iot_serviceEnable;
         copy.iot_dnsEnable = self.iot_dnsEnable;
-        copy.previousType = self.previousType;
     }
     return copy;
 }

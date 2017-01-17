@@ -216,18 +216,20 @@
     
     NSArray *ForwardRules = deviceDict[@"ForwardRules"];
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
-    NSArray *ports =deviceDict[@"Ports"];
-    NSArray *upnpPorts = [self getPorts:UpnpRules];
+   
+    
+    NSArray *ports =[self openPort:deviceDict];
+    
+    NSArray *upnpPorts1 = [self getPorts1:UpnpRules];
+    NSArray *upnpPorts2 = [self getPorts2:UpnpRules];
     NSArray *ForwardRulesPorts = [self getPorts:ForwardRules];
     
-    NSString *opnPorttag = [self getPortTag:ports];
-    NSString *upnptag = [self getUpnpTag:upnpPorts];
     
     NSDictionary *returnDict = @{@"Telnet":@{@"P":[telnet isEqualToString:@"1"]?@"1":@"0",
                                              @"Tag":@"1",
                                              @"Value":@[]},
                                  @"Ports":@{@"P":ports.count>0?@"1":@"0",
-                                            @"Tag":opnPorttag,
+                                            @"Tag":@"2",
                                             @"Value":ports},
                                  @"Http":@{@"P":[Http isEqualToString:@"1"]?@"1":@"0",
                                            @"Tag":@"3"
@@ -236,9 +238,12 @@
                                  @"ForwardRules":@{@"P":ForwardRules.count>0?@"1":@"0",
                                                    @"Tag":@"4",
                                                    @"Value":ForwardRules},
-                                 @"UpnpRules":@{@"P":UpnpRules.count>0?@"1":@"0",
-                                                @"Tag":upnptag,
-                                                @"Value":upnpPorts},
+                                 @"UpnpRules":@{@"P":upnpPorts1.count>0?@"1":@"0",
+                                                @"Tag":@"5",
+                                                @"Value":upnpPorts1},
+                                 @"UpnpRules1":@{@"P":upnpPorts2.count>0?@"1":@"0",
+                                                @"Tag":@"7",
+                                                @"Value":upnpPorts2},
                                  @"MAC":deviceDict[@"MAC"]
                                  };
     
@@ -274,19 +279,16 @@
     }
     return  addToHealthy;
 }
--(BOOL )openPort:(NSDictionary *)iotDict{
-    NSDictionary *portDict = iotDict[@"Ports"];
-    NSArray *values = portDict[@"Value"];
-    BOOL allPortOn;
-    for (NSString *port in values) {
-        if([port intValue] > 1024)// not add vulnerable list
-            allPortOn = NO;
-        else{
-            allPortOn = YES;
-            break;
+-(NSArray *)openPort:(NSDictionary *)iotDict{
+    NSArray *portArrVal = iotDict[@"Ports"];
+    NSMutableArray *portArr = [NSMutableArray new];
+    for (NSString *port in portArrVal) {
+        if([port intValue] < 1024)// not add vulnerable list
+        {
+            [portArr addObject:port];
         }
     }
-    return  allPortOn;
+    return  portArr;
 }
 -(BOOL )openPortHealthy:(NSDictionary *)iotDict{
     NSDictionary *portDict = iotDict[@"Ports"];
@@ -307,9 +309,33 @@
     NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
     for (NSDictionary *upnpObj in ObjArr) {
         NSString *upnpPort = upnpObj[@"Ports"];
+            [upnpPortsArr addObject:upnpPort];
+    }
+    NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:upnpPortsArr];
+    NSArray *arrayWithoutDuplicates = [orderedSet array];
+    return  arrayWithoutDuplicates;
+}
+-(NSArray *)getPorts1:(NSArray *)ObjArr{
+    NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
+    for (NSDictionary *upnpObj in ObjArr) {
+        NSString *upnpPort = upnpObj[@"Ports"];
+        if([upnpPort intValue] <= 1024)
         [upnpPortsArr addObject:upnpPort];
     }
-    return  upnpPortsArr;
+    NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:upnpPortsArr];
+    NSArray *arrayWithoutDuplicates = [orderedSet array];
+    return  arrayWithoutDuplicates;
+}
+-(NSArray *)getPorts2:(NSArray *)ObjArr{
+    NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
+    for (NSDictionary *upnpObj in ObjArr) {
+        NSString *upnpPort = upnpObj[@"Ports"];
+        if([upnpPort intValue] > 1024)
+            [upnpPortsArr addObject:upnpPort];
+    }
+    NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:upnpPortsArr];
+    NSArray *arrayWithoutDuplicates = [orderedSet array];
+    return  arrayWithoutDuplicates;
 }
 -(BOOL)validateResponse:(id)sender{
     if(sender==nil)

@@ -40,7 +40,6 @@ typedef NS_ENUM(NSInteger, DeviceAllowedType){
 @property(nonatomic) BOOL is_IoTDeviceType;
 @property(nonatomic) BOOL iot_serviceEnable;
 @property(nonatomic) BOOL iot_dnsEnable;
-@property(nonatomic) NSString *previousType;
 
 
 @property(nonatomic) SFINotificationMode notificationMode;

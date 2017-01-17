@@ -98,7 +98,7 @@
 + (instancetype)parseDeviceLogPayload:(NSDictionary *)payload {
     SFINotification *obj = [SFINotification new];
     obj.almondMAC = payload[@"mac"];
-    
+    NSLog(@"parseDeviceLogPayload %@",payload);
     NSString *str;
     
     str = payload[@"time"];         // milliseconds

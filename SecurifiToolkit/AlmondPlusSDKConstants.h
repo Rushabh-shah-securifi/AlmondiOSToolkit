@@ -98,5 +98,6 @@
 #define LOGOUT_REQUEST_XML                  @"<root><Logout></Logout></root>"
 #define CLOUD_SANITY_REQUEST_XML            @"<root><CloudSanity>DEADBEEF</CloudSanity></root>"
 #define ALMOND_LIST_REQUEST_XML             @"<root></root>"
+#define PRESENT_IOT_QUICK_TIPS              @"PRESENT_IOT_QUICK_TIPS"
 
 #endif

@@ -115,7 +115,7 @@
         Client *client = [Client findClientByID:ID];
         if(client){
             [self setDeviceProperties:client forDict:updatedClientPayload];
-            NSLog(@"client set previous type %@",client.previousType);
+            
             NSLog(@"client set device type %@",client.deviceType);//
         }
         
@@ -177,8 +177,6 @@
     device.deviceIP = dict[LAST_KNOWN_IP];
     device.deviceConnection = dict[CONNECTION];
     device.deviceLastActiveTime = dict[LAST_ACTIVE_EPOCH];
-    
-    device.previousType = device.deviceType;
     
     device.deviceType = dict[CLIENT_TYPE];
     device.deviceUseAsPresence = [dict[USE_AS_PRESENCE] boolValue];
