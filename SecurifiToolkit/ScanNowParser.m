@@ -74,13 +74,14 @@
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
         if([self checkForClientPresent:toolkit.clients mac:dict[@"MAC"]]){
-            if([self checkForValidresponse:dict]){
+            if([self checkForValidresponse:dict]  && ![self isToAddHealthyDevices:dict]){
                 NSDictionary *iotDeviceObj = [self iotDeviceObj:dict isVulnerable:YES];
                 [scanNowArr addObject:iotDeviceObj];
             }
             else{
                 NSDictionary *iotDeviceObj = [self iotDeviceObj:dict isVulnerable:NO];
                 [helthyDeviceArr addObject:iotDeviceObj];
+                
             }
         }
     }
@@ -277,6 +278,7 @@
     NSArray *ports = iotDict[@"Ports"];
     BOOL addToHealthy;
     for (NSString *port in ports) {
+        NSLog(@"port isToAddHealthyDevices %@",port);
         if([port intValue] > 1024)// not add vulnerable list
             addToHealthy = YES;
         else{
