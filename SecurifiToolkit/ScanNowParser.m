@@ -243,9 +243,9 @@
                                            @"Tag":@"3"
                                            ,
                                            @"Value":@[]},
-                                 @"ForwardRules":@{@"P":ForwardRules.count>0?@"1":@"0",
+                                 @"ForwardRules":@{@"P":ForwardRulesPorts.count>0?@"1":@"0",
                                                    @"Tag":@"4",
-                                                   @"Value":ForwardRules},
+                                                   @"Value":ForwardRulesPorts},
                                  @"UpnpRules":@{@"P":upnpPorts1.count>0?@"1":@"0",
                                                 @"Tag":@"5",
                                                 @"Value":upnpPorts1},
@@ -316,13 +316,45 @@
 }
 -(NSArray *)getPorts:(NSArray *)ObjArr{
     NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
+    NSLog(@"ObjArr == %@",ObjArr);
+    
     for (NSDictionary *upnpObj in ObjArr) {
         NSString *upnpPort = upnpObj[@"Ports"];
-            [upnpPortsArr addObject:upnpPort];
+        
+        NSLog(@" upnpPort  === %@",upnpPort);
+        NSString *portForwardedStr = [self handlePortForwarding:upnpPort];
+         NSLog(@" portForwardedStr  === %@",upnpPort);
+        [upnpPortsArr addObject:portForwardedStr];
     }
+    
     NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:upnpPortsArr];
     NSArray *arrayWithoutDuplicates = [orderedSet array];
     return  arrayWithoutDuplicates;
+}
+-(NSString *)handlePortForwarding:(NSString *)portforwarding{
+    NSString *returnString ;
+    NSArray *portForwArr;
+    if([self doesString:portforwarding containCharacter:':'])
+    {
+        NSArray* arrayOfStrings = [portforwarding componentsSeparatedByString:@":"];
+        NSString *port = [NSString stringWithFormat:@"%@ to %@",[arrayOfStrings objectAtIndex:0],[arrayOfStrings objectAtIndex:1]];
+        returnString = port;
+    }
+    else if([self doesString:portforwarding containCharacter:',']){
+        returnString = portforwarding;
+    }
+    else{
+        returnString = portforwarding;
+    }
+return returnString;
+}
+-(BOOL)doesString:(NSString *)string containCharacter:(char)character
+{
+    if ([string rangeOfString:[NSString stringWithFormat:@"%c",character]].location != NSNotFound)
+    {
+        return YES;
+    }
+    return NO;
 }
 -(NSArray *)getPorts1:(NSArray *)ObjArr{
     NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
