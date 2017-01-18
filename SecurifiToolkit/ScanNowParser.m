@@ -75,11 +75,11 @@
     for (NSDictionary *dict in deviceRespArr) {
         if([self checkForClientPresent:toolkit.clients mac:dict[@"MAC"]]){
             if([self checkForValidresponse:dict] && ![self isToAddHealthyDevices:dict]){
-                NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
+                NSDictionary *iotDeviceObj = [self iotDeviceObj:dict isVulnerable:YES];
                 [scanNowArr addObject:iotDeviceObj];
             }
             else{
-                NSDictionary *iotDeviceObj = [self iotDeviceObj:dict];
+                NSDictionary *iotDeviceObj = [self iotDeviceObj:dict isVulnerable:NO];
                 [helthyDeviceArr addObject:iotDeviceObj];
                 
             }
@@ -208,7 +208,7 @@
         
 }
 
--(NSDictionary *)iotDeviceObj:(NSDictionary *)deviceDict{
+-(NSDictionary *)iotDeviceObj:(NSDictionary *)deviceDict isVulnerable:(BOOL)isVulnerable{
     NSLog(@"deviceDict = = %@",deviceDict);
     
     NSString *telnet = deviceDict[@"Telnet"];
@@ -218,8 +218,16 @@
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
    
     
-    NSArray *ports =[self openPort:deviceDict];
-    
+    NSArray *ports;
+    NSString *portTag;
+    if(isVulnerable){
+        ports = [self openPort:deviceDict];
+        portTag = @"2";
+    }
+    else{
+        ports = [self openPortHealthy:deviceDict];
+        portTag = @"6";
+    }
     NSArray *upnpPorts1 = [self getPorts1:UpnpRules];
     NSArray *upnpPorts2 = [self getPorts2:UpnpRules];
     NSArray *ForwardRulesPorts = [self getPorts:ForwardRules];
@@ -229,7 +237,7 @@
                                              @"Tag":@"1",
                                              @"Value":@[]},
                                  @"Ports":@{@"P":ports.count>0?@"1":@"0",
-                                            @"Tag":@"2",
+                                            @"Tag":portTag,
                                             @"Value":ports},
                                  @"Http":@{@"P":[Http isEqualToString:@"1"]?@"1":@"0",
                                            @"Tag":@"3"
@@ -293,20 +301,18 @@
     return  arrayWithoutDuplicates;
     
 }
--(BOOL )openPortHealthy:(NSDictionary *)iotDict{
-    NSDictionary *portDict = iotDict[@"Ports"];
-    NSArray *values = portDict[@"Value"];
-    BOOL allPortOn;
-    for (NSString *port in values) {
-        if([port intValue] < 1024)
-            allPortOn = NO;
-        else{
-            allPortOn = YES;
-            break;
+-(NSArray * )openPortHealthy:(NSDictionary *)iotDict{
+    NSArray *portArrVal = iotDict[@"Ports"];
+    NSMutableArray *portArr = [NSMutableArray new];
+    for (NSString *port in portArrVal) {
+        if([port intValue] > 1024)// not add vulnerable list
+        {
+            [portArr addObject:port];
         }
     }
-    
-    return allPortOn;
+    NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:portArr];
+    NSArray *arrayWithoutDuplicates = [orderedSet array];
+    return  arrayWithoutDuplicates;
 }
 -(NSArray *)getPorts:(NSArray *)ObjArr{
     NSMutableArray *upnpPortsArr = [[NSMutableArray alloc]init];
