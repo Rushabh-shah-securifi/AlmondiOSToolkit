@@ -276,16 +276,26 @@
 
 -(BOOL)isToAddHealthyDevices:(NSDictionary *)iotDict{
     NSArray *ports = iotDict[@"Ports"];
+    
+    NSArray *isForwareded = iotDict[@"ForwardRules"];
+    
+    NSLog(@"iotDict ports = %@",iotDict);
     BOOL addToHealthy;
     for (NSString *port in ports) {
         NSLog(@"port isToAddHealthyDevices %@",port);
-        if([port intValue] > 1024)// not add vulnerable list
+        if([port intValue] > 1024){// not add vulnerable list
             addToHealthy = YES;
+            if(isForwareded.count > 0){
+                    addToHealthy = NO;
+                break;
+            }
+        }
         else{
             addToHealthy = NO;
-            break;
+                break;
         }
     }
+    
     return  addToHealthy;
 }
 -(NSArray *)openPort:(NSDictionary *)iotDict{
