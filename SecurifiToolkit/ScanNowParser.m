@@ -74,14 +74,13 @@
     NSArray *deviceRespArr = mainDict[@"Devices"];
     for (NSDictionary *dict in deviceRespArr) {
         if([self checkForClientPresent:toolkit.clients mac:dict[@"MAC"]]){
-            if([self checkForValidresponse:dict] && ![self isToAddHealthyDevices:dict]){
+            if([self checkForValidresponse:dict]){
                 NSDictionary *iotDeviceObj = [self iotDeviceObj:dict isVulnerable:YES];
                 [scanNowArr addObject:iotDeviceObj];
             }
             else{
                 NSDictionary *iotDeviceObj = [self iotDeviceObj:dict isVulnerable:NO];
                 [helthyDeviceArr addObject:iotDeviceObj];
-                
             }
         }
     }
