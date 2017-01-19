@@ -138,7 +138,15 @@
         else if([setting.type isEqualToString:@"Guest5G"]){
             setting.password = pass5GGuest;
         }
+        
+        if([self isUnSecure:setting.security]){
+            setting.password = nil;
+        }
     }
+}
+
++(BOOL)isUnSecure:(NSString *)security{
+    return [security isEqualToString:@"Unsecure"];
 }
 
 + (void)addPasswordSetWireless:(NSArray *)settings payload:(NSDictionary *)payload{
