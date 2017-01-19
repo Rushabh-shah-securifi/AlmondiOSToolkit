@@ -71,10 +71,11 @@
     char KEY[] = {0x6e, (char) 0xcc, (char) 0x94, (char) 0xed, 0x6a, (char) 0x90, 1, 0x3d, 0x30, (char) 0xaf, 0x52, 0xd, 0x18, 0x77, 0x44, 0x2f};
     
     // Decrypt
-    NSData *decrypted = [self securifiInternalAesOp:kCCDecrypt payload:self key:KEY iv:IV length:256];
+    NSData *decrypted = [self securifiInternalAesOp:kCCDecrypt payload:self key:KEY iv:IV length:128];
     decrypted = [self securifiTrimToNull:decrypted];
     // Convert back to string; we expect the plain text password to be UTF-8 encoded
-    NSString *decrypted_str = [[NSString alloc] initWithData:decrypted encoding:NSUTF8StringEncoding];
+//    NSString *decrypted_str = [[NSString alloc] initWithData:decrypted encoding:NSUTF8StringEncoding];
+    NSString *decrypted_str = [[NSString alloc] initWithData:decrypted encoding:NSASCIIStringEncoding];
     NSLog(@"decrypted_str: %@", decrypted_str);
     NSLog(@"length: %d", decrypted_str.length);
     return decrypted_str;
