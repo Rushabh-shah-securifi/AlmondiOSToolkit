@@ -219,18 +219,18 @@
     return isLocal;
 }
 
-+(BOOL)siteMapCompatbleFW{
++(BOOL)isiOTCompatbleFW{
     SecurifiToolkit *toolKit = [SecurifiToolkit sharedInstance];
     SFIAlmondPlus *almond = [AlmondManagement currentAlmond];
-    BOOL isSiteMapSupport = [[AlmondManagement currentAlmond] siteMapSupportFirmware:[AlmondManagement currentAlmond].firmware];
-    return isSiteMapSupport;
+    BOOL isiOTSupport = [[AlmondManagement currentAlmond] iotSupportFirmwareVersion:[AlmondManagement currentAlmond].firmware];
+    return isiOTSupport;
 }
 
 +(NSArray*) getClientGenericIndexes{
         NSArray *genericIndexesArray = [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-19,@-20,@-3,@-25,nil];
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
      BOOL local = [toolkit useLocalNetwork:[AlmondManagement currentAlmond].almondplusMAC];
-    if([self siteMapCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable && [SecurifiToolkit sharedInstance].configuration.isPaymentDone && !local){
+    if([self isiOTCompatbleFW] && [SecurifiToolkit sharedInstance].configuration.siteMapEnable && [SecurifiToolkit sharedInstance].configuration.isPaymentDone && !local){
          return [NSArray arrayWithObjects:@-11,@-12,@-13,@-14,@-15,@-16,@-17,@-18,@-21,@-22,@-23,@-27,@-19,@-20,@-3,@-25,nil];
     }
     //for commenting browsing history code

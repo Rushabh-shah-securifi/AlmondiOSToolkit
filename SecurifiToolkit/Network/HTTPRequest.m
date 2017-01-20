@@ -103,21 +103,6 @@
 }
 
 
-- (NSDictionary*)parseJson:(NSString*)fileName{
-    NSError *error = nil;
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:fileName
-                                                         ofType:@"json"];
-    NSData *dataFromFile = [NSData dataWithContentsOfFile:filePath];
-    NSDictionary *data = [NSJSONSerialization JSONObjectWithData:dataFromFile
-                                                         options:kNilOptions
-                                                           error:&error];
-    
-    if (error != nil) {
-        //NSLog(@"Error: was not able to load json file: %@.",fileName);
-    }
-    return data;
-}
-
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     //Now you can do what you want with the response string from the data
