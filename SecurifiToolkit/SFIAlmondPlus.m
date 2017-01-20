@@ -182,7 +182,7 @@
 }
 -(BOOL)iotSupportFirmwareVersion:(NSString *)almondFiemware{
     NSLog(@"almondFiemware results %@",almondFiemware);
-     BOOL result = [self compareVersions:almondFiemware supportedVersion:@"AL3-R014m"];
+     BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"];
     NSLog(@"results1 %d",result);
     
     return result;
@@ -195,11 +195,45 @@
     else
         return NO;
 }
-
 - (BOOL)compareVersions:(NSString *)almondVersion supportedVersion:(NSString *)supportedVersion {
     if (!almondVersion || !supportedVersion) {
         return NO;
     }
+    NSLog(@"almondVersion,supportedVersion %@ = %@",almondVersion,supportedVersion);
+    
+    NSArray *cur_alm_splits = [almondVersion componentsSeparatedByString:@"-"];
+    NSArray *supported_alm_splits = [supportedVersion componentsSeparatedByString:@"-"];
+    
+    
+    if (supported_alm_splits.count < 2 || cur_alm_splits.count < 2) {
+        return NO;
+    }
+    
+    NSString *current_str = cur_alm_splits[1];
+    NSString *supported_str = supported_alm_splits[1];
+    if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
+        return YES;
+    }
+    //NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
+    NSComparisonResult result = [current_str compare:supported_str];
+    //NSLog(@"result %d", result);
+    switch (result) {
+        case NSOrderedAscending:
+            return NO;
+        case NSOrderedSame:
+            return YES;
+        case NSOrderedDescending:
+            return YES;
+        default:
+            return NO;
+    }
+}
+
+- (BOOL)compareVersionsIOT:(NSString *)almondVersion supportedVersion:(NSString *)supportedVersion {
+    if (!almondVersion || !supportedVersion) {
+        return NO;
+    }
+    NSLog(@"almondVersion,supportedVersion %@ = %@",almondVersion,supportedVersion);
     
     NSArray *cur_alm_splits = [almondVersion componentsSeparatedByString:@"-"];
     NSArray *supported_alm_splits = [supportedVersion componentsSeparatedByString:@"-"];
@@ -214,6 +248,8 @@
     if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
        return YES;
     }
+    if(![cur_alm_splits[0] isEqualToString:@"AL3"])
+        return NO;
     //NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
     NSComparisonResult result = [current_str compare:supported_str];
     //NSLog(@"result %d", result);
