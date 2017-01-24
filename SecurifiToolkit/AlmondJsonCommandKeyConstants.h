@@ -176,6 +176,8 @@
 #define SIGNAL_STRENGTH @"SignalStrength"
 #define HOP_COUNT @"HopCount"
 
+#define OFFLINE_SLAVES @"OfflineSlaves"
+
 #define SM_ENABLE @"SMEnable"
 #define BW_ENABLE @"BWEnable"
 

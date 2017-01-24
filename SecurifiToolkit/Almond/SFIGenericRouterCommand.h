@@ -17,6 +17,8 @@ typedef NS_ENUM(unsigned int, SFIGenericRouterCommandType) {
     SFIGenericRouterCommandType_WIRELESS_SUMMARY        = 9,
     SFIGenericRouterCommandType_SEND_LOGS_RESPONSE      = 10,
     SFIGenericRouterCommandType_UPDATE_FIRMWARE_RESPONSE = 11,
+    
+    SFIGenericRouterCommandType_ALMOND_PROPERTY = 20,
 };
 
 @interface SFIGenericRouterCommand : NSObject

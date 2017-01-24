@@ -93,6 +93,13 @@
         genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_SEND_LOGS_RESPONSE payload:payload];
     }
     
+    //I saw this response was comming in false case, had to handle it.
+    else if([commandType isEqualToString:@"ChangeAlmondProperties"]){
+        genericRouterCommand = [self createGenericRouterCommand:nil commandType:SFIGenericRouterCommandType_ALMOND_PROPERTY payload:payload];
+    }
+    /*
+     {"CommandType":"ChangeAlmondProperties","Success":"false","OfflineSlaves":"Downstairs","Reason":"Slave in offline","MobileInternalIndex":"2909"}
+     */
     NSDictionary *data = nil;
     if (payload) {
         data = @{
