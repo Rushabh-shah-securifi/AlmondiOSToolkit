@@ -69,7 +69,7 @@ typedef NS_ENUM(unsigned int, SFIDeviceType) {
     SFIDeviceType_EnergyReader_56               = 56,
     SFIDeviceType_NestThermostat_57             = 57,
     SFIDeviceType_NestSmokeDetector_58          = 58,
-    SFIDeviceType_BuiltInSiren_60               = 60,
+    SFIDeviceType_GenericDevice_60              = 60,
     SFIDeviceType_SecurifiButton_61             = 61,
     SFIDeviceType_ZenThermostat_62              = 62,
     SFIDeviceType_AlmondSiren_63                = 63,

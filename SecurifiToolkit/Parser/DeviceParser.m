@@ -467,6 +467,7 @@
 - (void)updateKnownValue:(NSDictionary*)payload knownValues:(DeviceKnownValues*)values{
     values.valueName = payload[D_NAME];
     values.value = ![payload[VALUE] isKindOfClass:[NSString class]]? [payload[VALUE] stringValue]: payload[VALUE];
+    values.genericIndex = payload[TYPE];
 }
 
 //generic device parsing methods
@@ -500,9 +501,11 @@
         NSDictionary *indexDict = indexesDict[index];
         DeviceIndex *deviceIndex = [[DeviceIndex alloc]initWithIndex:index
                                                         genericIndex:indexDict[GENERIC_INDEX_ID]
-                                                               rowID:indexDict[ROW_NO] placement:indexDict[@"Placement"]
+                                                               rowID:indexDict[ROW_NO]
+                                                           placement:indexDict[@"Placement"]
                                                                  min:indexDict[@"min"]
-                                                                 max:indexDict[@"max"]];
+                                                                 max:indexDict[@"max"]
+                                                            appLabel:indexDict[APP_LABEL]? NSLocalizedString(indexDict[APP_LABEL], @""): nil];
         [indexes setObject:deviceIndex forKey:index];
     }
     return indexes;

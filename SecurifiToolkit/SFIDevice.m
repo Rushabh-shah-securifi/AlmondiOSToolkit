@@ -67,9 +67,6 @@
         }
             
         case SFIDeviceType_StandardWarningDevice_21:
-        case SFIDeviceType_BuiltInSiren_60:{
-            return SFIDevicePropertyType_ALARM_STATE;
-        }
             
         case SFIDeviceType_Alarm_6:
         case SFIDeviceType_SmokeDetector_36:
@@ -176,7 +173,6 @@
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
         case SFIDeviceType_GarageDoorOpener_53:
-        case SFIDeviceType_BuiltInSiren_60:
         case SFIDeviceType_RollerShutter_52:{
             return YES;
         }
@@ -206,7 +202,6 @@
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
         case SFIDeviceType_NestThermostat_57:
-        case SFIDeviceType_BuiltInSiren_60:
         case SFIDeviceType_RollerShutter_52:
         case SFIDeviceType_GarageDoorOpener_53:
         case SFIDeviceType_ZWtoACIRExtender_54:
@@ -238,8 +233,7 @@
         case SFIDeviceType_BinaryPowerSwitch_45:
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
-        case SFIDeviceType_NestThermostat_57:
-        case SFIDeviceType_BuiltInSiren_60:{
+        case SFIDeviceType_NestThermostat_57:{
             return YES;
         }
             
@@ -352,8 +346,7 @@
         case SFIDeviceType_HueLamp_48:
         case SFIDeviceType_SecurifiSmartSwitch_50:
         case SFIDeviceType_NestThermostat_57:
-        case SFIDeviceType_NestSmokeDetector_58:
-        case SFIDeviceType_BuiltInSiren_60: {
+        case SFIDeviceType_NestSmokeDetector_58:{
             deviceValues = [value knownValuesForProperty:self.statePropertyType];
             if (deviceValues.hasValue) {
                 [deviceValues setBoolValue:!deviceValues.boolValue];
