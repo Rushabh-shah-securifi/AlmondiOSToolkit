@@ -31,4 +31,5 @@
 
 - (void)updateWirelessSummaryWithSettings:(NSArray *)wirelessSettings;
 
+- (BOOL)hasSameAlmondLocation:(NSString *)location;
 @end

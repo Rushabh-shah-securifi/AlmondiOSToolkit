@@ -10,6 +10,7 @@
 #import "SFIWirelessSetting.h"
 #import "SFIWirelessSummary.h"
 #import "NSData+Securifi.h"
+#import "AlmondJsonCommandKeyConstants.h"
 
 @implementation SFIRouterSummary
 
@@ -37,4 +38,11 @@
     }
 }
 
+- (BOOL)hasSameAlmondLocation:(NSString *)location{
+    for(NSDictionary *dict in self.almondsList){
+        if([location isEqualToString:dict[LOCATION]])
+            return YES;
+    }
+    return NO;
+}
 @end

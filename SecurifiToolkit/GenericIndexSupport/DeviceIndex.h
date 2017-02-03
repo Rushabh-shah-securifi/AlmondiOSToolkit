@@ -15,6 +15,7 @@
 @property NSString *placement;
 @property (nonatomic) NSString *min;
 @property (nonatomic) NSString *max;
+@property (nonatomic) NSString *appLabel;
 
--(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement min:(NSString*)min max:(NSString*)max;
+-(id)initWithIndex:(NSString*)index genericIndex:(NSString*)genericIndex rowID:(NSString*)rowID placement:(NSString *)placement min:(NSString*)min max:(NSString*)max appLabel:(NSString *)appLabel;
 @end

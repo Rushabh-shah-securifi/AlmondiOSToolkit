@@ -14,5 +14,5 @@
 @property(nonatomic) unsigned int index;
 @property(nonatomic) NSString *valueName;
 @property(nonatomic) NSString *value;
-
+@property(nonatomic) NSString  *genericIndex; //coming as key "Type"
 @end
