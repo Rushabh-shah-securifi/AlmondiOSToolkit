@@ -537,7 +537,9 @@
                                              commandType:[GenericIndexClass getCommandType:genericIndexDict[DEVICE_COMMAND_TYPE]]
                                              readOnly:readOnly
                                              excludeFrom:genericIndexDict[EXCLUDE_FROM]
-                                             showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue] indexName:genericIndexDict[INDEX_NAME]];
+                                             showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]
+                                             indexName:genericIndexDict[INDEX_NAME]
+                                             categoryLabel:genericIndexDict[@"Title"]?: @"3"];
     return genericIndexObject;
 }
 

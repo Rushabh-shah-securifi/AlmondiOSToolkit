@@ -10,7 +10,7 @@
 #import "AlmondJsonCommandKeyConstants.h"
 
 @implementation GenericIndexClass
--(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly excludeFrom:(NSString *)excludeFrom showToggleInRules:(BOOL)showToggleInRules indexName:(NSString *)name{
+-(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly excludeFrom:(NSString *)excludeFrom showToggleInRules:(BOOL)showToggleInRules indexName:(NSString *)name categoryLabel:(NSString *)categoryLabel{
     self = [super init];
     if(self){
         self.groupLabel = label;
@@ -26,6 +26,7 @@
         self.excludeFrom = excludeFrom;
         self.showToggleInRules = showToggleInRules;
         self.name = name;
+        self.categoryLabel = categoryLabel;
     }
     return self;
 }
@@ -46,6 +47,7 @@
         self.excludeFrom = genericIndex.excludeFrom;
         self.showToggleInRules = genericIndex.showToggleInRules;
         self.rowID = genericIndex.rowID;
+        self.categoryLabel = genericIndex.categoryLabel;
     }
     return self;
 }
