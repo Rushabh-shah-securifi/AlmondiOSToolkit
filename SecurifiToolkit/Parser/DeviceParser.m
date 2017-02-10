@@ -539,8 +539,22 @@
                                              excludeFrom:genericIndexDict[EXCLUDE_FROM]
                                              showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]
                                              indexName:genericIndexDict[INDEX_NAME]
-                                             categoryLabel:genericIndexDict[@"Title"]?: @"3"];
+                                             categoryLabel:genericIndexDict[@"Title"]?: @"3"
+                                             property:genericIndexDict[PROPERTY]
+                                             header:genericIndexDict[D_HEADER]
+                                             footer:genericIndexDict[D_FOOTER]
+                                             elements:[self getElements:genericIndexDict genId:ID]];
     return genericIndexObject;
+}
+
++ (NSArray *)getElements:(NSDictionary *)dict genId:(NSString *)genId{
+    if(dict[ELEMENTS])
+        return dict[ELEMENTS];
+    else{
+//        NSMutableArray *array = [NSMutableArray new];
+//        [array addObject:[NSNumber numberWithInteger:genId.integerValue]];
+        return @[genId];
+    }
 }
 
 +(Formatter*)createFormatterFromIndexDicIfExists:(NSDictionary*)formatterDict{

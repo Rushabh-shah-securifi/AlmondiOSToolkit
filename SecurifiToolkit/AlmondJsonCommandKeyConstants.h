@@ -44,6 +44,10 @@
 #define DEVICE_COMMAND_TYPE @"CommandType"
 #define READ_ONLY @"ReadOnly"
 
+#define PROPERTY @"property"
+#define D_HEADER @"header"
+#define D_FOOTER @"footer"
+#define ELEMENTS @"Elements"
 
 #define FORMATTER @"Formatter"
 #define MINMUM @"Min"
