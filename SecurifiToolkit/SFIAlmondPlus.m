@@ -182,7 +182,7 @@
 }
 -(BOOL)iotSupportFirmwareVersion:(NSString *)almondFiemware{
     NSLog(@"almondFiemware results %@",almondFiemware);
-     BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"];
+     BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"AL2-R096c"];
     NSLog(@"results1 %d",result);
     
     return result;
@@ -248,7 +248,10 @@
     if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
        return YES;
     }
-    if(![cur_alm_splits[0] isEqualToString:@"AL3"])
+    if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL2"]){
+        return YES;
+    }
+    if(!([cur_alm_splits[0] isEqualToString:@"AL3"] || [cur_alm_splits[0] isEqualToString:@"AL2"]))
         return NO;
     //NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
     NSComparisonResult result = [current_str compare:supported_str];
