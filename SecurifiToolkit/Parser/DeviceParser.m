@@ -540,11 +540,18 @@
                                              showToggleInRules:[genericIndexDict[@"ShowToggleInRules"] boolValue]
                                              indexName:genericIndexDict[INDEX_NAME]
                                              categoryLabel:genericIndexDict[@"Title"]?: @"3"
-                                             property:genericIndexDict[PROPERTY]
+                                             property:genericIndexDict[PROPERTY]?:@"displayHere"
                                              header:genericIndexDict[D_HEADER]
                                              footer:genericIndexDict[D_FOOTER]
-                                             elements:[self getElements:genericIndexDict genId:ID]];
+                                             elements:[self getElements:genericIndexDict genId:ID] navigateElements:[self getElements:genericIndexDict genId:ID] ];
     return genericIndexObject;
+}
++ (NSArray *)getNevigateElements:(NSDictionary *)dict genId:(NSString *)genId{
+    if(dict[NAVIGATEELEMENT])
+        return dict[NAVIGATEELEMENT];
+    else{
+        return @[genId];
+    }
 }
 
 + (NSArray *)getElements:(NSDictionary *)dict genId:(NSString *)genId{

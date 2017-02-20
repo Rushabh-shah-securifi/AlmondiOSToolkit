@@ -37,9 +37,10 @@ typedef NS_ENUM(int, DeviceCommandType){
 @property(nonatomic) NSString *header;
 @property(nonatomic) NSString *footer;
 @property(nonatomic) NSArray *elements;
+@property(nonatomic) NSArray *navigateElements;
 
              
--(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly excludeFrom:(NSString *)excludeFrom showToggleInRules:(BOOL)showToggleInRules indexName:(NSString *)name categoryLabel:(NSString *)categoryLabel property:(NSString *)property header:(NSString *)header footer:(NSString *)footer elements:(NSString *)elements;
+-(id)initWithLabel:(NSString*)label icon:(NSString*)icon type:(NSString*)type identifier:(NSString*)ID placement:(NSString*)placement values:(NSDictionary*)values formatter:(Formatter*)formatter layoutType:(NSString*)layoutType commandType:(DeviceCommandType)commandType readOnly:(BOOL)readOnly excludeFrom:(NSString *)excludeFrom showToggleInRules:(BOOL)showToggleInRules indexName:(NSString *)name categoryLabel:(NSString *)categoryLabel property:(NSString *)property header:(NSString *)header footer:(NSString *)footer elements:(NSString *)elements navigateElements:(NSString *)navigateElements;
 
 -(id)initWithGenericIndex:(GenericIndexClass*)genericIndex;
 
