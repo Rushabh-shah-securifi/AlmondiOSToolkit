@@ -543,7 +543,7 @@
                                              property:genericIndexDict[PROPERTY]?:@"displayHere"
                                              header:genericIndexDict[D_HEADER]
                                              footer:genericIndexDict[D_FOOTER]
-                                             elements:[self getElements:genericIndexDict genId:ID] navigateElements:[self getElements:genericIndexDict genId:ID] ];
+                                             elements:[self getElements:genericIndexDict genId:ID] navigateElements:[self getNevigateElements:genericIndexDict genId:ID] ];
     return genericIndexObject;
 }
 + (NSArray *)getNevigateElements:(NSDictionary *)dict genId:(NSString *)genId{
