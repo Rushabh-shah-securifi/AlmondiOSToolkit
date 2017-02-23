@@ -27,6 +27,8 @@
 @property (nonatomic) NSString *keepSameSSID;
 @property (nonatomic) NSString *guestEnable;
 
+@property (nonatomic) NSString *temperatureUnit;
+
 @property (nonatomic) NSString *almondName;
 @property (nonatomic) NSString *almondMode;
 @property (nonatomic) NSString *upnp;

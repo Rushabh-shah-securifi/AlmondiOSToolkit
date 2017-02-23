@@ -365,6 +365,7 @@ static SecurifiToolkit *toolkit_singleton = nil;
         case (ConnectionStatusType)IS_CONNECTING_TO_NETWORK:
             return SFIAlmondConnectionStatus_connecting;
         case (ConnectionStatusType)CONNECTED_TO_NETWORK:
+            return SFIAlmondConnectionStatus_connected;
         case (ConnectionStatusType)AUTHENTICATED:
             return SFIAlmondConnectionStatus_connected;
         default:

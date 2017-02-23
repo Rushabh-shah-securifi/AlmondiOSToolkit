@@ -40,6 +40,8 @@
     almondProp.webAdminEnable = payload[@"WebAdminEnable"];
     almondProp.webAdminPassword = payload[@"WebAdminPassword"];
     almondProp.uptime1 = payload[@"Uptime1"];
+    
+    almondProp.temperatureUnit = @"\u00B0F";//to do replace constant with payload[@"TemperatureUnit"]
 }
 
 + (AlmondProperties *)getTestAlmondProperties{
@@ -68,6 +70,8 @@
     almondProp.upnp = @"false";
     almondProp.webAdminEnable = @"true";
     almondProp.webAdminPassword = @"encrypted password";
+    
+    almondProp.temperatureUnit = @"\u00B0F";
     return almondProp;
 }
 
@@ -157,6 +161,9 @@
     }
     else if([action isEqualToString:@"AutoUpdate"]){
         almondProp.autoUpdate = value;
+    }
+    else if([action hasPrefix:@"Temperature"]){
+        almondProp.temperatureUnit = value;
     }
 }
 
