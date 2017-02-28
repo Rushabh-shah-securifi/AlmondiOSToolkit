@@ -30,6 +30,12 @@
                selector:@selector(parseSubscriptionResponse:)
                    name:NOTIFICATION_SUBSCRIPTION_RESPONSE
                  object:nil];
+    
+    //to new response, which tells about the subscription status of new almond just linked.
+    [center addObserver:self
+               selector:@selector(parseSubscribeResponse:)
+                   name:SUBSCRIBE_ME_NOTIFIER
+                 object:nil];
 
 }
 
@@ -69,4 +75,46 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_SUBSCRIPTION_PARSED object:nil];
 }
+
+//the reason I seperated the methods is that 'SUBSCRIBE_ME_NOTIFIER' response could have SubscribeMe command response as well.
+- (void)parseSubscribeResponse:(id)sender{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    
+    NSDictionary *payload;
+    
+    NSNotification *notifier = (NSNotification *) sender;
+    NSDictionary *dataInfo = [notifier userInfo];
+    if (dataInfo == nil || dataInfo[@"data"]==nil ) {
+        return;
+    }
+    
+    if([toolkit currentConnectionMode]==SFIAlmondConnectionMode_local){
+        payload = dataInfo[@"data"];
+    }else{
+        NSLog(@"cloud data");
+        if(![dataInfo[@"data"] isKindOfClass:[NSData class]])
+            return;
+        payload = [dataInfo[@"data"] objectFromJSONData];
+    }
+    
+    NSLog(@"dynamic subscription - payload: %@", payload);
+    
+    if([toolkit currentConnectionMode]==SFIAlmondConnectionMode_local)
+        return;
+    NSString *commandType = payload[COMMAND_TYPE];
+    /*
+     { "CommandType": "CheckSubscriptionStatus", "Success": "true", "Status": "Available/Free/FreeExpired/Paid1M/Paid1Y" "AlmondMAC": 232323241 }
+     */
+    if([commandType isEqualToString:@"CheckSubscriptionStatus"]){
+        PlanType type = [AlmondPlan getPlanType:payload[@"Status"]];
+        if(type == PlanTypeNone)
+            return;
+        
+        NSString *epoch = payload[@"RenewalEpoch"];
+        [AlmondPlan updateAlmondPlan:type epoch:epoch mac:payload[@"AlmondMAC"]];
+    }
+    
+//    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_SUBSCRIPTION_PARSED object:nil];
+}
+
 @end

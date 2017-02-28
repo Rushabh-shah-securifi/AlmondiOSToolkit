@@ -99,6 +99,8 @@
         return PlanTypeSixMonths;
     }else if([planStrLC isEqualToString:@"paid1y"]){
         return PlanTypeOneYear;
+    }else{
+        return PlanTypeNone;
     }
 }
 

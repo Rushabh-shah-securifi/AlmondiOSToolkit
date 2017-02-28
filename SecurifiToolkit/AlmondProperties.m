@@ -42,6 +42,7 @@
     almondProp.uptime1 = payload[@"Uptime1"];
     
     almondProp.temperatureUnit = @"\u00B0F";//to do replace constant with payload[@"TemperatureUnit"]
+    almondProp.timeZone = payload[@"TimeZone"];
 }
 
 + (AlmondProperties *)getTestAlmondProperties{
@@ -72,6 +73,7 @@
     almondProp.webAdminPassword = @"encrypted password";
     
     almondProp.temperatureUnit = @"\u00B0F";
+    almondProp.timeZone = @"IST-5:30";
     return almondProp;
 }
 
@@ -101,6 +103,9 @@
     almondProp.upnp = @"";
     almondProp.webAdminEnable = @"";
     almondProp.webAdminPassword = @"";
+    
+    almondProp.temperatureUnit = @"";
+    almondProp.timeZone = @"";
     return almondProp;
 }
 
@@ -164,6 +169,9 @@
     }
     else if([action hasPrefix:@"Temperature"]){
         almondProp.temperatureUnit = value;
+    }
+    else if([action isEqualToString:@"TimeZone"]){
+        almondProp.timeZone = value;
     }
 }
 

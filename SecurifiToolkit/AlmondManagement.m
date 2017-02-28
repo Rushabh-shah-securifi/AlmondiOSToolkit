@@ -109,6 +109,7 @@ static int count = 0;
     
     cmd = [GenericCommand requestScanNow:mac];
     [toolKit asyncSendToNetwork:cmd];
+    
     // refresh notification preferences; currently, we cannot rely on receiving dynamic updates for these values and so always refresh.
     //    [self asyncRequestNotificationPreferenceList:mac]; //mk, currently requesting it on almond list response in device parser
 }
@@ -191,6 +192,8 @@ static int count = 0;
         }
         
         [self addAlmondToList:almond];
+        
+        [[SecurifiToolkit sharedInstance] asyncSendToNetwork:[GenericCommand requestCheckSubscription:almond.almondplusMAC]];
         
     }else if([commandType isEqualToString:@"DynamicAlmondDelete"]){
         NSString *almondMac = [response objectForKey:@"AlmondMAC"];
@@ -365,7 +368,6 @@ static int count = 0;
 }
 
 + (void)onAlmondListAndAffiliationDataResponse:(NSDictionary*)response network:(Network *)network {
-    
     count++;
     
     if(count == 1){

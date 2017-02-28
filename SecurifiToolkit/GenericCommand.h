@@ -52,6 +52,8 @@ typedef BOOL (^NetworkPrecondition)(Network *, GenericCommand *);
 
 + (instancetype)jsonStringPayloadCommand:(NSDictionary *)payload commandType:(enum CommandType)commandType;
 
++ (instancetype)requestCheckSubscription:(NSString*)mac;
+
 + (instancetype)requestSensorDeviceList:(NSString*)mac;
 
 + (instancetype)requestRai2UpMobile:(NSString *)almondMac;

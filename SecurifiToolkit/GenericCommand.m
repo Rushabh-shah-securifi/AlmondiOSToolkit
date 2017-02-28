@@ -124,6 +124,18 @@
     return cmd;
 }
 
++ (instancetype)requestCheckSubscription:(NSString*)mac {
+    /*
+     { CommandType: "CheckSubscriptionStatus", AlmondMAC: "232323241" }
+     */
+    NSDictionary *payload = @{
+                              @"CommandType" : @"CheckSubscriptionStatus",
+                              @"AlmondMAC":mac? mac: @""
+                              };
+    
+    return [self jsonPayloadCommand:payload commandType:CommandType_SUBSCRIBE_ME];
+}
+
 + (instancetype)requestSensorDeviceList:(NSString*)mac {
     sfi_id correlationId = [GenericCommand nextCorrelationId];
     
