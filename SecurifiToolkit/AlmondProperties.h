@@ -29,6 +29,7 @@
 
 @property (nonatomic) NSString *temperatureUnit;
 @property (nonatomic) NSString *timeZone;
+@property (nonatomic) NSString *region;
 
 @property (nonatomic) NSString *almondName;
 @property (nonatomic) NSString *almondMode;

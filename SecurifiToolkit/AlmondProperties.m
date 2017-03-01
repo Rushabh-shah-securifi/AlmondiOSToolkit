@@ -43,6 +43,7 @@
     
     almondProp.temperatureUnit = @"\u00B0F";//to do replace constant with payload[@"TemperatureUnit"]
     almondProp.timeZone = payload[@"TimeZone"];
+    almondProp.region = payload[@"Region"]?: @"my region";
 }
 
 + (AlmondProperties *)getTestAlmondProperties{
@@ -74,6 +75,7 @@
     
     almondProp.temperatureUnit = @"\u00B0F";
     almondProp.timeZone = @"IST-5:30";
+    almondProp.region = @"Nevada, Arizona";
     return almondProp;
 }
 
@@ -106,6 +108,7 @@
     
     almondProp.temperatureUnit = @"";
     almondProp.timeZone = @"";
+    almondProp.region = @"";
     return almondProp;
 }
 
@@ -172,6 +175,9 @@
     }
     else if([action isEqualToString:@"TimeZone"]){
         almondProp.timeZone = value;
+    }
+    else if([action isEqualToString:@"Region"]){
+        almondProp.region = value;
     }
 }
 

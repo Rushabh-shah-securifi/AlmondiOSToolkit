@@ -24,7 +24,7 @@
 + (instancetype)parseNotificationPayload:(NSDictionary *)payload {
     //NSLog(@"sfi notification - parseNotificationPayload");
     SFINotification *obj = [SFINotification new];
-    obj.almondMAC = payload[@"mac"];
+    obj.almondMAC = ![payload[@"mac"] isKindOfClass:[NSString class]]? [payload[@"mac"] stringValue]: payload[@"mac"];
     
     NSString *str;
     
