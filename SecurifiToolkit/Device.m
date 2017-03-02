@@ -30,6 +30,30 @@
     }
     return nil;
 }
++ (NSArray*)getDeviceLocations{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    
+    NSMutableArray *locationArr = [NSMutableArray new];
+    [locationArr addObject:@"All"];
+    for(Device *device in toolkit.devices){
+        //        NSLog(@"device id: %d, deviceid: %d", device.ID, deviceID);
+        [locationArr addObject:device.location];
+    }
+    NSOrderedSet *orderedSet = [NSOrderedSet orderedSetWithArray:locationArr];
+    NSArray *arrayWithoutDuplicates = [orderedSet array];
+    return arrayWithoutDuplicates;
+}
++(NSArray *)filterDevicesByLocation:(NSString *)location{
+    SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    NSArray *deviceArr = [[NSArray alloc]initWithArray:toolkit.devices];
+    if([location isEqualToString:@"All"])
+        return toolkit.devices;
+    
+    NSString *searchText = location;
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.location contains[c] %@", searchText];
+     return [deviceArr filteredArrayUsingPredicate:predicate];
+}
 
 +(NSString*)getValueFormKnownValues:(NSArray*)knownValues forIndex:(int)deviceIndex{
     for(DeviceKnownValues *knownValue in knownValues){

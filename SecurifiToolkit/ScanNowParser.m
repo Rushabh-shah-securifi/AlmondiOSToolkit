@@ -185,11 +185,16 @@
     NSArray *ports = deviceDict[@"Ports"];
     NSString *telnet = deviceDict[@"Telnet"];
     NSString *Http = deviceDict[@"Http"];
+    NSString *ssh = deviceDict[@"Ssh"]?:@"0";
     NSArray *ForwardRules = deviceDict[@"ForwardRules"];
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
     NSMutableArray *arr = [[NSMutableArray alloc]init];
     if([Http isEqualToString:@"1"])
         [arr addObject:@"1"];
+    
+    if([ssh isEqualToString:@"1"])
+        [arr addObject:@"8"];
+
     if([telnet isEqualToString:@"1"])
         [arr addObject:@"3"];
     if(ports.count> 0)

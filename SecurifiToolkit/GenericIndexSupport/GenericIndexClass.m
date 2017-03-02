@@ -78,4 +78,32 @@
         return DeviceCommand_UpdateDeviceIndex;
     }
 }
+- (id)copyWithZone:(NSZone *)zone {
+    GenericIndexClass *copy = (GenericIndexClass *) [[[self class] allocWithZone:zone] init];
+    if (copy != nil) {
+        copy.groupLabel = self.groupLabel;
+        copy.icon = self.icon;
+        copy.type = self.type;
+        copy.ID = self.ID;
+        copy.placement = self.placement;
+        copy.values = self.values;
+        copy.formatter = self.formatter;
+        copy.layoutType = self.layoutType;
+        copy.commandType = self.commandType ;
+        copy.readOnly = self.readOnly;
+        copy.excludeFrom = self.excludeFrom;
+        copy.rowID = self.rowID;
+        copy.showToggleInRules = self.showToggleInRules;
+        copy.name = self.name;
+        
+        copy.categoryLabel = self.categoryLabel;
+        copy.header = self.header;
+        copy.footer = self.footer;
+        copy.property = self.property;
+        copy.elements = self.elements;
+        copy.navigateElements = self.navigateElements;
+    }
+    
+    return copy;
+}
 @end

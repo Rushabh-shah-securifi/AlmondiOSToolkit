@@ -54,4 +54,8 @@
 + (void)updateDeviceData:(DeviceCommandType)deviceCmdType value:(NSString*)value deviceID:(int)deviceID;
 
 + (DeviceKnownValues *)getKnownValue:(NSArray*)knownValues index:(int)index;
+
++ (NSArray*)getDeviceLocations;
+
++(NSArray *)filterDevicesByLocation:(NSString *)location;
 @end
