@@ -182,8 +182,16 @@
 }
 -(BOOL)iotSupportFirmwareVersion:(NSString *)almondFiemware{
     NSLog(@"almondFiemware results %@",almondFiemware);
-     BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"AL2-R096c"];
-    NSLog(@"results1 %d",result);
+     BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"AL2-R096c"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"A1A-R010a"];
+    
+    NSLog(@"results1 %d",[self compareVersionsIOT:@"A1A-R010ab" supportedVersion:@"A1A-R010a"]);
+    NSLog(@"results1a %d",[self compareVersionsIOT:@"A1A-R010ba" supportedVersion:@"A1A-R010a"]);
+     NSLog(@"results2 %d",[self compareVersionsIOT:@"A1A-R010b" supportedVersion:@"A1A-R010a"]);
+     NSLog(@"results3 %d",[self compareVersionsIOT:@"A1A-R011a" supportedVersion:@"A1A-R010a"]);
+     NSLog(@"results4 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
+     NSLog(@"results5 %d",[self compareVersionsIOT:@"A1A-R010h" supportedVersion:@"A1A-R010a"]);
+    NSLog(@"results6 %d",[self compareVersionsIOT:@"A1A-R009z" supportedVersion:@"A1A-R010a"]);
+    NSLog(@"results7 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
     
     return result;
 }
@@ -238,7 +246,7 @@
     NSArray *cur_alm_splits = [almondVersion componentsSeparatedByString:@"-"];
     NSArray *supported_alm_splits = [supportedVersion componentsSeparatedByString:@"-"];
     
-    
+    NSLog(@"counts %ld,%ld",cur_alm_splits.count,supported_alm_splits.count);
     if (supported_alm_splits.count < 2 || cur_alm_splits.count < 2) {
         return NO;
     }
@@ -248,12 +256,26 @@
     if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
        return YES;
     }
-    if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL2"]){
-        return YES;
+    
+    if(current_str.length == 6 && ([cur_alm_splits[0] isEqualToString:@"AL2"]|| [cur_alm_splits[0] isEqualToString:@"A1A"])){
+        NSString *res = [cur_alm_splits[1] substringToIndex:NSMaxRange([cur_alm_splits[1] rangeOfComposedCharacterSequenceAtIndex:5])];
+            NSComparisonResult result = [res compare:supported_str];
+        
+        switch (result) {
+            case NSOrderedAscending:
+                return NO;
+            case NSOrderedSame:
+                return YES;
+            case NSOrderedDescending:
+                return YES;
+            default:
+                return NO;
+        }
+
     }
-    if(!([cur_alm_splits[0] isEqualToString:@"AL3"] || [cur_alm_splits[0] isEqualToString:@"AL2"]))
+    if(!([cur_alm_splits[0] isEqualToString:@"AL3"] || [cur_alm_splits[0] isEqualToString:@"AL2"] || [cur_alm_splits[0] isEqualToString:@"A1A"]))
         return NO;
-    //NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
+    NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
     NSComparisonResult result = [current_str compare:supported_str];
     //NSLog(@"result %d", result);
     switch (result) {
