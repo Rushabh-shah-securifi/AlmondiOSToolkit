@@ -45,7 +45,7 @@
 }
 +(NSArray *)filterDevicesByLocation:(NSString *)location{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
-    NSArray *deviceArr = [[NSArray alloc]initWithArray:toolkit.devices];
+    NSArray *deviceArr = [[NSArray alloc]initWithArray:[toolkit.devices copy]];
     if([location isEqualToString:@"All"])
         return toolkit.devices;
     
