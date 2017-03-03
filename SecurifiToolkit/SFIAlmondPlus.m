@@ -184,7 +184,7 @@
     NSLog(@"almondFiemware results %@",almondFiemware);
      BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"AL2-R096c"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"A1A-R010a"];
     
-    NSLog(@"results1 %d",[self compareVersionsIOT:@"A1A-R010ab" supportedVersion:@"A1A-R010a"]);
+    NSLog(@"results1 %d",[self compareVersionsIOT:@"A1A-R011" supportedVersion:@"A1A-R010a"]);
     NSLog(@"results1a %d",[self compareVersionsIOT:@"A1A-R010ba" supportedVersion:@"A1A-R010a"]);
      NSLog(@"results2 %d",[self compareVersionsIOT:@"A1A-R010b" supportedVersion:@"A1A-R010a"]);
      NSLog(@"results3 %d",[self compareVersionsIOT:@"A1A-R011a" supportedVersion:@"A1A-R010a"]);

@@ -740,7 +740,7 @@ static int count = 0;
 + (NSArray *)getPrimaryAL3s:(NSArray *)cloud{
     NSMutableArray *al3Array = [NSMutableArray new];
     for(SFIAlmondPlus *alm in cloud){
-        if([alm.firmware.lowercaseString hasPrefix:@"al3-"] && alm.isPrimaryAlmond)
+        if([alm iotSupportFirmwareVersion:alm.firmware] && alm.isPrimaryAlmond)
             [al3Array addObject:alm];
     }
     return al3Array;
