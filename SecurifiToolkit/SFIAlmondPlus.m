@@ -184,10 +184,10 @@
     NSLog(@"almondFiemware results %@",almondFiemware);
      BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"AL2-R096c"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"A1A-R010a"];
     
-    NSLog(@"results1 %d",[self compareVersionsIOT:@"A1A-R011" supportedVersion:@"A1A-R010a"]);
-    NSLog(@"results1a %d",[self compareVersionsIOT:@"A1A-R010ba" supportedVersion:@"A1A-R010a"]);
-     NSLog(@"results2 %d",[self compareVersionsIOT:@"A1A-R010b" supportedVersion:@"A1A-R010a"]);
-     NSLog(@"results3 %d",[self compareVersionsIOT:@"A1A-R011a" supportedVersion:@"A1A-R010a"]);
+    NSLog(@"results1 %d",[self compareVersionsIOT:@"AL2-R096" supportedVersion:@"AL2-R096c"]);
+    NSLog(@"results1a %d",[self compareVersionsIOT:@"AL2-R096a" supportedVersion:@"AL2-R096c"]);
+     NSLog(@"results2 %d",[self compareVersionsIOT:@"AL2-R096d" supportedVersion:@"AL2-R096c"]);
+     NSLog(@"results3 %d",[self compareVersionsIOT:@"AL2-R097" supportedVersion:@"AL2-R096c"]);
      NSLog(@"results4 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
      NSLog(@"results5 %d",[self compareVersionsIOT:@"A1A-R010h" supportedVersion:@"A1A-R010a"]);
     NSLog(@"results6 %d",[self compareVersionsIOT:@"A1A-R009z" supportedVersion:@"A1A-R010a"]);
@@ -252,6 +252,8 @@
     }
     
     NSString *current_str = cur_alm_splits[1];
+    if(![cur_alm_splits[0] isEqualToString:supported_alm_splits[0]])
+        return NO;
     NSString *supported_str = supported_alm_splits[1];
     if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
        return YES;
