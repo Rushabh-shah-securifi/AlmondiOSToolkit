@@ -193,7 +193,7 @@
     NSLog(@"results6 %d",[self compareVersionsIOT:@"A1A-R009z" supportedVersion:@"A1A-R010a"]);
     NSLog(@"results7 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
     
-    return result;
+    return result && self.isPrimaryAlmond;
 }
 
 -(BOOL)siteMapSupportFirmware:(NSString *)almondFiemware{
@@ -254,6 +254,7 @@
     NSString *current_str = cur_alm_splits[1];
     if(![cur_alm_splits[0] isEqualToString:supported_alm_splits[0]])
         return NO;
+    
     NSString *supported_str = supported_alm_splits[1];
     if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
        return YES;
