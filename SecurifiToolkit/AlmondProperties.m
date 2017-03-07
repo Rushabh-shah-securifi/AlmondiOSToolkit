@@ -41,7 +41,6 @@
     almondProp.webAdminPassword = payload[@"WebAdminPassword"];
     almondProp.uptime1 = payload[@"Uptime1"];
     
-    almondProp.temperatureUnit = @"\u00B0F";//to do replace constant with payload[@"TemperatureUnit"]
     almondProp.timeZone = payload[@"TimeZone"];
     almondProp.region = payload[@"GeoLocation"];
 }
@@ -73,7 +72,7 @@
     almondProp.webAdminEnable = @"true";
     almondProp.webAdminPassword = @"encrypted password";
     
-    almondProp.temperatureUnit = @"\u00B0F";
+    almondProp.weatherCentigrade = @"\u00B0F";
     almondProp.timeZone = @"IST-5:30";
     almondProp.region = @"Nevada, Arizona";
     return almondProp;
@@ -106,7 +105,7 @@
     almondProp.webAdminEnable = @"";
     almondProp.webAdminPassword = @"";
     
-    almondProp.temperatureUnit = @"";
+    almondProp.weatherCentigrade = @"";
     almondProp.timeZone = @"";
     almondProp.region = @"";
     return almondProp;
@@ -170,8 +169,8 @@
     else if([action isEqualToString:@"AutoUpdate"]){
         almondProp.autoUpdate = value;
     }
-    else if([action hasPrefix:@"Temperature"]){
-        almondProp.temperatureUnit = value;
+    else if([action isEqualToString:@"weatherCentigrade"]){
+        almondProp.weatherCentigrade = value;
     }
     else if([action isEqualToString:@"TimeZone"]){
         almondProp.timeZone = value;
