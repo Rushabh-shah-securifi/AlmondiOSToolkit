@@ -43,7 +43,7 @@
     
     almondProp.temperatureUnit = @"\u00B0F";//to do replace constant with payload[@"TemperatureUnit"]
     almondProp.timeZone = payload[@"TimeZone"];
-    almondProp.region = payload[@"Region"]?: @"my region";
+    almondProp.region = payload[@"GeoLocation"];
 }
 
 + (AlmondProperties *)getTestAlmondProperties{
@@ -176,7 +176,7 @@
     else if([action isEqualToString:@"TimeZone"]){
         almondProp.timeZone = value;
     }
-    else if([action isEqualToString:@"Region"]){
+    else if([action isEqualToString:@"GeoLocation"]){
         almondProp.region = value;
     }
 }
