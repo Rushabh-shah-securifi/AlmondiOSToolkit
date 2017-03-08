@@ -193,7 +193,7 @@
     NSLog(@"results6 %d",[self compareVersionsIOT:@"A1A-R009z" supportedVersion:@"A1A-R010a"]);
     NSLog(@"results7 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
     
-    return result && self.isPrimaryAlmond;
+    return result ;
 }
 
 -(BOOL)siteMapSupportFirmware:(NSString *)almondFiemware{
