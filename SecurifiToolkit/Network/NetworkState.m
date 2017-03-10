@@ -59,6 +59,9 @@
 }
 
 - (void)markPendingModeForAlmond:(NSString *)aAlmondMac mode:(SFIAlmondMode)mode {
+    if(!aAlmondMac)
+        return;
+    
     @synchronized (self.almondModeSynLocker) {
         self.pendingModeTable = @{
                 @"mac" : aAlmondMac,

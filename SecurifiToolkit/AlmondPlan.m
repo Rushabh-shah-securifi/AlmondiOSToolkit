@@ -229,6 +229,9 @@
 //for Iot
 + (BOOL)hasSubscription:(NSString *)mac{
     SecurifiToolkit *toolkit = [SecurifiToolkit sharedInstance];
+    if (!mac) {
+        return NO;
+    }
     AlmondPlan *plan = toolkit.subscription[mac];
     if(plan.planType != PlanTypeFreeExpired && plan.planType != PlanTypeNone){
         return YES;

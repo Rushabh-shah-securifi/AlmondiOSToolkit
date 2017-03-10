@@ -822,6 +822,9 @@ static SecurifiToolkit *toolkit_singleton = nil;
 
 // internal function used by high-level command dispatch methods for branching on local or cloud command queue
 - (BOOL)useLocalNetwork:(NSString *)almondMac {
+    if (!almondMac) {
+        return NO;
+    }
     if (!self.config.enableLocalNetworking) {
         return NO;
     }
