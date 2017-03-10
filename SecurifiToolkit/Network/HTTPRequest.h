@@ -17,7 +17,7 @@
 #endif /* HTTPRequest_h */
 
 @protocol HTTPDelegate <NSObject>
-
+@optional
 - (void) HTTPResponseReceived: (LoginResponse*) response;
 
 - (void)responseDict:(NSDictionary*)responseDict;
