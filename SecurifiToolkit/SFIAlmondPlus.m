@@ -31,17 +31,17 @@
     if (!macHex) {
         return nil;
     }
-
+    
     NSString *cleaned = [macHex stringByReplacingOccurrencesOfString:@":" withString:@""];
     NSScanner *scanner = [NSScanner scannerWithString:cleaned];
-
+    
     unsigned long long int result = 0;
     BOOL success = [scanner scanHexLongLong:&result];
     if (!success) {
         
         return @"9999999999";
     }
-
+    
     NSNumber *number = @(result);
     return number.stringValue;
 }
@@ -51,7 +51,7 @@
     if (self) {
         self.linkType = SFIAlmondPlusLinkType_cloud_local;
     }
-
+    
     return self;
 }
 
@@ -72,7 +72,7 @@
         self.ownerEmailID = [coder decodeObjectForKey:@"self.ownerEmailID"];
         self.linkType = (enum SFIAlmondPlusLinkType) [coder decodeIntForKey:@"self.linkType"];
     }
-
+    
     return self;
 }
 
@@ -111,7 +111,7 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     SFIAlmondPlus *copy = (SFIAlmondPlus *) [[[self class] allocWithZone:zone] init];
-
+    
     if (copy != nil) {
         copy.almondplusMAC = self.almondplusMAC;
         copy.almondplusName = self.almondplusName;
@@ -125,7 +125,7 @@
         copy.ownerEmailID = self.ownerEmailID;
         copy.linkType = self.linkType;
     }
-
+    
     return copy;
 }
 
@@ -133,16 +133,16 @@
     if (!almondVersion) {
         return NO;
     }
-
+    
     almondVersion = [almondVersion uppercaseString];
-
+    
     /*
-    The Almond  versions that support send logs are
-    R087 for v2
-    R073 for almond+
-    for cox we are not supporting it.
+     The Almond  versions that support send logs are
+     R087 for v2
+     R073 for almond+
+     for cox we are not supporting it.
      */
-
+    
     AlmondVersionCheckerResult result = AlmondVersionCheckerResult_cannotCompare;
     if ([almondVersion hasPrefix:@"AL2-"]) {
         result = [AlmondVersionChecker compareVersions:almondVersion currentVersion:@"AL2-R087"];
@@ -150,7 +150,7 @@
     else if ([almondVersion hasPrefix:@"AP2-"]) {
         result = [AlmondVersionChecker compareVersions:almondVersion currentVersion:@"AP2-R073"];
     }
-
+    
     return (result == AlmondVersionCheckerResult_currentSameAsLatest) || (result == AlmondVersionCheckerResult_currentOlderThanLatest);
 }
 
@@ -162,7 +162,7 @@
     //latest is what almond has, current is constant
     //AL2-R092 and above supports generic indexes
     //AP2-R086 and above supports generic indexes
-//    almondVersion = [almondVersion uppercaseString];
+    //    almondVersion = [almondVersion uppercaseString];
     BOOL result = NO;
     //"a" just to make sure internal beta's also support.
     if ([almondVersion hasPrefix:@"AL2-"]) {
@@ -182,16 +182,18 @@
 }
 -(BOOL)iotSupportFirmwareVersion:(NSString *)almondFiemware{
     NSLog(@"almondFiemware results %@",almondFiemware);
-     BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"AL2-R096c"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"A1A-R010a"];
+    BOOL result = [self compareVersionsIOT:almondFiemware supportedVersion:@"AL3-R014m"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"AL2-R096c"] || [self compareVersionsIOT:almondFiemware supportedVersion:@"A1A-R010a"];
     
     NSLog(@"results1 %d",[self compareVersionsIOT:@"AL2-R096" supportedVersion:@"AL2-R096c"]);
     NSLog(@"results1a %d",[self compareVersionsIOT:@"AL2-R096a" supportedVersion:@"AL2-R096c"]);
-     NSLog(@"results2 %d",[self compareVersionsIOT:@"AL2-R096d" supportedVersion:@"AL2-R096c"]);
-     NSLog(@"results3 %d",[self compareVersionsIOT:@"AL2-R097" supportedVersion:@"AL2-R096c"]);
-     NSLog(@"results4 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
-     NSLog(@"results5 %d",[self compareVersionsIOT:@"A1A-R010h" supportedVersion:@"A1A-R010a"]);
+    NSLog(@"results2 %d",[self compareVersionsIOT:@"AL2-R096d" supportedVersion:@"AL2-R096c"]);
+    NSLog(@"results3 %d",[self compareVersionsIOT:@"AL2-R097" supportedVersion:@"AL2-R096c"]);
+    NSLog(@"results4 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
+    NSLog(@"results5 %d",[self compareVersionsIOT:@"A1A-R010h" supportedVersion:@"A1A-R010a"]);
     NSLog(@"results6 %d",[self compareVersionsIOT:@"A1A-R009z" supportedVersion:@"A1A-R010a"]);
     NSLog(@"results7 %d",[self compareVersionsIOT:@"A1A-R009a" supportedVersion:@"A1A-R010a"]);
+    
+    NSLog(@"results8 %d",[self compareVersionsIOT:@"AL2-R096ac" supportedVersion:@"AL2-R096c"]);
     
     return result ;
 }
@@ -256,26 +258,28 @@
         return NO;
     
     NSString *supported_str = supported_alm_splits[1];
-    if(current_str.length == 6 && [cur_alm_splits[0] isEqualToString:@"AL3"]){
-       return YES;
+    if(current_str.length == 6 && ([cur_alm_splits[0] isEqualToString:@"AL3"]
+                                   || [cur_alm_splits[0] isEqualToString:@"AL2"] ||
+                                   [cur_alm_splits[0] isEqualToString:@"A1A"])){
+        return YES;
     }
     
-    if(current_str.length == 6 && ([cur_alm_splits[0] isEqualToString:@"AL2"]|| [cur_alm_splits[0] isEqualToString:@"A1A"])){
-        NSString *res = [cur_alm_splits[1] substringToIndex:NSMaxRange([cur_alm_splits[1] rangeOfComposedCharacterSequenceAtIndex:5])];
-            NSComparisonResult result = [res compare:supported_str];
-        
-        switch (result) {
-            case NSOrderedAscending:
-                return NO;
-            case NSOrderedSame:
-                return YES;
-            case NSOrderedDescending:
-                return YES;
-            default:
-                return NO;
-        }
-
-    }
+    //    if(current_str.length == 6 && ([cur_alm_splits[0] isEqualToString:@"AL2"]|| [cur_alm_splits[0] isEqualToString:@"A1A"])){
+    //        NSString *res = [cur_alm_splits[1] substringToIndex:NSMaxRange([cur_alm_splits[1] rangeOfComposedCharacterSequenceAtIndex:5])];
+    //            NSComparisonResult result = [res compare:supported_str];
+    //
+    //        switch (result) {
+    //            case NSOrderedAscending:
+    //                return NO;
+    //            case NSOrderedSame:
+    //                return YES;
+    //            case NSOrderedDescending:
+    //                return YES;
+    //            default:
+    //                return NO;
+    //        }
+    //
+    //    }
     if(!([cur_alm_splits[0] isEqualToString:@"AL3"] || [cur_alm_splits[0] isEqualToString:@"AL2"] || [cur_alm_splits[0] isEqualToString:@"A1A"]))
         return NO;
     NSLog(@"currentstr: %@, supportedstr: %@", current_str, supported_str);
@@ -297,23 +301,23 @@
     if (!other) {
         return NO;
     }
-
+    
     if (self == other) {
         return YES;
     }
-
+    
     NSString *this_mac = self.almondplusMAC;
     NSString *other_mac = other.almondplusMAC;
     if (!this_mac || !other_mac) {
         return NO;
     }
-
+    
     return [this_mac isEqualToString:other_mac];
 }
 
 + (BOOL)checkIfFirmwareIsCompatible:(SFIAlmondPlus *)almond{
-//    SFIAlmondPlus *currentAlmond = [[SecurifiToolkit sharedInstance] currentAlmond];
-//    BOOL local = [[SecurifiToolkit sharedInstance] useLocalNetwork:currentAlmond.almondplusMAC];
+    //    SFIAlmondPlus *currentAlmond = [[SecurifiToolkit sharedInstance] currentAlmond];
+    //    BOOL local = [[SecurifiToolkit sharedInstance] useLocalNetwork:currentAlmond.almondplusMAC];
     
     //Ignoring the screen when firmware is nil
     if([almond.firmware length] == 0){
