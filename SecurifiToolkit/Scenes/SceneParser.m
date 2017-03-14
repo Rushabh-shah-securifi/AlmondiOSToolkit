@@ -53,7 +53,7 @@
     if(!isMatchingAlmondOrLocal) //for cloud
         return;
 
-    //NSLog(@"main scene dict %@",mainDict);
+    NSLog(@"main scene dict %@",mainDict);
     NSDictionary *dict;
     NSString * commandType = mainDict[COMMAND_TYPE];
     
@@ -116,7 +116,7 @@
         
         NSInteger index = -1;
         for (NSDictionary *sceneDict in toolkit.scenesArray) {
-            NSLog(@"sceneDict active:: %@",sceneDict);
+            NSLog(@"sceneDict active: %@",sceneDict);
             if ([sceneDict[@"ID"] intValue] == [updatedID intValue]) {
                 index = [toolkit.scenesArray indexOfObject:sceneDict];
                 break;

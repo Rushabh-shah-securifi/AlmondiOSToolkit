@@ -185,11 +185,14 @@
     NSArray *ports = deviceDict[@"Ports"];
     NSString *telnet = deviceDict[@"Telnet"];
     NSString *Http = deviceDict[@"Http"];
+    NSString *Ssh = deviceDict[@"Ssh"];
     NSArray *ForwardRules = deviceDict[@"ForwardRules"];
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
     NSMutableArray *arr = [[NSMutableArray alloc]init];
     if([Http isEqualToString:@"1"])
         [arr addObject:@"1"];
+    if([Ssh isEqualToString:@"1"])
+        [arr addObject:@"8"];
     if([telnet isEqualToString:@"1"])
         [arr addObject:@"3"];
     if(ports.count> 0)
@@ -213,7 +216,7 @@
     
     NSString *telnet = deviceDict[@"Telnet"];
     NSString *Http = deviceDict[@"Http"];
-    
+    NSString *Ssh = deviceDict[@"Ssh"];
     NSArray *ForwardRules = deviceDict[@"ForwardRules"];
     NSArray *UpnpRules = deviceDict[@"UpnpRules"];
    
@@ -252,6 +255,9 @@
                                  @"UpnpRules1":@{@"P":upnpPorts2.count>0?@"1":@"0",
                                                 @"Tag":@"7",
                                                 @"Value":upnpPorts2},
+                                 @"Ssh":@{@"P":[Ssh isEqualToString:@"1"]?@"1":@"0",
+                                             @"Tag":@"8",
+                                             @"Value":@[]},
                                  @"MAC":deviceDict[@"MAC"]
                                  };
     
