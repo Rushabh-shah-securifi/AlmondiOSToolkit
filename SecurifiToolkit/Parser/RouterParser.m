@@ -100,6 +100,8 @@
     /*
      {"CommandType":"ChangeAlmondProperties","Success":"false","OfflineSlaves":"Downstairs","Reason":"Slave in offline","MobileInternalIndex":"2909"}
      */
+    if(genericRouterCommand == nil)
+        return;
     NSDictionary *data = nil;
     if (payload) {
         data = @{

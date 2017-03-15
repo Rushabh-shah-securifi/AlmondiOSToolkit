@@ -1089,7 +1089,17 @@ static SecurifiToolkit *toolkit_singleton = nil;
             break;
     }
 }
-
+- (void)asyncRequestChangeAlmondName:(NSString *)changedAlmondName almondMAC:(NSString *)almondMAC {
+    AlmondNameChange *req = [AlmondNameChange new];
+    req.almondMAC = almondMAC;
+    req.changedAlmondName = changedAlmondName;
+    
+    GenericCommand *cmd = [GenericCommand new];
+    cmd.commandType = CommandType_MOBILE_COMMAND;
+    cmd.command = req;
+    [self asyncSendToNetwork:cmd];
+//    [self asyncSendToCloud:cmd];
+}
 
 - (void)networkDidReceiveDynamicUpdate:(Network *)network response:(id)payload responseType:(enum CommandType)commandType {
     if (network == self.network) {
